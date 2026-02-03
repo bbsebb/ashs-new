@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: ashs-backend
+  docker:
+    compose:
+      file: ./backend/compose.yaml
+  http:
+    client:
+      service:
+        group:
+          meta-client:
+            base-url: https://graph.facebook.com
+
+  flyway:
+    create-schemas: true
+    schemas: hall_schema, staff_schema, team_schema, flyway_schema , season_schema
+    default-schema: flyway_schema
+    #    en developpement
+    validate-on-migrate: true
+    clean-disabled: false
+
+  modulith:
+    runtime:
+      flyway-enabled: true
+
+meta:
+  page-access-token: ${PAGE_ACCESS_TOKEN}
+  version: v24.0
+  page-id: 500999826723464
+
+app:
+  cors:
+    allowed-origins: http://localhost:4200
+    allowed-methods: GET, POST, PUT, DELETE, OPTIONS
+    allowed-headers: Content-Type, Authorization, Accept, Origin, X-Requested-With
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.results: TRACE
+    fr.hoenheimsports: DEBUG

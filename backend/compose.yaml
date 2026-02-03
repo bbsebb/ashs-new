@@ -1,0 +1,10 @@
+services:
+  postgres:
+    container_name: postgres-ashs-new
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=ashs-db'
+      - 'POSTGRES_PASSWORD=admin'
+      - 'POSTGRES_USER=admin'
+    ports:
+      - '5432:5432'

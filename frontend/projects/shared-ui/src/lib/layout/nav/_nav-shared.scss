@@ -1,0 +1,56 @@
+@use '@angular/material' as mat;
+
+$nav-bg: var(--mat-sys-surface-container-highest);
+$nav-color: var(--mat-sys-on-surface-container-highest);
+$active-color: var(--mat-sys-primary);
+$blur: 15px;
+
+@mixin nav-glass-container {
+  background: rgba($nav-bg, 0.1);
+  color: $nav-color;
+  backdrop-filter: blur($blur) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+}
+
+@mixin nav-item-base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  padding: 8px;
+
+  mat-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  .label {
+    font-size: 10px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+  }
+
+  &.active {
+    color: $active-color;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: 48px;
+      height: 32px;
+      border-radius: 16px;
+      z-index: -1;
+      animation: expand 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+  }
+}
+@keyframes expand {
+  from { width: 0; opacity: 0; }
+  to { width: 48px; opacity: 1; }
+}

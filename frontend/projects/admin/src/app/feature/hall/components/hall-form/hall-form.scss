@@ -1,0 +1,122 @@
+:host {
+  display: block;
+  padding: 24px;
+}
+
+.hall-form {
+  display: grid;
+  gap: 24px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: 28px;
+  border: 1px solid var(--mdc-sys-color-outline-variant, #d5cfc7);
+  background: linear-gradient(
+    135deg,
+    var(--mdc-sys-color-surface, #fcf9f6) 0%,
+    var(--mdc-sys-color-surface-container, #f4efe9) 100%
+  );
+  box-shadow: 0 24px 50px rgba(24, 18, 8, 0.12);
+}
+
+.hall-form__content {
+  display: grid;
+  gap: 24px;
+}
+
+.hall-form__header {
+  display: grid;
+  gap: 8px;
+}
+
+.hall-form__eyebrow {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  color: var(--mdc-sys-color-secondary, #6a5f52);
+}
+
+.hall-form__header h2 {
+  margin: 0;
+  font-size: clamp(24px, 2.6vw, 32px);
+  font-weight: 600;
+  color: var(--mdc-sys-color-on-surface, #2a2420);
+}
+
+.hall-form__header p {
+  margin: 0;
+  max-width: 540px;
+  color: var(--mdc-sys-color-on-surface-variant, #5f5a55);
+}
+
+.hall-form__grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.hall-form__field {
+  width: 100%;
+}
+
+.hall-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.hall-form__field--compact {
+  max-width: 220px;
+}
+
+.hall-form__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hall-form__debug {
+  max-width: 920px;
+  margin: 20px auto 0;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px dashed var(--mdc-sys-color-outline-variant, #d5cfc7);
+  color: var(--mdc-sys-color-on-surface-variant, #5f5a55);
+}
+
+.hall-form__debug summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.hall-form__debug pre {
+  margin: 12px 0 0;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (max-width: 720px) {
+  :host {
+    padding: 16px;
+  }
+
+  .hall-form {
+    padding: 24px;
+  }
+
+  .hall-form__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hall-form__field--compact {
+    max-width: none;
+  }
+
+  .hall-form__actions {
+    justify-content: stretch;
+  }
+
+  .hall-form__actions button {
+    width: 100%;
+  }
+}

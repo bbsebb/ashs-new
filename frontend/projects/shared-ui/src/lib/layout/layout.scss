@@ -1,0 +1,76 @@
+@use '@angular/material' as mat;
+
+
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+
+}
+
+.app-body {
+  display: flex;
+  flex: 1;               // PREND TOUT L'ESPACE RESTANT (100vh - 64px)
+  min-height: 0;         // IMPORTANT : permet au contenu de scroller proprement
+  overflow: hidden;
+}
+
+//Toolbar
+
+.toolbar {
+
+  flex: 0 0 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+
+
+// Content
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  // 1. On définit un padding vertical fixe (ex: 40px)
+  // 2. On calcule le padding horizontal dynamiquement
+  // max(20px, ...) garantit une marge minimale de 20px sur les petits écrans
+  padding: 40px max(20px, calc((100% - 1200px) / 2));
+  display: flex;
+  flex-direction: column;
+  min-height: 80%;
+}
+
+.mobile-mode {
+    padding-bottom: 120px;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+
+// Nav
+
+[app-bottom-bar] {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 16px; // Donne l'aspect "flottant"
+  z-index: 1000;
+  box-sizing: border-box;
+}
+
+[app-nav-rail] {
+  margin-left: 16px;
+  height: 90%;
+  width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+
+}

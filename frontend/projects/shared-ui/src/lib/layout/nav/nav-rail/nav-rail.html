@@ -1,0 +1,10 @@
+
+  <div class="rail-container">
+    @for (item of menuItems; track item.label) {
+      <a class="nav-item" [routerLink]="item.path" routerLinkActive="active" matRipple>
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span class="label">{{ item.label }}</span>
+      </a>
+    }
+  </div>
+

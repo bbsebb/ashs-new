@@ -1,0 +1,10 @@
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* Pour un défilement fluide sur iOS */
+}
+
+table {
+  width: 100%;
+}

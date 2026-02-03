@@ -1,0 +1,60 @@
+@use '@angular/material' as mat;
+.carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  outline: none; // focus visible géré par le navigateur/Mat si besoin
+}
+
+// Toutes les slides restent superposées, pas de changement de "position"
+app-media {
+  width: 100%;
+  height: auto;
+
+  position: absolute;
+  inset: 0;
+
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+
+  z-index: 1;
+  pointer-events: none; // évite de cliquer une slide "invisible"
+}
+
+app-media.active {
+  position: relative;
+  inset: auto ;
+  opacity: 1;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 10%;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  mat-icon {
+    color: white;
+    filter: drop-shadow(0 0 3px white);
+  }
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  app-media {
+    transition: none;
+  }
+}

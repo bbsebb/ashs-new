@@ -1,0 +1,20 @@
+@let type = typeSignal();
+@let media = mediaSignal();
+@let priority = prioritySignal();
+@if (type === 'photo') {
+  <img
+    [ngSrc]="media.image.src"
+    [width]="media.image.width"
+    [height]="media.image.height"
+    [priority]="priority"
+    [attr.loading]="priority ? 'eager' : 'lazy'"
+    [attr.fetchpriority]="priority ? 'high' : 'auto'"
+    alt="Instagram media">
+} @else if (type === 'video_inline' || type === 'video') {
+  <video controls preload="metadata" [poster]="media.image.src">
+    <source [src]="media.source" type="video/mp4"/>
+    Votre navigateur ne supporte pas les vidéos HTML5.
+  </video>
+} @else {
+  <img ngSrc="/feed-media-error.png" width="1024" height="1024" alt="feed media error">
+}

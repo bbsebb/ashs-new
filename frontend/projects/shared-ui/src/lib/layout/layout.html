@@ -1,0 +1,17 @@
+
+<app-header class="header"></app-header>
+
+<div class="app-body">
+  @if (!isMobile()) {
+    <nav app-nav-rail></nav>
+  }
+
+  <main class="content" [class.mobile-mode]="isMobile()">
+    <router-outlet></router-outlet>
+    <app-footer class="footer"></app-footer>
+  </main>
+
+  @if (isMobile()) {
+    <nav app-bottom-bar></nav>
+  }
+</div>

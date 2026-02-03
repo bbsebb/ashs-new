@@ -1,0 +1,26 @@
+@use '@angular/material' as mat;
+
+.notification-container {
+  display: flex;
+}
+
+.info-notification {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-secondary),
+    supporting-text-color:var(--mat-sys-on-secondary),
+  ));
+}
+
+.error-notification {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-error-container),
+    supporting-text-color:var(--mat-sys-on-error-container),
+  ));
+}
+
+.success-notification {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-tertiary-container),
+    supporting-text-color:var(--mat-sys-on-tertiary-container),
+  ));
+}

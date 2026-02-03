@@ -1,0 +1,60 @@
+@use '@angular/material' as mat;
+
+.error-card {
+  margin: 10vh auto;
+  max-width: 720px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.error-icon {
+  color: var(--mat-sys-error);
+  flex: 0 0 auto;
+}
+
+.texts {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.message {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--mat-sys-error) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mat-sys-error) 25%, transparent);
+  color: var(--mat-sys-on-surface);
+}
+
+.message-muted {
+  margin-left: 6px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,13 @@
+@if (isLoading()) {
+  <app-waiting-data />
+} @else if (error()) {
+  <app-error-data dataName="médias" (onRetry)="retry()"   />
+} @else {
+  <div class="feeds-container">
+    @for (feed of feedsSignal(); track feed.id) {
+      <app-feed [feed]="feed"></app-feed>
+    } @empty {
+      <p>Aucun média actuellement</p>
+    }
+  </div>
+}

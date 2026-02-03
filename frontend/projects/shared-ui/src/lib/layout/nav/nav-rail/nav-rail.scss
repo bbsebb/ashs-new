@@ -1,0 +1,19 @@
+@use '../nav-shared' as shared;
+// Nav
+// --- DESKTOP : NAVIGATION RAIL ---
+  .rail-container {
+    @include shared.nav-glass-container;
+    min-height: 500px; // Flotte verticalement
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 20px 0;
+  }
+
+// --- ITEM STYLING ---
+.nav-item {
+  @include shared.nav-item-base;
+}
+
+

@@ -1,0 +1,40 @@
+.media-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 220px;
+
+  /* Grid -> Flex (centrage) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  /* Material 3 (tokens système) */
+  background: color-mix(in srgb, var(--mat-sys-surface-container) 94%, transparent);
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.media-placeholder:hover {
+  background: color-mix(in srgb, var(--mat-sys-surface-container) 91%, transparent);
+}
+
+.media-placeholder:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--mat-sys-primary) 70%, transparent);
+  outline-offset: 2px;
+}
+
+.media-placeholder__text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: color-mix(in srgb, var(--mat-sys-on-surface) 70%, transparent);
+  line-height: 1.3;
+  text-align: center;
+}
+
+.media-placeholder__hint {
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--mat-sys-on-surface-variant) 70%, transparent);
+}

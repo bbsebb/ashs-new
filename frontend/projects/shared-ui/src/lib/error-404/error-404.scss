@@ -1,0 +1,77 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+}
+
+.error-404 {
+  position: relative;
+  min-height: 70vh;
+  padding: clamp(24px, 6vw, 72px) 16px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.card {
+  width: min(720px, 100%);
+  background: color-mix(in srgb, var(--mat-sys-surface-container) 80%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-label-large);
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.eyebrow mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.code {
+  font: var(--mat-sys-display-large);
+  font-size: clamp(72px, 18vw, 140px);
+  line-height: 0.9;
+  letter-spacing: -4px;
+  margin: 0;
+  color: var(--mat-sys-primary);
+  text-shadow: 0 18px 36px color-mix(in srgb, var(--mat-sys-primary) 30%, transparent);
+}
+
+.title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+  color: var(--mat-sys-on-surface);
+}
+
+.message {
+  margin: 0 auto;
+  max-width: 480px;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}

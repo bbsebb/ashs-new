@@ -26,6 +26,9 @@ jobs:
           distribution: "temurin"
           cache: "gradle"
 
+      - name: Make Gradle wrapper executable
+        run: chmod +x backend/gradlew
+
       # 1. Build du JAR avec Gradle (dans backend/)
       - name: Build with Gradle
         working-directory: backend

@@ -45,6 +45,36 @@ jobs:
           EXPOSE 8080
           ENTRYPOINT ["java", "-jar", "app.jar"]
           EOF
+      # 2bis. Build des frontends Angular (dans frontend/)
+      - name: Set up Node.js (npm)
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Angular (shared-ui + app + admin)
+        working-directory: frontend
+        run: npm run build:all
+
+      - name: Create Dockerfiles for Angular apps
+        working-directory: frontend
+        run: |
+          cat <<'EOF' > Dockerfile.app
+          FROM nginx:alpine
+          COPY dist/app /usr/share/nginx/html
+          EXPOSE 80
+          EOF
+
+          cat <<'EOF' > Dockerfile.admin
+          FROM nginx:alpine
+          COPY dist/admin /usr/share/nginx/html
+          EXPOSE 80
+          EOF
 
       # 3. Connexion au GitHub Container Registry
       - name: Log in to the Container registry
@@ -64,25 +94,50 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
+      # 4bis. Build et Push des images frontends (contexte = frontend/)
+      - name: Build and push Angular APP image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.app
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend-app:staging
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend-app:${{ github.sha }}
+
+      - name: Build and push Angular ADMIN image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.admin
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend-admin:staging
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend-admin:${{ github.sha }}
+
       # 5. Création du docker-compose.yml dans staging/
       - name: Generate Deployment Package
         run: |
           mkdir -p staging
           LOWER_IMAGE_NAME=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
-          IMAGE_URL="${LOWER_IMAGE_NAME}:${{ github.sha }}"
+
+          BACKEND_IMAGE_URL="${LOWER_IMAGE_NAME}:${{ github.sha }}"
+          FRONT_APP_IMAGE_URL="${LOWER_IMAGE_NAME}-frontend-app:${{ github.sha }}"
+          FRONT_ADMIN_IMAGE_URL="${LOWER_IMAGE_NAME}-frontend-admin:${{ github.sha }}"
 
           cat <<EOF > staging/docker-compose.yml
           version: '3.8'
           services:
             app:
-              image: ${IMAGE_URL}
+              image: ${BACKEND_IMAGE_URL}
               container_name: spring-app-staging
               ports:
                 - "8080:8080"
               environment:
                 - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/myapp
-                - SPRING_DATASOURCE_USERNAME=<db_user>
-                - SPRING_DATASOURCE_PASSWORD=<db_password>
+                - SPRING_DATASOURCE_USERNAME=test
+                - SPRING_DATASOURCE_PASSWORD=test
+                - PAGE_ACCESS_TOKEN=\${PAGE_ACCESS_TOKEN}
                 - SPRING_FLYWAY_ENABLED=true
               depends_on:
                 db:
@@ -93,13 +148,25 @@ jobs:
               container_name: postgres-db-staging
               environment:
                 - POSTGRES_DB=myapp
-                - POSTGRES_USER=<db_user>
-                - POSTGRES_PASSWORD=<db_password>
+                - POSTGRES_USER=test
+                - POSTGRES_PASSWORD=test
               healthcheck:
-                test: ["CMD-SHELL", "pg_isready -U <db_user> -d myapp"]
+                test: ["CMD-SHELL", "pg_isready -U "\$POSTGRES_USER" -d "\$POSTGRES_DB""]
                 interval: 5s
                 timeout: 5s
                 retries: 5
+
+            frontend-app:
+              image: ${FRONT_APP_IMAGE_URL}
+              container_name: angular-app-staging
+              ports:
+                - "8081:80"
+
+            frontend-admin:
+              image: ${FRONT_ADMIN_IMAGE_URL}
+              container_name: angular-admin-staging
+              ports:
+                - "8082:80"
           EOF
 
       # 6. Upload du package de déploiement

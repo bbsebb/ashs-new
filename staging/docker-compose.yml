@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    image: ghcr.io/bbsebb/ashs-new:ea06cd05e11280bb18f2e134eccb030dd381c0b4
+    container_name: spring-app-staging
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/myapp
+      - SPRING_DATASOURCE_USERNAME=test
+      - SPRING_DATASOURCE_PASSWORD=test
+      - SPRING_FLYWAY_ENABLED=true
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:latest
+    container_name: postgres-db-staging
+    environment:
+      - POSTGRES_DB=myapp
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 5

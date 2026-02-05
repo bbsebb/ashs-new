@@ -10,8 +10,8 @@ export class NotificationService {
 
   private snackBar = inject(MatSnackBar);
 
-  show(message: string,errorType:ErrorType) {
-    switch (errorType) {
+  show(message: string, levelType:LevelType) {
+    switch (levelType) {
       case 'info':
         this.snackBar.openFromComponent<Notification,string>(Notification, this.buildNotificationConfig(message,'info',0))
         break;
@@ -24,7 +24,7 @@ export class NotificationService {
     }
   }
 
-  private buildNotificationConfig(message: string,level:ErrorType = 'info',duration = 5000): MatSnackBarConfig<string> {
+  private buildNotificationConfig(message: string,level:LevelType = 'info',duration = 5000): MatSnackBarConfig<string> {
     return {
       panelClass: [`${level}-notification`],
       data: message,
@@ -34,5 +34,5 @@ export class NotificationService {
   }
 }
 
-export type ErrorType = 'info' | 'error' | 'success';
+export type LevelType = 'info' | 'error' | 'success';
 

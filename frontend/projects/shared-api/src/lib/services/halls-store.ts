@@ -1,9 +1,8 @@
-import {computed, effect, inject, Injectable, Signal} from '@angular/core';
+import {computed, inject, Injectable, Signal} from '@angular/core';
 import {HallGateway} from './hall-gateway';
 import {CreateHallDTO} from './dtos/create-hall-dto';
-import {Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {Hall} from '@shared-domain';
-
 
 
 @Injectable({
@@ -11,19 +10,25 @@ import {Hall} from '@shared-domain';
 })
 export class HallsStore {
   private readonly hallGateway = inject(HallGateway);
-
-  private readonly hallsResource= this.hallGateway.getHalls();
-  halls = this.hallsResource.value;
+  private readonly hallsResource=  this.hallGateway.getHalls();
+  readonly halls: Signal<Hall[]> = computed(() => this.hallsResource.hasValue() ? this.hallsResource.value() : []);
   isLoading = this.hallsResource.isLoading;
   error = this.hallsResource.error;
 
 
-  hallById(id: Signal<string>): Signal<Hall | undefined> {
-    return computed(() => this.hallsResource.value().find(hall => hall.id === id()));
+  hallById(id: Signal<string | undefined>): Signal<Hall | undefined> {
+    return computed(() => {
+      const hallId = id();
+      if (!hallId) return undefined;
+
+      return this.halls().find((hall) => hall.id === hallId);
+    });
   }
 
   createHall(createHallDTO: CreateHallDTO):Observable<Hall> {
-    return this.hallGateway.addHall(createHallDTO);
+    return this.hallGateway.addHall(createHallDTO).pipe(
+      tap(() => this.reload())
+    );
   }
 
   reload():void {
@@ -31,4 +36,15 @@ export class HallsStore {
   }
 
 
+  deleteById(id: string): Observable<void> {
+    return this.hallGateway.deleteById(id).pipe(
+      tap(() => this.reload())
+    );
+  }
+
+  updateHall(id: string,   createHallDTO: CreateHallDTO) {
+    return this.hallGateway.editHall(id,createHallDTO).pipe(
+      tap(() => this.reload())
+    );
+  }
 }

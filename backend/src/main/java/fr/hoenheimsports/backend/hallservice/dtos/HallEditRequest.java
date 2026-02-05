@@ -1,13 +1,11 @@
 package fr.hoenheimsports.backend.hallservice.dtos;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
-import java.util.UUID;
 
-public record HallUpdateRequest (
+public record HallEditRequest(
         @Size(message = "La nom de la salle ne doit pas dépasser 50 caractères", max = 50)
         @NotBlank(message = "La nom de la salle est obligatoire")
         String name,

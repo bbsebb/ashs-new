@@ -1,4 +1,4 @@
-import {Hall} from '../../../../../shared-domain/src/lib/hall/models/hall';
+import {Hall} from '@shared-domain';
 
 
 export type CreateHallDTO = Omit<Hall, 'id'>;

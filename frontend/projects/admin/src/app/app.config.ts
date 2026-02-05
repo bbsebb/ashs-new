@@ -1,8 +1,8 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {ApplicationConfig, provideBrowserGlobalErrorListeners} from '@angular/core';
 import {provideRouter, withComponentInputBinding} from '@angular/router';
 
-import { routes } from './app.routes';
-import {provideSharedIcons, MENU_CONFIG} from '@shared-ui';
+import {routes} from './app.routes';
+import {MENU_CONFIG, provideSharedIcons} from '@shared-ui';
 import {menuItems} from './core/layout/menu-items';
 
 import {environment} from '@environment';

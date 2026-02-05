@@ -4,7 +4,7 @@
 } @else if(error()) {
   <app-error-data dataName="salles" (onRetry)="retry()" />
 } @else if (!hall) {
-  <p>Salle introuvable</p>
+  <p>Aucune salle</p>
 } @else {
 <mat-card appearance="outlined" class="card">
   <mat-card-header class="header">

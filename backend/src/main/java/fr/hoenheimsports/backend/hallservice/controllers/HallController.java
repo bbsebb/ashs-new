@@ -2,7 +2,7 @@ package fr.hoenheimsports.backend.hallservice.controllers;
 
 import fr.hoenheimsports.backend.hallservice.dtos.HallCreateRequest;
 import fr.hoenheimsports.backend.hallservice.dtos.HallResponse;
-import fr.hoenheimsports.backend.hallservice.dtos.HallUpdateRequest;
+import fr.hoenheimsports.backend.hallservice.dtos.HallEditRequest;
 import fr.hoenheimsports.backend.hallservice.services.HallService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +34,8 @@ public class HallController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HallResponse> updateHall(@PathVariable UUID id,@RequestBody @Valid HallUpdateRequest hallUpdateRequest) {
-        return ResponseEntity.ok(hallService.updateHall(id,hallUpdateRequest));
+    public ResponseEntity<HallResponse> editHall(@PathVariable UUID id, @RequestBody @Valid HallEditRequest hallEditRequest) {
+        return ResponseEntity.ok(hallService.editHall(id, hallEditRequest));
     }
 
     @DeleteMapping("/{id}")

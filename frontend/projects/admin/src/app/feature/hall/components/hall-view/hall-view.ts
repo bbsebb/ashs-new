@@ -1,11 +1,10 @@
-import {Component, computed, effect, inject, input, Signal} from '@angular/core';
+import {Component, effect, inject, input, Signal} from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
 import {Hall} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
 import {HallsStore} from '@shared-api';
 import {ErrorData, LoadingData} from '@shared-ui';
-import {JsonPipe} from '@angular/common';
 
 @Component({
   selector: 'app-hall-view',
@@ -18,8 +17,7 @@ import {JsonPipe} from '@angular/common';
     MatCardHeader,
     RouterLink,
     ErrorData,
-    LoadingData,
-    JsonPipe
+    LoadingData
   ],
   templateUrl: './hall-view.html',
   styleUrl: './hall-view.scss',
@@ -31,7 +29,7 @@ export class HallView {
   isLoading = this.hallsStore.isLoading;
   error = this.hallsStore.error;
   id = input.required<string>();
-  hallSignal: Signal<Hall | undefined> =this.hallsStore.hallById(this.id);
+  hallSignal: Signal<Hall | undefined>  =  this.hallsStore.hallById(this.id);
   constructor() {
     effect(() => {
       if (!this.isLoading() && !this.error() && !this.hallSignal()) {

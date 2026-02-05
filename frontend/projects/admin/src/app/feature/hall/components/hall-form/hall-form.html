@@ -1,13 +1,13 @@
 <section class="hall-form">
-  <div class="hall-form__header">
-    <p class="hall-form__eyebrow">Gestion des salles</p>
-    <h2>Informations de la salle</h2>
-    <p>Renseignez le nom et l'adresse compl&egrave;te pour l'enregistrement.</p>
-  </div>
+  <app-page-title
+    eyebrow="Gestion des salles"
+    title="Informations de la salle"
+    subtitle="Renseignez le nom et l'adresse complète pour l'enregistrement."
+  />
 
-  <form class="hall-form__content" (submit)="submitForm($event); $event.preventDefault()">
-    <div class="hall-form__grid">
-    <mat-form-field class="hall-form__field hall-form__field--full" appearance="outline">
+  <form class="content" autocomplete="off"  (submit)="submitForm($event); $event.preventDefault()">
+    <div class="form-fields">
+    <mat-form-field class="field field-full" appearance="outline">
       <mat-label>Nom de la salle</mat-label>
       <input matInput type="text" [formField]="hallForm.name" autocomplete="organization"/>
       @if (shouldShowError(hallForm.name)) {
@@ -17,7 +17,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="hall-form__field hall-form__field--full" appearance="outline">
+    <mat-form-field class="field field-full" appearance="outline">
       <mat-label>Rue et num&eacute;ro</mat-label>
       <input matInput type="text" [formField]="hallForm.addressStreet" autocomplete="street-address"/>
       @if (shouldShowError(hallForm.addressStreet)) {
@@ -27,7 +27,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="hall-form__field hall-form__field--compact" appearance="outline">
+    <mat-form-field class="field field-compact" appearance="outline">
       <mat-label>Code postal</mat-label>
       <input matInput type="text" [formField]="hallForm.addressPostalCode" autocomplete="postal-code"/>
       @if (shouldShowError(hallForm.addressPostalCode)) {
@@ -38,7 +38,7 @@
 
     </mat-form-field>
 
-    <mat-form-field class="hall-form__field" appearance="outline">
+    <mat-form-field class="field" appearance="outline">
       <mat-label>Ville</mat-label>
       <input matInput type="text" [formField]="hallForm.addressCity" autocomplete="address-level2"/>
       @if (shouldShowError(hallForm.addressCity)) {
@@ -48,7 +48,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field class="hall-form__field" appearance="outline">
+    <mat-form-field class="field" appearance="outline">
       <mat-label>Pays</mat-label>
       <input matInput type="text" [formField]="hallForm.addressCountry" autocomplete="country-name"/>
       @if (shouldShowError(hallForm.addressCountry)) {
@@ -67,17 +67,18 @@
         }
     }
 
-    <div class="hall-form__actions">
+    <div class="actions">
 
       <app-form-submit-button
         [disabled]="hallForm().submitting() || hallForm().invalid()"
-        content="Enregistrer"
+        [content]="isCreateForm() ? 'Enregistrer' : 'Modifier'"
         [submitting]="hallForm().submitting()"  />
+      <button mat-button type="button" routerLink="/halls">Retour</button>
     </div>
   </form>
 </section>
 
-<details class="hall-form__debug">
+<details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
   <pre>{{ hallModel() | json }}</pre>
 </details>

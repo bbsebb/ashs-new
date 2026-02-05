@@ -7,10 +7,7 @@
     "declaration": true,
     "declarationMap": true,
     "types": [],
-    "paths": {
-      "@shared-domain": ["../../dist/shared-domain"],
-      "@shared-ui": ["../../dist/shared-ui"]
-    }
+
   },
   "include": [
     "src/**/*.ts"

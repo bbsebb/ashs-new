@@ -3,15 +3,15 @@ import {FeedDTO} from '../../models/feedDTO';
 import {Feed} from '../feed/feed';
 import {MetaStore} from '../../meta-store';
 import {LoadingData, ErrorData} from '@shared-ui';
-import {retry} from 'rxjs';
+
 
 
 @Component({
   selector: 'app-feeds-list',
   imports: [
     Feed,
-    LoadingData,
-    ErrorData
+    ErrorData,
+    LoadingData
   ],
   templateUrl: './feeds-list.html',
   styleUrl: './feeds-list.scss',

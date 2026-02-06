@@ -66,13 +66,13 @@ jobs:
         run: |
           cat <<'EOF' > Dockerfile.app
           FROM nginx:alpine
-          COPY dist/app /usr/share/nginx/html
+          COPY dist/app/browser /usr/share/nginx/html
           EXPOSE 80
           EOF
 
           cat <<'EOF' > Dockerfile.admin
           FROM nginx:alpine
-          COPY dist/admin /usr/share/nginx/html
+          COPY dist/admin/browser /usr/share/nginx/html
           EXPOSE 80
           EOF
 
@@ -151,7 +151,7 @@ jobs:
                 - POSTGRES_USER=test
                 - POSTGRES_PASSWORD=test
               healthcheck:
-                test: ["CMD-SHELL", "pg_isready -U "\$POSTGRES_USER" -d "\$POSTGRES_DB""]
+                test: ["CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
                 interval: 5s
                 timeout: 5s
                 retries: 5

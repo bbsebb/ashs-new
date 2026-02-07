@@ -2,7 +2,7 @@ name: CI/CD - Dynamic Dockerfile and Compose
 
 on:
   push:
-    branches: ["main"]
+    branches: ["staging"]
 
 env:
   REGISTRY: ghcr.io

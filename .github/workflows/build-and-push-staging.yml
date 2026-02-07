@@ -64,15 +64,44 @@ jobs:
       - name: Create Dockerfiles for Angular apps
         working-directory: frontend
         run: |
+          # Nginx config: SPA fallback (Angular Router deep links)
+          cat <<'EOF' > nginx.app.conf
+          server {
+            listen 80;
+            server_name _;
+            root /usr/share/nginx/html;
+            index index.html;
+          
+            location / {
+              try_files $uri $uri/ /index.html;
+            }
+          }
+          EOF
+          
+          cat <<'EOF' > nginx.admin.conf
+          server {
+            listen 80;
+            server_name _;
+            root /usr/share/nginx/html;
+            index index.html;
+          
+            location / {
+              try_files $uri $uri/ /index.html;
+            }
+          }
+          EOF
+          
           cat <<'EOF' > Dockerfile.app
           FROM nginx:alpine
           COPY dist/app/browser /usr/share/nginx/html
+          COPY nginx.app.conf /etc/nginx/conf.d/default.conf
           EXPOSE 80
           EOF
-
+          
           cat <<'EOF' > Dockerfile.admin
           FROM nginx:alpine
           COPY dist/admin/browser /usr/share/nginx/html
+          COPY nginx.admin.conf /etc/nginx/conf.d/default.conf
           EXPOSE 80
           EOF
 

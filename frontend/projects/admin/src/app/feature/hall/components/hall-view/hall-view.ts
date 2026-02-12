@@ -1,23 +1,15 @@
-import {Component, effect, inject, input, Signal} from '@angular/core';
-import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
-import {MatButton} from '@angular/material/button';
-import {Hall} from '@shared-domain';
-import {Router, RouterLink} from '@angular/router';
+import {Component, effect, inject, input} from '@angular/core';
+import {Router} from '@angular/router';
 import {HallsStore} from '@shared-api';
 import {ErrorData, LoadingData} from '@shared-ui';
+import {HallCard} from '../hall-card/hall-card';
 
 @Component({
   selector: 'app-hall-view',
   imports: [
-    MatCard,
-    MatCardTitle,
-    MatCardContent,
-    MatButton,
-    MatCardActions,
-    MatCardHeader,
-    RouterLink,
     ErrorData,
-    LoadingData
+    LoadingData,
+    HallCard
   ],
   templateUrl: './hall-view.html',
   styleUrl: './hall-view.scss',
@@ -26,10 +18,14 @@ import {ErrorData, LoadingData} from '@shared-ui';
 export class HallView {
   private readonly hallsStore = inject(HallsStore);
   private readonly router = inject(Router);
+
+  id = input<string>();
+  hallSignal = this.hallsStore.hallById(this.id);
+
   isLoading = this.hallsStore.isLoading;
   error = this.hallsStore.error;
-  id = input.required<string>();
-  hallSignal: Signal<Hall | undefined>  =  this.hallsStore.hallById(this.id);
+
+
   constructor() {
     effect(() => {
       if (!this.isLoading() && !this.error() && !this.hallSignal()) {

@@ -39,8 +39,8 @@ public class HallController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void>  deleteHall(@PathVariable UUID id) {
-        hallService.deleteHall(id);
+    public ResponseEntity<Void> deleteHallById(@PathVariable UUID id) {
+        hallService.deleteHallById(id);
         return ResponseEntity.noContent().build();
     }
 

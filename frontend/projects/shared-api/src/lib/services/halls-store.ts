@@ -3,6 +3,7 @@ import {HallGateway} from './hall-gateway';
 import {CreateHallDTO} from './dtos/create-hall-dto';
 import {Observable, tap} from 'rxjs';
 import {Hall} from '@shared-domain';
+import {EditHallDTO} from './dtos/edit-hall-dto';
 
 
 @Injectable({
@@ -42,7 +43,7 @@ export class HallsStore {
     );
   }
 
-  updateHall(id: string,   createHallDTO: CreateHallDTO) {
+  updateHall(id: string,   createHallDTO: EditHallDTO) {
     return this.hallGateway.editHall(id,createHallDTO).pipe(
       tap(() => this.reload())
     );

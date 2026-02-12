@@ -1,4 +1,4 @@
-<section class="hall-form">
+<section class="form">
   <app-page-title
     eyebrow="Gestion des salles"
     title="Informations de la salle"
@@ -10,52 +10,42 @@
     <mat-form-field class="field field-full" appearance="outline">
       <mat-label>Nom de la salle</mat-label>
       <input matInput type="text" [formField]="hallForm.name" autocomplete="organization"/>
-      @if (shouldShowError(hallForm.name)) {
-        <mat-error>
-          {{ errorMessage(hallForm.name, 'Le nom de la salle est requis.') }}
-        </mat-error>
-      }
+      <mat-error *appError="hallForm.name; let errorMsg">
+        {{errorMsg}}
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field class="field field-full" appearance="outline">
       <mat-label>Rue et num&eacute;ro</mat-label>
       <input matInput type="text" [formField]="hallForm.addressStreet" autocomplete="street-address"/>
-      @if (shouldShowError(hallForm.addressStreet)) {
-        <mat-error>
-          {{ errorMessage(hallForm.addressStreet, 'La rue est requise.') }}
-        </mat-error>
-      }
+      <mat-error *appError="hallForm.addressStreet; let errorMsg">
+        {{errorMsg}}
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field class="field field-compact" appearance="outline">
       <mat-label>Code postal</mat-label>
       <input matInput type="text" [formField]="hallForm.addressPostalCode" autocomplete="postal-code"/>
-      @if (shouldShowError(hallForm.addressPostalCode)) {
-        <mat-error>
-          {{ errorMessage(hallForm.addressPostalCode, 'Le code postal est requis.') }}
-        </mat-error>
-      }
+      <mat-error *appError="hallForm.addressPostalCode; let errorMsg">
+        {{errorMsg}}
+      </mat-error>
 
     </mat-form-field>
 
     <mat-form-field class="field" appearance="outline">
       <mat-label>Ville</mat-label>
       <input matInput type="text" [formField]="hallForm.addressCity" autocomplete="address-level2"/>
-      @if (shouldShowError(hallForm.addressCity)) {
-        <mat-error>
-          {{ errorMessage(hallForm.addressCity, 'La ville est requise.') }}
-        </mat-error>
-      }
+      <mat-error *appError="hallForm.addressCity; let errorMsg">
+        {{errorMsg}}
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field class="field" appearance="outline">
       <mat-label>Pays</mat-label>
       <input matInput type="text" [formField]="hallForm.addressCountry" autocomplete="country-name"/>
-      @if (shouldShowError(hallForm.addressCountry)) {
-        <mat-error>
-          {{ errorMessage(hallForm.addressCountry, 'Le pays est requis.') }}
-        </mat-error>
-      }
+      <mat-error *appError="hallForm.addressCountry; let errorMsg">
+        {{errorMsg}}
+      </mat-error>
     </mat-form-field>
     </div>
     @let globalErrors = hallForm().errors();
@@ -80,5 +70,5 @@
 
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <pre>{{ hallModel() | json }}</pre>
+  <app-hall-card [hall]="hallPreview()" [withActions]="false"/>
 </details>

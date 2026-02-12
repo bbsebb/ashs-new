@@ -1,28 +1,29 @@
 import {Component, computed, effect, inject, input, Signal, signal, WritableSignal} from '@angular/core';
 
 import {FieldTree, form, FormField, maxLength, required, submit} from '@angular/forms/signals';
-import {JsonPipe} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 
 import {firstValueFrom, tap} from 'rxjs';
-import {CreateHallDTO, FormErrorHandleService, HallsStore} from '@shared-api'
-import {FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
+import {FormErrorHandleService, HallsStore} from '@shared-api'
+import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Hall} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
+import {HallCard} from '../hall-card/hall-card';
 
 @Component({
   selector: 'app-hall-form',
   imports: [
     FormField,
-    JsonPipe,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     FormSubmitButton,
     RouterLink,
-    PageTitle
+    PageTitle,
+    FormFieldErrorDirective,
+    HallCard
   ],
   templateUrl: './hall-form.html',
   styleUrl: './hall-form.scss',
@@ -38,7 +39,7 @@ export class HallForm {
   hallSignal: Signal<Hall | undefined> = this.hallsStore.hallById(this.id);
   isCreateForm = computed(() => !this.id());  // Or it's a "edit" form if id is defined.
   hallModel = this.buildModel();
-
+  hallPreview = computed(() =>  this.hallModel() as Hall);
   hallForm = this.buildForm();
 
   constructor() {
@@ -54,8 +55,8 @@ export class HallForm {
     });
   }
 
-  private buildModel(): WritableSignal<CreateHallDTO> {
-    return signal<CreateHallDTO>({
+  private buildModel(): WritableSignal<HallFormeModel> {
+    return signal<HallFormeModel>({
       name: '',
       addressStreet: '',
       addressCity: '',
@@ -64,7 +65,7 @@ export class HallForm {
     })
   }
 
-  private buildForm(): FieldTree<CreateHallDTO> {
+  private buildForm(): FieldTree<HallFormeModel> {
     return form(this.hallModel, (path) => {
       required(path.name, {message: 'Le nom de la salle est requis.'});
       maxLength(path.name, 50, {message: 'Le nom de la salle ne doit pas dépasser 50 caractères.'});
@@ -84,15 +85,6 @@ export class HallForm {
   }
 
 
-  protected shouldShowError(field: FieldTree<unknown>): boolean {
-    const state = field();
-    return state.invalid() && (state.touched() || state.dirty());
-  }
-
-  protected errorMessage(field: FieldTree<unknown>, fallback: string): string {
-    const [first] = field().errors();
-    return first?.message ?? fallback;
-  }
 
 
   protected submitForm(event: Event) {
@@ -118,8 +110,7 @@ export class HallForm {
     });
 
   }
-
-
 }
 
+type HallFormeModel = Omit<Hall, 'id'>;
 

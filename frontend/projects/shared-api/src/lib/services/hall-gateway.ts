@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 import {CreateHallDTO} from './dtos/create-hall-dto';
 import {Hall} from '@shared-domain';
 import {APP_CONFIG} from '../configs/app-config';
+import {EditHallDTO} from './dtos/edit-hall-dto';
 
 
 @Injectable({
@@ -28,7 +29,7 @@ export class HallGateway {
     return this.http.delete<void>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`);
   }
 
-  editHall(id: string, createHallDTO: CreateHallDTO) {
+  editHall(id: string, createHallDTO: EditHallDTO) {
     return this.http.put<void>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`, createHallDTO);
   }
 }

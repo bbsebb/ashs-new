@@ -4,6 +4,9 @@ import {Error404} from '@shared-ui';
 import {HallsList} from './feature/hall/components/halls-list/halls-list';
 import {HallForm} from './feature/hall/components/hall-form/hall-form';
 import {HallView} from './feature/hall/components/hall-view/hall-view';
+import {SeasonsList} from './feature/season/components/seasons-list/seasons-list';
+import {SeasonForm} from './feature/season/components/season-form/season-form';
+import {SeasonView} from './feature/season/components/season-view/season-view';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'halls', pathMatch: 'full'},
@@ -14,6 +17,13 @@ export const routes: Routes = [
     { path: ':id/edit', component: HallForm },
     { path: ':id', component: HallView },
   ]},
+  {path: 'seasons',
+    children : [
+      { path: '', component: SeasonsList },       // /halls
+      { path: 'create', component: SeasonForm },
+      { path: ':id/edit', component: SeasonForm },
+      { path: ':id', component: SeasonView },
+    ]},
   {path: 'mentions-legales', component: MentionsLegales},
   {path: 'rgpd', component: Rgpd},
   {path: '404', component: Error404},

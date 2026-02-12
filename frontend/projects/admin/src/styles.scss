@@ -5,7 +5,7 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
-
+@use './styles/forms';
 html {
   height: 100%;
   @include mat.theme((
@@ -36,3 +36,4 @@ body {
   height: 100%;
 }
 /* You can add global styles to this file, and also import other style files */
+

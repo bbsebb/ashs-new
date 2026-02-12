@@ -13,4 +13,4 @@ export * from './lib/confirmation-dialog/dialog-service';
 export * from './lib/confirmation-dialog/confirmation-dialog';
 export * from './lib/form-submit-button/form-submit-button';
 export * from './lib/page-title/page-title'
-
+export * from './lib/form-field-error/form-field-error'

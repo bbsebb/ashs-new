@@ -57,7 +57,7 @@ public class HallService {
         return hallMapper.toDto(hallRepository.save(hall));
     }
 
-    public void deleteHall(UUID uuid) {
+    public void deleteHallById(UUID uuid) {
         log.debug("Tentative de suppression de la salle avec l'ID : {}", uuid);
         var hall = hallRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La salle n'a pas été trouvé ou n'existe plus."));
         hallRepository.delete(hall);

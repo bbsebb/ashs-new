@@ -1,0 +1,49 @@
+<section class="form">
+  <app-page-title
+    eyebrow="Gestion des saisons"
+    title="Informations d'une saison"
+    subtitle="Renseignez les dates de début et de fin pour l'enregistrement."
+  />
+
+  <form class="content" autocomplete="off"  (submit)="submitForm($event); $event.preventDefault()">
+    <div class="form-fields">
+      <mat-form-field class="field field-full" appearance="outline">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input   [rangePicker]="picker">
+          <input matStartDate [formField]="seasonForm.startDate" placeholder="Start date">
+          <input matEndDate [formField]="seasonForm.endDate" placeholder="End date">
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+        <mat-error *appError="seasonForm.startDate; let errorMsg">
+          {{errorMsg}}
+        </mat-error>
+      </mat-form-field>
+
+    </div>
+    @let globalErrors = seasonForm().errors();
+    @if (globalErrors.length > 0) {
+      @for(globalError of globalErrors; track globalError.kind) {
+        <mat-error class="alert alert-danger">
+          {{ globalError.message }}
+        </mat-error>
+      }
+    }
+
+    <div class="actions">
+
+      <app-form-submit-button
+        [disabled]="seasonForm().submitting() || seasonForm().invalid()"
+        [content]="isCreateForm() ? 'Enregistrer' : 'Modifier'"
+        [submitting]="seasonForm().submitting()"  />
+      <button mat-button type="button" routerLink="/seasons">Retour</button>
+    </div>
+  </form>
+</section>
+
+<details class="debug">
+  <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
+  <pre>{{ seasonForm().value() | json }}</pre>
+  <app-season-card [season]="seasonPreview()" [withActions]="false"/>
+</details>

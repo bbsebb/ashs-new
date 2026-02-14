@@ -8,3 +8,10 @@ export function dateToYyyyMmDd(date: Date): string {
   const d = pad2(date.getDate());
   return `${y}-${m}-${d}`;
 }
+
+export function dateToDdMmYyyy(date: Date): string {
+  const y = date.getFullYear();
+  const m = pad2(date.getMonth() + 1);
+  const d = pad2(date.getDate());
+  return `${d}-${m}-${y}`;
+}

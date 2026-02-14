@@ -3,7 +3,14 @@ import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitl
 import {MatButton} from "@angular/material/button";
 import {MatError, MatFormField, MatInputModule, MatLabel} from "@angular/material/input";
 import {Router, RouterLink} from "@angular/router";
-import {CreateSeasonDTO, dateToYyyyMmDd, EditSeasonDTO, FormErrorHandleService, SeasonsStore} from '@shared-api';
+import {
+  CreateSeasonDTO,
+  dateToDdMmYyyy,
+  dateToYyyyMmDd,
+  EditSeasonDTO,
+  FormErrorHandleService,
+  SeasonsStore
+} from '@shared-api';
 import {Season} from '@shared-domain';
 import {FieldTree, form, FormField, submit} from '@angular/forms/signals';
 import {firstValueFrom, tap} from 'rxjs';
@@ -62,14 +69,13 @@ export class SeasonForm {
     effect(() => {
       const season = this.seasonSignal();
       if (season) {
-        console.log(season);
         this.seasonModel.set(this.mapToSeasonFormModel(season))
       }
     });
   }
 
   private buildModel(): WritableSignal<SeasonFormModel> {
-    const now = dateToYyyyMmDd(new Date());
+    const now = new Date();
     return signal<SeasonFormModel>({
       startDate: now,
       endDate: now,
@@ -105,8 +111,8 @@ export class SeasonForm {
 
   private mapToSeasonFormModel(season:Season): SeasonFormModel {
     return {
-      endDate: dateToYyyyMmDd(season.endDate),
-      startDate: dateToYyyyMmDd(season.startDate)
+      endDate: new Date(season.endDate),
+      startDate: new Date(season.startDate)
     }
   }
 
@@ -125,15 +131,15 @@ export class SeasonForm {
   }
 
   private mapToCreateSeasonDTO<T extends CreateSeasonDTO | EditSeasonDTO>(seasonForm: SeasonFormModel): T {
+
     return {
-      ...seasonForm,
-      endDate: new Date(seasonForm.endDate),
-      startDate: new Date(seasonForm.startDate),
+      endDate: dateToYyyyMmDd(seasonForm.endDate),
+      startDate: dateToYyyyMmDd(seasonForm.startDate),
     } as T
   }
 }
 
 interface SeasonFormModel {
-  endDate: string;
-  startDate: string;
+  endDate: Date;
+  startDate: Date;
 }

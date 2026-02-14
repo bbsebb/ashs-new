@@ -11,6 +11,9 @@ spring:
           meta-client:
             base-url: https://graph.facebook.com
 
+  jackson:
+    time-zone: Europe/Paris
+
   flyway:
     create-schemas: true
     schemas: hall_schema, staff_schema, team_schema, flyway_schema , season_schema

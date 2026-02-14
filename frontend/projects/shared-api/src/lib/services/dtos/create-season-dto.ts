@@ -1,3 +1,4 @@
 import {Season} from '@shared-domain';
+import {SeasonDTO} from './season-dto';
 
-export type CreateSeasonDTO = Omit<Season, 'id'>
+export type CreateSeasonDTO = SeasonDTO;

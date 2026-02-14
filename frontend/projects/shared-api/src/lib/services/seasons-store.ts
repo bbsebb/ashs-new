@@ -46,7 +46,7 @@ export class SeasonsStore {
     );
   }
 
-  editSeason(id: string, editSeasonDTO: EditSeasonDTO): Observable<void> {
+  editSeason(id: string, editSeasonDTO: EditSeasonDTO): Observable<Season> {
     return this.seasonGateway.editSeason(id, editSeasonDTO).pipe(
       tap(() => this.reload())
     );

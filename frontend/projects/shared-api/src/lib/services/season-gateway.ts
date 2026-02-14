@@ -1,9 +1,9 @@
 import {inject, Injectable} from '@angular/core';
 
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
-import {map, Observable} from 'rxjs';
+import {map, Observable, tap} from 'rxjs';
 import {Season} from '@shared-domain';
-import {APP_CONFIG} from '@shared-api';
+import {APP_CONFIG, dateToYyyyMmDd} from '@shared-api';
 import {CreateSeasonDTO} from './dtos/create-season-dto';
 import {EditSeasonDTO} from './dtos/edit-season-dto';
 @Injectable({
@@ -32,8 +32,10 @@ export class SeasonGateway {
     return this.http.delete<void>(`${this.appConfig.apiUrl}/api/v1/seasons/${id}`);
   }
 
-  editSeason(id: string, editSeasonDTO: EditSeasonDTO): Observable<void> {
-    return this.http.put<void>(`${this.appConfig.apiUrl}/api/v1/seasons/${id}`, editSeasonDTO);
+  editSeason(id: string, editSeasonDTO: EditSeasonDTO): Observable<Season> {
+    return this.http.put<SeasonResponseDTO>(`${this.appConfig.apiUrl}/api/v1/seasons/${id}`, editSeasonDTO).pipe(
+      map(response => this.toSeason(response)),
+    );
   }
 
   toSeason(seasonResponseDTO:SeasonResponseDTO): Season {

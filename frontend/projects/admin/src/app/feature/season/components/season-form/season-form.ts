@@ -3,14 +3,7 @@ import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitl
 import {MatButton} from "@angular/material/button";
 import {MatError, MatFormField, MatInputModule, MatLabel} from "@angular/material/input";
 import {Router, RouterLink} from "@angular/router";
-import {
-  CreateSeasonDTO,
-  dateToDdMmYyyy,
-  dateToYyyyMmDd,
-  EditSeasonDTO,
-  FormErrorHandleService,
-  SeasonsStore
-} from '@shared-api';
+import {CreateSeasonDTO, dateToYyyyMmDd, EditSeasonDTO, FormErrorHandleService, SeasonsStore} from '@shared-api';
 import {Season} from '@shared-domain';
 import {FieldTree, form, FormField, submit} from '@angular/forms/signals';
 import {firstValueFrom, tap} from 'rxjs';
@@ -23,7 +16,6 @@ import {
 } from '@angular/material/datepicker';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {FormsModule} from '@angular/forms';
-import {JsonPipe} from '@angular/common';
 
 @Component({
   selector: 'app-season-form',
@@ -45,7 +37,7 @@ import {JsonPipe} from '@angular/common';
     MatFormFieldModule,
     MatDatepickerModule,
     FormsModule,
-    JsonPipe,
+
   ],
   templateUrl: './season-form.html',
   styleUrl: './season-form.scss',
@@ -62,7 +54,7 @@ export class SeasonForm {
   isCreateForm = computed(() => !this.id());  // Or it's a "edit" form if id is defined.
   seasonModel = this.buildModel();
   seasonForm = this.buildForm();
-  seasonPreview = computed(() =>  this.mapToSeason(this.seasonModel()));
+  seasonPreview = computed(() => this.mapToSeason(this.seasonModel()));
 
 
   constructor() {
@@ -94,11 +86,11 @@ export class SeasonForm {
       try {
         if (!id) {
           await firstValueFrom(this.seasonsStore.createSeason(this.mapToCreateSeasonDTO(this.seasonModel())).pipe(
-            tap(() => this.notificationService.show('La saison a été enregistrée','success'))
+            tap(() => this.notificationService.show('La saison a été enregistrée', 'success'))
           ));
         } else {
           await firstValueFrom(this.seasonsStore.editSeason(id, this.mapToCreateSeasonDTO(this.seasonModel())).pipe(
-            tap(() => this.notificationService.show('La saison a été mise à jour','success'))
+            tap(() => this.notificationService.show('La saison a été mise à jour', 'success'))
           ));
         }
         await this.router.navigateByUrl('/seasons');
@@ -109,14 +101,14 @@ export class SeasonForm {
     });
   }
 
-  private mapToSeasonFormModel(season:Season): SeasonFormModel {
+  private mapToSeasonFormModel(season: Season): SeasonFormModel {
     return {
       endDate: new Date(season.endDate),
       startDate: new Date(season.startDate)
     }
   }
 
-  private mapToSeason(seasonFormModel:SeasonFormModel): Season {
+  private mapToSeason(seasonFormModel: SeasonFormModel): Season {
     const StartDate = new Date(seasonFormModel.startDate);
     const EndDate = new Date(seasonFormModel.endDate);
     return {
@@ -143,3 +135,4 @@ interface SeasonFormModel {
   endDate: Date;
   startDate: Date;
 }
+

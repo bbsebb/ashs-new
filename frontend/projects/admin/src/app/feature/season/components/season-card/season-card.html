@@ -1,14 +1,15 @@
+@let season = seasonSignal();
 <mat-card class="card" appearance="outlined">
   <mat-card-header class="header">
-    <mat-card-title class="title">{{ seasonSignal().name }}</mat-card-title>
+    <mat-card-title class="title">{{ season.name }}</mat-card-title>
 
     <mat-chip-set aria-label="Statut de la saison">
-      @if (seasonSignal().isActive) {
+      @if (season.isActive) {
         <mat-chip class="status status-active" >Active</mat-chip>
       } @else {
         <mat-chip class="status" >Inactive</mat-chip>
       }
-      @if (seasonSignal().isCurrent) {
+      @if (season.isCurrent) {
         <mat-chip class="status status-active" >En cours</mat-chip>
       }
     </mat-chip-set>
@@ -18,13 +19,19 @@
     <dl class="meta">
       <div class="row">
         <dt>Début</dt>
-        <dd>{{ seasonSignal().startDate | date : 'dd/MM/yyyy' }}</dd>
+        <dd>{{ season.startDate | date : 'dd/MM/yyyy' }}</dd>
       </div>
 
       <div class="row">
         <dt>Fin</dt>
-        <dd>{{ seasonSignal().endDate | date : 'dd/MM/yyyy' }}</dd>
+        <dd>{{ season.endDate | date : 'dd/MM/yyyy' }}</dd>
       </div>
     </dl>
   </mat-card-content>
+  @if(withActions()) {
+    <mat-card-actions align="end">
+      <button mat-button type="button" routerLink="/seasons">Retour</button>
+      <button mat-flat-button type="button" routerLink="/seasons/{{season.id}}/edit">Modifier</button>
+    </mat-card-actions>
+  }
 </mat-card>

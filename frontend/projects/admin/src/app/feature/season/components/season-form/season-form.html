@@ -13,7 +13,7 @@
           <input matStartDate [formField]="seasonForm.startDate" placeholder="Start date">
           <input matEndDate [formField]="seasonForm.endDate" placeholder="End date">
         </mat-date-range-input>
-        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+        <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-date-range-picker #picker></mat-date-range-picker>
         <mat-error *appError="seasonForm.startDate; let errorMsg">
@@ -44,6 +44,5 @@
 
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <pre>{{ seasonForm().value() | json }}</pre>
   <app-season-card [season]="seasonPreview()" [withActions]="false"/>
 </details>

@@ -19,7 +19,7 @@ export class HallView {
   private readonly hallsStore = inject(HallsStore);
   private readonly router = inject(Router);
 
-  id = input<string>();
+  id = input.required<string>();
   hallSignal = this.hallsStore.hallById(this.id);
 
   isLoading = this.hallsStore.isLoading;

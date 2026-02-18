@@ -31,7 +31,7 @@
 @if(withActions()) {
     <mat-card-actions align="end">
       <button mat-button type="button" routerLink="/halls">Retour</button>
-      <button mat-flat-button color="primary" type="button">Modifier</button>
+      <button mat-flat-button type="button" routerLink="/halls/{{hall.id}}/edit">Modifier</button>
     </mat-card-actions>
 }
 </mat-card>

@@ -1,1 +1,10 @@
-<p>season-view works!</p>
+@let season = seasonSignal();
+@if(isLoading()) {
+  <app-loading-data label="Chargement de la salle" [isLoading]="isLoading()" />
+} @else if(error()) {
+  <app-error-data dataName="saisons" (onRetry)="retry()" />
+} @else if (!season) {
+  <p>Aucune salle</p>
+} @else {
+  <app-season-card [season]="season" ></app-season-card>
+}

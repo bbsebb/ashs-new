@@ -6,14 +6,6 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {MatTooltipModule} from '@angular/material/tooltip';
 
-const FAKE_HALL: Hall = {
-  id: 'demo-001',
-  name: 'Salle Démo',
-  addressStreet: '10 Rue de la Paix',
-  addressCity: 'Paris',
-  addressPostalCode: '75002',
-  addressCountry: 'France',
-};
 
 @Component({
   selector: 'app-hall-card',

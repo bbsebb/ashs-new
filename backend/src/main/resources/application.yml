@@ -14,6 +14,18 @@ spring:
   jackson:
     time-zone: Europe/Paris
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   flyway:
     create-schemas: true
     schemas: hall_schema, staff_schema, team_schema, flyway_schema , season_schema

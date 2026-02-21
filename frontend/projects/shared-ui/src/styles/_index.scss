@@ -1,0 +1,5 @@
+@forward './theme';
+@forward './forms';
+
+@use './theme' as theme;
+@include theme.shared-ui-theme();

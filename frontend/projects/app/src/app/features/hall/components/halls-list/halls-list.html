@@ -1,0 +1,13 @@
+@if (isLoading()) {
+  <app-loading-data label="Chargement des salles" [isLoading]="isLoading()"/>
+} @else if (error()) {
+  <app-error-data dataName="salles" (onRetry)="retry()"/>
+} @else {
+  <section class="halls-list">
+    @for (hall of hallsSignal(); track hall.id) {
+      <app-hall-card [hall]="hall"></app-hall-card>
+    } @empty {
+      <p>Aucune salle n'est présente</p>
+    }
+  </section>
+}

@@ -1,0 +1,58 @@
+
+<section class="form">
+  <app-page-title
+    eyebrow="Contact"
+    title="Nous contacter"
+    subtitle="Renseignez votre email, un sujet et votre message."
+  />
+
+  <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
+    <div class="form-fields">
+      <mat-form-field class="field field-full" appearance="outline">
+        <mat-label>Votre email</mat-label>
+        <input matInput type="email" [formField]="contactForm.from" autocomplete="email" />
+        <mat-error *appError="contactForm.from; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="field field-full" appearance="outline">
+        <mat-label>Sujet</mat-label>
+        <input matInput type="text" [formField]="contactForm.subject" autocomplete="off" />
+        <mat-error *appError="contactForm.subject; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="field field-full" appearance="outline">
+        <mat-label>Message</mat-label>
+        <textarea
+          matInput
+          rows="6"
+          [formField]="contactForm.content"
+          autocomplete="off"
+        ></textarea>
+        <mat-error *appError="contactForm.content; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    @let globalErrors = contactForm().errors();
+    @if (globalErrors.length > 0) {
+      @for (globalError of globalErrors; track globalError.kind) {
+        <mat-error class="alert alert-danger">
+          {{ globalError.message }}
+        </mat-error>
+      }
+    }
+
+    <div class="actions">
+      <app-form-submit-button
+        [disabled]="contactForm().submitting() || contactForm().invalid()"
+        content="Envoyer"
+        [submitting]="contactForm().submitting()"
+      />
+    </div>
+  </form>
+</section>

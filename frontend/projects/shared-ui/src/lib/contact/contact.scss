@@ -1,0 +1,28 @@
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.content {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-fields {
+  display: grid;
+  gap: 1rem;
+}
+
+.field-full {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.alert.alert-danger {
+  margin-top: 0.5rem;
+}

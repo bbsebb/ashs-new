@@ -1,0 +1,38 @@
+<article class="card" aria-label="Informations de la salle">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title class="title">{{ hall().name }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="content">
+      <section class="address" aria-label="Adresse">
+        <div class="row">
+          <mat-icon class="icon" aria-hidden="true">location_on</mat-icon>
+          <div class="text">
+            <div class="line">{{ hall().addressStreet }}</div>
+            <div class="line">
+              {{ hall().addressPostalCode }} {{ hall().addressCity }}
+            </div>
+            <div class="line">{{ hall().addressCountry }}</div>
+          </div>
+        </div>
+
+      </section>
+    </mat-card-content>
+
+    <mat-card-actions align="end" class="actions">
+      <a
+        mat-button
+        class="btn"
+        [href]="googleMapsUrl()"
+        target="_blank"
+        rel="noopener noreferrer"
+        [matTooltip]="'Ouvrir : ' + fullAddress()"
+        aria-label="Ouvrir dans Google Maps"
+      >
+        <mat-icon aria-hidden="true">map</mat-icon>
+        Google Maps
+      </a>
+    </mat-card-actions>
+  </mat-card>
+</article>

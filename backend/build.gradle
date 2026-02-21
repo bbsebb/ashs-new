@@ -40,6 +40,7 @@ dependencies {
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     // Spring Boot 4 a amélioré l'auto-configuration pour les aspects
     runtimeOnly 'org.springframework.modulith:spring-modulith-runtime'

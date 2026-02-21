@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+
+.card {
+  width: 300px;
+}
+
+mat-card {
+  border-radius: 16px;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+.title {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.subtitle {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.content {
+  padding-top: 8px;
+}
+
+.address {
+  display: grid;
+  gap: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.icon {
+  color: var(--mat-sys-primary);
+  margin-top: 2px;
+}
+
+.text {
+  display: grid;
+  gap: 2px;
+}
+
+.line {
+  line-height: 1.35;
+}
+
+.hint {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+}
+
+.actions {
+  padding-top: 4px;
+}
+
+.btn {
+  text-decoration: none;
+}

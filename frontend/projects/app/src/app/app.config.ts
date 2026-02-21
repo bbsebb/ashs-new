@@ -2,10 +2,10 @@ import {ApplicationConfig, provideBrowserGlobalErrorListeners} from '@angular/co
 import {provideRouter} from '@angular/router';
 
 import {routes} from './app.routes';
-import {provideSharedIcons, MENU_CONFIG} from '@shared-ui';
+import {MENU_CONFIG, provideSharedIcons} from '@shared-ui';
 import {menuItems} from './core/layout/menu-items';
 import {APP_CONFIG} from '@shared-api';
-import {environment} from '../../../admin/src/environments/environment';
+import {environment} from '@environment';
 
 
 /*export const delayInterceptor: HttpInterceptorFn = (req, next) => {

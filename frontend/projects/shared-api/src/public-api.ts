@@ -9,3 +9,4 @@ export * from './lib/services/season-gateway';
 export * from './lib/services/dtos/create-season-dto';
 export * from './lib/services/dtos/edit-season-dto';
 export * from './lib/utils/DateMapper'
+export * from './lib/services/contact-gateway'

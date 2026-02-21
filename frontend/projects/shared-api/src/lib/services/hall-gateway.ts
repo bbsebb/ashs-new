@@ -13,19 +13,21 @@ import {EditHallDTO} from './dtos/edit-hall-dto';
   providedIn: 'root',
 })
 export class HallGateway {
-    private readonly http = inject(HttpClient);
-    private readonly appConfig = inject(APP_CONFIG);
-    getHalls():HttpResourceRef<Hall[]> {
-        return httpResource<Hall[]>(() => `${this.appConfig.apiUrl}/api/v1/halls`,{
-          defaultValue: []
-        });
-    }
+  private readonly http = inject(HttpClient);
+  private readonly appConfig = inject(APP_CONFIG);
 
-    addHall(createHallDTO: CreateHallDTO): Observable<Hall> {
-        return this.http.post<Hall>(`${this.appConfig.apiUrl}/api/v1/halls`, createHallDTO);
-    }
+  getHalls(): HttpResourceRef<Hall[]> {
+    console.log(this.appConfig)
+    return httpResource<Hall[]>(() => `${this.appConfig.apiUrl}/api/v1/halls`, {
+      defaultValue: []
+    });
+  }
 
-  deleteById(id: string):Observable<void> {
+  addHall(createHallDTO: CreateHallDTO): Observable<Hall> {
+    return this.http.post<Hall>(`${this.appConfig.apiUrl}/api/v1/halls`, createHallDTO);
+  }
+
+  deleteById(id: string): Observable<void> {
     return this.http.delete<void>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`);
   }
 

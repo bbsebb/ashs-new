@@ -11,7 +11,7 @@ import {EditHallDTO} from './dtos/edit-hall-dto';
 })
 export class HallsStore {
   private readonly hallGateway = inject(HallGateway);
-  private readonly hallsResource=  this.hallGateway.getHalls();
+  private readonly hallsResource = this.hallGateway.getHalls();
   readonly halls: Signal<Hall[]> = computed(() => this.hallsResource.hasValue() ? this.hallsResource.value() : []);
   isLoading = this.hallsResource.isLoading;
   error = this.hallsResource.error;
@@ -26,13 +26,13 @@ export class HallsStore {
     });
   }
 
-  createHall(createHallDTO: CreateHallDTO):Observable<Hall> {
+  createHall(createHallDTO: CreateHallDTO): Observable<Hall> {
     return this.hallGateway.addHall(createHallDTO).pipe(
       tap(() => this.reload())
     );
   }
 
-  reload():void {
+  reload(): void {
     this.hallsResource.reload();
   }
 
@@ -43,8 +43,8 @@ export class HallsStore {
     );
   }
 
-  updateHall(id: string,   createHallDTO: EditHallDTO) {
-    return this.hallGateway.editHall(id,createHallDTO).pipe(
+  updateHall(id: string, createHallDTO: EditHallDTO) {
+    return this.hallGateway.editHall(id, createHallDTO).pipe(
       tap(() => this.reload())
     );
   }

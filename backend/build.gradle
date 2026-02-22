@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Spring Boot 4 a amélioré l'auto-configuration pour les aspects
     runtimeOnly 'org.springframework.modulith:spring-modulith-runtime'
@@ -58,6 +59,8 @@ dependencies {
     testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
     testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
     testImplementation 'org.testcontainers:testcontainers-postgresql'
+    runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
+    runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

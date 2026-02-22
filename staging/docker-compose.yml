@@ -1,13 +1,34 @@
 services:
+  # 1. La BDD démarre en premier
+  db:
+    image: postgres:latest
+    container_name: postgres-db-staging
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=ashs_db
+      - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME}
+      - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - db-data-staging:/var/lib/postgresql
+    networks:
+      - ashs-network
+    healthcheck:
+      test: [ "CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"' ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # 2. Le Backend démarre UNIQUEMENT quand la BDD est "healthy"
   app:
-    image:
-      ghcr.io/bbsebb/ashs-new:${IMAGE_TAG:-latest}
+    image: ghcr.io/bbsebb/ashs-new:${IMAGE_TAG:-latest}
     container_name: spring-app-staging
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=staging
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db-staging:5432/ashs_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ashs_db
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - PAGE_ACCESS_TOKEN=${PAGE_ACCESS_TOKEN}
@@ -15,31 +36,50 @@ services:
       - MAIL_PASSWORD=${MAIL_PASSWORD}
       - MAIL_USERNAME=${MAIL_USERNAME}
       - SPRING_FLYWAY_ENABLED=true
+    networks:
+      - ashs-network
     depends_on:
       db:
         condition: service_healthy
-
-  db:
-    image: postgres:latest
-    container_name: postgres-db-staging
-    environment:
-      - POSTGRES_DB=ashs_db
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
     healthcheck:
-      test: [ "CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"' ]
-      interval: 5s
+      # Utilisation de wget à la place de curl. 
+      # --spider vérifie juste que l'URL répond sans télécharger le fichier.
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8080/actuator/health || exit 1" ]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s # Laisse 30s à Spring pour s'initialiser
 
+  # 3. Les frontends démarrent UNIQUEMENT quand le Backend est "healthy"
   frontend-app:
     image: ghcr.io/bbsebb/ashs-new-frontend-app:${IMAGE_TAG:-latest}
     container_name: angular-app-staging
+    restart: unless-stopped
     ports:
       - "8081:80"
+    networks:
+      - ashs-network
+    depends_on:
+      app:
+        condition: service_healthy
 
   frontend-admin:
     image: ghcr.io/bbsebb/ashs-new-frontend-admin:${IMAGE_TAG:-latest}
     container_name: angular-admin-staging
+    restart: unless-stopped
     ports:
       - "8082:80"
+    networks:
+      - ashs-network
+    depends_on:
+      app:
+        condition: service_healthy
+
+# Définition de l'infrastructure Docker
+networks:
+  ashs-network:
+    driver: bridge
+
+volumes:
+  db-data-staging:
+    name: ashs_db_data_staging

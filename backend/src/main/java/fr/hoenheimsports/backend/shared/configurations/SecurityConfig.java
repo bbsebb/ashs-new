@@ -12,8 +12,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SecurityConfig {
 
 
-
-
     @Bean
     WebMvcConfigurer corsConfigurer(CorsProperties corsProperties) {
         return new WebMvcConfigurer() {
@@ -33,4 +31,5 @@ record CorsProperties(
         String[] allowedOrigins,
         String[] allowedMethods,
         String[] allowedHeaders
-) {}
+) {
+}

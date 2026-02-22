@@ -171,7 +171,7 @@ jobs:
           username: ${{ vars.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "deployment/docker-compose.prod.yml,deployment/.env"
-          target: "/home/ashs-app" # Remplace par le chemin de ton choix sur ton VPS
+          target: "~/ashs-app" # Remplace par le chemin de ton choix sur ton VPS
           strip_components: 1 # Retire le dossier 'deployment/' pour mettre les fichiers directement dans /opt/ashs-app
 
       # Connexion SSH et lancement des conteneurs
@@ -182,7 +182,7 @@ jobs:
           username: ${{ vars.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /opt/ashs-app
+            cd ~/ashs-app
             # Connexion au registre GitHub depuis le VPS pour pouvoir pull les images privées
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             

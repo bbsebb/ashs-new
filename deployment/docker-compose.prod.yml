@@ -11,7 +11,7 @@ services:
       - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME}
       - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
     volumes:
-      - db-data-staging:/var/lib/postgresql # Ajout de '/data' qui est le chemin officiel recommandé par l'image Postgres
+      - db-data-prod:/var/lib/postgresql # Ajout de '/data' qui est le chemin officiel recommandé par l'image Postgres
     networks:
       - ashs-network
     healthcheck:

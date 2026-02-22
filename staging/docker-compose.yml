@@ -1,18 +1,19 @@
 services:
   app:
     image:
-      ghcr.io/bbsebb/ashs-new:5624cfc6fc2101795e2a45a7132f08ebb626234e
+      ghcr.io/bbsebb/ashs-new:${IMAGE_TAG:-latest}
     container_name: spring-app-staging
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/myapp
-      - SPRING_DATASOURCE_USERNAME=test
-      - SPRING_DATASOURCE_PASSWORD=test
+      - SPRING_PROFILES_ACTIVE=staging
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db-staging:5432/ashs_db
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - PAGE_ACCESS_TOKEN=${PAGE_ACCESS_TOKEN}
-      - APP_CORS_ALLOWED_ORIGINS={APP_CORS_ALLOWED_ORIGINS}
-      - MAIL_PASSWORD={MAIL_PASSWORD}
-      - MAIL_USERNAME={MAIL_USERNAME}
+      - APP_CORS_ALLOWED_ORIGINS=${APP_CORS_ALLOWED_ORIGINS}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_USERNAME=${MAIL_USERNAME}
       - SPRING_FLYWAY_ENABLED=true
     depends_on:
       db:
@@ -22,7 +23,7 @@ services:
     image: postgres:latest
     container_name: postgres-db-staging
     environment:
-      - POSTGRES_DB=myapp
+      - POSTGRES_DB=ashs_db
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
     healthcheck:
@@ -32,13 +33,13 @@ services:
       retries: 5
 
   frontend-app:
-    image: ghcr.io/bbsebb/ashs-new-frontend-app:5624cfc6fc2101795e2a45a7132f08ebb626234e
+    image: ghcr.io/bbsebb/ashs-new-frontend-app:${IMAGE_TAG:-latest}
     container_name: angular-app-staging
     ports:
       - "8081:80"
 
   frontend-admin:
-    image: ghcr.io/bbsebb/ashs-new-frontend-admin:5624cfc6fc2101795e2a45a7132f08ebb626234e
+    image: ghcr.io/bbsebb/ashs-new-frontend-admin:${IMAGE_TAG:-latest}
     container_name: angular-admin-staging
     ports:
       - "8082:80"

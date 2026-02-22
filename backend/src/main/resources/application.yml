@@ -1,18 +1,16 @@
 spring:
   application:
     name: ashs-backend
-  docker:
-    compose:
-      file: ./backend/compose.yaml
+
+  jackson:
+    time-zone: Europe/Paris
+
   http:
     client:
       service:
         group:
           meta-client:
             base-url: https://graph.facebook.com
-
-  jackson:
-    time-zone: Europe/Paris
 
   mail:
     host: smtp.gmail.com
@@ -28,11 +26,8 @@ spring:
 
   flyway:
     create-schemas: true
-    schemas: hall_schema, staff_schema, team_schema, flyway_schema , season_schema
+    schemas: hall_schema, staff_schema, team_schema, flyway_schema, season_schema
     default-schema: flyway_schema
-    #    en developpement
-    validate-on-migrate: true
-    clean-disabled: false
 
   servlet:
     multipart:
@@ -50,15 +45,8 @@ meta:
 
 app:
   cors:
+    allowed-headers: "Authorization,Content-Type,Accept,Origin,X-Requested-With"
+    allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:4200}
-    allowed-methods: ${APP_CORS_ALLOWED_METHODS:GET,POST,PUT,PATCH,DELETE,OPTIONS}
-    allowed-headers: ${APP_CORS_ALLOWED_HEADERS:Authorization,Content-Type,Accept,Origin,X-Requested-With}
   upload:
-    dir: ${APP_UPLOAD_DIR:uploads/}
-
-logging:
-  level:
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.results: TRACE
-    fr.hoenheimsports: DEBUG
+    dir: "uploads/"

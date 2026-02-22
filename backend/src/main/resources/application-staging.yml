@@ -1,0 +1,27 @@
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+  docker:
+    compose:
+      enabled: false # C'est nous qui lançons via `docker-compose up`
+
+  datasource:
+    # 'postgres-db' doit correspondre au nom du service BDD dans votre docker-compose
+    url: jdbc:postgresql://postgres-db-staging:5432/ashs_db
+    username: ${SPRING_DATASOURCE_USERNAME:staging_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:staging_pass}
+
+  flyway:
+    clean-disabled: false # Permet de réinitialiser la BDD en phase de test
+    validate-on-migrate: true
+
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    fr.hoenheimsports: DEBUG

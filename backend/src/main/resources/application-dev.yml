@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  docker:
+    compose:
+      enabled: true
+      file: ./backend/compose.yaml
+
+  flyway:
+    clean-disabled: false
+    validate-on-migrate: false
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.results: TRACE
+    fr.hoenheimsports: DEBUG

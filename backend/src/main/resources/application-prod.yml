@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  docker:
+    compose:
+      enabled: false
+
+  datasource:
+    # 'postgres-prod' doit correspondre au nom du service BDD dans le docker-compose du VPS
+    url: jdbc:postgresql://postgres-db-prod:5432/ashs_db
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  flyway:
+    clean-disabled: true # CRITIQUE : Empêche la suppression des données en prod
+    validate-on-migrate: true
+
+
+logging:
+  level:
+    # On réduit drastiquement les logs pour ne pas saturer l'espace disque du VPS
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.orm.results: WARN
+    fr.hoenheimsports: INFO

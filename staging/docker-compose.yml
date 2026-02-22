@@ -21,7 +21,7 @@ services:
 
   # 2. Le Backend démarre UNIQUEMENT quand la BDD est "healthy"
   app:
-    image: ghcr.io/bbsebb/ashs-new:${IMAGE_TAG:-latest}
+    image: ghcr.io/bbsebb/ashs-new:${IMAGE_TAG}
     container_name: spring-app-staging
     restart: unless-stopped
     ports:
@@ -52,7 +52,7 @@ services:
 
   # 3. Les frontends démarrent UNIQUEMENT quand le Backend est "healthy"
   frontend-app:
-    image: ghcr.io/bbsebb/ashs-new-frontend-app:${IMAGE_TAG:-latest}
+    image: ghcr.io/bbsebb/ashs-new-frontend-app:${IMAGE_TAG}
     container_name: angular-app-staging
     restart: unless-stopped
     ports:
@@ -64,7 +64,7 @@ services:
         condition: service_healthy
 
   frontend-admin:
-    image: ghcr.io/bbsebb/ashs-new-frontend-admin:${IMAGE_TAG:-latest}
+    image: ghcr.io/bbsebb/ashs-new-frontend-admin:${IMAGE_TAG}
     container_name: angular-admin-staging
     restart: unless-stopped
     ports:

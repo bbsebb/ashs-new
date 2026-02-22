@@ -25,7 +25,7 @@ repositories {
 }
 
 ext {
-    set('springModulithVersion', "2.0.0")
+    set('springModulithVersion', "2.0.3")
     set('mapstructVersion', "1.6.3")
 }
 

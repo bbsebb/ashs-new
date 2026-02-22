@@ -9,7 +9,7 @@ spring:
 
   datasource:
     # 'postgres-db' doit correspondre au nom du service BDD dans votre docker-compose
-    url: jdbc:postgresql://postgres-db-staging:5432/ashs_db
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://db:5432/ashs_db}
     username: ${SPRING_DATASOURCE_USERNAME:staging_user}
     password: ${SPRING_DATASOURCE_PASSWORD:staging_pass}
 

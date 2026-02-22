@@ -28,7 +28,7 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=staging
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ashs_db
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
       - PAGE_ACCESS_TOKEN=${PAGE_ACCESS_TOKEN}
@@ -44,11 +44,11 @@ services:
     healthcheck:
       # Utilisation de wget à la place de curl. 
       # --spider vérifie juste que l'URL répond sans télécharger le fichier.
-      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8080/actuator/health || exit 1" ]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/actuator/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s # Laisse 30s à Spring pour s'initialiser
+      start_period: 60s # Laisse 60s à Spring pour s'initialiser
 
   # 3. Les frontends démarrent UNIQUEMENT quand le Backend est "healthy"
   frontend-app:

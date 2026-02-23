@@ -1,11 +1,11 @@
 import {Component, inject} from '@angular/core';
-import {MENU_CONFIG} from '../../menu-config';
+import {MENU_CONFIG} from '@shared-ui';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {MatRipple} from '@angular/material/core';
 import {MatIcon} from '@angular/material/icon';
 
 @Component({
-  selector:'[app-bottom-bar]',
+  selector: '[app-bottom-bar]',
   imports: [
     RouterLink,
     RouterLinkActive,

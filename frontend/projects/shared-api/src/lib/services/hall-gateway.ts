@@ -17,7 +17,6 @@ export class HallGateway {
   private readonly appConfig = inject(APP_CONFIG);
 
   getHalls(): HttpResourceRef<Hall[]> {
-    console.log(this.appConfig)
     return httpResource<Hall[]>(() => `${this.appConfig.apiUrl}/api/v1/halls`, {
       defaultValue: []
     });

@@ -1,12 +1,19 @@
-
-<app-header class="header"></app-header>
+<app-header class="header">
+  <ng-container ngProjectAs="[left-menu]">
+    <ng-content select="[left-menu]"></ng-content>
+  </ng-container>
+  <ng-container ngProjectAs="[right-menu]">
+    <ng-content select="[right-menu]"></ng-content>
+  </ng-container>
+</app-header>
 
 <div class="app-body">
   @if (!isMobile()) {
     <nav app-nav-rail></nav>
   }
 
-  <main class="content" [class.mobile-mode]="isMobile()">
+
+  <main #content class="content" [class.mobile-mode]="isMobile()">
     <router-outlet></router-outlet>
     <app-footer class="footer"></app-footer>
   </main>

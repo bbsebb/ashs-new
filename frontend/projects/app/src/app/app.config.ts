@@ -1,11 +1,12 @@
 import {ApplicationConfig, provideBrowserGlobalErrorListeners} from '@angular/core';
-import {provideRouter} from '@angular/router';
+import {provideRouter, TitleStrategy, withInMemoryScrolling} from '@angular/router';
 
 import {routes} from './app.routes';
 import {MENU_CONFIG, provideSharedIcons} from '@shared-ui';
 import {menuItems} from './core/layout/menu-items';
 import {APP_CONFIG} from '@shared-api';
 import {environment} from '@environment';
+import {MyCustomPageTitleStrategy} from './shared/services/title-strategy';
 
 
 /*export const delayInterceptor: HttpInterceptorFn = (req, next) => {
@@ -16,7 +17,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     // provideHttpClient(withInterceptors([delayInterceptor])),
-    provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({scrollPositionRestoration: 'top', anchorScrolling: 'enabled'})),
+    {provide: TitleStrategy, useClass: MyCustomPageTitleStrategy},
     provideSharedIcons(),
     {
       provide: MENU_CONFIG,

@@ -1,0 +1,29 @@
+<!--
+  Preview section displaying the crop result or the current processing state.
+  Uses Material 3 components for consistency and a modern aesthetic.
+-->
+<div class="preview-section">
+  <h3>Résultat</h3>
+
+  <!-- Loading State: Shown while the blob is being generated from canvas -->
+  @if (isLoadingSignal()) {
+    <div class="result-box loading">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+      <span class="mat-label-small">Traitement...</span>
+    </div>
+  } @else if (isErrorSignal()) {
+    <div class="result-box error">
+      <mat-icon>error</mat-icon>
+      <span class="mat-label-large">Erreur</span>
+    </div>
+  } @else if (previewImageSourceSignal()) {
+    <div class="result-box success mat-elevation-z2">
+      <img [src]="previewImageSourceSignal()" alt="Cropped Image Preview"/>
+    </div>
+  } @else {
+    <div class="result-box empty">
+      <mat-icon>crop</mat-icon>
+      <span class="mat-label-large">Aperçu</span>
+    </div>
+  }
+</div>

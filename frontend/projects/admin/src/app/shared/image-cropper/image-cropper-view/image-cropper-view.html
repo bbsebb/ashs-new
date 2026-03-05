@@ -1,0 +1,50 @@
+<!-- 
+  Interactive cropping container.
+  Includes the draggable image and the static cropping mask overlay.
+-->
+<div class="crop-container mat-elevation-z2"
+     (wheel)="onWheel($event)">
+  @if (selectedImageSourceSignal()) {
+
+    <!-- Mask Overlay: Represents the final crop area -->
+    <div class="crop-overlay"
+         #maskElement>
+    </div>
+
+    <!-- Draggable Wrapper: Handled by Angular CDK -->
+    <div class="drag-wrapper"
+         cdkDrag
+         (cdkDragEnded)="recalculateCropGeometry()"
+         style="touch-action: none;">
+      
+      <!-- Scalable Image: The actual content being cropped -->
+      <img [src]="selectedImageSourceSignal()"
+           #imageElement
+           class="draggable-image"
+           alt="Image to be cropped"
+           [style.transform]="'scale(' + zoomLevelSignal() + ')'"
+           (load)="recalculateCropGeometry()"/>
+    </div>
+
+    <!-- Floating Zoom Controls -->
+    <div class="zoom-controls mat-elevation-z4">
+      <button mat-icon-button (click)="zoomOut()" [disabled]="zoomLevelSignal() <= 0.5" title="Dézoomer">
+        <mat-icon>zoom_out</mat-icon>
+      </button>
+
+      <span class="zoom-level mat-label-small" (click)="resetView()" title="Réinitialiser le zoom">
+        {{ zoomLevelSignal() | percent }}
+      </span>
+
+      <button mat-icon-button (click)="zoomIn()" [disabled]="zoomLevelSignal() >= 5" title="Zoomer">
+        <mat-icon>zoom_in</mat-icon>
+      </button>
+    </div>
+  } @else {
+    <!-- Placeholder State: Displayed when no image has been selected -->
+    <div class="placeholder-state">
+      <mat-icon class="large-icon">add_photo_alternate</mat-icon>
+      <p class="mat-body-medium">Chargez une image pour commencer</p>
+    </div>
+  }
+</div>

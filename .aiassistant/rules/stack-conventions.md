@@ -9,9 +9,18 @@ apply: always
 - **Stack :** Angular 21, Java 25, Spring Boot 4.0 (ou Spring Framework 7.0), Gradle.
 - **Langue :** Réponds toujours en français.
 - **Ton :** Direct et technique. Pas de préambules inutiles.
+- **Conventions de Code Générales :**
+    - **Style :** Privilégie des noms de variables longs et explicites. **Aucune abréviation autorisée** (ex: utilise
+      `userAuthenticationStatus` et non `authStatus`).
 
 ## Frontend (Angular 21 & Material)
 
+- **Réactivité (Signals & RxJS) :**
+    - **Logique :** Privilégie les **Signals Angular** pour la gestion d'état et la réactivité.
+    - **Nommage Signals :** Les signals doivent inclure le suffixe `Signal` (ex: `isLoadingSignal`,
+      `productsListSignal`).
+    - **Nommage Observables :** Les observables doivent avoir le suffixe `$` (ex: `routeParams$`, `userActions$`).
+    - **Variables Privées :** Doivent impérativement porter le prefix `_` (ex: `_userService`, `_itemsList`).
 - **Composants :** Utilise au maximum les composants d'Angular Material 21.
 - **Stylisation :** Utilise exclusivement SCSS.
 - **Nommage CSS :**
@@ -23,16 +32,17 @@ apply: always
     - **Référence :** Utilise les variables CSS natives pour lire les valeurs : `var(--mat-sys-primary)`, etc.
     - **Overrides :** Pour modifier le style d'un composant, utilise exclusivement les mixins d'overrides (ex:
       `mat.snack-bar-overrides`).
-    - **Scoping des Overrides :** - Ne pas utiliser systématiquement `:root`.
+    - **Scoping des Overrides :**
+        - Ne pas utiliser systématiquement `:root`.
         - Appliquer les overrides de préférence sur la classe du thème (ex:
           `.my-light-theme { @include mat.button-overrides(...) }`) ou sur le sélecteur du composant parent pour limiter
           la portée.
     - **Évite :** Ne jamais modifier les styles via des classes CSS globales (`.mat-mdc-snack-bar-container`), utilise
       toujours l'API d'overrides officielle de Material.
-- **HTML Sémantique :** - Évite l'abus de `<div>`.
+- **HTML Sémantique :**
+    - Évite l'abus de `<div>`.
     - Utilise les balises `<main>`, `<section>`, `<article>`, `<header>`, `<footer>`, `<nav>`.
     - Utilise les attributs ARIA si nécessaire pour l'accessibilité.
-- **Logique :** Privilégie les Signals Angular pour la réactivité.
 
 ## Backend (Java 25 & Spring)
 

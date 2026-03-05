@@ -1,0 +1,40 @@
+<!--
+  Main container for the image cropper tool.
+  Provides file selection, editing area, and preview.
+-->
+<div class="image-cropper-wrapper">
+
+  <!-- Action bar containing the file selection button -->
+  <div class="actions-bar">
+    <button mat-stroked-button (click)="fileInput.click()" aria-label="Sélectionner une image">
+      <mat-icon fontIcon="upload_file"></mat-icon>
+      Sélectionner une image
+    </button>
+    <!-- Hidden file input triggered by the button above -->
+    <input #fileInput type="file" accept="image/*" (change)="onImageFileSelected($event)" hidden/>
+  </div>
+
+  <div class="image-cropper-layout">
+
+    <!-- Primary crop editing section -->
+    <div class="crop-section">
+      <h3>Éditeur</h3>
+      <app-image-cropper-view
+        [selectedImageSourceSignal]="selectedImageUrlSignal()"
+        [cropMaskWidthSignal]="cropMaskWidthSignal()"
+        [cropMaskHeightSignal]="cropMaskHeightSignal()"
+        (cropGeometryChange)="updateCropGeometry($event)">
+      </app-image-cropper-view>
+    </div>
+    @if (true) {
+      <!-- Live preview section showing the cropped result -->
+      <app-image-cropper-preview
+        [previewImageSourceSignal]="previewImageUrlSignal()"
+        [isErrorSignal]="!!croppedBlobResource.error()"
+        [isLoadingSignal]="croppedBlobResource.isLoading()"
+        [previewWidthSignal]="cropMaskWidthSignal()"
+        [previewHeightSignal]="cropMaskHeightSignal()">
+      </app-image-cropper-preview>
+    }
+  </div>
+</div>

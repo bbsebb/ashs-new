@@ -2,21 +2,23 @@
 @let attachment = attachmentSignal();
 <mat-card #trigger class="feed-card">
   @switch (attachment.type) {
-    @case('album') {
-      @if(attachment.subAttachments) {
-        @defer (on viewport(trigger);on interaction; prefetch on idle) {
-      <app-carousel [subAttachments]="attachment.subAttachments.data">
-      </app-carousel>
+    @case ('album') {
+      @if (attachment.subAttachments) {
+        @defer (on viewport(trigger); on interaction; prefetch on idle) {
+          <app-carousel [subAttachments]="attachment.subAttachments.data">
+          </app-carousel>
         } @placeholder {
-            <app-media-placeholder />
-          }
+          <app-media-placeholder/>
+        }
       }
-    } @default {
-      @if(attachment.media) {
-        @defer (on viewport(trigger);on interaction; prefetch on idle) {
-        <app-media [type]="attachment.type" [media]="attachment.media">
-        </app-media>} @placeholder {
-          <app-media-placeholder />
+    }
+    @default {
+      @if (attachment.media) {
+        @defer (on viewport(trigger); on interaction; prefetch on idle) {
+          <app-media [type]="attachment.type" [media]="attachment.media">
+          </app-media>
+        } @placeholder {
+          <app-media-placeholder/>
         }
       }
     }
@@ -29,6 +31,6 @@
   </mat-card-content>
   <mat-card-actions class="feed-actions">
     <span class="feed-meta">Posté le {{ feed.createdTime | date: 'dd/MM/yyyy HH:mm' }}</span>
-    <button type="button" mat-button (click)="openDialog()">VOIR</button>
+    <!--    <button type="button" mat-button (click)="openDialog()">VOIR</button>-->
   </mat-card-actions>
 </mat-card>

@@ -6,9 +6,11 @@ import {HallView} from './feature/hall/components/hall-view/hall-view';
 import {SeasonsList} from './feature/season/components/seasons-list/seasons-list';
 import {SeasonForm} from './feature/season/components/season-form/season-form';
 import {SeasonView} from './feature/season/components/season-view/season-view';
+import {ImageCropper} from './shared/image-cropper/image-cropper';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'halls', pathMatch: 'full'},
+  {path: 'image', component: ImageCropper},
   {
     path: 'halls',
     children: [
@@ -31,4 +33,5 @@ export const routes: Routes = [
   {path: 'contact', component: Contact},
   {path: 'rgpd', component: Rgpd},
   {path: '404', component: Error404},
+  {path: '**', redirectTo: '404'},
 ];

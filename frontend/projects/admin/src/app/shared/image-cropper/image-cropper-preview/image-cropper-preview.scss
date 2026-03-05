@@ -1,0 +1,56 @@
+/** 
+ * Styles for the individual result boxes.
+ * Handles different visual states (loading, error, success, empty).
+ */
+.result-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--mat-sys-corner-small);
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+
+  // Uses dynamic CSS variables provided by host binding in TS.
+  width: var(--preview-width);
+  height: var(--preview-height);
+
+  /** Indicates an active background processing. */
+  &.loading {
+    background-color: var(--mat-sys-surface-container);
+    color: var(--mat-sys-primary);
+    border: 1px solid var(--mat-sys-outline-variant);
+  }
+
+  /** Alert for processing errors. */
+  &.error {
+    background-color: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+    border: 1px solid var(--mat-sys-error);
+
+    mat-icon {
+      color: var(--mat-sys-error);
+    }
+  }
+
+  /** Default state when no image is loaded. */
+  &.empty {
+    background-color: var(--mat-sys-surface-container-low);
+    color: var(--mat-sys-outline);
+    border: 2px dashed var(--mat-sys-outline-variant);
+  }
+
+  /** Successful crop result state. */
+  &.success {
+    background-color: transparent;
+    border: 1px solid var(--mat-sys-outline-variant);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; // Ensures the image maintains its aspect ratio within the preview.
+    }
+  }
+}

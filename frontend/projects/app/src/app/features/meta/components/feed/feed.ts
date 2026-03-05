@@ -1,6 +1,5 @@
 import {Component, computed, inject, input} from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
-import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {FeedDTO} from '../../models/feedDTO';
 import {Carousel} from '../carousel/carousel';
@@ -15,7 +14,6 @@ import {MediaPlaceholder} from '../media-placeholder/media-placeholder';
     MatCard,
     MatCardContent,
     MatCardActions,
-    MatButton,
     Carousel,
     Media,
     DatePipe,
@@ -36,13 +34,11 @@ export class Feed {
   constructor() {
   }
 
-/*  openDialog() {
-    const feed = this.feedSignal();
-    this.logger.info('Ouverture du dialogue pour le feed');
-    this.dialog.open(FeedDialogComponent, {data: {feed: feed}});
-    this.logger.debug('Dialogue ouvert avec les données du feed');
-  }*/
-  protected openDialog() {
-    console.log('openDialog');
-  }
+  /*  openDialog() {
+      const feed = this.feedSignal();
+      this.logger.info('Ouverture du dialogue pour le feed');
+      this.dialog.open(FeedDialogComponent, {data: {feed: feed}});
+      this.logger.debug('Dialogue ouvert avec les données du feed');
+    }*/
+
 }

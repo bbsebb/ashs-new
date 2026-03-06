@@ -2,9 +2,9 @@
  * Root host styles for the editor view.
  */
 :host {
-  --container-scale: 1.5;
   display: block;
   width: 100%;
+  min-width: 300px;
   max-width: calc(var(--target-width) * var(--container-scale));
   margin: 0 auto;
 }
@@ -61,6 +61,10 @@
   // Size relative to the responsive container using the scale factor.
   width: calc(100% / var(--container-scale));
   height: calc(100% / var(--container-scale));
+
+  &.circular {
+    border-radius: 50%;
+  }
 }
 
 /** Floating zoom controls with glassmorphism effect. */

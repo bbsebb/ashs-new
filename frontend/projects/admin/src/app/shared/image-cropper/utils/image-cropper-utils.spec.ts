@@ -79,6 +79,9 @@ describe('ImageCropperUtils', () => {
       // Mock Canvas and Context
       const mockContext = {
         drawImage: vi.fn(),
+        beginPath: vi.fn(),
+        arc: vi.fn(),
+        clip: vi.fn(),
       };
 
       const mockCanvas = {
@@ -119,13 +122,27 @@ describe('ImageCropperUtils', () => {
       expect(blob.type).toBe('image/webp');
     });
 
+    it('should apply circular clipping when isCircular is true', async () => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d')!;
+      vi.spyOn(context, 'beginPath');
+      vi.spyOn(context, 'arc');
+      vi.spyOn(context, 'clip');
+
+      await generateCroppedBlob('mock-url', mockGeometry, true);
+
+      expect(context.beginPath).toHaveBeenCalled();
+      expect(context.arc).toHaveBeenCalledWith(25, 25, 25, 0, Math.PI * 2);
+      expect(context.clip).toHaveBeenCalled();
+    });
+
     it('should throw error if canvas context cannot be created', async () => {
       vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
         if (tagName === 'canvas') return {getContext: () => null} as any;
         return {} as any;
       });
 
-      expect(generateCroppedBlob('mock-url', mockGeometry))
+      await expect(generateCroppedBlob('mock-url', mockGeometry))
         .rejects.toThrow('Could not create 2D context for the canvas.');
     });
 
@@ -139,7 +156,7 @@ describe('ImageCropperUtils', () => {
         }
       } as any;
 
-      expect(generateCroppedBlob('bad-url', mockGeometry))
+      await expect(generateCroppedBlob('bad-url', mockGeometry))
         .rejects.toThrow('Failed to load image from source: bad-url');
     });
   });

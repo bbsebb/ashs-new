@@ -22,7 +22,8 @@
       <app-image-cropper-view
         [selectedImageSourceSignal]="selectedImageUrlSignal()"
         [cropMaskWidthSignal]="cropMaskWidthSignal()"
-        [cropMaskHeightSignal]="cropMaskHeightSignal()"
+        [cropMaskHeightSignal]="effectiveHeightSignal()"
+        [isCircularSignal]="isCircularSignal()"
         (cropGeometryChange)="updateCropGeometry($event)">
       </app-image-cropper-view>
     </div>
@@ -33,7 +34,8 @@
         [isErrorSignal]="!!croppedBlobResource.error()"
         [isLoadingSignal]="croppedBlobResource.isLoading()"
         [previewWidthSignal]="cropMaskWidthSignal()"
-        [previewHeightSignal]="cropMaskHeightSignal()">
+        [previewHeightSignal]="effectiveHeightSignal()"
+        [isCircularSignal]="isCircularSignal()">
       </app-image-cropper-preview>
     }
   </div>

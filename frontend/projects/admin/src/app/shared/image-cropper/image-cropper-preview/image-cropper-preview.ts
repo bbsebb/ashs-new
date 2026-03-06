@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
@@ -15,9 +15,9 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
   templateUrl: './image-cropper-preview.html',
   styleUrl: './image-cropper-preview.scss',
   host: {
-    '[style.--target-width.px]': 'previewWidthSignal()',
-    '[style.--target-height.px]': 'previewHeightSignal()',
-    '[style.--aspect-ratio]': 'previewWidthSignal() / previewHeightSignal()',
+    '[style.--target-width.px]': 'calculatedWithSignal()',
+    '[style.--target-height.px]': 'calculatedHeightSignal()',
+    '[style.--aspect-ratio]': 'calculatedWithSignal() / calculatedHeightSignal()',
   }
 })
 export class ImageCropperPreview {
@@ -35,4 +35,23 @@ export class ImageCropperPreview {
 
   /** The source URL of the cropped image to preview. */
   previewImageSourceSignal = input<string | null>(null);
+
+  /** Whether the preview should be displayed as a circle. */
+  isCircularSignal = input(false);
+
+  calculatedWithSignal = computed(() => {
+    if (this.isErrorSignal() || this.isLoadingSignal() || !this.previewImageSourceSignal()) {
+      return 300;
+    } else {
+      return this.previewWidthSignal();
+    }
+  });
+
+  calculatedHeightSignal = computed(() => {
+    if (this.isErrorSignal() || this.isLoadingSignal() || !this.previewImageSourceSignal()) {
+      return 300;
+    } else {
+      return this.previewHeightSignal();
+    }
+  });
 }

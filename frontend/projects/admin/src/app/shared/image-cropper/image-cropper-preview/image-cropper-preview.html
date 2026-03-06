@@ -17,7 +17,7 @@
       <span class="mat-label-large">Erreur</span>
     </div>
   } @else if (previewImageSourceSignal()) {
-    <div class="result-box success mat-elevation-z2">
+    <div class="result-box success mat-elevation-z2" [class.circular]="isCircularSignal()">
       <img [src]="previewImageSourceSignal()" alt="Cropped Image Preview"/>
     </div>
   } @else {

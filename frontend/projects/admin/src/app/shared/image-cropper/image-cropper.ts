@@ -1,4 +1,4 @@
-import {Component, effect, input, output, resource, Signal, signal} from '@angular/core';
+import {Component, computed, effect, input, output, resource, Signal, signal} from '@angular/core';
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {ImageCropperView} from './image-cropper-view/image-cropper-view';
 import {MatIcon} from '@angular/material/icon';
@@ -24,16 +24,25 @@ import {Observable, of, switchMap} from 'rxjs';
 })
 export class ImageCropper {
   withPreviewSignal = input(true, {alias: 'withPreview'});
-  /** The width of the cropping mask area. Defaults to 400. */
-  cropMaskWidthSignal = input(800, {
+
+  /** Whether the cropping mask and result should be circular (forces 1:1 ratio). */
+  isCircularSignal = input(false, {alias: 'isCircular'});
+
+  /** The width of the cropping mask area. Defaults to 800. */
+  cropMaskWidthSignal = input(100, {
     alias: 'cropMaskWidth',
-    transform: (value: number) => value || 800,
+    transform: (value: number) => value || 100,
   });
 
-  /** The height of the cropping mask area. Defaults to 400. */
-  cropMaskHeightSignal = input(300, {
+  /** The height of the cropping mask area. Defaults to 300. Forced to match width if circular. */
+  cropMaskHeightSignal = input(100, {
     alias: 'cropMaskHeight',
-    transform: (value: number) => value || 300,
+    transform: (value: number) => value || 100,
+  });
+
+  /** Computed height that respects the circular constraint. */
+  effectiveHeightSignal = computed(() => {
+    return this.isCircularSignal() ? this.cropMaskWidthSignal() : this.cropMaskHeightSignal();
   });
 
   /** Emits the resulting Blob whenever the crop is updated. */
@@ -96,13 +105,14 @@ export class ImageCropper {
     return resource({
       params: () => ({
         source: this._selectedImageUrlSignal(),
-        geometry: this._currentCropGeometrySignal()
+        geometry: this._currentCropGeometrySignal(),
+        isCircular: this.isCircularSignal()
       }),
       loader: async ({params}) => {
         if (!params.source || !params.geometry) {
           return undefined;
         }
-        return await generateCroppedBlob(params.source, params.geometry);
+        return await generateCroppedBlob(params.source, params.geometry, params.isCircular);
       }
     });
   }

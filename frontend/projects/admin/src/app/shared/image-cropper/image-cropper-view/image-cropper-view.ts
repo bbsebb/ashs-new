@@ -1,4 +1,4 @@
-import {Component, effect, ElementRef, input, output, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, output, Signal, signal, viewChild} from '@angular/core';
 import {CdkDrag} from '@angular/cdk/drag-drop';
 import {computeCropGeometry, CropGeometry} from '../utils/image-cropper-utils';
 import {MatIcon} from '@angular/material/icon';
@@ -20,6 +20,7 @@ import {PercentPipe} from '@angular/common';
   templateUrl: './image-cropper-view.html',
   styleUrl: './image-cropper-view.scss',
   host: {
+    '[style.--container-scale]': 'containerScaleSignal()',
     '[style.--target-width.px]': 'cropMaskWidthSignal()',
     '[style.--target-height.px]': 'cropMaskHeightSignal()',
     '[style.--aspect-ratio]': 'cropMaskWidthSignal() / cropMaskHeightSignal()',
@@ -34,6 +35,11 @@ export class ImageCropperView {
 
   /** The height of the cropping mask area. */
   cropMaskHeightSignal = input.required<number>();
+
+  /** Whether the crop mask should be displayed as a circle. */
+  isCircularSignal = input(false);
+
+  containerScaleSignal: Signal<number> = computed(() => this.isCircularSignal() ? 1.1 : 1.5);
 
   /** Emits the new crop geometry coordinates whenever the image is moved, zoomed or loaded. */
   cropGeometryChange = output<CropGeometry>();

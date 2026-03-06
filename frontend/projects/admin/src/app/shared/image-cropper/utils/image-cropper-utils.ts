@@ -77,6 +77,7 @@ async function convertCanvasToBlob(
  * 
  * @param imageSource The source URL or base64 string of the image.
  * @param geometry The geometry defining the crop area.
+ * @param isCircular Whether the final crop should be clipped into a circle.
  * @param imageMediaType The media type of the resulting image (default: 'image/webp').
  * @param quality The quality of the resulting image (0 to 1).
  * @returns A promise that resolves to the cropped image Blob.
@@ -84,6 +85,7 @@ async function convertCanvasToBlob(
 export async function generateCroppedBlob(
   imageSource: string,
   geometry: CropGeometry,
+  isCircular = false,
   imageMediaType = 'image/webp',
   quality = 1
 ): Promise<Blob> {
@@ -97,6 +99,17 @@ export async function generateCroppedBlob(
   const canvasRenderingContext = canvas.getContext('2d');
   if (canvasRenderingContext === null) {
     throw new Error('Could not create 2D context for the canvas.');
+  }
+
+  // Apply circular clipping if requested
+  if (isCircular) {
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(canvas.width, canvas.height) / 2;
+
+    canvasRenderingContext.beginPath();
+    canvasRenderingContext.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    canvasRenderingContext.clip();
   }
 
   // Draw the cropped portion of the image onto the canvas

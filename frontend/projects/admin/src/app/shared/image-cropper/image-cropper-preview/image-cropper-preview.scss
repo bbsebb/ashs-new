@@ -2,6 +2,12 @@
  * Styles for the individual result boxes.
  * Handles different visual states (loading, error, success, empty).
  */
+:host {
+  display: block;
+  width: 100%;
+  max-width: var(--target-width);
+}
+
 .result-box {
   display: flex;
   flex-direction: column;
@@ -13,9 +19,8 @@
   box-sizing: border-box;
   transition: all 0.3s ease;
 
-  // Uses dynamic CSS variables provided by host binding in TS.
-  width: var(--preview-width);
-  height: var(--preview-height);
+  width: 100%;
+  aspect-ratio: var(--aspect-ratio);
 
   /** Indicates an active background processing. */
   &.loading {

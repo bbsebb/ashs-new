@@ -25,15 +25,15 @@ import {Observable, of, switchMap} from 'rxjs';
 export class ImageCropper {
   withPreviewSignal = input(true, {alias: 'withPreview'});
   /** The width of the cropping mask area. Defaults to 400. */
-  cropMaskWidthSignal = input(400, {
+  cropMaskWidthSignal = input(800, {
     alias: 'cropMaskWidth',
-    transform: (value: number) => value || 400,
+    transform: (value: number) => value || 800,
   });
 
   /** The height of the cropping mask area. Defaults to 400. */
-  cropMaskHeightSignal = input(400, {
+  cropMaskHeightSignal = input(300, {
     alias: 'cropMaskHeight',
-    transform: (value: number) => value || 400,
+    transform: (value: number) => value || 300,
   });
 
   /** Emits the resulting Blob whenever the crop is updated. */
@@ -159,8 +159,4 @@ export class ImageCropper {
     });
   }
 
-  private clamp(value: number, min: number, max: number, defaultValue: number): number {
-    const safeValue = value || defaultValue;
-    return Math.min(Math.max(safeValue, min), max);
-  }
 }

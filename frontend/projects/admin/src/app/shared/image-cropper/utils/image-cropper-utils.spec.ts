@@ -36,7 +36,7 @@ describe('ImageCropperUtils', () => {
       // Source Width: 100 * 2 = 200
       // Source Height: 100 * 2 = 200
 
-      const result = computeCropGeometry(mockImage, mockMask);
+      const result = computeCropGeometry(mockImage, mockMask, 100, 100);
 
       expect(result).toEqual({
         sourceX: 100,

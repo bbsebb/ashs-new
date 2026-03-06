@@ -1,4 +1,4 @@
-import {Component, computed, effect, ElementRef, input, output, signal, viewChild} from '@angular/core';
+import {Component, effect, ElementRef, input, output, signal, viewChild} from '@angular/core';
 import {CdkDrag} from '@angular/cdk/drag-drop';
 import {computeCropGeometry, CropGeometry} from '../utils/image-cropper-utils';
 import {MatIcon} from '@angular/material/icon';
@@ -20,8 +20,9 @@ import {PercentPipe} from '@angular/common';
   templateUrl: './image-cropper-view.html',
   styleUrl: './image-cropper-view.scss',
   host: {
-    '[style.--view-width.px]': 'cropMaskWidthSignal()',
-    '[style.--view-height.px]': 'cropMaskHeightSignal()',
+    '[style.--target-width.px]': 'cropMaskWidthSignal()',
+    '[style.--target-height.px]': 'cropMaskHeightSignal()',
+    '[style.--aspect-ratio]': 'cropMaskWidthSignal() / cropMaskHeightSignal()',
   }
 })
 export class ImageCropperView {
@@ -69,7 +70,7 @@ export class ImageCropperView {
    * Increases the zoom level within maximum limits.
    */
   zoomIn(): void {
-    this.zoomLevelSignal.update(current => 
+    this.zoomLevelSignal.update(current =>
       Math.min(current + this._ZOOM_STEP, this._MAX_ZOOM)
     );
   }
@@ -78,7 +79,7 @@ export class ImageCropperView {
    * Decreases the zoom level within minimum limits.
    */
   zoomOut(): void {
-    this.zoomLevelSignal.update(current => 
+    this.zoomLevelSignal.update(current =>
       Math.max(current - this._ZOOM_STEP, this._MIN_ZOOM)
     );
   }
@@ -125,7 +126,12 @@ export class ImageCropperView {
       return;
     }
 
-    const geometry = computeCropGeometry(imageElement, maskElement);
+    const geometry = computeCropGeometry(
+      imageElement,
+      maskElement,
+      this.cropMaskWidthSignal(),
+      this.cropMaskHeightSignal()
+    );
     this.cropGeometryChange.emit(geometry);
   }
 }

@@ -1,4 +1,4 @@
-/** 
+/**
  * Root host styles for the image cropper component.
  * Defines shared design tokens for the cropper.
  */
@@ -9,7 +9,7 @@
 }
 
 /** Main wrapper providing spacing and max-width layout. */
-.image-cropper-wrapper {
+.image-cropper-container {
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -33,14 +33,24 @@
   flex-direction: column;
   gap: 32px;
   align-items: center;
+  width: 100%; // Ensure it fills the container width
 
   // Responsive switch to horizontal layout on larger screens.
   @media (min-width: 900px) {
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
+    flex-wrap: wrap;
     gap: 48px;
   }
+}
+
+.crop-section, .preview-section {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /** Section headings style. */

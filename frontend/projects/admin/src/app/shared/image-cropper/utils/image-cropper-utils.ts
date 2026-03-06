@@ -14,14 +14,18 @@ export interface CropGeometry {
 
 /**
  * Calculates the crop coordinates based on the image and mask elements.
- * 
+ *
  * @param imageElement The HTML image element being cropped.
  * @param maskElement The HTML element representing the crop area (the mask).
+ * @param targetWidth The desired output width in pixels.
+ * @param targetHeight The desired output height in pixels.
  * @returns The calculated crop geometry.
  */
 export function computeCropGeometry(
   imageElement: HTMLImageElement,
-  maskElement: HTMLElement
+  maskElement: HTMLElement,
+  targetWidth: number,
+  targetHeight: number
 ): CropGeometry {
   const imageBoundingClientRect = imageElement.getBoundingClientRect();
   const maskBoundingClientRect = maskElement.getBoundingClientRect();
@@ -35,8 +39,8 @@ export function computeCropGeometry(
     sourceY: (maskBoundingClientRect.top - imageBoundingClientRect.top) * verticalScaleRatio,
     sourceWidth: maskBoundingClientRect.width * horizontalScaleRatio,
     sourceHeight: maskBoundingClientRect.height * verticalScaleRatio,
-    destinationWidth: maskBoundingClientRect.width,
-    destinationHeight: maskBoundingClientRect.height
+    destinationWidth: targetWidth,
+    destinationHeight: targetHeight
   };
 }
 

@@ -15,8 +15,9 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
   templateUrl: './image-cropper-preview.html',
   styleUrl: './image-cropper-preview.scss',
   host: {
-    '[style.--preview-width.px]': 'previewWidthSignal()',
-    '[style.--preview-height.px]': 'previewHeightSignal()',
+    '[style.--target-width.px]': 'previewWidthSignal()',
+    '[style.--target-height.px]': 'previewHeightSignal()',
+    '[style.--aspect-ratio]': 'previewWidthSignal() / previewHeightSignal()',
   }
 })
 export class ImageCropperPreview {

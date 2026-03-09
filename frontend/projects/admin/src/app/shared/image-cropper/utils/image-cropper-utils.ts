@@ -1,3 +1,5 @@
+import {environment} from '@environment';
+
 /**
  * Defines the complete geometry of the area to be cropped.
  * Uses explicit names to avoid confusion between source image coordinates
@@ -46,15 +48,15 @@ export function computeCropGeometry(
 
 /**
  * Converts a Canvas element to a Blob using a Promise-based approach.
- * 
+ *
  * @param canvas The canvas element to convert.
  * @param imageMediaType The media type of the resulting image (default: 'image/webp').
  * @param quality The quality of the resulting image (0 to 1).
  * @returns A promise that resolves to the image Blob.
  */
 async function convertCanvasToBlob(
-  canvas: HTMLCanvasElement, 
-  imageMediaType = 'image/webp', 
+  canvas: HTMLCanvasElement,
+  imageMediaType = 'image/png',
   quality = 1
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
@@ -74,7 +76,7 @@ async function convertCanvasToBlob(
 
 /**
  * Generates a cropped Blob from the image source and calculated geometry.
- * 
+ *
  * @param imageSource The source URL or base64 string of the image.
  * @param geometry The geometry defining the crop area.
  * @param isCircular Whether the final crop should be clipped into a circle.
@@ -86,7 +88,7 @@ export async function generateCroppedBlob(
   imageSource: string,
   geometry: CropGeometry,
   isCircular = false,
-  imageMediaType = 'image/webp',
+  imageMediaType = 'image/png',
   quality = 1
 ): Promise<Blob> {
   const imageElement = await loadImageElement(imageSource);
@@ -130,7 +132,7 @@ export async function generateCroppedBlob(
 
 /**
  * Utility to load an image from a source URL and return it as an HTMLImageElement.
- * 
+ *
  * @param imageSource The source URL of the image.
  * @returns A promise that resolves to the loaded HTMLImageElement.
  */
@@ -143,4 +145,28 @@ function loadImageElement(imageSource: string): Promise<HTMLImageElement> {
     imageElement.onload = () => resolve(imageElement);
     imageElement.onerror = () => reject(new Error(`Failed to load image from source: ${imageSource}`));
   });
+}
+
+export function createImageSourceUrl(source: string | null | undefined) {
+
+  const DEFAULT_AVATAR_IMAGE_PATH = '/shared-ui/avatar.png';
+  if (!source) {
+    return DEFAULT_AVATAR_IMAGE_PATH;
+  }
+  const isAbsoluteOrBrowserImageSource =
+    source.startsWith('http://') ||
+    source.startsWith('https://') ||
+    source.startsWith('blob:') ||
+    source.startsWith('data:');
+  if (isAbsoluteOrBrowserImageSource) {
+    return source;
+  }
+
+  const uploadsBaseUrl = `${environment.apiUrl}${environment.uploadsPath}`;
+
+  return `${uploadsBaseUrl}/${source}`;
+}
+
+export function buildCssBackgroundImageUrl(imageSource: string): string {
+  return `url(${imageSource})`;
 }

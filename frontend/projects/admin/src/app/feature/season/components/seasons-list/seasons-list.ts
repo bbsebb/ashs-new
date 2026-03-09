@@ -3,7 +3,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {LayoutService, SeasonsStore} from '@shared-api';
-import {DialogService, ErrorData, LoadingData, NotificationService, PageTitle} from '@shared-ui';
+import {ErrorData, LoadingData, NotificationService, PageTitle} from '@shared-ui';
 import {MatFabButton, MatIconButton} from '@angular/material/button';
 import {RouterLink} from '@angular/router';
 import {MatIcon} from '@angular/material/icon';
@@ -24,13 +24,13 @@ import {
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {MatPaginator} from '@angular/material/paginator';
 import {Season} from '@shared-domain';
-import {EMPTY, switchMap} from 'rxjs';
 import {DatePipe} from '@angular/common';
+import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 
 
 @Component({
   selector: 'app-seasons-list',
-  imports: [MatFormFieldModule, MatSortHeader, MatInputModule, MatDatepickerModule, LoadingData, ErrorData, PageTitle, MatFabButton, RouterLink, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, MatIconButton, MatHeaderRow, MatRow, MatHeaderRowDef, MatRowDef, MatNoDataRow, MatPaginator, DatePipe],
+  imports: [MatFormFieldModule, MatSortHeader, MatInputModule, MatDatepickerModule, LoadingData, ErrorData, PageTitle, MatFabButton, RouterLink, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, MatIconButton, MatHeaderRow, MatRow, MatHeaderRowDef, MatRowDef, MatNoDataRow, MatPaginator, DatePipe, FormDeleteButton],
   templateUrl: './seasons-list.html',
   styleUrl: './seasons-list.scss',
 })
@@ -38,7 +38,6 @@ export class SeasonsList {
   private readonly seasonsStore = inject(SeasonsStore);
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
-  private readonly dialogService = inject(DialogService);
   seasonsSignal = this.seasonsStore.seasons;
   isLoading = this.seasonsStore.isLoading;
   error = computed(() => !!this.seasonsStore.error());
@@ -70,12 +69,9 @@ export class SeasonsList {
     this.seasonsStore.reload();
   }
 
-  protected delete(id:string) {
-    this.dialogService.showConfirmation("Etes vous sur de vouloir supprimer cette saison?").pipe(
-      switchMap(confirmed => confirmed ? this.seasonsStore.deleteById(id) : EMPTY),
-    ).subscribe({
-      next: () => this.notificationService.show("Season supprimée avec succès",'success')
-    })
-
+  protected onDelete(id: string) {
+    this.seasonsStore.deleteById(id).subscribe({
+      next: () => this.notificationService.show("Saison supprimée avec succès", 'success')
+    });
   }
 }

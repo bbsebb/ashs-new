@@ -1,3 +1,4 @@
 export const environment = {
-  apiUrl: 'https://api.hoenheimsports.fr'
+  apiUrl: 'https://api.hoenheimsports.fr',
+  uploadsPath: '/uploads',
 };

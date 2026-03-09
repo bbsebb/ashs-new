@@ -1,11 +1,13 @@
-import {Component, computed, effect, input, output, resource, Signal, signal} from '@angular/core';
-import {toObservable, toSignal} from '@angular/core/rxjs-interop';
+import {Component, computed, effect, input, output, resource, signal} from '@angular/core';
+import {toObservable} from '@angular/core/rxjs-interop';
 import {ImageCropperView} from './image-cropper-view/image-cropper-view';
 import {MatIcon} from '@angular/material/icon';
 import {MatButton} from '@angular/material/button';
 import {ImageCropperPreview} from './image-cropper-preview/image-cropper-preview';
 import {CropGeometry, generateCroppedBlob} from './utils/image-cropper-utils';
-import {Observable, of, switchMap} from 'rxjs';
+
+const DEFAULT_CROP_MASK_WIDTH = 400;
+const DEFAULT_CROP_MASK_HEIGHT = 400;
 
 /**
  * ImageCropper component provides a UI for selecting, dragging, and cropping an image.
@@ -23,21 +25,23 @@ import {Observable, of, switchMap} from 'rxjs';
   styleUrl: './image-cropper.scss',
 })
 export class ImageCropper {
-  withPreviewSignal = input(true, {alias: 'withPreview'});
+
+
+  withPreviewSignal = input(false, {alias: 'withPreview'});
 
   /** Whether the cropping mask and result should be circular (forces 1:1 ratio). */
   isCircularSignal = input(false, {alias: 'isCircular'});
 
   /** The width of the cropping mask area. Defaults to 800. */
-  cropMaskWidthSignal = input(100, {
+  cropMaskWidthSignal = input(DEFAULT_CROP_MASK_WIDTH, {
     alias: 'cropMaskWidth',
-    transform: (value: number) => value || 100,
+    transform: (value: number) => value || DEFAULT_CROP_MASK_WIDTH,
   });
 
   /** The height of the cropping mask area. Defaults to 300. Forced to match width if circular. */
-  cropMaskHeightSignal = input(100, {
+  cropMaskHeightSignal = input(DEFAULT_CROP_MASK_HEIGHT, {
     alias: 'cropMaskHeight',
-    transform: (value: number) => value || 100,
+    transform: (value: number) => value || DEFAULT_CROP_MASK_HEIGHT,
   });
 
   /** Computed height that respects the circular constraint. */
@@ -60,12 +64,6 @@ export class ImageCropper {
    */
   protected readonly croppedBlobResource = this._initializeCroppedBlobResource();
 
-  /**
-   * Signal providing a temporary Object URL for previewing the cropped result.
-   * Manages its own lifecycle (creation and revocation) to prevent memory leaks.
-   */
-  protected readonly previewImageUrlSignal = this._initializePreviewImageUrlSignal();
-
   /** Accessor for the selected image URL (used in template). */
   protected get selectedImageUrlSignal() {
     return this._selectedImageUrlSignal;
@@ -73,7 +71,11 @@ export class ImageCropper {
 
   constructor() {
     this._setupSourceUrlCleanup();
-    this._setupBlobEmission();
+
+    // Émission du blob vers le parent via un observable pour garantir le déclenchement
+    toObservable(this.croppedBlobResource.value).subscribe(blob => {
+      this.croppedBlobChange.emit(blob);
+    });
   }
 
   /**
@@ -118,34 +120,6 @@ export class ImageCropper {
   }
 
   /**
-   * Initializes the signal for the preview image URL with automatic cleanup.
-   */
-  private _initializePreviewImageUrlSignal(): Signal<string | null> {
-    return toSignal(
-      toObservable(this.croppedBlobResource.value).pipe(
-        switchMap(blob => {
-          if (!blob) {
-            return of(null);
-          }
-
-          // On crée un nouvel Observable manuel au lieu de 'of'
-          return new Observable<string>(observer => {
-            const objectUrl = URL.createObjectURL(blob);
-            observer.next(objectUrl);
-
-            // Cette fonction de retour est appelée UNIQUEMENT au désabonnement
-            // (quand switchMap reçoit un nouveau blob ou que le composant est détruit)
-            return () => {
-              URL.revokeObjectURL(objectUrl);
-            };
-          });
-        })
-      ),
-      {initialValue: null}
-    );
-  }
-
-  /**
    * Sets up an effect to automatically revoke the source image Object URL
    * whenever it changes or when the component is destroyed.
    */
@@ -157,15 +131,6 @@ export class ImageCropper {
           URL.revokeObjectURL(sourceUrl);
         }
       });
-    });
-  }
-
-  /**
-   * Sets up an effect to emit the generated blob to the parent component.
-   */
-  private _setupBlobEmission(): void {
-    effect(() => {
-      this.croppedBlobChange.emit(this.croppedBlobResource.value());
     });
   }
 

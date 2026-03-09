@@ -6,7 +6,7 @@
 
   <!-- Action bar containing the file selection button -->
   <div class="actions-bar">
-    <button mat-stroked-button (click)="fileInput.click()" aria-label="Sélectionner une image">
+    <button mat-stroked-button type="button" (click)="fileInput.click()" aria-label="Sélectionner une image">
       <mat-icon fontIcon="upload_file"></mat-icon>
       Sélectionner une image
     </button>
@@ -27,10 +27,10 @@
         (cropGeometryChange)="updateCropGeometry($event)">
       </app-image-cropper-view>
     </div>
-    @if (true) {
+    @if (withPreviewSignal()) {
       <!-- Live preview section showing the cropped result -->
       <app-image-cropper-preview
-        [previewImageSourceSignal]="previewImageUrlSignal()"
+        [previewBlob]="croppedBlobResource.value()"
         [isErrorSignal]="!!croppedBlobResource.error()"
         [isLoadingSignal]="croppedBlobResource.isLoading()"
         [previewWidthSignal]="cropMaskWidthSignal()"

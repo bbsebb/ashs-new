@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input, signal, Signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, input, linkedSignal, Signal} from '@angular/core';
 import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from "@shared-ui";
 import {MatButton} from "@angular/material/button";
 import {MatError, MatFormField, MatInputModule, MatLabel} from "@angular/material/input";
@@ -52,30 +52,28 @@ export class SeasonForm {
   id = input<string | undefined>(undefined);
   seasonSignal: Signal<Season | undefined> = this.seasonsStore.seasonById(this.id);
   isCreateForm = computed(() => !this.id());  // Or it's a "edit" form if id is defined.
-  seasonModel = this.buildModel();
-  seasonForm = this.buildForm();
-  seasonPreview = computed(() => this.mapToSeason(this.seasonModel()));
 
-
-  constructor() {
-    effect(() => {
-      const season = this.seasonSignal();
-      if (season) {
-        this.seasonModel.set(this.mapToSeasonFormModel(season))
-      }
-    });
-  }
-
-  private buildModel(): WritableSignal<SeasonFormModel> {
+  // Form model reset automatically when seasonSignal changes
+  seasonModelSignal = linkedSignal<SeasonFormModel>(() => {
+    const season = this.seasonSignal();
+    if (season) {
+      return {
+        endDate: new Date(season.endDate),
+        startDate: new Date(season.startDate)
+      };
+    }
     const now = new Date();
-    return signal<SeasonFormModel>({
+    return {
       startDate: now,
       endDate: now,
-    })
-  }
+    };
+  });
+
+  seasonForm = this.buildForm();
+  seasonPreview = computed(() => this.mapToSeason(this.seasonModelSignal()));
 
   private buildForm(): FieldTree<SeasonFormModel> {
-    return form(this.seasonModel);
+    return form(this.seasonModelSignal);
   }
 
   protected submitForm(event: Event) {
@@ -84,28 +82,24 @@ export class SeasonForm {
 
     void submit(this.seasonForm, async (form) => {
       try {
+        let resultId = id;
         if (!id) {
-          await firstValueFrom(this.seasonsStore.createSeason(this.mapToCreateSeasonDTO(this.seasonModel())).pipe(
+          const newSeason = await firstValueFrom(this.seasonsStore.createSeason(this.mapToCreateSeasonDTO(this.seasonModelSignal())).pipe(
             tap(() => this.notificationService.show('La saison a été enregistrée', 'success'))
           ));
+          resultId = newSeason.id;
         } else {
-          await firstValueFrom(this.seasonsStore.editSeason(id, this.mapToCreateSeasonDTO(this.seasonModel())).pipe(
+          const updatedSeason = await firstValueFrom(this.seasonsStore.editSeason(id, this.mapToCreateSeasonDTO(this.seasonModelSignal())).pipe(
             tap(() => this.notificationService.show('La saison a été mise à jour', 'success'))
           ));
+          resultId = updatedSeason.id;
         }
-        await this.router.navigateByUrl('/seasons');
+        await this.router.navigateByUrl(`/seasons/${resultId}`);
         return undefined;
       } catch (error) {
         return this.formErrorHandler.handleError(error, form);
       }
     });
-  }
-
-  private mapToSeasonFormModel(season: Season): SeasonFormModel {
-    return {
-      endDate: new Date(season.endDate),
-      startDate: new Date(season.startDate)
-    }
   }
 
   private mapToSeason(seasonFormModel: SeasonFormModel): Season {

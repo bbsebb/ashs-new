@@ -1,6 +1,6 @@
 import {Component, computed, effect, inject, viewChild} from '@angular/core';
 import {HallsStore, LayoutService} from '@shared-api';
-import {DialogService, ErrorData, LoadingData, NotificationService, PageTitle} from '@shared-ui';
+import {ErrorData, LoadingData, NotificationService, PageTitle} from '@shared-ui';
 import {
   MatCell,
   MatCellDef,
@@ -21,7 +21,7 @@ import {MatFabButton, MatIconButton} from '@angular/material/button';
 import {RouterLink} from '@angular/router';
 import {MatIcon} from '@angular/material/icon';
 import {Hall} from '@shared-domain';
-import {EMPTY, switchMap} from 'rxjs';
+import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 
 @Component({
   selector: 'app-halls',
@@ -46,7 +46,8 @@ import {EMPTY, switchMap} from 'rxjs';
     MatIcon,
     MatNoDataRow,
     MatFabButton,
-    PageTitle
+    PageTitle,
+    FormDeleteButton
   ],
   templateUrl: './halls-list.html',
   styleUrl: './halls-list.scss',
@@ -55,7 +56,6 @@ export class HallsList {
   private readonly hallsStore = inject(HallsStore);
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
-  private readonly dialogService = inject(DialogService);
   hallsSignal = this.hallsStore.halls;
   isLoading = this.hallsStore.isLoading;
   error = computed(() => !!this.hallsStore.error());
@@ -87,12 +87,9 @@ export class HallsList {
   this.hallsStore.reload();
 }
 
-  protected delete(id:string) {
-    this.dialogService.showConfirmation("Etes vous sur de vouloir supprimer cette salle?").pipe(
-      switchMap(confirmed => confirmed ? this.hallsStore.deleteById(id) : EMPTY),
-    ).subscribe({
-      next: () => this.notificationService.show("Salle supprimée avec succès",'success')
-    })
-
+  protected onDelete(id: string) {
+    this.hallsStore.deleteById(id).subscribe({
+      next: () => this.notificationService.show("Salle supprimée avec succès", 'success')
+    });
   }
 }

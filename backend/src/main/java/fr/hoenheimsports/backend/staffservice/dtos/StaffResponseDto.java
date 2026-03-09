@@ -9,5 +9,5 @@ import java.util.UUID;
  * DTO for {@link Staff}
  */
 public record StaffResponseDto(UUID id, String firstName, String lastName, String email,
-                               String phone) implements Serializable {
+                               String phone, String fileName) implements Serializable {
 }

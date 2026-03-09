@@ -49,9 +49,11 @@
             <mat-icon>edit</mat-icon>
           </button>
 
-          <button mat-icon-button type="button" aria-label="Supprimer" (click)="delete(season.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <app-form-delete-button
+            confirmMessage="Êtes-vous sûr de vouloir supprimer cette saison ?"
+            [iconOnly]="true"
+            (deleteConfirmed)="onDelete(season.id)">
+          </app-form-delete-button>
         </td>
       </ng-container>
 

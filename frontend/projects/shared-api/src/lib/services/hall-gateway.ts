@@ -30,7 +30,7 @@ export class HallGateway {
     return this.http.delete<void>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`);
   }
 
-  editHall(id: string, createHallDTO: EditHallDTO) {
-    return this.http.put<void>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`, createHallDTO);
+  editHall(id: string, createHallDTO: EditHallDTO): Observable<Hall> {
+    return this.http.put<Hall>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`, createHallDTO);
   }
 }

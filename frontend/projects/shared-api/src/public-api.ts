@@ -8,5 +8,8 @@ export * from './lib/services/seasons-store';
 export * from './lib/services/season-gateway';
 export * from './lib/services/dtos/create-season-dto';
 export * from './lib/services/dtos/edit-season-dto';
+export * from './lib/services/dtos/staff-dto';
+export * from './lib/services/staff-gateway';
+export * from './lib/services/staffs-store';
 export * from './lib/utils/DateMapper'
 export * from './lib/services/contact-gateway'

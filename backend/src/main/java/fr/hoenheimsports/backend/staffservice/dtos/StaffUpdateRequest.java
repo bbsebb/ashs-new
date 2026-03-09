@@ -8,6 +8,6 @@ import java.util.UUID;
 /**
  * DTO for {@link Staff}
  */
-public record StaffRequestDto(UUID id, String firstName, String lastName, String email,
-                              String phone) implements Serializable {
+public record StaffUpdateRequest(UUID id, String firstName, String lastName, String email,
+                                 String phone, String fileName) implements Serializable {
 }

@@ -45,10 +45,10 @@ export class ImageCropperView {
   cropGeometryChange = output<CropGeometry>();
 
   /** Reference to the draggable image element. */
-  private readonly _imageElementRef = viewChild.required<ElementRef<HTMLImageElement>>('imageElement');
+  private readonly _imageElementRef = viewChild<ElementRef<HTMLImageElement>>('imageElement');
 
   /** Reference to the static mask overlay element. */
-  private readonly _maskElementRef = viewChild.required<ElementRef<HTMLDivElement>>('maskElement');
+  private readonly _maskElementRef = viewChild<ElementRef<HTMLDivElement>>('maskElement');
 
   /** Internal state for the zoom level. 1.0 is original size. */
   protected readonly zoomLevelSignal = signal(1);
@@ -68,7 +68,10 @@ export class ImageCropperView {
       // We access the signal to subscribe to changes.
       this.zoomLevelSignal();
       // Wait for the next macro-task to ensure CSS transform is applied before measuring.
-      setTimeout(() => this.recalculateCropGeometry());
+      // We also check if we have an image selected and elements are available.
+      if (this.selectedImageSourceSignal()) {
+        setTimeout(() => this.recalculateCropGeometry());
+      }
     });
   }
 
@@ -124,8 +127,15 @@ export class ImageCropperView {
    * Emits the results to the parent component.
    */
   recalculateCropGeometry(): void {
-    const imageElement = this._imageElementRef().nativeElement;
-    const maskElement = this._maskElementRef().nativeElement;
+    const imageRef = this._imageElementRef();
+    const maskRef = this._maskElementRef();
+
+    if (!imageRef || !maskRef) {
+      return;
+    }
+
+    const imageElement = imageRef.nativeElement;
+    const maskElement = maskRef.nativeElement;
 
     // Safety check: image must be fully loaded to get correct natural dimensions.
     if (!imageElement.complete || imageElement.naturalWidth === 0) {

@@ -1,0 +1,34 @@
+@let staff = staffSignal();
+<mat-card appearance="outlined" class="card">
+  <mat-card-header class="header">
+    <div mat-card-avatar
+         class="example-header-image">
+    </div>
+    <mat-card-title class="title">{{ staff.firstName }} {{ staff.lastName }}</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content class="content">
+    <div class="info-container">
+      <div class="info-item">
+        <span class="info-label">Email</span>
+        <span class="info-value">{{ staff.email }}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="info-label">Téléphone</span>
+        <span class="info-value">{{ staff.phone }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+
+  @if (withActions()) {
+    <mat-card-actions align="end">
+      <button mat-button type="button" routerLink="/staffs">Retour</button>
+      <button mat-flat-button type="button" routerLink="/staffs/{{staff.id}}/edit">Modifier</button>
+      <app-form-delete-button
+        confirmMessage="Êtes-vous sûr de vouloir supprimer ce membre de l'encadrement ?"
+        (deleteConfirmed)="onDelete()">
+      </app-form-delete-button>
+    </mat-card-actions>
+  }
+</mat-card>

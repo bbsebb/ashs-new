@@ -1,4 +1,4 @@
-import {Component, computed, input} from '@angular/core';
+import {Component, computed, effect, input} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
@@ -33,8 +33,14 @@ export class ImageCropperPreview {
   /** Indicates if an error occurred during image processing. */
   isErrorSignal = input(false);
 
-  /** The source URL of the cropped image to preview. */
-  previewImageSourceSignal = input<string | null>(null);
+  /** The blob of the cropped image to preview. */
+  previewBlobSignal = input.required<Blob | undefined>({alias: 'previewBlob'});
+
+  /** The generated source URL for the preview image. */
+  previewImageSourceSignal = computed(() => {
+    const blob = this.previewBlobSignal();
+    return blob ? URL.createObjectURL(blob) : null;
+  });
 
   /** Whether the preview should be displayed as a circle. */
   isCircularSignal = input(false);
@@ -54,4 +60,15 @@ export class ImageCropperPreview {
       return this.previewHeightSignal();
     }
   });
+
+  constructor() {
+    effect((onCleanup) => {
+      const url = this.previewImageSourceSignal();
+      onCleanup(() => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    });
+  }
 }

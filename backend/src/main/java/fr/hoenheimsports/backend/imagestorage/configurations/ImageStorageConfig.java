@@ -12,7 +12,7 @@ public class ImageStorageConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Mappe l'URL http://localhost:8080/images/mon-fichier.jpg
+        // Mappe l'URL http://localhost:8080/uploads/mon-fichier.jpg
         // Vers le dossier physique "uploads/"
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + uploadDir + "/");

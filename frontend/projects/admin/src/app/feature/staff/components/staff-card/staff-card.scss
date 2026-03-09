@@ -1,0 +1,48 @@
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}
+
+.content {
+  padding: 24px;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+  word-break: break-word;
+}
+
+mat-card-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  gap: 8px;
+}
+
+.example-header-image {
+  background-image: var(--avatar-url);
+  background-size: cover;
+}

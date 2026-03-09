@@ -6,11 +6,14 @@ import {HallView} from './feature/hall/components/hall-view/hall-view';
 import {SeasonsList} from './feature/season/components/seasons-list/seasons-list';
 import {SeasonForm} from './feature/season/components/season-form/season-form';
 import {SeasonView} from './feature/season/components/season-view/season-view';
+import {StaffsList} from './feature/staff/components/staffs-list/staffs-list';
+import {StaffForm} from './feature/staff/components/staff-form/staff-form';
+import {StaffView} from './feature/staff/components/staff-view/staff-view';
 import {ImageCropper} from './shared/image-cropper/image-cropper';
 
 export const routes: Routes = [
   {path: '', redirectTo: 'halls', pathMatch: 'full'},
-  {path: 'image', component: ImageCropper},
+  {path: 'image', component: ImageCropper, data: {withPreview: true}},
   {
     path: 'halls',
     children: [
@@ -27,6 +30,15 @@ export const routes: Routes = [
       {path: 'create', component: SeasonForm},
       {path: ':id/edit', component: SeasonForm},
       {path: ':id', component: SeasonView},
+    ]
+  },
+  {
+    path: 'staffs',
+    children: [
+      {path: '', component: StaffsList},
+      {path: 'create', component: StaffForm},
+      {path: ':id/edit', component: StaffForm},
+      {path: ':id', component: StaffView},
     ]
   },
   {path: 'mentions-legales', component: MentionsLegales},

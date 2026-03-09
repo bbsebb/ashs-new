@@ -49,9 +49,11 @@
             <mat-icon>edit</mat-icon>
           </button>
 
-          <button mat-icon-button type="button" aria-label="Supprimer" (click)="delete(hall.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <app-form-delete-button
+            confirmMessage="Êtes-vous sûr de vouloir supprimer cette salle ?"
+            [iconOnly]="true"
+            (deleteConfirmed)="onDelete(hall.id)">
+          </app-form-delete-button>
         </td>
       </ng-container>
 

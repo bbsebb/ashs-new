@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input, Signal, signal, WritableSignal} from '@angular/core';
+import {Component, computed, inject, input, linkedSignal, Signal} from '@angular/core';
 
 import {FieldTree, form, FormField, maxLength, required, submit} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
@@ -38,35 +38,24 @@ export class HallForm {
   id = input<string | undefined>(undefined);
   hallSignal: Signal<Hall | undefined> = this.hallsStore.hallById(this.id);
   isCreateForm = computed(() => !this.id());  // Or it's a "edit" form if id is defined.
-  hallModel = this.buildModel();
-  hallPreview = computed(() =>  this.hallModel() as Hall);
+
+  // Form model reset automatically when hallSignal changes
+  hallModelSignal = linkedSignal<HallFormeModel>(() => {
+    const hall = this.hallSignal();
+    return {
+      name: hall?.name ?? '',
+      addressStreet: hall?.addressStreet ?? '',
+      addressCity: hall?.addressCity ?? '',
+      addressPostalCode: hall?.addressPostalCode ?? '',
+      addressCountry: hall?.addressCountry ?? ''
+    };
+  });
+
+  hallPreview = computed(() => this.hallModelSignal() as Hall);
   hallForm = this.buildForm();
 
-  constructor() {
-    effect(() => {
-      const hall = this.hallSignal();
-      if (hall) this.hallModel.set({
-        name: hall.name,
-        addressStreet: hall.addressStreet,
-        addressCity: hall.addressCity,
-        addressPostalCode: hall.addressPostalCode,
-        addressCountry: hall.addressCountry
-      })
-    });
-  }
-
-  private buildModel(): WritableSignal<HallFormeModel> {
-    return signal<HallFormeModel>({
-      name: '',
-      addressStreet: '',
-      addressCity: '',
-      addressPostalCode: '',
-      addressCountry: ''
-    })
-  }
-
   private buildForm(): FieldTree<HallFormeModel> {
-    return form(this.hallModel, (path) => {
+    return form(this.hallModelSignal, (path) => {
       required(path.name, {message: 'Le nom de la salle est requis.'});
       maxLength(path.name, 50, {message: 'Le nom de la salle ne doit pas dépasser 50 caractères.'});
 
@@ -84,25 +73,24 @@ export class HallForm {
     });
   }
 
-
-
-
   protected submitForm(event: Event) {
     event.preventDefault();
     const id = this.id();
 
     void submit(this.hallForm, async (form) => {
       try {
+        let resultId = id;
         if (!id) {
-          await firstValueFrom(this.hallsStore.createHall(this.hallModel()).pipe(
-            tap(() => this.notificationService.show('La salle a été enregistrée','success'))
+          const newHall = await firstValueFrom(this.hallsStore.createHall(this.hallModelSignal()).pipe(
+            tap(() => this.notificationService.show('La salle a été enregistrée', 'success'))
           ));
+          resultId = newHall.id;
         } else {
-           await firstValueFrom(this.hallsStore.updateHall(id, this.hallModel()).pipe(
-            tap(() => this.notificationService.show('La salle a été mise à jour','success'))
+          await firstValueFrom(this.hallsStore.updateHall(id, this.hallModelSignal()).pipe(
+            tap(() => this.notificationService.show('La salle a été mise à jour', 'success'))
           ));
         }
-        await this.router.navigateByUrl('/halls');
+        await this.router.navigateByUrl(`/halls/${resultId}`);
         return undefined;
       } catch (error) {
         return this.formErrorHandler.handleError(error, form);

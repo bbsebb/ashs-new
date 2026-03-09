@@ -32,6 +32,10 @@
     <mat-card-actions align="end">
       <button mat-button type="button" routerLink="/halls">Retour</button>
       <button mat-flat-button type="button" routerLink="/halls/{{hall.id}}/edit">Modifier</button>
+      <app-form-delete-button 
+        confirmMessage="Êtes-vous sûr de vouloir supprimer cette salle ?" 
+        (deleteConfirmed)="onDelete()">
+      </app-form-delete-button>
     </mat-card-actions>
 }
 </mat-card>

@@ -1,8 +1,12 @@
 package fr.hoenheimsports.backend.staffservice.entities;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.Pattern;
 
 @Embeddable
-public record Phone(String phone) {
+
+public record Phone(@Pattern(
+        regexp = "^[0-9+()\\-\\s]{6,20}$",
+        message = "Le numéro de téléphone est invalide"
+) String phone) {
 }

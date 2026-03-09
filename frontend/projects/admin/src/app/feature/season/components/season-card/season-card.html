@@ -32,6 +32,10 @@
     <mat-card-actions align="end">
       <button mat-button type="button" routerLink="/seasons">Retour</button>
       <button mat-flat-button type="button" routerLink="/seasons/{{season.id}}/edit">Modifier</button>
+      <app-form-delete-button 
+        confirmMessage="Êtes-vous sûr de vouloir supprimer cette saison ?" 
+        (deleteConfirmed)="onDelete()">
+      </app-form-delete-button>
     </mat-card-actions>
   }
 </mat-card>

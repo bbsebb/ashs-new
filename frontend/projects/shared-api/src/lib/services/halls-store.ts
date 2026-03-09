@@ -43,7 +43,7 @@ export class HallsStore {
     );
   }
 
-  updateHall(id: string, createHallDTO: EditHallDTO) {
+  updateHall(id: string, createHallDTO: EditHallDTO): Observable<Hall> {
     return this.hallGateway.editHall(id, createHallDTO).pipe(
       tap(() => this.reload())
     );

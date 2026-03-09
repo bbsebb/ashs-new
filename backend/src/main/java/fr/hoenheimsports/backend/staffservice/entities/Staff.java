@@ -1,9 +1,8 @@
 package fr.hoenheimsports.backend.staffservice.entities;
 
 import jakarta.persistence.*;
-
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -23,22 +22,21 @@ public class Staff {
     private UUID id;
 
     @NotBlank
-    @Size(max = 50, message = "Le prénom ne doit pas dépasser 50 caractères")
-    @Column(name = "first_name",nullable = false,length = 50)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
     @NotBlank
-    @Size(max = 50, message = "Le nom de famille ne doit pas dépasser 50 caractères")
-    @Column(name = "last_name",nullable = false,length = 50)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "email",length = 100))
-    @Size(max = 100, message = "L'email ne doit pas dépasser 100 caractères")
-    @jakarta.validation.constraints.Email
+    @AttributeOverride(name = "value", column = @Column(name = "email", length = 100))
+    @Valid
     private Email email;
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "phone",length = 20))
-    @Size(max = 20, message = "Le numéro de téléphone ne doit pas dépasser 20 caractères")
+    @AttributeOverride(name = "value", column = @Column(name = "phone", length = 20))
+    @Valid
     private Phone phone;
+    @Column(name = "file_name", length = 50)
+    private String fileName;
 
     @Override
     public final boolean equals(Object o) {

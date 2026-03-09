@@ -1,0 +1,10 @@
+@let staff = staffSignal();
+@if(isLoading()) {
+  <app-loading-data label="Chargement du membre du personnel" [isLoading]="isLoading()" />
+} @else if(error()) {
+  <app-error-data dataName="personnel" (onRetry)="retry()" />
+} @else if (!staff) {
+  <p>Aucun membre du personnel trouvé</p>
+} @else {
+  <app-staff-card [staff]="staff"></app-staff-card>
+}

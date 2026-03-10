@@ -10,6 +10,7 @@ import fr.hoenheimsports.backend.staffservice.entities.Phone;
 import fr.hoenheimsports.backend.staffservice.mappers.StaffMapper;
 import fr.hoenheimsports.backend.staffservice.repositories.StaffRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +30,7 @@ public class StaffService {
         return this.staffRepository.findAll().stream().map(staffMapper::toDto).collect(Collectors.toList());
     }
 
-    public StaffResponseDto createStaff(MultipartFile file, StaffCreateRequest staffCreateRequest) {
+    public StaffResponseDto createStaff(@Nullable MultipartFile file, StaffCreateRequest staffCreateRequest) {
 
         var staff = this.staffMapper.toEntity(staffCreateRequest);
         if (file != null) {
@@ -38,14 +39,17 @@ public class StaffService {
         return this.staffMapper.toDto(this.staffRepository.save(staff));
     }
 
-    public StaffResponseDto updateStaff(UUID id, MultipartFile file, StaffUpdateRequest staffUpdateRequest) {
-        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Le Staff n'a pas été trouvée ou n'existe plus."));
+    public StaffResponseDto updateStaff(UUID id, @Nullable MultipartFile file, StaffUpdateRequest staffUpdateRequest) {
+        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvée ou n'existe plus."));
         staff.setEmail(new Email(staffUpdateRequest.email()));
         staff.setPhone(new Phone(staffUpdateRequest.phone()));
         staff.setFirstName(staffUpdateRequest.firstName());
         staff.setLastName(staffUpdateRequest.lastName());
         // if there is a new filename, file is not null. If the avatar is deleted, fileName is null
-        staff.setFileName(staffUpdateRequest.fileName());
+        if (staff.getFileName() != null && !staffUpdateRequest.fileName().equals(staff.getFileName())) {
+            imageStorageService.deleteImage(staff.getFileName());
+            staff.setFileName(staffUpdateRequest.fileName());
+        }
         if (file != null) {
             staff.setFileName(imageStorageService.saveImage(file));
         }
@@ -54,7 +58,10 @@ public class StaffService {
     }
 
     public void deleteStaff(UUID id) {
-        var coach = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Le Staff n'a pas été trouvée ou n'existe plus."));
-        this.staffRepository.delete(coach);
+        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvée ou n'existe plus."));
+        if (staff.getFileName() != null) {
+            imageStorageService.deleteImage(staff.getFileName());
+        }
+        this.staffRepository.delete(staff);
     }
 }

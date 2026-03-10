@@ -49,6 +49,16 @@ public class ImageStorageService {
         }
     }
 
+    public void deleteImage(String fileName) {
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+            Path filePath = uploadPath.resolve(fileName);
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            log.error("Erreur lors de la suppression du fichier : {}", e.getMessage());
+        }
+    }
+
     private String buildStoredFileName(String originalFilename) {
         String cleanedOriginalFilename = StringUtils.cleanPath(originalFilename);
         return UUID.randomUUID() + FILE_NAME_SEPARATOR + cleanedOriginalFilename;

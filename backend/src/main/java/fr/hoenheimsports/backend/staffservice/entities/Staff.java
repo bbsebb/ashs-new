@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -36,6 +37,7 @@ public class Staff {
     @Valid
     private Phone phone;
     @Column(name = "file_name", length = 50)
+    @Nullable
     private String fileName;
 
     @Override

@@ -6,7 +6,13 @@
     "outDir": "../../out-tsc/spec",
     "types": [
       "vitest/globals"
-    ]
+    ],
+    "paths": {
+      "@environment": ["./src/environments/environment"],
+      "@shared-ui": ["../../projects/shared-ui/src/public-api.ts"],
+      "@shared-api": ["../../projects/shared-api/src/public-api.ts"],
+      "@shared-domain": ["../../projects/shared-domain/src/public-api.ts"]
+    }
   },
   "include": [
     "src/**/*.d.ts",

@@ -1,0 +1,4 @@
+MAIL_USERNAME: dummy@gmail.com
+MAIL_PASSWORD: dummypassword
+PAGE_ACCESS_TOKEN: dummytoken
+APP_CORS_ALLOWED_ORIGINS: http://localhost:4200

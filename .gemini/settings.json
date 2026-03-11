@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "angular-cli": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@angular/cli",
+        "mcp"
+      ]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://admin:admin@localhost:5432/ashs-db"
+      ]
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@quantgeekdev/docker-mcp"
+      ]
+    }
+  }
+}

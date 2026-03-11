@@ -25,6 +25,8 @@ spring:
             enable: true
 
   flyway:
+    enabled: true
+    locations: classpath:db/migration
     create-schemas: true
     schemas: hall_schema, staff_schema, team_schema, flyway_schema, season_schema
     default-schema: flyway_schema

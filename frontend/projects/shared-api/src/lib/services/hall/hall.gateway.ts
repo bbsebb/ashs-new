@@ -1,13 +1,9 @@
 import {inject, Injectable} from '@angular/core';
-
-
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {CreateHallDTO} from './dtos/create-hall-dto';
 import {Hall} from '@shared-domain';
-import {APP_CONFIG} from '../configs/app-config';
-import {EditHallDTO} from './dtos/edit-hall-dto';
-
+import {APP_CONFIG} from '../../configs/app-config';
+import {CreateHallDTO, EditHallDTO} from './hall.dtos';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +26,7 @@ export class HallGateway {
     return this.http.delete<void>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`);
   }
 
-  editHall(id: string, createHallDTO: EditHallDTO): Observable<Hall> {
-    return this.http.put<Hall>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`, createHallDTO);
+  editHall(id: string, editHallDTO: EditHallDTO): Observable<Hall> {
+    return this.http.put<Hall>(`${this.appConfig.apiUrl}/api/v1/halls/${id}`, editHallDTO);
   }
 }

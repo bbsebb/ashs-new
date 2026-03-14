@@ -1,3 +1,5 @@
+// noinspection Annotator
+
 import {Component, computed, effect, ElementRef, input, output, Signal, signal, viewChild} from '@angular/core';
 import {CdkDrag} from '@angular/cdk/drag-drop';
 import {computeCropGeometry, CropGeometry} from '../utils/image-cropper-utils';
@@ -41,7 +43,7 @@ export class ImageCropperView {
 
   containerScaleSignal: Signal<number> = computed(() => this.isCircularSignal() ? 1.1 : 1.5);
 
-  /** Emits the new crop geometry coordinates whenever the image is moved, zoomed or loaded. */
+  /** Emits the new crop geometry coordinates whenever the image is moved, zoomed, or loaded. */
   cropGeometryChange = output<CropGeometry>();
 
   /** Reference to the draggable image element. */
@@ -50,7 +52,7 @@ export class ImageCropperView {
   /** Reference to the static mask overlay element. */
   private readonly _maskElementRef = viewChild<ElementRef<HTMLDivElement>>('maskElement');
 
-  /** Internal state for the zoom level. 1.0 is original size. */
+  /** Internal state for the zoom level. 1.0 is the original size. */
   protected readonly zoomLevelSignal = signal(1);
 
   /** Minimum allowed zoom level. */
@@ -137,7 +139,7 @@ export class ImageCropperView {
     const imageElement = imageRef.nativeElement;
     const maskElement = maskRef.nativeElement;
 
-    // Safety check: image must be fully loaded to get correct natural dimensions.
+    // Safety check: the image must be fully loaded to get correct natural dimensions.
     if (!imageElement.complete || imageElement.naturalWidth === 0) {
       return;
     }

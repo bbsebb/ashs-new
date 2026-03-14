@@ -66,10 +66,7 @@ describe('ImageCropperUtils', () => {
       globalThis.Image = class {
         onload: () => void = () => {
         };
-        onerror: () => void = () => {
-        };
         src: string = '';
-        crossOrigin: string = '';
 
         constructor() {
           setTimeout(() => this.onload(), 0);
@@ -142,7 +139,7 @@ describe('ImageCropperUtils', () => {
         return {} as any;
       });
 
-      await expect(generateCroppedBlob('mock-url', mockGeometry))
+      expect(generateCroppedBlob('mock-url', mockGeometry))
         .rejects.toThrow('Could not create 2D context for the canvas.');
     });
 
@@ -156,7 +153,7 @@ describe('ImageCropperUtils', () => {
         }
       } as any;
 
-      await expect(generateCroppedBlob('bad-url', mockGeometry))
+      expect(generateCroppedBlob('bad-url', mockGeometry))
         .rejects.toThrow('Failed to load image from source: bad-url');
     });
   });

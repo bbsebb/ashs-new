@@ -5,8 +5,8 @@ import {DialogService} from '@shared-ui';
 import {take} from 'rxjs';
 
 /**
- * Reusable delete button with built-in confirmation dialog.
- * Styled with Material Design tokens for error state.
+ * Reusable delete button with a built-in confirmation dialog.
+ * Styled with Material Design tokens for the error state.
  * Supports both full button with text and icon-only mode.
  */
 @Component({

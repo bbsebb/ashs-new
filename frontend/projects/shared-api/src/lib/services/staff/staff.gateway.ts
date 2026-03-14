@@ -2,8 +2,8 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Staff} from '@shared-domain';
-import {APP_CONFIG} from '../configs/app-config';
-import {CreateStaffDTO, EditStaffDTO} from './dtos/staff-dto';
+import {APP_CONFIG} from '../../configs/app-config';
+import {CreateStaffDTO, EditStaffDTO} from './staff.dtos';
 
 
 @Injectable({

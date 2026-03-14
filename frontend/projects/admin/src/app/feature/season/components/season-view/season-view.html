@@ -1,7 +1,7 @@
 @let season = seasonSignal();
-@if(isLoading()) {
-  <app-loading-data label="Chargement de la salle" [isLoading]="isLoading()" />
-} @else if(error()) {
+@if(isLoadingSignal()) {
+  <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()" />
+} @else if(errorSignal()) {
   <app-error-data dataName="saisons" (onRetry)="retry()" />
 } @else if (!season) {
   <p>Aucune salle</p>

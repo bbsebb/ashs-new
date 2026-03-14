@@ -38,13 +38,13 @@ export class SeasonsList {
   private readonly seasonsStore = inject(SeasonsStore);
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
-  seasonsSignal = this.seasonsStore.seasons;
-  isLoading = this.seasonsStore.isLoading;
-  error = computed(() => !!this.seasonsStore.error());
+  seasonsSignal = this.seasonsStore.seasonsSignal;
+  isLoading = this.seasonsStore.isLoadingSignal;
+  error = computed(() => !!this.seasonsStore.errorSignal());
 
 
 
-  displayedColumns = computed(() => this.layoutService.isDesktop() ? ['name', 'startDate','endDate','isCurrent','isActive','actions'] : ['name','actions']);
+  displayedColumns = computed(() => this.layoutService.isDesktopSignal() ? ['name', 'startDate','endDate','isCurrent','isActive','actions'] : ['name','actions']);
 
 
   // 2. Initialisation de la DataSource

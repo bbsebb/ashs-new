@@ -7,7 +7,7 @@ import {Season} from '@shared-domain';
 })
 export class SelectedSeason {
   private readonly _seasonStore = inject(SeasonsStore);
-  private readonly _selectedSeasonSignal = linkedSignal(() => this._seasonStore.seasons().find(s => s.isCurrent))
+  private readonly _selectedSeasonSignal = linkedSignal(() => this._seasonStore.seasonsSignal().find((s: Season) => s.isCurrent))
   selectedSeasonSignal = this._selectedSeasonSignal.asReadonly();
 
   onChangeSeason(season: Season) {

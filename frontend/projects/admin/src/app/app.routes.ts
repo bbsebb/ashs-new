@@ -9,8 +9,12 @@ import {SeasonView} from './feature/season/components/season-view/season-view';
 import {StaffsList} from './feature/staff/components/staffs-list/staffs-list';
 import {StaffForm} from './feature/staff/components/staff-form/staff-form';
 import {StaffView} from './feature/staff/components/staff-view/staff-view';
+import {TeamsList} from './feature/team/components/teams-list/teams-list';
+import {TeamForm} from './feature/team/components/team-form/team-form';
+import {TeamView} from './feature/team/components/team-view/team-view';
 import {ImageCropper} from './shared/image-cropper/image-cropper';
 
+// noinspection SpellCheckingInspection
 export const routes: Routes = [
   {path: '', redirectTo: 'halls', pathMatch: 'full'},
   {path: 'image', component: ImageCropper, data: {withPreview: true}},
@@ -39,6 +43,15 @@ export const routes: Routes = [
       {path: 'create', component: StaffForm},
       {path: ':id/edit', component: StaffForm},
       {path: ':id', component: StaffView},
+    ]
+  },
+  {
+    path: 'teams',
+    children: [
+      {path: '', component: TeamsList},
+      {path: 'create', component: TeamForm},
+      {path: ':id/edit', component: TeamForm},
+      {path: ':id', component: TeamView},
     ]
   },
   {path: 'mentions-legales', component: MentionsLegales},

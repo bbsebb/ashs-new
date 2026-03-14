@@ -7,14 +7,12 @@ import {map} from 'rxjs';
   providedIn: 'root',
 })
 export class LayoutService {
-  private breakpointObserver = inject(BreakpointObserver);
+  private _breakpointObserver = inject(BreakpointObserver);
 
-  isDesktop = toSignal(
-    this.breakpointObserver
+  isDesktopSignal = toSignal(
+    this._breakpointObserver
       .observe([Breakpoints.Medium,Breakpoints.Large, Breakpoints.XLarge])
       .pipe(map(result => result.matches)),
     { initialValue: false }
   );
-
-
 }

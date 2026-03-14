@@ -1,11 +1,11 @@
 @if (isLoading()) {
-  <app-loading-data label="Chargement du personnel" [isLoading]="isLoading()"/>
+  <app-loading-data label="Chargement de l'encadrement" [isLoading]="isLoading()"/>
 } @else if (error()) {
   <app-error-data dataName="personnel" (onRetry)="retry()"/>
 } @else {
   <div class="table-toolbar">
-    <app-page-title title="Personnel" subtitle="Gestion du personnel"/>
-    <a mat-fab extended color="primary" routerLink="/staffs/create" aria-label="Ajouter un membre du personnel">
+    <app-page-title title="Personnel" subtitle="Gestion de l'encadrement"/>
+    <a mat-fab extended color="primary" routerLink="/staffs/create" aria-label="Ajouter un membre de l'encadrement">
       <mat-icon>add</mat-icon>
       Ajouter
     </a>
@@ -55,7 +55,7 @@
       <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
       <tr class="mat-row" *matNoDataRow>
         <td class="mat-cell" [attr.colspan]="displayedColumns().length">
-          Aucun membre du personnel à afficher.
+          Aucun membre de l'encadrement à afficher.
         </td>
       </tr>
     </table>

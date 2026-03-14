@@ -1,15 +1,29 @@
 export * from './lib/form-error-handle-service';
 export * from './lib/configs/app-config';
-export * from './lib/services/dtos/create-hall-dto';
-export * from './lib/services/hall-gateway';
-export * from './lib/services/halls-store';
-export * from './lib/services/layouts/layout-service';
-export * from './lib/services/seasons-store';
-export * from './lib/services/season-gateway';
-export * from './lib/services/dtos/create-season-dto';
-export * from './lib/services/dtos/edit-season-dto';
-export * from './lib/services/dtos/staff-dto';
-export * from './lib/services/staff-gateway';
-export * from './lib/services/staffs-store';
-export * from './lib/utils/DateMapper'
-export * from './lib/services/contact-gateway'
+export * from './lib/utils/DateMapper';
+
+// Contact
+export * from './lib/services/contact/contact.gateway';
+
+// Hall
+export * from './lib/services/hall/hall.dtos';
+export * from './lib/services/hall/hall.gateway';
+export * from './lib/services/hall/halls.store';
+
+// Season
+export * from './lib/services/season/season.dtos';
+export * from './lib/services/season/season.gateway';
+export * from './lib/services/season/seasons.store';
+
+// Staff
+export * from './lib/services/staff/staff.dtos';
+export * from './lib/services/staff/staff.gateway';
+export * from './lib/services/staff/staffs.store';
+
+// Team
+export * from './lib/services/team/team.dtos';
+export * from './lib/services/team/team.gateway';
+export * from './lib/services/team/teams.store';
+
+// Layout
+export * from './lib/services/layout/layout.service';

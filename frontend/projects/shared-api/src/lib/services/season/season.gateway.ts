@@ -1,11 +1,10 @@
 import {inject, Injectable} from '@angular/core';
-
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
-import {map, Observable, tap} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {Season} from '@shared-domain';
-import {APP_CONFIG, dateToYyyyMmDd} from '@shared-api';
-import {CreateSeasonDTO} from './dtos/create-season-dto';
-import {EditSeasonDTO} from './dtos/edit-season-dto';
+import {APP_CONFIG} from '../../configs/app-config';
+import {CreateSeasonDTO, EditSeasonDTO} from './season.dtos';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -50,27 +49,21 @@ export class SeasonGateway {
   }
 
   private parseSeasons(response: unknown): SeasonResponseDTO[] {
-
     if (!Array.isArray(response)) {
       throw new Error('Réponse API invalide: attendu un tableau de saisons.');
     }
-
     const seasons: SeasonResponseDTO[] = [];
     for (const item of response) {
-
       if (!this.isSeasonResponseDTO(item)) {
         throw new Error('Réponse API invalide: un élément du tableau ne correspond pas à SeasonResponseDTO.');
       }
-
       seasons.push(item);
     }
-
     return seasons;
   }
 
   private isSeasonResponseDTO(value: unknown): value is SeasonResponseDTO {
     if (typeof value !== 'object' || value === null) return false;
-
     const v = value as Record<string, unknown>;
     return (
       typeof v['id'] === 'string' &&

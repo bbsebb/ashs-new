@@ -22,13 +22,13 @@ export class SeasonView {
 
   seasonSignal = this.seasonStore.seasonById(this.id);
 
-  isLoading = this.seasonStore.isLoading;
-  error = this.seasonStore.error;
+  isLoadingSignal = this.seasonStore.isLoadingSignal;
+  errorSignal = this.seasonStore.errorSignal;
 
 
   constructor() {
     effect(() => {
-      if (!this.isLoading() && !this.error() && !this.seasonSignal()) {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.seasonSignal()) {
         void this.router.navigateByUrl('/404');
       }
     });

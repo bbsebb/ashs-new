@@ -1,3 +1,5 @@
+// noinspection Annotator
+
 import {Component, computed, effect, input} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';

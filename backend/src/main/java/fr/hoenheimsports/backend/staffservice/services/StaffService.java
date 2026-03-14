@@ -46,7 +46,7 @@ public class StaffService {
         staff.setFirstName(staffUpdateRequest.firstName());
         staff.setLastName(staffUpdateRequest.lastName());
         // if there is a new filename, file is not null. If the avatar is deleted, fileName is null
-        if (staff.getFileName() != null && !staffUpdateRequest.fileName().equals(staff.getFileName())) {
+        if (staff.getFileName() != null && !staff.getFileName().equals(staffUpdateRequest.fileName())) {
             imageStorageService.deleteImage(staff.getFileName());
             staff.setFileName(staffUpdateRequest.fileName());
         }

@@ -22,8 +22,8 @@ export class HallView {
   id = input.required<string>();
   hallSignal = this.hallsStore.hallById(this.id);
 
-  isLoading = this.hallsStore.isLoading;
-  error = this.hallsStore.error;
+  isLoading = this.hallsStore.isLoadingSignal;
+  error = this.hallsStore.errorSignal;
 
 
   constructor() {

@@ -2,6 +2,9 @@
 
 ## Contexte Global
 
+- **Architecture :** Monorepo Fullstack centralisé.
+    - **Frontend :** Monorepo Angular structuré par projets (`projects/`) séparant les applications (`app`, `admin`) des bibliothèques métier (`shared-domain`, `shared-api`) et UI (`shared-ui`).
+    - **Backend :** Monolithe Modulaire (Spring Modulith) favorisant l'encapsulation et la communication par événements.
 - **Stack :** Angular 21, Java 25, Spring Boot 4.0 (ou Spring Framework 7.0), Gradle.
 - **Langue :** Réponds toujours en français.
 - **Ton :** Direct et technique. Pas de préambules inutiles.
@@ -9,6 +12,7 @@
     - **Style :** Privilégie des noms de variables longs et explicites. **Aucune abréviation autorisée** (ex: utilise
       `userAuthenticationStatus` et non `authStatus`).
     - **Commentaire** : tous les commentaires doivent être en anglais.
+    - **Atomicité :** Favorise les commits atomiques regroupant à la fois les changements backend (API) et frontend (Consommation) pour une fonctionnalité donnée.
 
 ## Frontend (Angular 21 & Material)
 
@@ -40,6 +44,18 @@
     - Évite l'abus de `<div>`.
     - Utilise les balises `<main>`, `<section>`, `<article>`, `<header>`, `<footer>`, `<nav>`.
     - Utilise les attributs ARIA si nécessaire pour l'accessibilité.
+- **Architecture de Service (Pattern Gateway -> Store) :**
+    - **Structure de fichiers :** Un sous-dossier par domaine métier dans `services/` (ex: `hall/`) contenant :
+        - `[domaine].gateway.ts` : Appels HTTP purs, mapping technique et validation des réponses.
+        - `[domaine]s.store.ts` : Gestion d'état centralisée via Signals.
+        - `[domaine].dtos.ts` : Centralisation de tous les types DTO (Data Transfer Objects) du domaine.
+    - **Implémentation Gateway :**
+        - Utilise `httpResource` pour les requêtes de lecture (GET).
+        - Utilise `Observable<T>` pour les mutations (POST, PUT, DELETE).
+    - **Implémentation Store :**
+        - Injecte la Gateway et expose les données via des Signals publics (suffixe `Signal`).
+        - **Zéro Reload Policy :** Les mutations ne doivent jamais appeler `reload()`. Elles doivent intercepter l'objet de retour via `tap()` et mettre à jour le cache local du signal via `this.resource.update()`.
+        - **Nommage Explicite :** Les variables dans les opérateurs RxJS et les callbacks de signaux doivent être longues et descriptives (ex: `hallsList.map(hall => ...)` et non `items.map(i => ...)`).
 
 ## Backend (Java 25 & Spring)
 
@@ -53,4 +69,7 @@
     - Respecte strictement l'encapsulation des modules (seuls les packages exposés peuvent être utilisés par d'autres
       modules).
     - Favorise les événements d'application (`ApplicationEventPublisher`) pour la communication entre modules.
+- **Persistance & Migration :**
+    - **Flyway :** Un schéma de base de données par module Spring Modulith pour garantir l'isolation des données.
+    - **Développement :** Utilisation du support **Docker Compose** de Spring Boot pour l'instanciation automatique de la base de données en local.
 - **Outils :** Configuration via Gradle (Kotlin DSL de préférence).

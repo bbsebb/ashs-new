@@ -3,6 +3,7 @@ package fr.hoenheimsports.backend.staffservice.dtos;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import org.jspecify.annotations.Nullable;
 
 public record StaffCreateRequest(
         @NotBlank(message = "Le prénom est obligatoire")
@@ -12,11 +13,13 @@ public record StaffCreateRequest(
         String lastName,
 
         @Email(message = "L'adresse e-mail est invalide")
+        @Nullable
         String email,
 
         @Pattern(
                 regexp = "^[0-9+()\\-\\s]{6,20}$",
                 message = "Le numéro de téléphone est invalide"
         )
+        @Nullable
         String phone) {
 }

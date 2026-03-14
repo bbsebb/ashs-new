@@ -47,11 +47,11 @@ export class SeasonForm {
   private readonly seasonsStore = inject(SeasonsStore);
   private readonly router = inject(Router);
   private readonly notificationService = inject(NotificationService);
-  isLoading = this.seasonsStore.isLoading;
-  error = computed(() => !!this.seasonsStore.error);
+  isLoading = this.seasonsStore.isLoadingSignal;
+  error = computed(() => !!this.seasonsStore.errorSignal());
   id = input<string | undefined>(undefined);
   seasonSignal: Signal<Season | undefined> = this.seasonsStore.seasonById(this.id);
-  isCreateForm = computed(() => !this.id());  // Or it's a "edit" form if id is defined.
+  isCreateForm = computed(() => !this.id());  // Or it's an "edit" form if id is defined.
 
   // Form model reset automatically when seasonSignal changes
   seasonModelSignal = linkedSignal<SeasonFormModel>(() => {
@@ -82,7 +82,7 @@ export class SeasonForm {
 
     void submit(this.seasonForm, async (form) => {
       try {
-        let resultId = id;
+        let resultId: string | undefined;
         if (!id) {
           const newSeason = await firstValueFrom(this.seasonsStore.createSeason(this.mapToCreateSeasonDTO(this.seasonModelSignal())).pipe(
             tap(() => this.notificationService.show('La saison a été enregistrée', 'success'))

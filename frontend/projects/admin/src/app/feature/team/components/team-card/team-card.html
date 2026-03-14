@@ -1,0 +1,38 @@
+@let team = teamSignal();
+<mat-card appearance="outlined" class="card">
+  <mat-card-header class="header">
+    <mat-card-title class="title">
+      {{ team.ageGroup.isUpperLimit ? 'U' : '' }}{{ team.ageGroup.ageLimit }} {{ team.gender }} {{ team.teamNumber > 1 ? team.teamNumber : '' }}
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content class="content">
+    <div class="info-container">
+      <div class="info-item">
+        <span class="info-label">Catégorie</span>
+        <span class="info-value">{{ team.ageGroup.isUpperLimit ? 'Moins de' : '' }} {{ team.ageGroup.ageLimit }} ans</span>
+      </div>
+
+      <div class="info-item">
+        <span class="info-label">Genre</span>
+        <span class="info-value">{{ team.gender }}</span>
+      </div>
+
+      <div class="info-item">
+        <span class="info-label">Équipe n°</span>
+        <span class="info-value">{{ team.teamNumber }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+
+  @if(withActions()) {
+    <mat-card-actions align="end">
+      <button mat-button type="button" routerLink="/teams">Retour</button>
+      <button mat-flat-button type="button" routerLink="/teams/{{team.id}}/edit">Modifier</button>
+      <app-form-delete-button 
+        confirmMessage="Êtes-vous sûr de vouloir supprimer cette équipe ?" 
+        (deleteConfirmed)="onDelete()">
+      </app-form-delete-button>
+    </mat-card-actions>
+  }
+</mat-card>

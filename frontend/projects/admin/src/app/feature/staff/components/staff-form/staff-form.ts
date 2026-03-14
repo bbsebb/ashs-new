@@ -38,8 +38,8 @@ export class StaffForm {
   private readonly staffsStore = inject(StaffsStore);
   private readonly router = inject(Router);
   private readonly notificationService = inject(NotificationService);
-  isLoading = this.staffsStore.isLoading;
-  error = computed(() => !!this.staffsStore.error);
+  isLoading = this.staffsStore.isLoadingSignal;
+  error = computed(() => !!this.staffsStore.errorSignal());
   id = input<string | undefined>(undefined);
   staffSignal: Signal<Staff | undefined> = this.staffsStore.staffById(this.id);
   isCreateForm = computed(() => !this.id());
@@ -91,7 +91,7 @@ export class StaffForm {
           email: staffFormModel.email.trim() || null,
         }
 
-        let resultId = this.id();
+        let resultId: string | undefined;
         if (!oldStaff) {
           // Mode Création
           const newStaff = await firstValueFrom(this.staffsStore.createStaff(staffDTO as CreateStaffDTO, this.blobAvatarSignal()).pipe(

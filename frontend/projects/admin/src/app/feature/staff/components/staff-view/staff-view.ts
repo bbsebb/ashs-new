@@ -22,8 +22,8 @@ export class StaffView {
   id = input.required<string>();
   staffSignal = this.staffsStore.staffById(this.id);
 
-  isLoading = this.staffsStore.isLoading;
-  error = this.staffsStore.error;
+  isLoading = this.staffsStore.isLoadingSignal;
+  error = this.staffsStore.errorSignal;
 
 
   constructor() {

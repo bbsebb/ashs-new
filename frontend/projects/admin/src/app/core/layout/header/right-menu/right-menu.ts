@@ -18,7 +18,7 @@ export class RightMenu {
   private readonly _seasonStore = inject(SeasonsStore);
   private readonly _selectedSaisonService = inject(SelectedSeason);
   selected: Season | undefined = undefined;
-  seasons = this._seasonStore.seasons;
+  seasonsSignal = this._seasonStore.seasonsSignal;
 
   constructor() {
     effect(() => {

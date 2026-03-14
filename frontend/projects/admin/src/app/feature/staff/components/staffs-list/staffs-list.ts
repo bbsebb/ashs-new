@@ -56,13 +56,12 @@ export class StaffsList {
   private readonly staffsStore = inject(StaffsStore);
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
-  staffsSignal = this.staffsStore.staffs;
-  isLoading = this.staffsStore.isLoading;
-  error = computed(() => !!this.staffsStore.error());
+  staffsSignal = this.staffsStore.staffsSignal;
+  isLoading = this.staffsStore.isLoadingSignal;
+  error = computed(() => !!this.staffsStore.errorSignal());
 
 
-
-  displayedColumns = computed(() => this.layoutService.isDesktop() ? ['firstName', 'lastName','email','phone','actions'] : ['firstName', 'lastName','actions']);
+  displayedColumns = computed(() => this.layoutService.isDesktopSignal() ? ['firstName', 'lastName', 'email', 'phone', 'actions'] : ['firstName', 'lastName', 'actions']);
 
 
   // 2. Initialisation de la DataSource
@@ -84,12 +83,12 @@ export class StaffsList {
   }
 
   protected retry(): void {
-  this.staffsStore.reload();
-}
+    this.staffsStore.reload();
+  }
 
   protected onDelete(id: string) {
     this.staffsStore.deleteById(id).subscribe({
-      next: () => this.notificationService.show("Membre du personnel supprimé avec succès", 'success')
+      next: () => this.notificationService.show("Membre de l'encadrement supprimé avec succès", 'success')
     });
   }
 }

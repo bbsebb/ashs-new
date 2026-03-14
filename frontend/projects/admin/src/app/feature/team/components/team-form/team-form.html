@@ -1,0 +1,69 @@
+<section class="form">
+  <app-page-title
+    eyebrow="Gestion des équipes"
+    title="Informations de l'équipe"
+    subtitle="Renseignez la catégorie, le genre et le numéro de l'équipe."
+  />
+
+  <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
+    <div class="form-fields">
+      
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Catégorie</mat-label>
+        <mat-select [formField]="teamForm.ageGroupId">
+          @for (ageGroup of ageGroupsSignal(); track ageGroup.uuid) {
+            <mat-option [value]="ageGroup.uuid">
+              {{ ageGroup.isUpperLimit ? 'Moins de' : '' }} {{ ageGroup.ageLimit }} ans
+            </mat-option>
+          }
+        </mat-select>
+        <mat-error *appError="teamForm.ageGroupId; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Genre</mat-label>
+        <mat-select [formField]="teamForm.gender">
+          @for (gender of genders; track gender) {
+            <mat-option [value]="gender">{{ gender }}</mat-option>
+          }
+        </mat-select>
+        <mat-error *appError="teamForm.gender; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Numéro d'équipe</mat-label>
+        <input matInput type="number" [formField]="teamForm.teamNumber"/>
+        <mat-error *appError="teamForm.teamNumber; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+    </div>
+
+    @let globalErrors = teamForm().errors();
+    @if (globalErrors.length > 0) {
+      @for (globalError of globalErrors; track globalError.kind) {
+        <mat-error class="alert alert-danger">
+          {{ globalError.message }}
+        </mat-error>
+      }
+    }
+
+    <div class="actions">
+      <app-form-submit-button
+        [disabled]="teamForm().submitting() || teamForm().invalid()"
+        [content]="isCreateForm() ? 'Enregistrer' : 'Modifier'"
+        [submitting]="teamForm().submitting()"/>
+      <button mat-button type="button" routerLink="/teams">Retour</button>
+    </div>
+  </form>
+</section>
+
+<details class="debug">
+  <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
+  <app-team-card [team]="teamPreview()" [withActions]="false"/>
+</details>

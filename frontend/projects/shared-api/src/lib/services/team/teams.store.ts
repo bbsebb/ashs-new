@@ -1,0 +1,54 @@
+import {computed, inject, Injectable, Signal} from '@angular/core';
+import {Observable, tap} from 'rxjs';
+import {Team} from '@shared-domain';
+import {TeamGateway} from './team.gateway';
+import {CreateTeamDTO, EditTeamDTO} from './team.dtos';
+
+
+@Injectable({
+  providedIn: 'root',
+})
+export class TeamsStore {
+  private readonly _teamGateway = inject(TeamGateway);
+  private readonly _teamsResource = this._teamGateway.getTeams();
+  private readonly _ageGroupsResource = this._teamGateway.getAgeGroups();
+
+  readonly teamsSignal: Signal<Team[]> = computed(() => this._teamsResource.hasValue() ? this._teamsResource.value() : []);
+  readonly ageGroupsSignal = computed(() => this._ageGroupsResource.hasValue() ? this._ageGroupsResource.value() : []);
+
+  isLoadingSignal = this._teamsResource.isLoading;
+  errorSignal = this._teamsResource.error;
+
+
+  teamById(idSignal: Signal<string | undefined>): Signal<Team | undefined> {
+    return computed(() => {
+      const teamId = idSignal();
+      if (!teamId) return undefined;
+
+      return this.teamsSignal().find((team) => team.id === teamId);
+    });
+  }
+
+  createTeam(createTeamDTO: CreateTeamDTO): Observable<Team> {
+    return this._teamGateway.addTeam(createTeamDTO).pipe(
+      tap((createdTeam) => this._teamsResource.update(teamsList => [...teamsList, createdTeam]))
+    );
+  }
+
+  reload(): void {
+    this._teamsResource.reload();
+  }
+
+
+  deleteById(teamId: string): Observable<void> {
+    return this._teamGateway.deleteById(teamId).pipe(
+      tap(() => this._teamsResource.update(teamsList => teamsList.filter(team => team.id !== teamId)))
+    );
+  }
+
+  updateTeam(teamId: string, editTeamDTO: EditTeamDTO): Observable<Team> {
+    return this._teamGateway.editTeam(teamId, editTeamDTO).pipe(
+      tap((updatedTeam) => this._teamsResource.update(teamsList => teamsList.map(team => team.id === updatedTeam.id ? updatedTeam : team)))
+    );
+  }
+}

@@ -38,7 +38,6 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   }
 })
 export class StaffCard {
-  private static readonly DEFAULT_AVATAR_PATH = '/shared-ui/avatar.png';
 
   private readonly staffsStore = inject(StaffsStore);
   private readonly notificationService = inject(NotificationService);
@@ -75,7 +74,7 @@ export class StaffCard {
   protected onDelete() {
     this.staffsStore.deleteById(this.staffSignal().id).subscribe({
       next: () => {
-        this.notificationService.show("Membre du personnel supprimé avec succès", 'success');
+        this.notificationService.show("Membre de l'encadrement supprimé avec succès", 'success');
         void this.router.navigateByUrl('/staffs');
       }
     });

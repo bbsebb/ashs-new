@@ -15,9 +15,9 @@ import {HallCard} from '../hall-card/hall-card';
 })
 export class HallsList {
   private readonly hallsStore = inject(HallsStore);
-  hallsSignal = this.hallsStore.halls;
-  isLoading = this.hallsStore.isLoading;
-  error = this.hallsStore.error;
+  hallsSignal = this.hallsStore.hallsSignal;
+  isLoading = this.hallsStore.isLoadingSignal;
+  error = this.hallsStore.errorSignal;
 
   protected retry() {
     this.hallsStore.reload();

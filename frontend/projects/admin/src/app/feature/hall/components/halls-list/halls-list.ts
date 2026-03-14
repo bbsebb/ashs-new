@@ -56,13 +56,13 @@ export class HallsList {
   private readonly hallsStore = inject(HallsStore);
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
-  hallsSignal = this.hallsStore.halls;
-  isLoading = this.hallsStore.isLoading;
-  error = computed(() => !!this.hallsStore.error());
+  hallsSignal = this.hallsStore.hallsSignal;
+  isLoading = this.hallsStore.isLoadingSignal;
+  error = computed(() => !!this.hallsStore.errorSignal());
 
 
 
-  displayedColumns = computed(() => this.layoutService.isDesktop() ? ['name', 'addressStreet','addressCity','addressPostalCode','addressCountry','actions'] : ['name','actions']);
+  displayedColumns = computed(() => this.layoutService.isDesktopSignal() ? ['name', 'addressStreet','addressCity','addressPostalCode','addressCountry','actions'] : ['name','actions']);
 
 
   // 2. Initialisation de la DataSource

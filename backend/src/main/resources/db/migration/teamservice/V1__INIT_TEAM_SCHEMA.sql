@@ -1,9 +1,9 @@
 CREATE TABLE team_schema.age_group
 (
-    uuid           UUID    NOT NULL,
+    id             UUID    NOT NULL,
     age_limit      INTEGER NOT NULL,
     is_upper_limit BOOLEAN NOT NULL,
-    CONSTRAINT pk_age_group PRIMARY KEY (uuid)
+    CONSTRAINT pk_age_group PRIMARY KEY (id)
 );
 
 CREATE TABLE team_schema.team
@@ -36,7 +36,7 @@ CREATE TABLE team_schema.training_session
 );
 
 ALTER TABLE team_schema.team
-    ADD CONSTRAINT FK_TEAM_ON_AGE_GROUP FOREIGN KEY (age_group_id) REFERENCES team_schema.age_group (uuid);
+    ADD CONSTRAINT FK_TEAM_ON_AGE_GROUP FOREIGN KEY (age_group_id) REFERENCES team_schema.age_group (id);
 
 ALTER TABLE team_schema.team_staff
     ADD CONSTRAINT FK_TEAM_STAFF_ON_TEAM FOREIGN KEY (team_id) REFERENCES team_schema.team (id);

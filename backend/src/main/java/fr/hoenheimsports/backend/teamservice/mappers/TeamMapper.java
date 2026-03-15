@@ -20,7 +20,7 @@ public interface TeamMapper {
 
     @Mapping(target = "nameAgeGroupIsUpperLimit", source = "name.ageGroup.upperLimit")
     @Mapping(target = "nameAgeGroupAgeLimit", source = "name.ageGroup.ageLimit")
-    @Mapping(target = "nameAgeGroupUuid", source = "name.ageGroup.uuid")
+    @Mapping(target = "nameAgeGroupId", source = "name.ageGroup.id")
     @Mapping(target = "nameTeamNumber", source = "name.teamNumber")
     TeamReponseDTO toDto(Team team);
 

@@ -3,7 +3,7 @@ import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Staff} from '@shared-domain';
 import {APP_CONFIG} from '../../configs/app-config';
-import {CreateStaffDTO, EditStaffDTO} from './staff.dtos';
+import {CreateStaffDTO, UpdateStaffDTO} from './staff.dtos';
 
 
 @Injectable({
@@ -33,13 +33,13 @@ export class StaffGateway {
     return this.http.delete<void>(`${this.appConfig.apiUrl}/api/v1/staffs/${id}`);
   }
 
-  editStaff(id: string, editStaffDTO: EditStaffDTO, blobAvatar: Blob | undefined): Observable<Staff> {
+  updateStaff(id: string, updateStaffDTO: UpdateStaffDTO, blobAvatar: Blob | undefined): Observable<Staff> {
     const formData = new FormData();
     if (blobAvatar) {
       formData.append('file', blobAvatar, 'avatar.png');
     }
     formData.append('data',
-      new Blob([JSON.stringify(editStaffDTO)], {type: 'application/json'}))
+      new Blob([JSON.stringify(updateStaffDTO)], {type: 'application/json'}))
     return this.http.put<Staff>(`${this.appConfig.apiUrl}/api/v1/staffs/${id}`, formData);
   }
 }

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 
-public record HallEditRequest(
+public record HallUpdateRequest(
         @Size(message = "La nom de la salle ne doit pas dépasser 50 caractères", max = 50)
         @NotBlank(message = "La nom de la salle est obligatoire")
         String name,
@@ -20,4 +20,5 @@ public record HallEditRequest(
         String addressPostalCode,
         @NotBlank(message = "Le pays est obligatoire")
         @Size(max = 50, message = "Le pays ne doit pas dépasser 50 caractères")
-        String addressCountry) implements Serializable {}
+        String addressCountry) implements Serializable {
+}

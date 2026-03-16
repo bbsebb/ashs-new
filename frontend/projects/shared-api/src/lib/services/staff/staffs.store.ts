@@ -2,7 +2,7 @@ import {computed, inject, Injectable, Signal} from '@angular/core';
 import {Observable, tap} from 'rxjs';
 import {Staff} from '@shared-domain';
 import {StaffGateway} from './staff.gateway';
-import {CreateStaffDTO, EditStaffDTO} from './staff.dtos';
+import {CreateStaffDTO, UpdateStaffDTO} from './staff.dtos';
 
 
 @Injectable({
@@ -42,8 +42,8 @@ export class StaffsStore {
     );
   }
 
-  editStaff(staffId: string, editStaffDTO: EditStaffDTO, blobAvatar: Blob | undefined): Observable<Staff> {
-    return this._staffGateway.editStaff(staffId, editStaffDTO, blobAvatar).pipe(
+  updateStaff(staffId: string, updateStaffDTO: UpdateStaffDTO, blobAvatar: Blob | undefined): Observable<Staff> {
+    return this._staffGateway.updateStaff(staffId, updateStaffDTO, blobAvatar).pipe(
       tap((updatedStaff) => this._staffsResource.update(staffsList => staffsList ? staffsList.map(staff => staff.id === updatedStaff.id ? updatedStaff : staff) : [updatedStaff]))
     );
   }

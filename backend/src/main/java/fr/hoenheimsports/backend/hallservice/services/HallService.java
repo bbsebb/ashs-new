@@ -2,7 +2,7 @@ package fr.hoenheimsports.backend.hallservice.services;
 
 import fr.hoenheimsports.backend.hallservice.dtos.HallCreateRequest;
 import fr.hoenheimsports.backend.hallservice.dtos.HallResponse;
-import fr.hoenheimsports.backend.hallservice.dtos.HallEditRequest;
+import fr.hoenheimsports.backend.hallservice.dtos.HallUpdateRequest;
 import fr.hoenheimsports.backend.hallservice.entities.Hall;
 import fr.hoenheimsports.backend.hallservice.mappers.HallMapper;
 import fr.hoenheimsports.backend.hallservice.repositories.HallRepository;
@@ -30,7 +30,7 @@ public class HallService {
      */
     public List<HallResponse> getAllHalls() {
         log.debug("Appel de getAllHalls");
-        var halls =  hallRepository.findAll().stream().map(hallMapper::toDto).toList();
+        var halls = hallRepository.findAll().stream().map(hallMapper::toDto).toList();
         log.debug("Retour de getAllHalls - Nombre de salles : {}", halls.size());
         return halls;
     }
@@ -45,14 +45,14 @@ public class HallService {
         return response;
     }
 
-    public HallResponse editHall(UUID id, HallEditRequest HallEditRequest) {
-        log.debug("Tentative de mise à jour de la salle avec le nom: {}", HallEditRequest.name());
-        Hall hall = hallRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("La salle avec le nom -" + HallEditRequest.name() + "- n'a pas été trouvé ou n'existe plus."));
-        hall.setName(HallEditRequest.name());
-        hall.getAddress().setStreet(HallEditRequest.addressStreet());
-        hall.getAddress().setCity(HallEditRequest.addressCity());
-        hall.getAddress().setPostalCode(HallEditRequest.addressPostalCode());
-        hall.getAddress().setCountry(HallEditRequest.addressCountry());
+    public HallResponse updateHall(UUID id, HallUpdateRequest hallUpdateRequest) {
+        log.debug("Tentative de mise à jour de la salle avec le nom: {}", hallUpdateRequest.name());
+        Hall hall = hallRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("La salle avec le nom -" + hallUpdateRequest.name() + "- n'a pas été trouvé ou n'existe plus."));
+        hall.setName(hallUpdateRequest.name());
+        hall.getAddress().setStreet(hallUpdateRequest.addressStreet());
+        hall.getAddress().setCity(hallUpdateRequest.addressCity());
+        hall.getAddress().setPostalCode(hallUpdateRequest.addressPostalCode());
+        hall.getAddress().setCountry(hallUpdateRequest.addressCountry());
         log.info("Mise à jour de la salle : {}", id);
         return hallMapper.toDto(hallRepository.save(hall));
     }
@@ -64,8 +64,6 @@ public class HallService {
         log.info("Salle supprimée : {}", uuid);
 
     }
-
-
 
 
 }

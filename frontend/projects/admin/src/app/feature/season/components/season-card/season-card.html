@@ -5,12 +5,12 @@
 
     <mat-chip-set aria-label="Statut de la saison">
       @if (season.isActive) {
-        <mat-chip class="status status-active" >Active</mat-chip>
+        <mat-chip class="status status-active">Active</mat-chip>
       } @else {
-        <mat-chip class="status" >Inactive</mat-chip>
+        <mat-chip class="status">Inactive</mat-chip>
       }
       @if (season.isCurrent) {
-        <mat-chip class="status status-active" >En cours</mat-chip>
+        <mat-chip class="status status-active">En cours</mat-chip>
       }
     </mat-chip-set>
   </mat-card-header>
@@ -28,12 +28,12 @@
       </div>
     </dl>
   </mat-card-content>
-  @if(withActions()) {
+  @if (withActions()) {
     <mat-card-actions align="end">
       <button mat-button type="button" routerLink="/seasons">Retour</button>
-      <button mat-flat-button type="button" routerLink="/seasons/{{season.id}}/edit">Modifier</button>
-      <app-form-delete-button 
-        confirmMessage="Êtes-vous sûr de vouloir supprimer cette saison ?" 
+      <button mat-flat-button type="button" routerLink="/seasons/{{season.id}}/update">Modifier</button>
+      <app-form-delete-button
+        confirmMessage="Êtes-vous sûr de vouloir supprimer cette saison ?"
         (deleteConfirmed)="onDelete()">
       </app-form-delete-button>
     </mat-card-actions>

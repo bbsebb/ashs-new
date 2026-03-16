@@ -8,7 +8,7 @@ import {MatIconButton} from '@angular/material/button';
 import {PercentPipe} from '@angular/common';
 
 /**
- * ImageCropperView component provides the interactive editing area.
+ * ImageCropperView component provides the interactive updateing area.
  * It allows the user to drag and zoom the image behind a fixed crop mask.
  */
 @Component({
@@ -29,7 +29,7 @@ import {PercentPipe} from '@angular/common';
   }
 })
 export class ImageCropperView {
-  /** The source URL of the image to be edited. */
+  /** The source URL of the image to be updateed. */
   selectedImageSourceSignal = input.required<string | null>();
 
   /** The width of the cropping mask area. */
@@ -112,7 +112,7 @@ export class ImageCropperView {
       return;
     }
 
-    // Prevent page scrolling while zooming inside the editor
+    // Prevent page scrolling while zooming inside the updateor
     event.preventDefault();
 
     const zoomDirection = event.deltaY < 0 ? 1 : -1;

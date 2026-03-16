@@ -2,7 +2,7 @@ import {computed, inject, Injectable, Signal} from '@angular/core';
 import {Observable, tap} from 'rxjs';
 import {Hall} from '@shared-domain';
 import {HallGateway} from './hall.gateway';
-import {CreateHallDTO, EditHallDTO} from './hall.dtos';
+import {CreateHallDTO, UpdateHallDTO} from './hall.dtos';
 
 
 @Injectable({
@@ -42,8 +42,8 @@ export class HallsStore {
     );
   }
 
-  updateHall(hallId: string, editHallDTO: EditHallDTO): Observable<Hall> {
-    return this._hallGateway.editHall(hallId, editHallDTO).pipe(
+  updateHall(hallId: string, updateHallDTO: UpdateHallDTO): Observable<Hall> {
+    return this._hallGateway.updateHall(hallId, updateHallDTO).pipe(
       tap((updatedHall) => this._hallsResource.update(hallsList => hallsList ? hallsList.map(hall => hall.id === updatedHall.id ? updatedHall : hall) : [updatedHall]))
     );
   }

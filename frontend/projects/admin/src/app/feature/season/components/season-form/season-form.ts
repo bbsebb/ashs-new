@@ -3,7 +3,7 @@ import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitl
 import {MatButton} from "@angular/material/button";
 import {MatError, MatFormField, MatInputModule, MatLabel} from "@angular/material/input";
 import {Router, RouterLink} from "@angular/router";
-import {CreateSeasonDTO, dateToYyyyMmDd, EditSeasonDTO, FormErrorHandleService, SeasonsStore} from '@shared-api';
+import {CreateSeasonDTO, dateToYyyyMmDd, UpdateSeasonDTO, FormErrorHandleService, SeasonsStore} from '@shared-api';
 import {Season} from '@shared-domain';
 import {FieldTree, form, FormField, submit} from '@angular/forms/signals';
 import {firstValueFrom, tap} from 'rxjs';
@@ -51,7 +51,7 @@ export class SeasonForm {
   error = computed(() => !!this.seasonsStore.errorSignal());
   id = input<string | undefined>(undefined);
   seasonSignal: Signal<Season | undefined> = this.seasonsStore.seasonById(this.id);
-  isCreateForm = computed(() => !this.id());  // Or it's an "edit" form if id is defined.
+  isCreateForm = computed(() => !this.id());  // Or it's an "update" form if id is defined.
 
   // Form model reset automatically when seasonSignal changes
   seasonModelSignal = linkedSignal<SeasonFormModel>(() => {
@@ -89,7 +89,7 @@ export class SeasonForm {
           ));
           resultId = newSeason.id;
         } else {
-          const updatedSeason = await firstValueFrom(this.seasonsStore.editSeason(id, this.mapToCreateSeasonDTO(this.seasonModelSignal())).pipe(
+          const updatedSeason = await firstValueFrom(this.seasonsStore.updateSeason(id, this.mapToCreateSeasonDTO(this.seasonModelSignal())).pipe(
             tap(() => this.notificationService.show('La saison a été mise à jour', 'success'))
           ));
           resultId = updatedSeason.id;
@@ -116,7 +116,7 @@ export class SeasonForm {
     }
   }
 
-  private mapToCreateSeasonDTO<T extends CreateSeasonDTO | EditSeasonDTO>(seasonForm: SeasonFormModel): T {
+  private mapToCreateSeasonDTO<T extends CreateSeasonDTO | UpdateSeasonDTO>(seasonForm: SeasonFormModel): T {
 
     return {
       endDate: dateToYyyyMmDd(seasonForm.endDate),

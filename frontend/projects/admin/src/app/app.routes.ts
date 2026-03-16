@@ -23,7 +23,7 @@ export const routes: Routes = [
     children: [
       {path: '', component: HallsList},       // /halls
       {path: 'create', component: HallForm},
-      {path: ':id/edit', component: HallForm},
+      {path: ':id/update', component: HallForm},
       {path: ':id', component: HallView},
     ]
   },
@@ -32,7 +32,7 @@ export const routes: Routes = [
     children: [
       {path: '', component: SeasonsList},       // /halls
       {path: 'create', component: SeasonForm},
-      {path: ':id/edit', component: SeasonForm},
+      {path: ':id/update', component: SeasonForm},
       {path: ':id', component: SeasonView},
     ]
   },
@@ -41,7 +41,7 @@ export const routes: Routes = [
     children: [
       {path: '', component: StaffsList},
       {path: 'create', component: StaffForm},
-      {path: ':id/edit', component: StaffForm},
+      {path: ':id/update', component: StaffForm},
       {path: ':id', component: StaffView},
     ]
   },
@@ -50,7 +50,7 @@ export const routes: Routes = [
     children: [
       {path: '', component: TeamsList},
       {path: 'create', component: TeamForm},
-      {path: ':id/edit', component: TeamForm},
+      {path: ':id/update', component: TeamForm},
       {path: ':id', component: TeamView},
     ]
   },

@@ -24,7 +24,7 @@
   @if (withActions()) {
     <mat-card-actions align="end">
       <button mat-button type="button" routerLink="/staffs">Retour</button>
-      <button mat-flat-button type="button" routerLink="/staffs/{{staff.id}}/edit">Modifier</button>
+      <button mat-flat-button type="button" routerLink="/staffs/{{staff.id}}/update">Modifier</button>
       <app-form-delete-button
         confirmMessage="Êtes-vous sûr de vouloir supprimer ce membre de l'encadrement ?"
         (deleteConfirmed)="onDelete()">

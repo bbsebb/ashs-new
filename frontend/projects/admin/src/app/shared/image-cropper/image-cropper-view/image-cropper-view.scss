@@ -1,5 +1,5 @@
 /**
- * Root host styles for the editor view.
+ * Root host styles for the updateor view.
  */
 :host {
   display: block;
@@ -9,7 +9,7 @@
   margin: 0 auto;
 }
 
-/** Container for the editor. Manages overflow and centering. */
+/** Container for the updateor. Manages overflow and centering. */
 .crop-container {
   position: relative;
   display: flex;

@@ -7,7 +7,7 @@ export interface CreateTeamDTO {
   ageGroupId: string;
 }
 
-export type EditTeamDTO = CreateTeamDTO;
+export type UpdateTeamDTO = CreateTeamDTO;
 
 export interface AgeGroupDTO {
   uuid: string;

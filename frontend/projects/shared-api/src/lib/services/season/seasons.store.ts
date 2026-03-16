@@ -2,7 +2,7 @@ import {computed, inject, Injectable, Signal} from '@angular/core';
 import {Observable, tap} from 'rxjs';
 import {Season} from '@shared-domain';
 import {SeasonGateway} from './season.gateway';
-import {CreateSeasonDTO, EditSeasonDTO} from './season.dtos';
+import {CreateSeasonDTO, UpdateSeasonDTO} from './season.dtos';
 
 
 @Injectable({
@@ -44,8 +44,8 @@ export class SeasonsStore {
     );
   }
 
-  editSeason(seasonId: string, editSeasonDTO: EditSeasonDTO): Observable<Season> {
-    return this._seasonGateway.editSeason(seasonId, editSeasonDTO).pipe(
+  updateSeason(seasonId: string, updateSeasonDTO: UpdateSeasonDTO): Observable<Season> {
+    return this._seasonGateway.updateSeason(seasonId, updateSeasonDTO).pipe(
       tap((updatedSeason) => this._seasonsResource.update(seasonsList => seasonsList ? seasonsList.map(season => season.id === updatedSeason.id ? updatedSeason : season) : [updatedSeason]))
     );
   }

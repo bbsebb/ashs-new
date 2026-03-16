@@ -1,8 +1,8 @@
 package fr.hoenheimsports.backend.teamservice.controllers;
 
 import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
-import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupeCreateRequest;
-import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupeEditRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupCreateRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.services.AgeGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/v1/age-group")
+@RequestMapping("api/v1/age-groups")
 @RequiredArgsConstructor
 public class AgeGroupController {
     private final AgeGroupService ageGroupService;
@@ -23,13 +23,13 @@ public class AgeGroupController {
     }
 
     @PostMapping
-    public ResponseEntity<AgeGroupResponseDTO> createAgeGroup(@RequestBody AgeGroupeCreateRequest ageGroupeCreateRequest) {
-        return ResponseEntity.ok(ageGroupService.createAgeGroup(ageGroupeCreateRequest));
+    public ResponseEntity<AgeGroupResponseDTO> createAgeGroup(@RequestBody AgeGroupCreateRequest ageGroupCreateRequest) {
+        return ResponseEntity.ok(ageGroupService.createAgeGroup(ageGroupCreateRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AgeGroupResponseDTO> editAgeGroup(@PathVariable UUID id, @RequestBody AgeGroupeEditRequest ageGroupeEditRequest) {
-        return ResponseEntity.ok(ageGroupService.editAgeGroup(id, ageGroupeEditRequest));
+    public ResponseEntity<AgeGroupResponseDTO> updateAgeGroup(@PathVariable UUID id, @RequestBody AgeGroupUpdateRequest ageGroupUpdateRequest) {
+        return ResponseEntity.ok(ageGroupService.updateAgeGroup(id, ageGroupUpdateRequest));
     }
 
     @DeleteMapping("/{id}")

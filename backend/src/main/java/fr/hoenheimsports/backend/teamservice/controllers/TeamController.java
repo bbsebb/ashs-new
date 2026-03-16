@@ -1,7 +1,7 @@
 package fr.hoenheimsports.backend.teamservice.controllers;
 
 import fr.hoenheimsports.backend.teamservice.dtos.TeamCreateRequest;
-import fr.hoenheimsports.backend.teamservice.dtos.TeamEditRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.TeamUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamReponseDTO;
 import fr.hoenheimsports.backend.teamservice.services.TeamService;
 import jakarta.validation.Valid;
@@ -30,8 +30,8 @@ public class TeamController {
     }
 
     @PutMapping("/{teamId}")
-    public ResponseEntity<TeamReponseDTO> editTeam(@PathVariable UUID teamId, @RequestBody @Valid TeamEditRequest teamRequestDTO) {
-        return ResponseEntity.ok(this.teamService.editTeam(teamId, teamRequestDTO));
+    public ResponseEntity<TeamReponseDTO> updateTeam(@PathVariable UUID teamId, @RequestBody @Valid TeamUpdateRequest teamRequestDTO) {
+        return ResponseEntity.ok(this.teamService.updateTeam(teamId, teamRequestDTO));
     }
 
     @DeleteMapping("/{teamId}")

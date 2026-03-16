@@ -2,8 +2,8 @@ package fr.hoenheimsports.backend.teamservice.services;
 
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
-import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupeCreateRequest;
-import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupeEditRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupCreateRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.mappers.AgeGroupMapper;
 import fr.hoenheimsports.backend.teamservice.repository.AgeGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +26,14 @@ public class AgeGroupService {
     }
 
 
-    public AgeGroupResponseDTO createAgeGroup(AgeGroupeCreateRequest ageGroupeCreateRequest) {
-        return ageGroupMapper.toDto(ageGroupRepository.save(ageGroupMapper.toEntity(ageGroupeCreateRequest)));
+    public AgeGroupResponseDTO createAgeGroup(AgeGroupCreateRequest ageGroupCreateRequest) {
+        return ageGroupMapper.toDto(ageGroupRepository.save(ageGroupMapper.toEntity(ageGroupCreateRequest)));
     }
 
-    public AgeGroupResponseDTO editAgeGroup(UUID id, AgeGroupeEditRequest ageGroupeEditRequest) {
+    public AgeGroupResponseDTO updateAgeGroup(UUID id, AgeGroupUpdateRequest ageGroupUpdateRequest) {
         var ageGroup = this.ageGroupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("La catégorie d'age n'a pas été trouvée ou n'existe plus."));
-        ageGroup.setAgeLimit(ageGroupeEditRequest.ageLimit());
-        ageGroup.setUpperLimit(ageGroupeEditRequest.upperLimit());
+        ageGroup.setAgeLimit(ageGroupUpdateRequest.ageLimit());
+        ageGroup.setUpperLimit(ageGroupUpdateRequest.upperLimit());
         return this.ageGroupMapper.toDto(ageGroup);
     }
 

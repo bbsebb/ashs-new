@@ -37,7 +37,7 @@ export class HallForm {
   error = computed(() => !!this.hallsStore.errorSignal());
   id = input<string | undefined>(undefined);
   hallSignal: Signal<Hall | undefined> = this.hallsStore.hallById(this.id);
-  isCreateForm = computed(() => !this.id());  // Or it's an "edit" form if id is defined.
+  isCreateForm = computed(() => !this.id());  // Or it's an "update" form if id is defined.
 
   // Form model reset automatically when hallSignal changes
   hallModelSignal = linkedSignal<HallFormeModel>(() => {

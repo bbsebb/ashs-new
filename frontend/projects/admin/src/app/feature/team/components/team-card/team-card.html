@@ -29,7 +29,7 @@
   @if (withActions()) {
     <mat-card-actions align="end">
       <button mat-button type="button" routerLink="/teams">Retour</button>
-      <button mat-flat-button type="button" routerLink="/teams/{{team.id}}/edit">Modifier</button>
+      <button mat-flat-button type="button" routerLink="/teams/{{team.id}}/update">Modifier</button>
       <app-form-delete-button
         confirmMessage="Êtes-vous sûr de vouloir supprimer cette équipe ?"
         (deleteConfirmed)="onDelete()">

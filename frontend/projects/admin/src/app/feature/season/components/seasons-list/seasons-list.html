@@ -1,10 +1,10 @@
 @if (isLoading()) {
   <app-loading-data label="Chargement des salles" [isLoading]="isLoading()"/>
-} @else if  (error()) {
+} @else if (error()) {
   <app-error-data dataName="salles" (onRetry)="retry()"/>
 } @else {
   <div class="table-toolbar">
-    <app-page-title title="Saisons" subtitle="Gestion des saisons" />
+    <app-page-title title="Saisons" subtitle="Gestion des saisons"/>
     <a mat-fab extended color="primary" routerLink="/seasons/create" aria-label="Ajouter une saison">
       <mat-icon>add</mat-icon>
       Ajouter
@@ -26,17 +26,17 @@
 
       <ng-container matColumnDef="endDate">
         <th mat-header-cell *matHeaderCellDef>Date de fin</th>
-        <td mat-cell *matCellDef="let season"> {{ season.endDate | date:'dd/MM/yyyy'}}</td>
+        <td mat-cell *matCellDef="let season"> {{ season.endDate | date:'dd/MM/yyyy' }}</td>
       </ng-container>
 
       <ng-container matColumnDef="isCurrent">
         <th mat-header-cell *matHeaderCellDef>En cours</th>
-        <td mat-cell *matCellDef="let season"> {{ season.isCurrent? 'oui' : 'non' }}</td>
+        <td mat-cell *matCellDef="let season"> {{ season.isCurrent ? 'oui' : 'non' }}</td>
       </ng-container>
 
       <ng-container matColumnDef="isActive">
         <th mat-header-cell *matHeaderCellDef>Sélectionnée</th>
-        <td mat-cell *matCellDef="let season"> {{ season.isActive? 'oui' : 'non' }}</td>
+        <td mat-cell *matCellDef="let season"> {{ season.isActive ? 'oui' : 'non' }}</td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
@@ -45,8 +45,8 @@
           <button mat-icon-button type="button" aria-label="Modifier" routerLink="/seasons/{{season.id}}">
             <mat-icon>visibility</mat-icon>
           </button>
-          <button mat-icon-button type="button" aria-label="Modifier" routerLink="/seasons/{{season.id}}/edit">
-            <mat-icon>edit</mat-icon>
+          <button mat-icon-button type="button" aria-label="Modifier" routerLink="/seasons/{{season.id}}/update">
+            <mat-icon>update</mat-icon>
           </button>
 
           <app-form-delete-button

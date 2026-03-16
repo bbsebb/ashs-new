@@ -2,7 +2,7 @@ package fr.hoenheimsports.backend.teamservice.services;
 
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamCreateRequest;
-import fr.hoenheimsports.backend.teamservice.dtos.TeamEditRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.TeamUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamReponseDTO;
 import fr.hoenheimsports.backend.teamservice.entities.*;
 import fr.hoenheimsports.backend.teamservice.mappers.TeamMapper;
@@ -41,7 +41,7 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamReponseDTO editTeam(UUID teamId, TeamEditRequest teamRequestDTO) {
+    public TeamReponseDTO updateTeam(UUID teamId, TeamUpdateRequest teamRequestDTO) {
         Team team = this.teamRepository.findById(teamId)
                 .orElseThrow(() -> new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId));
 
@@ -67,14 +67,14 @@ public class TeamService {
         this.teamRepository.delete(team);
     }
 
-    private void syncStaffs(Team team, List<TeamEditRequest.TeamStaffEditRequest> dtoList) {
+    private void syncStaffs(Team team, List<TeamUpdateRequest.TeamStaffUpdateRequest> dtoList) {
         if (dtoList == null || dtoList.isEmpty()) {
             new ArrayList<>(team.getStaffs()).forEach(team::removeStaff);
             return;
         }
 
         Set<UUID> dtoIds = dtoList.stream()
-                .map(TeamEditRequest.TeamStaffEditRequest::id)
+                .map(TeamUpdateRequest.TeamStaffUpdateRequest::id)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
@@ -94,14 +94,14 @@ public class TeamService {
                 });
     }
 
-    private void syncTrainingSessions(Team team, List<TeamEditRequest.TrainingSessionEditRequest> dtoList) {
+    private void syncTrainingSessions(Team team, List<TeamUpdateRequest.TrainingSessionUpdateRequest> dtoList) {
         if (dtoList == null || dtoList.isEmpty()) {
             new ArrayList<>(team.getTrainingSessions()).forEach(team::removeTrainingSession);
             return;
         }
 
         Set<UUID> dtoIds = dtoList.stream()
-                .map(TeamEditRequest.TrainingSessionEditRequest::id)
+                .map(TeamUpdateRequest.TrainingSessionUpdateRequest::id)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 

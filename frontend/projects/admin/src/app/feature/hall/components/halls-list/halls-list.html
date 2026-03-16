@@ -1,15 +1,15 @@
- @if (isLoading()) {
- <app-loading-data label="Chargement des salles" [isLoading]="isLoading()"/>
- } @else if  (error()) {
-   <app-error-data dataName="salles" (onRetry)="retry()"/>
- } @else {
-   <div class="table-toolbar">
-     <app-page-title title="Salles" subtitle="Gestion des salles" />
-     <a mat-fab extended color="primary" routerLink="/halls/create" aria-label="Ajouter une salle">
-       <mat-icon>add</mat-icon>
-       Ajouter
-     </a>
-   </div>
+@if (isLoading()) {
+  <app-loading-data label="Chargement des salles" [isLoading]="isLoading()"/>
+} @else if (error()) {
+  <app-error-data dataName="salles" (onRetry)="retry()"/>
+} @else {
+  <div class="table-toolbar">
+    <app-page-title title="Salles" subtitle="Gestion des salles"/>
+    <a mat-fab extended color="primary" routerLink="/halls/create" aria-label="Ajouter une salle">
+      <mat-icon>add</mat-icon>
+      Ajouter
+    </a>
+  </div>
   <div class="table-container">
     <table mat-table [dataSource]="dataSource" matSort>
 
@@ -45,8 +45,8 @@
           <button mat-icon-button type="button" aria-label="Modifier" routerLink="/halls/{{hall.id}}">
             <mat-icon>visibility</mat-icon>
           </button>
-          <button mat-icon-button type="button" aria-label="Modifier" routerLink="/halls/{{hall.id}}/edit">
-            <mat-icon>edit</mat-icon>
+          <button mat-icon-button type="button" aria-label="Modifier" routerLink="/halls/{{hall.id}}/update">
+            <mat-icon>update</mat-icon>
           </button>
 
           <app-form-delete-button

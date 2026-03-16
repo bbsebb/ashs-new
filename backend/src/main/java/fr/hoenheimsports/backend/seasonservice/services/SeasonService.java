@@ -1,7 +1,7 @@
 package fr.hoenheimsports.backend.seasonservice.services;
 
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonCreateRequest;
-import fr.hoenheimsports.backend.seasonservice.dtos.SeasonEditRequest;
+import fr.hoenheimsports.backend.seasonservice.dtos.SeasonUpdateRequest;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonResponse;
 import fr.hoenheimsports.backend.seasonservice.mappers.SeasonMapper;
 import fr.hoenheimsports.backend.seasonservice.repositories.SeasonRepository;
@@ -25,7 +25,7 @@ public class SeasonService {
 
     public List<SeasonResponse> getAllSeasons() {
         log.debug("Appel de getAllSeasons");
-        var seasons =  seasonRepository.findAll().stream()
+        var seasons = seasonRepository.findAll().stream()
                 .map(this.seasonMapper::toDto)
                 .toList();
         log.debug("Retour de getAllSeasons - Nombre de saison : {}", seasons.size());
@@ -44,8 +44,8 @@ public class SeasonService {
                 "Tentative de création d'une saison du : {} au : {}",
                 seasonCreateRequest.startDate().format(DateTimeFormatter.BASIC_ISO_DATE),
                 seasonCreateRequest.endDate().format(DateTimeFormatter.BASIC_ISO_DATE)
-                );
-        if(seasonCreateRequest.startDate().isAfter(seasonCreateRequest.endDate())) {
+        );
+        if (seasonCreateRequest.startDate().isAfter(seasonCreateRequest.endDate())) {
             throw new RangeDateException("La date de début doit être antérieure à la date de fin");
         }
         var season = seasonMapper.toEntity(seasonCreateRequest);
@@ -55,16 +55,16 @@ public class SeasonService {
         return response;
     }
 
-    public SeasonResponse editSeason(UUID id, SeasonEditRequest seasonEditRequest) {
+    public SeasonResponse updateSeason(UUID id, SeasonUpdateRequest seasonUpdateRequest) {
         log.debug(
                 "Tentative de mise à jour d'une saison du : {} au : {}",
-                seasonEditRequest.startDate().format(DateTimeFormatter.BASIC_ISO_DATE),
-                seasonEditRequest.endDate().format(DateTimeFormatter.BASIC_ISO_DATE)
+                seasonUpdateRequest.startDate().format(DateTimeFormatter.BASIC_ISO_DATE),
+                seasonUpdateRequest.endDate().format(DateTimeFormatter.BASIC_ISO_DATE)
         );
-        var errorMessage = "La saison du %s au %s n'existe pas ou n'a pas été trouvée".formatted(seasonEditRequest.startDate(), seasonEditRequest.endDate());
+        var errorMessage = "La saison du %s au %s n'existe pas ou n'a pas été trouvée".formatted(seasonUpdateRequest.startDate(), seasonUpdateRequest.endDate());
         var season = seasonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(errorMessage));
-        season.setStartDate(seasonEditRequest.startDate());
-        season.setEndDate(seasonEditRequest.endDate());
+        season.setStartDate(seasonUpdateRequest.startDate());
+        season.setEndDate(seasonUpdateRequest.endDate());
         season.setName(createSeasonName(season.getStartDate(), season.getEndDate()));
         log.info("Mise à jour de la salle : {}", id);
         return seasonMapper.toDto(seasonRepository.save(season));

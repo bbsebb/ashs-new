@@ -4,4 +4,4 @@ export type SeasonDTO = {
 }
 
 export type CreateSeasonDTO = SeasonDTO;
-export type EditSeasonDTO = SeasonDTO;
+export type UpdateSeasonDTO = SeasonDTO;

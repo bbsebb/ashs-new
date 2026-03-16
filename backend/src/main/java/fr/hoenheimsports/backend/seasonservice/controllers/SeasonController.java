@@ -1,7 +1,7 @@
 package fr.hoenheimsports.backend.seasonservice.controllers;
 
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonCreateRequest;
-import fr.hoenheimsports.backend.seasonservice.dtos.SeasonEditRequest;
+import fr.hoenheimsports.backend.seasonservice.dtos.SeasonUpdateRequest;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonResponse;
 import fr.hoenheimsports.backend.seasonservice.services.SeasonService;
 import jakarta.validation.Valid;
@@ -29,8 +29,8 @@ public class SeasonController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SeasonResponse> editSeason(@PathVariable UUID id, @RequestBody @Valid SeasonEditRequest seasonEditRequest) {
-        return ResponseEntity.ok(seasonService.editSeason(id, seasonEditRequest));
+    public ResponseEntity<SeasonResponse> updateSeason(@PathVariable UUID id, @RequestBody @Valid SeasonUpdateRequest seasonUpdateRequest) {
+        return ResponseEntity.ok(seasonService.updateSeason(id, seasonUpdateRequest));
     }
 
     @DeleteMapping("/{id}")

@@ -2,8 +2,7 @@ import {computed, inject, Injectable, Signal} from '@angular/core';
 import {Observable, tap} from 'rxjs';
 import {Team} from '@shared-domain';
 import {TeamGateway} from './team.gateway';
-import {CreateTeamDTO, EditTeamDTO} from './team.dtos';
-
+import {CreateTeamDTO, UpdateTeamDTO} from './team.dtos';
 
 @Injectable({
   providedIn: 'root',
@@ -46,8 +45,8 @@ export class TeamsStore {
     );
   }
 
-  updateTeam(teamId: string, editTeamDTO: EditTeamDTO): Observable<Team> {
-    return this._teamGateway.editTeam(teamId, editTeamDTO).pipe(
+  updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO): Observable<Team> {
+    return this._teamGateway.updateTeam(teamId, updateTeamDTO).pipe(
       tap((updatedTeam) => this._teamsResource.update(teamsList => teamsList.map(team => team.id === updatedTeam.id ? updatedTeam : team)))
     );
   }

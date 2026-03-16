@@ -3,7 +3,7 @@ import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
 import {AgeGroup, Team} from '@shared-domain';
 import {APP_CONFIG} from '../../configs/app-config';
-import {CreateTeamDTO, EditTeamDTO, TeamResponseDTO} from './team.dtos';
+import {CreateTeamDTO, TeamResponseDTO, UpdateTeamDTO} from './team.dtos';
 
 @Injectable({
   providedIn: 'root',
@@ -37,8 +37,8 @@ export class TeamGateway {
     return this._http.delete<void>(`${this._appConfig.apiUrl}/api/v1/teams/${teamId}`);
   }
 
-  editTeam(teamId: string, editTeamDTO: EditTeamDTO): Observable<Team> {
-    return this._http.put<TeamResponseDTO>(`${this._appConfig.apiUrl}/api/v1/teams/${teamId}`, editTeamDTO).pipe(
+  updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO): Observable<Team> {
+    return this._http.put<TeamResponseDTO>(`${this._appConfig.apiUrl}/api/v1/teams/${teamId}`, updateTeamDTO).pipe(
       map(teamResponseDTO => this.toTeam(teamResponseDTO))
     );
   }

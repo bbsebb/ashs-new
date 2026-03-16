@@ -4,7 +4,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {firstValueFrom, tap} from 'rxjs';
-import {CreateStaffDTO, EditStaffDTO, FormErrorHandleService, StaffsStore} from '@shared-api'
+import {CreateStaffDTO, UpdateStaffDTO, FormErrorHandleService, StaffsStore} from '@shared-api'
 import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Staff} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
@@ -85,7 +85,7 @@ export class StaffForm {
     void submit(this.staffForm, async (form) => {
       try {
         const staffFormModel = this.staffFormModelSignal();
-        const staffDTO: CreateStaffDTO | EditStaffDTO = {
+        const staffDTO: CreateStaffDTO | UpdateStaffDTO = {
           ...staffFormModel,
           phone: staffFormModel.phone.trim() || null,
           email: staffFormModel.email.trim() || null,
@@ -100,13 +100,13 @@ export class StaffForm {
           resultId = newStaff.id;
         } else {
           // Mode Modification
-          const editStaffDTO: EditStaffDTO = {
+          const updateStaffDTO: UpdateStaffDTO = {
             ...staffDTO,
             // If showExistingAvatarSignal is false, the user explicitly deleted it.
             fileName: this.showExistingAvatarSignal() ? oldStaff.fileName : null,
           }
 
-          const updatedStaff = await firstValueFrom(this.staffsStore.editStaff(oldStaff.id, editStaffDTO, this.blobAvatarSignal()).pipe(
+          const updatedStaff = await firstValueFrom(this.staffsStore.updateStaff(oldStaff.id, updateStaffDTO, this.blobAvatarSignal()).pipe(
             tap(() => this.notificationService.show('Le membre de l\'encadrement a été mis à jour', 'success'))
           ));
           resultId = updatedStaff.id;

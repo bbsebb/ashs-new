@@ -5,10 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "team", schema = "team_schema")
@@ -37,12 +34,12 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @Setter(AccessLevel.PRIVATE)
-    private List<TeamStaff> staffs;
+    private List<TeamStaff> staffs = new ArrayList<>();
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @Setter(AccessLevel.PRIVATE)
-    private List<TrainingSession> trainingSessions;
+    private List<TrainingSession> trainingSessions = new ArrayList<>();
 
     public List<TrainingSession> getTrainingSessions() {
         return Collections.unmodifiableList(trainingSessions);

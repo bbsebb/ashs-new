@@ -6,6 +6,6 @@ import java.time.LocalTime;
 /**
  * DTO for {@link fr.hoenheimsports.backend.teamservice.entities.TimeSlot}
  */
-public record TimeSlotResponseDTO(LocalTime startTime, LocalTime endTime) implements Serializable {
+public record TimeSlotDTO(LocalTime startTime, LocalTime endTime) implements Serializable {
 
 }

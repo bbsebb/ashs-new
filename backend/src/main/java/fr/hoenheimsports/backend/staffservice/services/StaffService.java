@@ -40,7 +40,7 @@ public class StaffService {
     }
 
     public StaffResponseDto updateStaff(UUID id, @Nullable MultipartFile file, StaffUpdateRequest staffUpdateRequest) {
-        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvée ou n'existe plus."));
+        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));
         staff.setEmail(new Email(staffUpdateRequest.email()));
         staff.setPhone(new Phone(staffUpdateRequest.phone()));
         staff.setFirstName(staffUpdateRequest.firstName());
@@ -58,7 +58,7 @@ public class StaffService {
     }
 
     public void deleteStaff(UUID id) {
-        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvée ou n'existe plus."));
+        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));
         if (staff.getFileName() != null) {
             imageStorageService.deleteImage(staff.getFileName());
         }

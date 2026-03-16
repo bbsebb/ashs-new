@@ -27,14 +27,7 @@
     "@angular/cdk": "^21.2.2",
     "@angular/common": "^21.2.2",
     "@angular/compiler": "^21.2.2",
-    "@angular/core": "^21.2.2",Crée un lien symbolique de ton binaire node actuel vers /usr/local/bin :
-
-Bash
-sudo ln -s $(which node) /usr/local/bin/node
-Fais la même chose pour npx :
-
-Bash
-sudo ln -s $(which npx) /usr/local/bin/npx
+    "@angular/core": "^21.2.2",
     "@angular/forms": "^21.2.2",
     "@angular/material-luxon-adapter": "^21.2.2",
     "@angular/platform-browser": "^21.2.2",

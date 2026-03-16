@@ -2,7 +2,7 @@ package fr.hoenheimsports.backend.teamservice.dtos;
 
 import jakarta.validation.constraints.Min;
 
-public record AgeGroupeCreateRequest(
+public record AgeGroupeEditRequest(
         @Min(0)
         int ageLimit,
         boolean upperLimit) {

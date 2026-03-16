@@ -8,6 +8,6 @@ import java.util.UUID;
 /**
  * DTO for {@link TrainingSession}
  */
-public record TrainingSessionResponseDTO(UUID id, UUID hallId, TimeSlotResponseDTO timeSlot,
+public record TrainingSessionResponseDTO(UUID id, UUID hallId, TimeSlotDTO timeSlot,
                                          UUID teamId) implements Serializable {
 }

@@ -1,14 +1,11 @@
+import {AgeGroup} from './age-group';
+
 export enum Gender {
   Female = 'Female',
   Male = 'Male',
   Mixte = 'Mixte'
 }
 
-export interface AgeGroup {
-  uuid: string;
-  ageLimit: number;
-  isUpperLimit: boolean;
-}
 
 export interface Team {
   id: string;

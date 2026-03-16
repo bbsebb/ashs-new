@@ -7,13 +7,13 @@
 
   <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
     <div class="form-fields">
-      
+
       <mat-form-field class="field" appearance="outline">
         <mat-label>Catégorie</mat-label>
         <mat-select [formField]="teamForm.ageGroupId">
-          @for (ageGroup of ageGroupsSignal(); track ageGroup.uuid) {
-            <mat-option [value]="ageGroup.uuid">
-              {{ ageGroup.isUpperLimit ? 'Moins de' : '' }} {{ ageGroup.ageLimit }} ans
+          @for (ageGroup of ageGroupsSignal(); track ageGroup.id) {
+            <mat-option [value]="ageGroup.id">
+              {{ ageGroup.upperLimit ? 'Moins de' : '' }} {{ ageGroup.ageLimit }} ans
             </mat-option>
           }
         </mat-select>

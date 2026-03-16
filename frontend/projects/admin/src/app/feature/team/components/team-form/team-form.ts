@@ -1,13 +1,13 @@
 import {Component, computed, inject, input, linkedSignal, Signal} from '@angular/core';
-import {FieldTree, form, FormField, min, max, required, submit} from '@angular/forms/signals';
+import {FieldTree, form, FormField, max, min, required, submit} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {firstValueFrom, tap} from 'rxjs';
-import {CreateTeamDTO, EditTeamDTO, FormErrorHandleService, TeamsStore} from '@shared-api'
+import {CreateTeamDTO, FormErrorHandleService, TeamsStore} from '@shared-api'
 import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
-import {Gender, Team, AgeGroup} from '@shared-domain';
+import {Gender, Team} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
 import {TeamCard} from '../team-card/team-card';
 import {SelectedSeason} from '../../../../shared/services/selected-season';
@@ -49,7 +49,7 @@ export class TeamForm {
   teamFormModelSignal = linkedSignal<TeamFormModel>(() => {
     const team = this.teamSignal();
     return {
-      ageGroupId: team?.ageGroup.uuid ?? '',
+      ageGroupId: team?.ageGroup.id ?? '',
       gender: team?.gender ?? Gender.Male,
       teamNumber: team?.teamNumber ?? 1,
     };
@@ -59,7 +59,7 @@ export class TeamForm {
 
   teamPreview = computed(() => {
     const model = this.teamFormModelSignal();
-    const ageGroup = this.ageGroupsSignal().find(ag => ag.uuid === model.ageGroupId) ?? {
+    const ageGroup = this.ageGroupsSignal().find(ag => ag.id === model.ageGroupId) ?? {
       uuid: '',
       ageLimit: 0,
       isUpperLimit: false

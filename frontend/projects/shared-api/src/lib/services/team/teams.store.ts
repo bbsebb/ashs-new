@@ -10,10 +10,8 @@ import {CreateTeamDTO, UpdateTeamDTO} from './team.dtos';
 export class TeamsStore {
   private readonly _teamGateway = inject(TeamGateway);
   private readonly _teamsResource = this._teamGateway.getTeams();
-  private readonly _ageGroupsResource = this._teamGateway.getAgeGroups();
-
   readonly teamsSignal: Signal<Team[]> = computed(() => this._teamsResource.hasValue() ? this._teamsResource.value() : []);
-  readonly ageGroupsSignal = computed(() => this._ageGroupsResource.hasValue() ? this._ageGroupsResource.value() : []);
+
 
   isLoadingSignal = this._teamsResource.isLoading;
   errorSignal = this._teamsResource.error;
@@ -29,7 +27,7 @@ export class TeamsStore {
   }
 
   createTeam(createTeamDTO: CreateTeamDTO): Observable<Team> {
-    return this._teamGateway.addTeam(createTeamDTO).pipe(
+    return this._teamGateway.createTeam(createTeamDTO).pipe(
       tap((createdTeam) => this._teamsResource.update(teamsList => [...teamsList, createdTeam]))
     );
   }

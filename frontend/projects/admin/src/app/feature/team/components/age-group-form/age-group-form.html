@@ -1,0 +1,56 @@
+<section class="form">
+  <app-page-title
+    eyebrow="Gestion des catégorie"
+    title="Informations de la catégorie"
+    subtitle="Renseignez l'âge limite"
+  />
+
+  <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
+    <div class="form-fields">
+
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Sens de la limite</mat-label>
+        <mat-select [formField]="ageGroupForm.upperLimite">
+          <mat-option [value]="true">Moins de</mat-option>
+          <mat-option [value]="false">Plus de</mat-option>
+        </mat-select>
+        <mat-error *appError="ageGroupForm.upperLimite; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+
+      <mat-form-field class="field age-limit" appearance="outline">
+        <mat-label>Limite d'âge</mat-label>
+        <input matInput type="number" [formField]="ageGroupForm.ageLimit"/>
+        <span matTextSuffix>ans</span>
+        <mat-error *appError="ageGroupForm.ageLimit; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+    </div>
+
+    @let globalErrors = ageGroupForm().errors();
+    @if (globalErrors.length > 0) {
+      @for (globalError of globalErrors; track globalError.kind) {
+        <mat-error class="alert alert-danger">
+          {{ globalError.message }}
+        </mat-error>
+      }
+    }
+
+    <div class="actions">
+      <app-form-submit-button
+        [disabled]="ageGroupForm().submitting() || ageGroupForm().invalid()"
+        content="Enregistrer"
+        [submitting]="ageGroupForm().submitting()"/>
+      <button mat-button type="button" routerLink="/age-groups">Retour</button>
+    </div>
+  </form>
+</section>
+
+<details class="debug">
+  <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
+  <!--  <app-team-card [team]="teamPreview()" [withActions]="false"/>-->
+</details>

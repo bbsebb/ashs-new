@@ -5,7 +5,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {firstValueFrom, tap} from 'rxjs';
-import {CreateTeamDTO, FormErrorHandleService, TeamsStore} from '@shared-api'
+import {AgeGroupStore, CreateTeamDTO, FormErrorHandleService, TeamsStore} from '@shared-api'
 import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Gender, Team} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
@@ -32,6 +32,7 @@ import {SelectedSeason} from '../../../../shared/services/selected-season';
 export class TeamForm {
   private readonly _formErrorHandler = inject(FormErrorHandleService);
   private readonly _teamsStore = inject(TeamsStore);
+  private readonly _ageGroupStore = inject(AgeGroupStore);
   private readonly _selectedSeasonService = inject(SelectedSeason);
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
@@ -42,7 +43,7 @@ export class TeamForm {
   teamSignal: Signal<Team | undefined> = this._teamsStore.teamById(this.id);
   isCreateForm = computed(() => !this.id());
 
-  ageGroupsSignal = this._teamsStore.ageGroupsSignal;
+  ageGroupsSignal = this._ageGroupStore.ageGroupsSignal;
   genders = Object.values(Gender);
 
   // Form model reset automatically when teamSignal changes

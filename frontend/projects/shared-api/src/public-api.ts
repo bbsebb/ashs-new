@@ -25,5 +25,10 @@ export * from './lib/services/team/team.dtos';
 export * from './lib/services/team/team.gateway';
 export * from './lib/services/team/teams.store';
 
+//Age group
+export * from './lib/services/team/age-group.dtos';
+export * from './lib/services/team/age-group.gateway';
+export * from './lib/services/team/age-group.store';
+
 // Layout
 export * from './lib/services/layout/layout.service';

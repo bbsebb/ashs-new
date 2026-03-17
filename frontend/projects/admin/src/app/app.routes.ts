@@ -13,6 +13,8 @@ import {TeamsList} from './feature/team/components/teams-list/teams-list';
 import {TeamForm} from './feature/team/components/team-form/team-form';
 import {TeamView} from './feature/team/components/team-view/team-view';
 import {ImageCropper} from './shared/image-cropper/image-cropper';
+import {AgeGroupList} from './feature/team/components/age-group-list/age-group-list';
+import {AgeGroupForm} from './feature/team/components/age-group-form/age-group-form';
 
 // noinspection SpellCheckingInspection
 export const routes: Routes = [
@@ -52,6 +54,13 @@ export const routes: Routes = [
       {path: 'create', component: TeamForm},
       {path: ':id/update', component: TeamForm},
       {path: ':id', component: TeamView},
+    ]
+  },
+  {
+    path: 'age-groups',
+    children: [
+      {path: '', component: AgeGroupList},
+      {path: 'create', component: AgeGroupForm},
     ]
   },
   {path: 'mentions-legales', component: MentionsLegales},

@@ -1,9 +1,12 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
-import {AgeGroup, Team} from '@shared-domain';
+import {Team} from '@shared-domain';
 import {APP_CONFIG} from '../../configs/app-config';
 import {CreateTeamDTO, TeamResponseDTO, UpdateTeamDTO} from './team.dtos';
+
+const API_VERSION = '/api/v1';
+const API_NAME = "teams"
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +16,7 @@ export class TeamGateway {
   private readonly _appConfig = inject(APP_CONFIG);
 
   getTeams(): HttpResourceRef<Team[]> {
-    return httpResource<Team[]>(() => `${this._appConfig.apiUrl}/api/v1/teams`, {
+    return httpResource<Team[]>(() => `${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}`, {
       parse: (response: unknown) => {
         return this.parseTeams(response).map(teamResponseDTO => this.toTeam(teamResponseDTO));
       },
@@ -21,24 +24,19 @@ export class TeamGateway {
     });
   }
 
-  getAgeGroups(): HttpResourceRef<AgeGroup[]> {
-    return httpResource<AgeGroup[]>(() => `${this._appConfig.apiUrl}/api/v1/teams/age-groups`, {
-      defaultValue: []
-    });
-  }
 
-  addTeam(createTeamDTO: CreateTeamDTO): Observable<Team> {
-    return this._http.post<TeamResponseDTO>(`${this._appConfig.apiUrl}/api/v1/teams`, createTeamDTO).pipe(
+  createTeam(createTeamDTO: CreateTeamDTO): Observable<Team> {
+    return this._http.post<TeamResponseDTO>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}`, createTeamDTO).pipe(
       map(teamResponseDTO => this.toTeam(teamResponseDTO))
     );
   }
 
   deleteById(teamId: string): Observable<void> {
-    return this._http.delete<void>(`${this._appConfig.apiUrl}/api/v1/teams/${teamId}`);
+    return this._http.delete<void>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}/${teamId}`);
   }
 
   updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO): Observable<Team> {
-    return this._http.put<TeamResponseDTO>(`${this._appConfig.apiUrl}/api/v1/teams/${teamId}`, updateTeamDTO).pipe(
+    return this._http.put<TeamResponseDTO>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}/${teamId}`, updateTeamDTO).pipe(
       map(teamResponseDTO => this.toTeam(teamResponseDTO))
     );
   }

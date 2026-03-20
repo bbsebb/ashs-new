@@ -8,6 +8,6 @@ import {Component, input} from '@angular/core';
 })
 export class PageTitle {
   eyebrow = input<string | null>(null);
-  title = input<string>('Titre');       // requis “logiquement”
+  title = input<string | null>(null);       // requis “logiquement”
   subtitle = input<string | null>(null);
 }

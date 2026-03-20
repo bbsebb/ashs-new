@@ -4,7 +4,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {firstValueFrom, tap} from 'rxjs';
-import {CreateStaffDTO, UpdateStaffDTO, FormErrorHandleService, StaffsStore} from '@shared-api'
+import {CreateStaffDTO, FormErrorHandleService, StaffsStore, UpdateStaffDTO} from '@shared-api'
 import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Staff} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
@@ -34,14 +34,14 @@ import {MatIcon} from '@angular/material/icon';
   styleUrl: './staff-form.scss',
 })
 export class StaffForm {
-  private readonly formErrorHandler = inject(FormErrorHandleService);
-  private readonly staffsStore = inject(StaffsStore);
-  private readonly router = inject(Router);
-  private readonly notificationService = inject(NotificationService);
-  isLoading = this.staffsStore.isLoadingSignal;
-  error = computed(() => !!this.staffsStore.errorSignal());
+  private readonly _formErrorHandler = inject(FormErrorHandleService);
+  private readonly _staffsStore = inject(StaffsStore);
+  private readonly _router = inject(Router);
+  private readonly _notificationService = inject(NotificationService);
+  isLoading = this._staffsStore.isLoadingSignal;
+  error = computed(() => !!this._staffsStore.errorSignal());
   id = input<string | undefined>(undefined);
-  staffSignal: Signal<Staff | undefined> = this.staffsStore.staffById(this.id);
+  staffSignal: Signal<Staff | undefined> = this._staffsStore.staffById(this.id);
   isCreateForm = computed(() => !this.id());
 
   // Form model reset automatically when staffSignal changes
@@ -94,8 +94,8 @@ export class StaffForm {
         let resultId: string | undefined;
         if (!oldStaff) {
           // Mode Création
-          const newStaff = await firstValueFrom(this.staffsStore.createStaff(staffDTO as CreateStaffDTO, this.blobAvatarSignal()).pipe(
-            tap(() => this.notificationService.show('Le membre de l\'encadrement a été enregistré', 'success'))
+          const newStaff = await firstValueFrom(this._staffsStore.createStaff(staffDTO as CreateStaffDTO, this.blobAvatarSignal()).pipe(
+            tap(() => this._notificationService.show('Le membre de l\'encadrement a été enregistré', 'success'))
           ));
           resultId = newStaff.id;
         } else {
@@ -106,15 +106,15 @@ export class StaffForm {
             fileName: this.showExistingAvatarSignal() ? oldStaff.fileName : null,
           }
 
-          const updatedStaff = await firstValueFrom(this.staffsStore.updateStaff(oldStaff.id, updateStaffDTO, this.blobAvatarSignal()).pipe(
-            tap(() => this.notificationService.show('Le membre de l\'encadrement a été mis à jour', 'success'))
+          const updatedStaff = await firstValueFrom(this._staffsStore.updateStaff(oldStaff.id, updateStaffDTO, this.blobAvatarSignal()).pipe(
+            tap(() => this._notificationService.show('Le membre de l\'encadrement a été mis à jour', 'success'))
           ));
           resultId = updatedStaff.id;
         }
-        await this.router.navigateByUrl(`/staffs/${resultId}`);
+        await this._router.navigateByUrl(`/staffs/${resultId}`);
         return undefined;
       } catch (error) {
-        return this.formErrorHandler.handleError(error, form);
+        return this._formErrorHandler.handleError(error, form);
       }
     });
   }

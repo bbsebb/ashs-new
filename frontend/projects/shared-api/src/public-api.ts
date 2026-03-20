@@ -1,6 +1,6 @@
 export * from './lib/form-error-handle-service';
 export * from './lib/configs/app-config';
-export * from './lib/utils/DateMapper';
+export * from './lib/utils/date-mapper';
 
 // Contact
 export * from './lib/services/contact/contact.gateway';

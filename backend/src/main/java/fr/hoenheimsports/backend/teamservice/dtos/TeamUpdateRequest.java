@@ -4,6 +4,7 @@ import fr.hoenheimsports.backend.teamservice.entities.Gender;
 import fr.hoenheimsports.backend.teamservice.entities.Role;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,9 +15,10 @@ public record TeamUpdateRequest(
         List<TeamStaffUpdateRequest> staffs,
         List<TrainingSessionUpdateRequest> trainingSessions) {
 
-    public record TeamStaffUpdateRequest(UUID id, @NotNull Role role, @NotNull UUID coachId) {
+    public record TeamStaffUpdateRequest(UUID id, @NotNull Role role, @NotNull UUID staffId) {
     }
 
-    public record TrainingSessionUpdateRequest(UUID id, @NotNull UUID hallId, @NotNull TimeSlotDTO timeSlot) {
+    public record TrainingSessionUpdateRequest(UUID id, @NotNull UUID hallId, @NotNull DayOfWeek dayOfWeek,
+                                               @NotNull TimeSlotDTO timeSlot) {
     }
 }

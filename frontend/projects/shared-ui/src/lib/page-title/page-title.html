@@ -2,9 +2,9 @@
   @if (eyebrow()) {
     <p class="eyebrow">{{ eyebrow() }}</p>
   }
-
-  <h2 class="title">{{ title() }}</h2>
-
+  @if (title()) {
+    <h2 class="title">{{ title() }}</h2>
+  }
   @if (subtitle()) {
     <p class="subtitle">{{ subtitle() }}</p>
   }

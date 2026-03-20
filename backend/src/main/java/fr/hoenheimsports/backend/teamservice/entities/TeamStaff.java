@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "team_staff",  schema = "team_schema")
+@Table(name = "team_staff", schema = "team_schema")
 @Getter
 @Setter
 @ToString
@@ -20,20 +20,20 @@ public class TeamStaff {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @Column(name = "role",nullable = false)
+    @Column(name = "role", nullable = false)
     @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id",nullable = false)
+    @JoinColumn(name = "team_id", nullable = false)
     @NotNull
     @ToString.Exclude
     private Team team;
 
-    @Column(name = "coach_id", nullable = false)
+    @Column(name = "staff_id", nullable = false)
     @NotNull
-    private UUID coachId;
+    private UUID staffId;
 
     @Override
     public final boolean equals(Object o) {

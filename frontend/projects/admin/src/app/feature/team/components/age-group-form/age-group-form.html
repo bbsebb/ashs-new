@@ -10,11 +10,11 @@
 
       <mat-form-field class="field" appearance="outline">
         <mat-label>Sens de la limite</mat-label>
-        <mat-select [formField]="ageGroupForm.upperLimite">
+        <mat-select [formField]="ageGroupForm.upperLimit">
           <mat-option [value]="true">Moins de</mat-option>
           <mat-option [value]="false">Plus de</mat-option>
         </mat-select>
-        <mat-error *appError="ageGroupForm.upperLimite; let errorMsg">
+        <mat-error *appError="ageGroupForm.upperLimit; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
@@ -39,7 +39,10 @@
         </mat-error>
       }
     }
-
+    <div class="preview-section">
+      <span class="preview-label">Aperçu :</span>
+      <div class="preview-badge">{{ ageGroupPreviewSignal() }}</div>
+    </div>
     <div class="actions">
       <app-form-submit-button
         [disabled]="ageGroupForm().submitting() || ageGroupForm().invalid()"
@@ -50,7 +53,4 @@
   </form>
 </section>
 
-<details class="debug">
-  <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <!--  <app-team-card [team]="teamPreview()" [withActions]="false"/>-->
-</details>
+

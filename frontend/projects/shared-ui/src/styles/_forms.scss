@@ -1,12 +1,11 @@
 
-
 .form {
   display: flex;
   flex-direction: column;
   gap: 24px;
 
   max-width: 920px;
-  margin: 24px ;
+  margin: 24px;
   padding: 32px;
   border-radius: 28px;
 
@@ -32,6 +31,7 @@
   flex-wrap: wrap;
   gap: 18px;
   align-items: flex-start;
+  align-content: center;
 }
 
 /* Les champs prennent 2 colonnes "logiques" via le wrapping */

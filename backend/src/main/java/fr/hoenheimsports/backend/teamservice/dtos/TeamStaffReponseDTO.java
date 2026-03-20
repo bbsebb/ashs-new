@@ -8,5 +8,5 @@ import java.util.UUID;
 /**
  * DTO for {@link fr.hoenheimsports.backend.teamservice.entities.TeamStaff}
  */
-public record TeamStaffReponseDTO(UUID id, Role role, UUID coachId) implements Serializable {
+public record TeamStaffReponseDTO(UUID id, Role role, UUID staffId) implements Serializable {
 }

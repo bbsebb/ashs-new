@@ -1,11 +1,14 @@
 package fr.hoenheimsports.backend.teamservice.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.time.DayOfWeek;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -14,9 +17,9 @@ import java.util.UUID;
         name = "training_session",
         schema = "team_schema",
         check = @CheckConstraint(
-        name = "check_timeslot_range",
-        constraint = "start_time < end_time"
-))
+                name = "check_timeslot_range",
+                constraint = "start_time < end_time"
+        ))
 @Getter
 @Setter
 @ToString
@@ -29,6 +32,10 @@ public class TrainingSession {
 
     @Column(name = "hall_id", nullable = false)
     private UUID hallId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "day_of_week", nullable = false)
+    private DayOfWeek dayOfWeek;
 
     @Embedded
     @AttributeOverrides({
@@ -43,7 +50,6 @@ public class TrainingSession {
     @NotNull
     @ToString.Exclude
     private Team team;
-
 
 
     @Override

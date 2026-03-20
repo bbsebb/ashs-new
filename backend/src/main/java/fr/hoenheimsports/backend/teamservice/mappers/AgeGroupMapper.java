@@ -1,7 +1,7 @@
 package fr.hoenheimsports.backend.teamservice.mappers;
 
-import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
 import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupCreateRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
 import fr.hoenheimsports.backend.teamservice.entities.AgeGroup;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,7 +17,8 @@ public interface AgeGroupMapper {
 
 
     default String namingAgeGroup(int ageLimit, boolean isUpperLimite) {
-        return isUpperLimite ? "-%s ans".formatted(ageLimit) : "Sénior";
+        var sign = isUpperLimite ? "-" : "+";
+        return "%s%s ans".formatted(sign, ageLimit);
     }
 
 }

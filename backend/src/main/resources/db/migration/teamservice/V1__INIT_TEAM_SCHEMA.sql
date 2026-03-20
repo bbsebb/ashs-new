@@ -21,17 +21,18 @@ CREATE TABLE team_schema.team_staff
     id       UUID         NOT NULL,
     role     VARCHAR(255) NOT NULL,
     team_id  UUID         NOT NULL,
-    coach_id UUID         NOT NULL,
+    staff_id UUID         NOT NULL,
     CONSTRAINT pk_team_staff PRIMARY KEY (id)
 );
 
 CREATE TABLE team_schema.training_session
 (
-    id         UUID                   NOT NULL,
-    hall_id    UUID                   NOT NULL,
-    team_id    UUID                   NOT NULL,
-    start_time time WITHOUT TIME ZONE NOT NULL,
-    end_time   time WITHOUT TIME ZONE NOT NULL,
+    id          UUID                   NOT NULL,
+    hall_id     UUID                   NOT NULL,
+    day_of_week VARCHAR(255)           NOT NULL,
+    team_id     UUID                   NOT NULL,
+    start_time  time WITHOUT TIME ZONE NOT NULL,
+    end_time    time WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_training_session PRIMARY KEY (id)
 );
 

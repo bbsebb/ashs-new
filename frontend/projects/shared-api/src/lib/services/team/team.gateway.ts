@@ -1,9 +1,19 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {map, Observable} from 'rxjs';
-import {Team} from '@shared-domain';
+import {DAY_OF_WEEKS, DayOfWeek, GENDER, Gender, STAFF_ROLE_VALUE, StaffRoleValue, Team} from '@shared-domain';
 import {APP_CONFIG} from '../../configs/app-config';
-import {CreateTeamDTO, TeamResponseDTO, UpdateTeamDTO} from './team.dtos';
+import {
+  AgeGroupResponseDTO,
+  CreateTeamDTO,
+  TeamNameResponseDTO,
+  TeamResponseDTO,
+  TeamStaffResponseDTO,
+  TimeSlotDTO,
+  TrainingSessionResponseDTO,
+  UpdateTeamDTO
+} from './team.dtos';
+import {parseLocalDateTime} from '../../utils/date-mapper';
 
 const API_VERSION = '/api/v1';
 const API_NAME = "teams"
@@ -47,7 +57,21 @@ export class TeamGateway {
       seasonId: teamResponseDTO.seasonId,
       gender: teamResponseDTO.gender,
       teamNumber: teamResponseDTO.name.teamNumber,
-      ageGroup: teamResponseDTO.name.ageGroup
+      ageGroup: teamResponseDTO.name.ageGroup,
+      staffs: teamResponseDTO.staffs.map(staff => ({
+        id: staff.id,
+        role: staff.role,
+        staffId: staff.staffId
+      })),
+      trainingSessions: teamResponseDTO.trainingSessions.map(trainingSession => ({
+        id: trainingSession.id,
+        hallId: trainingSession.hallId,
+        dayOfWeek: trainingSession.dayOfWeek,
+        timeSlot: {
+          startTime: parseLocalDateTime(trainingSession.timeSlot.startTime),
+          endTime: parseLocalDateTime(trainingSession.timeSlot.endTime)
+        }
+      }))
     };
   }
 
@@ -68,35 +92,106 @@ export class TeamGateway {
     return teams;
   }
 
-  private isTeamResponseDTO(value: unknown): value is TeamResponseDTO {
-    if (typeof value !== 'object' || value === null) {
+  private isString(value: unknown): value is string {
+    return typeof value === 'string';
+  }
+
+  private isNumber(value: unknown): value is number {
+    return typeof value === 'number';
+  }
+
+  private isBoolean(value: unknown): value is boolean {
+    return typeof value === 'boolean';
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null;
+  }
+
+  private isStaffRole(value: unknown): value is StaffRoleValue {
+    return typeof value === 'string' && STAFF_ROLE_VALUE.includes(value as StaffRoleValue);
+  }
+
+  private isGender(value: unknown): value is Gender {
+    return typeof value === 'string' && GENDER.includes(value as Gender);
+  }
+
+  private isTimeSlotDTO(value: unknown): value is TimeSlotDTO {
+    if (!this.isRecord(value)) {
       return false;
     }
 
-    const teamResponseRecord = value as Record<string, unknown>;
-    const teamNameRecord = teamResponseRecord['name'];
+    return this.isString(value['startTime']) && this.isString(value['endTime']);
+  }
 
-    if (typeof teamNameRecord !== 'object' || teamNameRecord === null) {
-      return false;
-    }
+  private isDayOfWeek(value: unknown): value is DayOfWeek {
+    return typeof value === 'string' && DAY_OF_WEEKS.includes(value as DayOfWeek);
+  }
 
-    const ageGroupRecord = (teamNameRecord as Record<string, unknown>)['ageGroup'];
-
-    if (typeof ageGroupRecord !== 'object' || ageGroupRecord === null) {
+  private isTrainingSessionResponseDTO(value: unknown): value is TrainingSessionResponseDTO {
+    if (!this.isRecord(value)) {
       return false;
     }
 
     return (
-      typeof teamResponseRecord['id'] === 'string' &&
-      typeof teamResponseRecord['seasonId'] === 'string' &&
-      typeof teamResponseRecord['gender'] === 'string' &&
-      typeof (teamNameRecord as Record<string, unknown>)['teamNumber'] === 'number' &&
-      typeof (ageGroupRecord as Record<string, unknown>)['id'] === 'string' &&
-      typeof (ageGroupRecord as Record<string, unknown>)['ageLimit'] === 'number' &&
-      typeof (ageGroupRecord as Record<string, unknown>)['upperLimit'] === 'boolean' &&
-      typeof (ageGroupRecord as Record<string, unknown>)['name'] === 'string' &&
-      Array.isArray(teamResponseRecord['staffs']) &&
-      Array.isArray(teamResponseRecord['trainingSessions'])
+      this.isString(value['id']) &&
+      this.isString(value['hallId']) &&
+      this.isDayOfWeek(value['dayOfWeek']) &&
+      this.isString(value['teamId']) &&
+      this.isTimeSlotDTO(value['timeSlot'])
+    );
+  }
+
+  private isAgeGroupResponseDTO(value: unknown): value is AgeGroupResponseDTO {
+    if (!this.isRecord(value)) {
+      return false;
+    }
+
+    return (
+      this.isString(value['id']) &&
+      this.isNumber(value['ageLimit']) &&
+      this.isBoolean(value['upperLimit']) &&
+      this.isString(value['name'])
+    );
+  }
+
+  private isTeamNameResponseDTO(value: unknown): value is TeamNameResponseDTO {
+    if (!this.isRecord(value)) {
+      return false;
+    }
+
+    return (
+      this.isNumber(value['teamNumber']) &&
+      this.isAgeGroupResponseDTO(value['ageGroup'])
+    );
+  }
+
+  private isTeamStaffResponseDTO(value: unknown): value is TeamStaffResponseDTO {
+    if (!this.isRecord(value)) {
+      return false;
+    }
+
+    return (
+      this.isString(value['id']) &&
+      this.isString(value['staffId']) &&
+      this.isStaffRole(value['role'])
+    );
+  }
+
+  private isTeamResponseDTO(value: unknown): value is TeamResponseDTO {
+    if (!this.isRecord(value)) {
+      return false;
+    }
+
+    return (
+      this.isString(value['id']) &&
+      this.isString(value['seasonId']) &&
+      this.isGender(value['gender']) &&
+      this.isTeamNameResponseDTO(value['name']) &&
+      Array.isArray(value['staffs']) &&
+      value['staffs'].every(item => this.isTeamStaffResponseDTO(item)) &&
+      Array.isArray(value['trainingSessions']) &&
+      value['trainingSessions'].every(item => this.isTrainingSessionResponseDTO(item))
     );
   }
 }

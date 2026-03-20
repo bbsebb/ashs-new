@@ -2,8 +2,8 @@ package fr.hoenheimsports.backend.teamservice.services;
 
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamCreateRequest;
-import fr.hoenheimsports.backend.teamservice.dtos.TeamUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamReponseDTO;
+import fr.hoenheimsports.backend.teamservice.dtos.TeamUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.entities.*;
 import fr.hoenheimsports.backend.teamservice.mappers.TeamMapper;
 import fr.hoenheimsports.backend.teamservice.repository.AgeGroupRepository;
@@ -73,22 +73,33 @@ public class TeamService {
             return;
         }
 
+        Map<UUID, TeamStaff> existingStaffsById = team.getStaffs().stream()
+                .collect(Collectors.toMap(TeamStaff::getId, staff -> staff));
+
         Set<UUID> dtoIds = dtoList.stream()
                 .map(TeamUpdateRequest.TeamStaffUpdateRequest::id)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        // Suppression des absents
         new ArrayList<>(team.getStaffs()).stream()
                 .filter(staff -> !dtoIds.contains(staff.getId()))
                 .forEach(team::removeStaff);
 
-        // Ajout des nouveaux (id == null)
+        dtoList.stream()
+                .filter(dto -> dto.id() != null)
+                .forEach(dto -> {
+                    TeamStaff existingStaff = existingStaffsById.get(dto.id());
+                    if (existingStaff != null) {
+                        existingStaff.setStaffId(dto.staffId());
+                        existingStaff.setRole(dto.role());
+                    }
+                });
+
         dtoList.stream()
                 .filter(dto -> dto.id() == null)
                 .forEach(dto -> {
                     TeamStaff newStaff = new TeamStaff();
-                    newStaff.setCoachId(dto.coachId());
+                    newStaff.setStaffId(dto.staffId());
                     newStaff.setRole(dto.role());
                     team.addStaff(newStaff);
                 });
@@ -100,17 +111,31 @@ public class TeamService {
             return;
         }
 
+        Map<UUID, TrainingSession> existingTrainingSessionsById = team.getTrainingSessions().stream()
+                .collect(Collectors.toMap(TrainingSession::getId, trainingSession -> trainingSession));
+
         Set<UUID> dtoIds = dtoList.stream()
                 .map(TeamUpdateRequest.TrainingSessionUpdateRequest::id)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        // Suppression des absents
         new ArrayList<>(team.getTrainingSessions()).stream()
                 .filter(session -> !dtoIds.contains(session.getId()))
                 .forEach(team::removeTrainingSession);
 
-        // Ajout des nouveaux (id == null)
+        dtoList.stream()
+                .filter(dto -> dto.id() != null)
+                .forEach(dto -> {
+                    TrainingSession existingTrainingSession = existingTrainingSessionsById.get(dto.id());
+                    if (existingTrainingSession != null) {
+                        existingTrainingSession.setHallId(dto.hallId());
+                        existingTrainingSession.setTimeSlot(new TimeSlot(
+                                dto.timeSlot().startTime(),
+                                dto.timeSlot().endTime()
+                        ));
+                    }
+                });
+
         dtoList.stream()
                 .filter(dto -> dto.id() == null)
                 .forEach(dto -> {

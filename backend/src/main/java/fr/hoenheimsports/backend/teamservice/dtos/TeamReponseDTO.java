@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * DTO for {@link fr.hoenheimsports.backend.teamservice.entities.Team}
  */
-public record TeamReponseDTO(UUID id, UUID seasonId, Gender gender, TeamNameReponseDTO name,
+public record TeamReponseDTO(UUID id, UUID seasonId, Gender gender, TeamNameReponseDTO name, String photoFileName,
                              List<TeamStaffReponseDTO> staffs,
                              List<TrainingSessionResponseDTO> trainingSessions) implements Serializable {
 }

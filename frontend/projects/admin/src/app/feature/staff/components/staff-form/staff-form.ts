@@ -5,14 +5,15 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {firstValueFrom, tap} from 'rxjs';
 import {CreateStaffDTO, FormErrorHandleService, StaffsStore, UpdateStaffDTO} from '@shared-api'
-import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
+import {BreakpointService, FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Staff} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
 import {StaffCard} from '../staff-card/staff-card';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
 import {createImageSourceUrl} from '../../../../shared/image-cropper/utils/image-cropper-utils';
-import {MatIcon} from '@angular/material/icon';
+import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-staff-form',
@@ -28,16 +29,21 @@ import {MatIcon} from '@angular/material/icon';
     StaffCard,
     ImageCropper,
     ImageCropperPreview,
-    MatIcon
+    FormDeleteButton,
+    NgOptimizedImage
   ],
   templateUrl: './staff-form.html',
   styleUrl: './staff-form.scss',
 })
 export class StaffForm {
+  protected readonly PHOTO_HEIGHT = 100;
+  protected readonly PHOTO_WIDTH = 100;
+  private readonly _breakpointService = inject(BreakpointService);
   private readonly _formErrorHandler = inject(FormErrorHandleService);
   private readonly _staffsStore = inject(StaffsStore);
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
+  isHandsetSignal = this._breakpointService.isHandsetSignal;
   isLoading = this._staffsStore.isLoadingSignal;
   error = computed(() => !!this._staffsStore.errorSignal());
   id = input<string | undefined>(undefined);

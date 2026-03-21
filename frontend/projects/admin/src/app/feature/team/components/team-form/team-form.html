@@ -41,7 +41,7 @@
         <mat-label>Genre</mat-label>
         <mat-select [formField]="teamForm.gender">
           @for (gender of genders; track gender) {
-            <mat-option [value]="gender">{{ gender }}</mat-option>
+            <mat-option [value]="gender">{{ gender | gender }}</mat-option>
           }
         </mat-select>
         <mat-error *appError="teamForm.gender; let errorMsg">
@@ -75,7 +75,7 @@
             <mat-select [formField]="teamForm.staffs[$index].role">
               @for (staffRole of staffRoles; track staffRole) {
                 <mat-option [value]="staffRole">
-                  {{ staffRole }}
+                  {{ staffRole | roleStaff }}
                 </mat-option>
               }
             </mat-select>
@@ -134,7 +134,7 @@
             <mat-label>Jour</mat-label>
             <mat-select [formField]="teamForm.trainingSessions[$index].dayOfWeek">
               @for (dayOfWeek of dayOfWeeks; track dayOfWeek) {
-                <mat-option [value]="dayOfWeek">{{ dayOfWeek }}</mat-option>
+                <mat-option [value]="dayOfWeek">{{ dayOfWeek | dayOfWeek }}</mat-option>
               }
             </mat-select>
             <mat-error *appError="teamForm.trainingSessions[$index].dayOfWeek; let errorMsg">
@@ -169,7 +169,42 @@
         </app-form-delete-button>
       </div>
     }
+    <mat-divider/>
 
+
+    <div class="table-toolbar">
+      <app-page-title title="Photo d'équipe"/>
+    </div>
+    @if (showExistingPhotoSignal()) {
+      <div class="image-preview-container">
+
+        <img class="image-preview" [ngSrc]="createImageSourceUrl(teamSignal()?.photoFileName)" [height]="PHOTO_HEIGHT"
+             [width]="PHOTO_WIDTH"
+             alt="avatar" priority/>
+        <app-form-delete-button
+          confirmMessage="Êtes-vous sûr de vouloir supprimer la photo d'équipe ?"
+          [iconOnly]="!isHandsetSignal()"
+          (deleteConfirmed)="deletePhoto()">
+        </app-form-delete-button>
+      </div>
+    } @else {
+      <div class="image-container">
+        <app-image-cropper
+          (croppedBlobChange)="onCroppedBlobChange($event)"
+          [withPreview]="false"
+          [isCircular]="false"
+          [cropMaskHeight]="PHOTO_HEIGHT"
+          [cropMaskWidth]="PHOTO_WIDTH"
+        >
+        </app-image-cropper>
+        <app-image-cropper-preview
+          [previewBlob]="blobPhotoSignal()"
+          [previewHeightSignal]="PHOTO_HEIGHT"
+          [previewWidthSignal]="PHOTO_WIDTH"
+        >
+        </app-image-cropper-preview>
+      </div>
+    }
 
     @let globalErrors = teamForm().errors();
     @if (globalErrors.length > 0) {

@@ -49,10 +49,17 @@
       }
     }
     @if (showExistingAvatarSignal()) {
-      <button mat-raised-button type="button" (click)="deleteAvatar()">
-        <mat-icon>delete</mat-icon>
-      </button>
-      <img [src]="createImageSourceUrl(staffSignal()?.avatarFileName)" height="100" width="100" alt="avatar"/>
+      <div class="image-preview-container">
+
+        <img class="image-preview" [ngSrc]="createImageSourceUrl(staffSignal()?.avatarFileName)" [height]="PHOTO_HEIGHT"
+             [width]="PHOTO_WIDTH"
+             alt="avatar" priority/>
+        <app-form-delete-button
+          confirmMessage="Êtes-vous sûr de vouloir supprimer la photo d'équipe ?"
+          [iconOnly]="!isHandsetSignal()"
+          (deleteConfirmed)="deleteAvatar()">
+        </app-form-delete-button>
+      </div>
     } @else {
       <div class="image-container">
         <app-image-cropper

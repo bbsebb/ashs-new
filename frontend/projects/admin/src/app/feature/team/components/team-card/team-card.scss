@@ -1,43 +1,225 @@
-.title {
+.team-card {
+  width: 100%;
+  max-width: 450px;
+  overflow: hidden;
+  border-radius: 16px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background-color: var(--mat-sys-surface-container-high);
+  overflow: hidden;
+
+  .team-photo {
+    object-fit: cover;
+  }
+
+  .photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--mat-sys-on-surface-variant);
+    gap: 8px;
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      opacity: 0.5;
+    }
+
+    span {
+      font-weight: 500;
+      opacity: 0.7;
+    }
+  }
+
+  .badge-overlay {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    z-index: 1;
+  }
+}
+
+.category-chip {
+  background-color: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 600;
+
+  &.female {
+    background-color: #fce4ec; // Rose léger pour Féminine si besoin d'accentuation
+    color: #880e4f;
+  }
+
+  &.male {
+    background-color: #e3f2fd; // Bleu léger pour Masculine
+    color: #0d47a1;
+  }
+
+  &.mixte {
+    background-color: #f3e5f5; // Violet léger pour Mixte
+    color: #4a148c;
+  }
+}
+
+mat-card-header {
+  padding: 16px;
+
+  mat-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  mat-card-subtitle {
+    font-weight: 500;
+    color: var(--mat-sys-secondary);
+  }
+}
+
+mat-card-content {
+  padding: 0 16px 16px;
+}
+
+.info-section {
+  padding: 16px 0;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--mat-sys-on-surface-variant);
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.staff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.staff-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .staff-info {
+    display: flex;
+    flex-direction: column;
+
+    .staff-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .staff-role {
+      font-size: 0.8rem;
+      color: var(--mat-sys-secondary);
+    }
+  }
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--mat-sys-surface-container-low);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: var(--mat-sys-surface-container-high);
+    border-color: var(--mat-sys-outline-variant);
+    transform: translateX(4px);
+  }
+
+  .session-day {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    width: 40px;
+    color: var(--mat-sys-primary);
+    flex-shrink: 0;
+  }
+
+  .session-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+
+    .session-time {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .session-hall {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: var(--mat-sys-on-surface-variant);
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  .chevron {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--mat-sys-outline);
+    opacity: 0.5;
+  }
+}
+
+.empty-state {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--mat-sys-outline);
   margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--mat-sys-on-surface);
-}
-
-.content {
-  padding: 24px;
-}
-
-.info-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.info-label {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--mat-sys-on-surface-variant);
-}
-
-.info-value {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--mat-sys-on-surface);
-  word-break: break-word;
 }
 
 mat-card-actions {
-  padding: 16px 24px;
-  border-top: 1px solid var(--mat-sys-outline-variant);
+  padding: 8px 16px 16px;
   gap: 8px;
+
+  .spacer {
+    flex: 1;
+  }
 }

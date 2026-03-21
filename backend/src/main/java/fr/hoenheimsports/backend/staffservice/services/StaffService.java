@@ -46,15 +46,25 @@ public class StaffService {
         staff.setFirstName(staffUpdateRequest.firstName());
         staff.setLastName(staffUpdateRequest.lastName());
         // if there is a new filename, file is not null. If the avatar is deleted, avatarFileName is null
-        if (staff.getAvatarFileName() != null && !staff.getAvatarFileName().equals(staffUpdateRequest.avatarFileName())) {
+        updateAvatarFileName(staff, staffUpdateRequest.avatarFileName(), file);
+
+        return this.staffMapper.toDto(this.staffRepository.save(staff));
+    }
+
+    private void updateAvatarFileName(
+            fr.hoenheimsports.backend.staffservice.entities.Staff staff,
+            @Nullable String requestedAvatarFileName,
+            @Nullable MultipartFile file
+    ) {
+        // If there is a new filename, file is not null. If the avatar is deleted, avatarFileName is null
+        if (staff.getAvatarFileName() != null && !staff.getAvatarFileName().equals(requestedAvatarFileName)) {
             imageStorageService.deleteImage(staff.getAvatarFileName());
-            staff.setAvatarFileName(staffUpdateRequest.avatarFileName());
+            staff.setAvatarFileName(requestedAvatarFileName);
         }
+
         if (file != null) {
             staff.setAvatarFileName(imageStorageService.saveImage(file));
         }
-
-        return this.staffMapper.toDto(this.staffRepository.save(staff));
     }
 
     public void deleteStaff(UUID id) {

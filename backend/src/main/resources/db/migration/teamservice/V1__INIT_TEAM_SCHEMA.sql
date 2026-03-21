@@ -8,11 +8,12 @@ CREATE TABLE team_schema.age_group
 
 CREATE TABLE team_schema.team
 (
-    id           UUID         NOT NULL,
-    season_id    UUID         NOT NULL,
-    gender       VARCHAR(255) NOT NULL,
-    name         INTEGER      NOT NULL,
-    age_group_id UUID         NOT NULL,
+    id              UUID         NOT NULL,
+    season_id       UUID         NOT NULL,
+    gender          VARCHAR(255) NOT NULL,
+    photo_file_name VARCHAR(50),
+    name            INTEGER      NOT NULL,
+    age_group_id    UUID         NOT NULL,
     CONSTRAINT pk_team PRIMARY KEY (id)
 );
 

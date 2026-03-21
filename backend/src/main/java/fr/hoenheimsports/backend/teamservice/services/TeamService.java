@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.teamservice.services;
 
+import fr.hoenheimsports.backend.imagestorage.ImageStorageService;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamCreateRequest;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamReponseDTO;
@@ -10,8 +11,10 @@ import fr.hoenheimsports.backend.teamservice.repository.AgeGroupRepository;
 import fr.hoenheimsports.backend.teamservice.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,25 +26,29 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final AgeGroupRepository ageGroupRepository;
     private final TeamMapper teamMapper;
+    private final ImageStorageService imageStorageService;
 
 
     public List<TeamReponseDTO> getAllTeams() {
         return this.teamRepository.findAll().stream().map(teamMapper::toDto).collect(Collectors.toList());
     }
 
-    public TeamReponseDTO createTeam(TeamCreateRequest teamRequestDTO) {
+    public TeamReponseDTO createTeam(@Nullable MultipartFile file, TeamCreateRequest teamRequestDTO) {
 
         log.debug("Mapping {}", this.teamMapper.toEntity(teamRequestDTO));
         var team = this.teamMapper.toEntity(teamRequestDTO);
         var teamName = new TeamName(teamRequestDTO.teamNumber(), findById(teamRequestDTO.ageGroupId()));
         team.setName(teamName);
+        if (file != null) {
+            team.setPhotoFileName(imageStorageService.saveImage(file));
+        }
 
 
         return this.teamMapper.toDto(this.teamRepository.save(team));
     }
 
     @Transactional
-    public TeamReponseDTO updateTeam(UUID teamId, TeamUpdateRequest teamRequestDTO) {
+    public TeamReponseDTO updateTeam(UUID teamId, @Nullable MultipartFile file, TeamUpdateRequest teamRequestDTO) {
         Team team = this.teamRepository.findById(teamId)
                 .orElseThrow(() -> new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId));
 
@@ -50,6 +57,7 @@ public class TeamService {
 
         AgeGroup ageGroup = findById(teamRequestDTO.ageGroupId());
         team.setName(new TeamName(teamRequestDTO.teamNumber(), ageGroup));
+        updatePhotoFileName(team, teamRequestDTO.photoFileName(), file);
 
         // 2. Synchronisation des Staffs
         syncStaffs(team, teamRequestDTO.staffs());
@@ -60,6 +68,22 @@ public class TeamService {
         return this.teamMapper.toDto(this.teamRepository.save(team));
     }
 
+    private void updatePhotoFileName(
+            Team team,
+            @Nullable String requestedAvatarFileName,
+            @Nullable MultipartFile file
+    ) {
+        // If there is a new filename, file is not null. If the avatar is deleted, avatarFileName is null
+        if (team.getPhotoFileName() != null && !team.getPhotoFileName().equals(requestedAvatarFileName)) {
+            imageStorageService.deleteImage(team.getPhotoFileName());
+            team.setPhotoFileName(requestedAvatarFileName);
+        }
+
+        if (file != null) {
+            team.setPhotoFileName(imageStorageService.saveImage(file));
+        }
+    }
+
 
     public void deleteTeam(UUID teamId) {
         Team team = this.teamRepository.findById(teamId)
@@ -68,7 +92,7 @@ public class TeamService {
     }
 
     private void syncStaffs(Team team, List<TeamUpdateRequest.TeamStaffUpdateRequest> dtoList) {
-        if (dtoList == null || dtoList.isEmpty()) {
+        if (dtoList.isEmpty()) {
             new ArrayList<>(team.getStaffs()).forEach(team::removeStaff);
             return;
         }
@@ -77,8 +101,11 @@ public class TeamService {
                 .collect(Collectors.toMap(TeamStaff::getId, staff -> staff));
 
         Set<UUID> dtoIds = dtoList.stream()
-                .map(TeamUpdateRequest.TeamStaffUpdateRequest::id)
-                .filter(Objects::nonNull)
+                .<UUID>mapMulti((dto, consumer) -> {
+                    if (dto.id() != null) {
+                        consumer.accept(dto.id());
+                    }
+                })
                 .collect(Collectors.toSet());
 
         new ArrayList<>(team.getStaffs()).stream()
@@ -106,7 +133,7 @@ public class TeamService {
     }
 
     private void syncTrainingSessions(Team team, List<TeamUpdateRequest.TrainingSessionUpdateRequest> dtoList) {
-        if (dtoList == null || dtoList.isEmpty()) {
+        if (dtoList.isEmpty()) {
             new ArrayList<>(team.getTrainingSessions()).forEach(team::removeTrainingSession);
             return;
         }
@@ -115,8 +142,11 @@ public class TeamService {
                 .collect(Collectors.toMap(TrainingSession::getId, trainingSession -> trainingSession));
 
         Set<UUID> dtoIds = dtoList.stream()
-                .map(TeamUpdateRequest.TrainingSessionUpdateRequest::id)
-                .filter(Objects::nonNull)
+                .<UUID>mapMulti((dto, consumer) -> {
+                    if (dto.id() != null) {
+                        consumer.accept(dto.id());
+                    }
+                })
                 .collect(Collectors.toSet());
 
         new ArrayList<>(team.getTrainingSessions()).stream()

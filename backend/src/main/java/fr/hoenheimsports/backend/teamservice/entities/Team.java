@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -30,6 +31,11 @@ public class Team {
     @Embedded
     @NotNull
     private TeamName name;
+
+
+    @Column(name = "photo_file_name", length = 50)
+    @Nullable
+    private String photoFileName;
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

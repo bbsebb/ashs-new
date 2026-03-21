@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input, linkedSignal, Signal} from '@angular/core';
+import {Component, computed, inject, input, linkedSignal, signal, Signal} from '@angular/core';
 import {applyEach, FieldTree, form, FormField, max, min, required, submit, validateTree} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -17,10 +17,13 @@ import {
 } from '@shared-api'
 import {
   BreakpointService,
+  DayOfWeekPipe,
   FormFieldErrorDirective,
   FormSubmitButton,
+  GenderPipe,
   NotificationService,
-  PageTitle
+  PageTitle,
+  RoleStaffPipe
 } from '@shared-ui';
 import {DAY_OF_WEEKS, DayOfWeek, GENDER, Gender, STAFF_ROLE_VALUE, StaffRoleValue, Team} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
@@ -30,6 +33,10 @@ import {MatIcon} from '@angular/material/icon';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 import {MatTimepicker, MatTimepickerInput, MatTimepickerToggle} from '@angular/material/timepicker';
 import {firstValueFrom, tap} from 'rxjs';
+import {createImageSourceUrl} from '../../../../shared/image-cropper/utils/image-cropper-utils';
+import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
+import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-team-form',
@@ -49,21 +56,22 @@ import {firstValueFrom, tap} from 'rxjs';
     FormDeleteButton,
     MatTimepickerInput,
     MatTimepickerToggle,
-    MatTimepicker
+    MatTimepicker,
+    ImageCropper,
+    ImageCropperPreview,
+    NgOptimizedImage,
+    RoleStaffPipe,
+    DayOfWeekPipe,
+    GenderPipe
   ],
   templateUrl: './team-form.html',
   styleUrl: './team-form.scss',
 })
 export class TeamForm {
+  readonly PHOTO_HEIGHT = 450;
+  readonly PHOTO_WIDTH = 800;
+
   private readonly _breakpointService = inject(BreakpointService);
-  readonly isHandsetSignal = this._breakpointService.isHandsetSignal;
-
-  constructor() {
-    effect(() => {
-      console.log(this.isHandsetSignal())
-    });
-  }
-
   private readonly _formErrorHandler = inject(FormErrorHandleService);
   private readonly _teamsStore = inject(TeamsStore);
   private readonly _staffsStore = inject(StaffsStore);
@@ -72,10 +80,12 @@ export class TeamForm {
   private readonly _hallsStore = inject(HallsStore);
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
+  isHandsetSignal = this._breakpointService.isHandsetSignal;
   staffsSignal = this._staffsStore.staffsSignal;
   seasonsSignal = this._seasonsStore.seasonsSignal;
   hallsSignal = this._hallsStore.hallsSignal;
-
+  showExistingPhotoSignal = linkedSignal(() => !!this.teamSignal()?.photoFileName);
+  blobPhotoSignal = signal<Blob | undefined>(undefined)
   isLoading = computed(() =>
     this._teamsStore.isLoadingSignal() &&
     this._seasonsStore.isLoadingSignal() &&
@@ -185,53 +195,54 @@ export class TeamForm {
 
   protected submitForm(event: Event) {
     event.preventDefault();
-    const id = this.id();
+    const oldTeam = this.teamSignal();
 
 
     void submit(this.teamForm, async (form) => {
       try {
 
-        const createTeamDTO: CreateTeamDTO = {
-          ...this.teamFormModelSignal(),
-          staffs: this.teamFormModelSignal().staffs.map(staff => ({
-            role: staff.role,
-            staffId: staff.staffId
-          })),
-          trainingSessions: this.teamFormModelSignal().trainingSessions.map(session => ({
-            hallId: session.hallId,
-            dayOfWeek: session.dayOfWeek,
-            timeSlot: {
-              startTime: dateToLocalDateTime(session.timeSlot.startTime),
-              endTime: dateToLocalDateTime(session.timeSlot.endTime)
-            }
-          }))
-        };
-        const updateTeamDTO: UpdateTeamDTO = {
-          ...this.teamFormModelSignal(),
-          staffs: this.teamFormModelSignal().staffs.map(staff => ({
-            id: staff.id?.trim() ? staff.id : null,
-            role: staff.role,
-            staffId: staff.staffId
-          })),
-          trainingSessions: this.teamFormModelSignal().trainingSessions.map(session => ({
-            id: session.id?.trim() ? session.id : null,
-            hallId: session.hallId,
-            dayOfWeek: session.dayOfWeek,
-            timeSlot: {
-              startTime: dateToLocalDateTime(session.timeSlot.startTime),
-              endTime: dateToLocalDateTime(session.timeSlot.endTime)
-            }
-          }))
-        };
 
         let resultId: string | undefined;
-        if (!id) {
-          const newTeam = await firstValueFrom(this._teamsStore.createTeam(createTeamDTO).pipe(
+        if (!oldTeam) {
+          const createTeamDTO: CreateTeamDTO = {
+            ...this.teamFormModelSignal(),
+            staffs: this.teamFormModelSignal().staffs.map(staff => ({
+              role: staff.role,
+              staffId: staff.staffId
+            })),
+            trainingSessions: this.teamFormModelSignal().trainingSessions.map(session => ({
+              hallId: session.hallId,
+              dayOfWeek: session.dayOfWeek,
+              timeSlot: {
+                startTime: dateToLocalDateTime(session.timeSlot.startTime),
+                endTime: dateToLocalDateTime(session.timeSlot.endTime)
+              }
+            }))
+          };
+          const newTeam = await firstValueFrom(this._teamsStore.createTeam(createTeamDTO, this.blobPhotoSignal()).pipe(
             tap(() => this._notificationService.show("L'équipe a été enregistrée", 'success'))
           ));
           resultId = newTeam.id;
         } else {
-          const updatedTeam = await firstValueFrom(this._teamsStore.updateTeam(id, updateTeamDTO).pipe(
+          const updateTeamDTO: UpdateTeamDTO = {
+            ...this.teamFormModelSignal(),
+            photoFileName: this.showExistingPhotoSignal() ? oldTeam.photoFileName : null,
+            staffs: this.teamFormModelSignal().staffs.map(staff => ({
+              id: staff.id?.trim() ? staff.id : null,
+              role: staff.role,
+              staffId: staff.staffId
+            })),
+            trainingSessions: this.teamFormModelSignal().trainingSessions.map(session => ({
+              id: session.id?.trim() ? session.id : null,
+              hallId: session.hallId,
+              dayOfWeek: session.dayOfWeek,
+              timeSlot: {
+                startTime: dateToLocalDateTime(session.timeSlot.startTime),
+                endTime: dateToLocalDateTime(session.timeSlot.endTime)
+              }
+            }))
+          };
+          const updatedTeam = await firstValueFrom(this._teamsStore.updateTeam(oldTeam.id, updateTeamDTO, this.blobPhotoSignal()).pipe(
             tap(() => this._notificationService.show("L'équipe a été mise à jour", 'success'))
           ));
           resultId = updatedTeam.id;
@@ -290,6 +301,16 @@ export class TeamForm {
       ...teamFormModel,
       trainingSessions: teamFormModel.trainingSessions.filter((_, currentIndex) => currentIndex !== $index)
     }));
+  }
+
+  protected readonly createImageSourceUrl = createImageSourceUrl;
+
+  protected onCroppedBlobChange($event: any) {
+    this.blobPhotoSignal.set($event);
+  }
+
+  protected deletePhoto() {
+    this.showExistingPhotoSignal.set(false);
   }
 }
 

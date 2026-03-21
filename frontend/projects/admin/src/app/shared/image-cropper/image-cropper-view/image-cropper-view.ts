@@ -56,10 +56,10 @@ export class ImageCropperView {
   protected readonly zoomLevelSignal = signal(1);
 
   /** Minimum allowed zoom level. */
-  private readonly _MIN_ZOOM = 0.5;
+  protected readonly _MIN_ZOOM = 0.1;
 
   /** Maximum allowed zoom level. */
-  private readonly _MAX_ZOOM = 5.0;
+  protected readonly _MAX_ZOOM = 5.0;
 
   /** Zoom step for each button click. */
   private readonly _ZOOM_STEP = 0.1;

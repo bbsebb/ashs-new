@@ -25,6 +25,7 @@ export interface UpdateTeamDTO {
   gender: Gender;
   teamNumber: number;
   ageGroupId: string;
+  photoFileName: string | null;
   staffs: (CreateTeamStaffDOT | UpdateTeamStaffDOT)[];
   trainingSessions: (CreateTrainingSessionDTO | UpdateTrainingSessionDTO)[];
 }
@@ -52,6 +53,7 @@ export interface AgeGroupDTO {
 export interface TeamResponseDTO {
   id: string;
   seasonId: string;
+  photoFileName: string | null;
   gender: Gender;
   name: TeamNameResponseDTO;
   staffs: TeamStaffResponseDTO[];

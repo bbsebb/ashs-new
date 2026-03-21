@@ -26,8 +26,8 @@ export class TeamsStore {
     });
   }
 
-  createTeam(createTeamDTO: CreateTeamDTO): Observable<Team> {
-    return this._teamGateway.createTeam(createTeamDTO).pipe(
+  createTeam(createTeamDTO: CreateTeamDTO, blobPhoto: Blob | undefined): Observable<Team> {
+    return this._teamGateway.createTeam(createTeamDTO, blobPhoto).pipe(
       tap((createdTeam) => this._teamsResource.update(teamsList => [...teamsList, createdTeam]))
     );
   }
@@ -43,8 +43,8 @@ export class TeamsStore {
     );
   }
 
-  updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO): Observable<Team> {
-    return this._teamGateway.updateTeam(teamId, updateTeamDTO).pipe(
+  updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO, blobPhoto: Blob | undefined): Observable<Team> {
+    return this._teamGateway.updateTeam(teamId, updateTeamDTO, blobPhoto).pipe(
       tap((updatedTeam) => this._teamsResource.update(teamsList => teamsList.map(team => team.id === updatedTeam.id ? updatedTeam : team)))
     );
   }

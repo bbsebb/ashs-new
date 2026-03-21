@@ -16,3 +16,9 @@ export * from './lib/page-title/page-title'
 export * from './lib/form-field-error/form-field-error'
 export * from './lib/contact/contact'
 export * from './lib/services/breakpoint.service';
+export * from './lib/pipes/role-staff-pipe';
+export * from './lib/pipes/day-of-week-pipe';
+export * from './lib/pipes/gender-pipe';
+export * from './lib/pipes/age-limit-pipe';
+
+

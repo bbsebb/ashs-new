@@ -22,7 +22,9 @@
       `productsListSignal`).
     - **Nommage Observables :** Les observables doivent avoir le suffixe `$` (ex: `routeParams$`, `userActions$`).
     - **Variables Privées :** Doivent impérativement porter le prefix `_` (ex: `_userService`, `_itemsList`).
-- **Composants :** Utilise au maximum les composants d'Angular Material 21.
+- **Composants :**
+    - Utilise au maximum les composants d'Angular Material 21.
+    - **Structure :** Tout composant Angular doit être impérativement structuré en 3 fichiers distincts (`.ts`, `.html`, `.scss`). L'utilisation de templates ou de styles inline est interdite.
 - **Stylisation :** Utilise exclusivement SCSS.
 - **Nommage CSS :**
     - Utilise des noms de classes simples, courts et sémantiques (ex: `.card`, `.title`, `.actions`).

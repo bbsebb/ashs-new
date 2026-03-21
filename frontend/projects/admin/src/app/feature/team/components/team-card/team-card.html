@@ -1,37 +1,116 @@
 @let team = teamSignal();
-<mat-card appearance="outlined" class="card">
-  <mat-card-header class="header">
-    <mat-card-title class="title">
-      {{ team.ageGroup.upperLimit ? 'U' : '' }}{{ team.ageGroup.ageLimit }} {{ team.gender }} {{ team.teamNumber > 1 ? team.teamNumber : '' }}
+@let enrichedStaffs = enrichedStaffsSignal();
+@let enrichedSessions = enrichedTrainingSessionsSignal();
+
+<mat-card appearance="outlined" class="team-card">
+  <!-- Image de l'équipe -->
+  <div class="image-container">
+    @if (team.photoFileName) {
+      <img [ngSrc]="createImageSourceUrl(team.photoFileName)"
+           alt="Photo de l'équipe {{ team.ageGroup.name }}"
+           fill
+           priority
+           class="team-photo">
+    } @else {
+      <div class="photo-placeholder">
+        <mat-icon>groups</mat-icon>
+        <span>Pas de photo d'équipe</span>
+      </div>
+    }
+
+    <!-- Badges superposés sur l'image -->
+    <div class="badge-overlay">
+      <mat-chip-set>
+        <mat-chip class="category-chip"
+                  [class.female]="team.gender === 'Female'"
+                  [class.male]="team.gender === 'Male'"
+                  [class.mixte]="team.gender === 'Mixte'">
+          {{ team.ageGroup.upperLimit | ageLimit }}{{ team.ageGroup.ageLimit }} {{ team.gender | gender }}
+        </mat-chip>
+        @if (team.teamNumber > 1) {
+          <mat-chip class="number-chip">Équipe {{ team.teamNumber }}</mat-chip>
+        }
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <mat-card-header>
+    <mat-card-title>
+      {{ team.ageGroup.upperLimit | ageLimit: 'long' }} {{ team.ageGroup.ageLimit }} ans
+      @if (team.teamNumber > 1) {
+        ({{ team.teamNumber }})
+      }
     </mat-card-title>
+    <mat-card-subtitle>{{ team.gender | gender }}</mat-card-subtitle>
   </mat-card-header>
 
-  <mat-card-content class="content">
-    <div class="info-container">
-      <div class="info-item">
-        <span class="info-label">Catégorie</span>
-        <span class="info-value">{{ team.ageGroup.upperLimit ? 'Moins de' : '' }} {{ team.ageGroup.ageLimit }}
-          ans</span>
-      </div>
+  <mat-card-content>
+    <mat-divider></mat-divider>
 
-      <div class="info-item">
-        <span class="info-label">Genre</span>
-        <span class="info-value">{{ team.gender }}</span>
-      </div>
+    <!-- Section Encadrants -->
+    <section class="info-section">
+      <h3 class="section-title">
+        <mat-icon>person</mat-icon>
+        Encadrement
+      </h3>
+      @if (enrichedStaffs.length > 0) {
+        <div class="staff-list">
+          @for (staff of enrichedStaffs; track staff.id) {
+            <app-staff-mini-card
+              [staffId]="staff.staffId"
+              [fullName]="staff.fullName"
+              [role]="staff.role | roleStaff"
+              [avatar]="staff.avatar?? null">
+            </app-staff-mini-card>
+          }
+        </div>
+      } @else {
+        <p class="empty-state">Aucun encadrant renseigné</p>
+      }
+    </section>
 
-      <div class="info-item">
-        <span class="info-label">Équipe n°</span>
-        <span class="info-value">{{ team.teamNumber }}</span>
-      </div>
-    </div>
+    <mat-divider></mat-divider>
+
+    <!-- Section Entraînements -->
+    <section class="info-section">
+      <h3 class="section-title">
+        <mat-icon>event</mat-icon>
+        Entraînements
+      </h3>
+      @if (enrichedSessions.length > 0) {
+        <div class="session-list">
+          @for (session of enrichedSessions; track session.id) {
+            <a [routerLink]="['/halls', session.hallId]" class="session-item" title="Voir les détails de la salle">
+              <div class="session-day">{{ session.dayOfWeek | dayOfWeek }}</div>
+              <div class="session-details">
+                <span class="session-time">
+                  {{ session.timeSlot.startTime | date: 'HH:mm' }} - {{ session.timeSlot.endTime | date: 'HH:mm' }}
+                </span>
+                <span class="session-hall">
+                  <mat-icon>location_on</mat-icon>
+                  {{ session.hallName }}
+                </span>
+              </div>
+              <mat-icon class="chevron">chevron_right</mat-icon>
+            </a>
+          }
+        </div>
+      } @else {
+        <p class="empty-state">Aucun créneau d'entraînement</p>
+      }
+    </section>
   </mat-card-content>
 
   @if (withActions()) {
     <mat-card-actions align="end">
-      <button mat-button type="button" routerLink="/teams">Retour</button>
-      <button mat-flat-button type="button" routerLink="/teams/{{team.id}}/update">Modifier</button>
+      <button mat-button routerLink="/teams">Retour</button>
+      <div class="spacer"></div>
+      <button mat-icon-button color="primary" routerLink="/teams/{{team.id}}/update" aria-label="Modifier">
+        <mat-icon>edit</mat-icon>
+      </button>
       <app-form-delete-button
         confirmMessage="Êtes-vous sûr de vouloir supprimer cette équipe ?"
+        [iconOnly]="true"
         (deleteConfirmed)="onDelete()">
       </app-form-delete-button>
     </mat-card-actions>

@@ -35,8 +35,27 @@ export class TeamGateway {
   }
 
 
-  createTeam(createTeamDTO: CreateTeamDTO): Observable<Team> {
-    return this._http.post<TeamResponseDTO>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}`, createTeamDTO).pipe(
+  createTeam(createTeamDTO: CreateTeamDTO, blobPhoto: Blob | undefined): Observable<Team> {
+    const formData = new FormData();
+    if (blobPhoto) {
+      formData.append('file', blobPhoto, 'avatar.png');
+    }
+    formData.append('data',
+      new Blob([JSON.stringify(createTeamDTO)], {type: 'application/json'}))
+    return this._http.post<TeamResponseDTO>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}`, formData).pipe(
+      map(teamResponseDTO => this.toTeam(teamResponseDTO))
+    );
+  }
+
+
+  updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO, blobPhoto: Blob | undefined): Observable<Team> {
+    const formData = new FormData();
+    if (blobPhoto) {
+      formData.append('file', blobPhoto, 'avatar.png');
+    }
+    formData.append('data',
+      new Blob([JSON.stringify(updateTeamDTO)], {type: 'application/json'}))
+    return this._http.put<TeamResponseDTO>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}/${teamId}`, formData).pipe(
       map(teamResponseDTO => this.toTeam(teamResponseDTO))
     );
   }
@@ -45,11 +64,6 @@ export class TeamGateway {
     return this._http.delete<void>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}/${teamId}`);
   }
 
-  updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO): Observable<Team> {
-    return this._http.put<TeamResponseDTO>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}/${teamId}`, updateTeamDTO).pipe(
-      map(teamResponseDTO => this.toTeam(teamResponseDTO))
-    );
-  }
 
   private toTeam(teamResponseDTO: TeamResponseDTO): Team {
     return {
@@ -58,6 +72,7 @@ export class TeamGateway {
       gender: teamResponseDTO.gender,
       teamNumber: teamResponseDTO.name.teamNumber,
       ageGroup: teamResponseDTO.name.ageGroup,
+      photoFileName: teamResponseDTO.photoFileName,
       staffs: teamResponseDTO.staffs.map(staff => ({
         id: staff.id,
         role: staff.role,
@@ -186,6 +201,7 @@ export class TeamGateway {
     return (
       this.isString(value['id']) &&
       this.isString(value['seasonId']) &&
+      this.isString(value['photoFileName']) &&
       this.isGender(value['gender']) &&
       this.isTeamNameResponseDTO(value['name']) &&
       Array.isArray(value['staffs']) &&

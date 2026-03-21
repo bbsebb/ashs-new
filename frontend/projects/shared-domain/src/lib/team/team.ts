@@ -18,6 +18,7 @@ export interface Team {
   seasonId: string;
   gender: Gender;
   teamNumber: number;
+  photoFileName: string | null;
   ageGroup: AgeGroup;
   staffs: StaffView[],
   trainingSessions: TrainingSessionView[]

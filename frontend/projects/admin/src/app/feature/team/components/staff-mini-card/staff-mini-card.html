@@ -1,0 +1,16 @@
+<a [routerLink]="['/staffs', staffId()]" class="staff-mini-card" title="Voir la fiche de l'encadrant">
+  <div class="avatar-container">
+    @if (avatar()) {
+      <img [ngSrc]="createImageSourceUrl(avatar())" [alt]="fullName()" width="32" height="32" class="avatar">
+    } @else {
+      <div class="avatar-placeholder">
+        <mat-icon>person</mat-icon>
+      </div>
+    }
+  </div>
+  <div class="staff-details">
+    <span class="full-name">{{ fullName() }}</span>
+    <span class="role">{{ role() }}</span>
+  </div>
+  <mat-icon class="chevron">chevron_right</mat-icon>
+</a>

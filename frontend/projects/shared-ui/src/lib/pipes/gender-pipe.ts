@@ -6,15 +6,14 @@ import {Gender} from '@shared-domain';
 })
 export class GenderPipe implements PipeTransform {
 
-  transform(value: Gender, ...args: unknown[]): string {
+  transform(value: Gender, format: 'short' | 'long' = 'short'): string {
     switch (value) {
       case 'Male':
-        return 'Homme';
+        return format === 'short' ? 'Masc.' : 'Masculin';
       case 'Female':
-        return 'Femme';
+        return format === 'short' ? 'Fém.' : 'Feminin';
       case 'Mixte':
-        return 'Mixte';
-
+        return format === 'short' ? 'Mixte' : 'Mixte';
     }
   }
 

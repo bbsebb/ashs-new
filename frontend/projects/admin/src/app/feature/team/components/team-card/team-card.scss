@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 .team-card {
   width: 100%;
   max-width: 450px;
@@ -5,10 +7,6 @@
   border-radius: 16px;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
 }
 
 .image-container {
@@ -53,23 +51,34 @@
 }
 
 .category-chip {
+  // On utilise les overrides pour les tokens existants
+  @include mat.chips-overrides((
+    label-text-color: var(--mat-sys-on-primary-container),
+    label-text-weight: 600,
+  ));
+
+  // On utilise background-color standard car container-color n'existe pas en token M3 pour chips
   background-color: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-  font-weight: 600;
 
   &.female {
-    background-color: #fce4ec; // Rose léger pour Féminine si besoin d'accentuation
-    color: #880e4f;
+    background-color: #fce4ec;
+    @include mat.chips-overrides((
+      label-text-color: #880e4f
+    ));
   }
 
   &.male {
-    background-color: #e3f2fd; // Bleu léger pour Masculine
-    color: #0d47a1;
+    background-color: #e3f2fd;
+    @include mat.chips-overrides((
+      label-text-color: #0d47a1
+    ));
   }
 
   &.mixte {
-    background-color: #f3e5f5; // Violet léger pour Mixte
-    color: #4a148c;
+    background-color: #f3e5f5;
+    @include mat.chips-overrides((
+      label-text-color: #4a148c
+    ));
   }
 }
 

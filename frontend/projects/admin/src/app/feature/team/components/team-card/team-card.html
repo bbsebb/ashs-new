@@ -14,7 +14,7 @@
     } @else {
       <div class="photo-placeholder">
         <mat-icon>groups</mat-icon>
-        <span>Pas de photo d'équipe</span>
+        <span>Photo d'équipe</span>
       </div>
     }
 
@@ -25,27 +25,15 @@
                   [class.female]="team.gender === 'Female'"
                   [class.male]="team.gender === 'Male'"
                   [class.mixte]="team.gender === 'Mixte'">
-          {{ team.ageGroup.upperLimit | ageLimit }}{{ team.ageGroup.ageLimit }} {{ team.gender | gender }}
+          {{ team.ageGroup.upperLimit | ageLimit }}{{ team.ageGroup.ageLimit }} {{ team.gender | gender }} {{ team.teamNumber }}
         </mat-chip>
-        @if (team.teamNumber > 1) {
-          <mat-chip class="number-chip">Équipe {{ team.teamNumber }}</mat-chip>
-        }
       </mat-chip-set>
     </div>
   </div>
 
-  <mat-card-header>
-    <mat-card-title>
-      {{ team.ageGroup.upperLimit | ageLimit: 'long' }} {{ team.ageGroup.ageLimit }} ans
-      @if (team.teamNumber > 1) {
-        ({{ team.teamNumber }})
-      }
-    </mat-card-title>
-    <mat-card-subtitle>{{ team.gender | gender }}</mat-card-subtitle>
-  </mat-card-header>
 
   <mat-card-content>
-    <mat-divider></mat-divider>
+
 
     <!-- Section Encadrants -->
     <section class="info-section">

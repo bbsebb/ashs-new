@@ -1,13 +1,6 @@
 import {Component, computed, inject, input} from '@angular/core';
 import {MatButton, MatIconButton} from "@angular/material/button";
-import {
-  MatCard,
-  MatCardActions,
-  MatCardContent,
-  MatCardHeader,
-  MatCardSubtitle,
-  MatCardTitle
-} from "@angular/material/card";
+import {MatCard, MatCardActions, MatCardContent} from "@angular/material/card";
 import {Router, RouterLink} from "@angular/router";
 import {AgeLimitPipe, DayOfWeekPipe, GenderPipe, NotificationService, RoleStaffPipe} from '@shared-ui';
 import {HallsStore, StaffsStore, TeamsStore} from '@shared-api';
@@ -18,7 +11,7 @@ import {MatDivider} from '@angular/material/divider';
 import {MatChipsModule} from '@angular/material/chips';
 import {createImageSourceUrl} from '../../../../shared/image-cropper/utils/image-cropper-utils';
 import {Team} from '@shared-domain';
-import {StaffMiniCard} from '../staff-mini-card/staff-mini-card';
+import {StaffMiniCard} from '../../../staff/components/staff-mini-card/staff-mini-card';
 
 @Component({
   selector: 'app-team-card',
@@ -27,8 +20,6 @@ import {StaffMiniCard} from '../staff-mini-card/staff-mini-card';
     MatCard,
     MatCardActions,
     MatCardContent,
-    MatCardHeader,
-    MatCardTitle,
     RouterLink,
     FormDeleteButton,
     NgOptimizedImage,
@@ -41,8 +32,7 @@ import {StaffMiniCard} from '../staff-mini-card/staff-mini-card';
     DayOfWeekPipe,
     AgeLimitPipe,
     MatIconButton,
-    StaffMiniCard,
-    MatCardSubtitle
+    StaffMiniCard
   ],
   templateUrl: './team-card.html',
   styleUrl: './team-card.scss',

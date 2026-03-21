@@ -91,7 +91,9 @@ export class TeamGateway {
   }
 
   private parseTeams(response: unknown): TeamResponseDTO[] {
+
     if (!Array.isArray(response)) {
+      console.error('Réponse API invalide: attendu un tableau d équipes.');
       throw new Error('Réponse API invalide: attendu un tableau d équipes.');
     }
 
@@ -99,6 +101,7 @@ export class TeamGateway {
 
     for (const item of response) {
       if (!this.isTeamResponseDTO(item)) {
+        console.error('Réponse API invalide: un élément du tableau ne correspond pas à TeamResponseDTO.');
         throw new Error('Réponse API invalide: un élément du tableau ne correspond pas à TeamResponseDTO.');
       }
       teams.push(item);
@@ -201,7 +204,7 @@ export class TeamGateway {
     return (
       this.isString(value['id']) &&
       this.isString(value['seasonId']) &&
-      this.isString(value['photoFileName']) &&
+      (value['photoFileName'] === null || this.isString(value['photoFileName'])) &&
       this.isGender(value['gender']) &&
       this.isTeamNameResponseDTO(value['name']) &&
       Array.isArray(value['staffs']) &&

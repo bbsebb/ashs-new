@@ -33,8 +33,8 @@
       simples.
 - **Design Tokens & Material 3 :**
     - **Référence :** Utilise les variables CSS natives pour lire les valeurs : `var(--mat-sys-primary)`, etc.
-    - **Overrides :** Pour modifier le style d'un composant, utilise exclusivement les mixins d'overrides (ex:
-      `mat.snack-bar-overrides`).
+    - **Overrides :** Pour modifier le style d'un composant, utilise exclusivement les mixins d'overrides (ex: `mat.snack-bar-overrides`).
+    - **Règle de priorité :** Si une propriété spécifique (comme la couleur de fond) ne possède pas de token correspondant dans la mixin d'override de Material 3, utilise les propriétés CSS standards (ex: `background-color`) directement sur le sélecteur.
     - **Scoping des Overrides :**
         - Ne pas utiliser systématiquement `:root`.
         - Appliquer les overrides de préférence sur la classe du thème (ex:

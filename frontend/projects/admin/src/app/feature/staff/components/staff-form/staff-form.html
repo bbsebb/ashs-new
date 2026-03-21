@@ -52,7 +52,7 @@
       <button mat-raised-button type="button" (click)="deleteAvatar()">
         <mat-icon>delete</mat-icon>
       </button>
-      <img [src]="createImageSourceUrl(staffSignal()?.fileName)" height="100" width="100" alt="avatar"/>
+      <img [src]="createImageSourceUrl(staffSignal()?.avatarFileName)" height="100" width="100" alt="avatar"/>
     } @else {
       <div class="image-container">
         <app-image-cropper

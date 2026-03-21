@@ -34,7 +34,7 @@ public class StaffService {
 
         var staff = this.staffMapper.toEntity(staffCreateRequest);
         if (file != null) {
-            staff.setFileName(imageStorageService.saveImage(file));
+            staff.setAvatarFileName(imageStorageService.saveImage(file));
         }
         return this.staffMapper.toDto(this.staffRepository.save(staff));
     }
@@ -45,13 +45,13 @@ public class StaffService {
         staff.setPhone(new Phone(staffUpdateRequest.phone()));
         staff.setFirstName(staffUpdateRequest.firstName());
         staff.setLastName(staffUpdateRequest.lastName());
-        // if there is a new filename, file is not null. If the avatar is deleted, fileName is null
-        if (staff.getFileName() != null && !staff.getFileName().equals(staffUpdateRequest.fileName())) {
-            imageStorageService.deleteImage(staff.getFileName());
-            staff.setFileName(staffUpdateRequest.fileName());
+        // if there is a new filename, file is not null. If the avatar is deleted, avatarFileName is null
+        if (staff.getAvatarFileName() != null && !staff.getAvatarFileName().equals(staffUpdateRequest.avatarFileName())) {
+            imageStorageService.deleteImage(staff.getAvatarFileName());
+            staff.setAvatarFileName(staffUpdateRequest.avatarFileName());
         }
         if (file != null) {
-            staff.setFileName(imageStorageService.saveImage(file));
+            staff.setAvatarFileName(imageStorageService.saveImage(file));
         }
 
         return this.staffMapper.toDto(this.staffRepository.save(staff));
@@ -59,8 +59,8 @@ public class StaffService {
 
     public void deleteStaff(UUID id) {
         var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));
-        if (staff.getFileName() != null) {
-            imageStorageService.deleteImage(staff.getFileName());
+        if (staff.getAvatarFileName() != null) {
+            imageStorageService.deleteImage(staff.getAvatarFileName());
         }
         this.staffRepository.delete(staff);
     }

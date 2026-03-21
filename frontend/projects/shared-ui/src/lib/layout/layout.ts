@@ -1,13 +1,13 @@
 import {Component, ElementRef, inject, viewChild} from '@angular/core';
 
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
-import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
-import {filter, map} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {filter} from 'rxjs';
 import {Header} from './header/header';
 import {Footer} from './footer/footer';
 import {NavRail} from './nav/nav-rail/nav-rail';
 import {BottomBar} from './nav/bottom-bar/bottom-bar';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {BreakpointService} from '../services/breakpoint.service';
 
 @Component({
   selector: 'app-layout',
@@ -29,8 +29,8 @@ export class Layout {
   // Utilisation de la fonction moderne inject() au lieu du constructeur.
   // C'est plus propre et ça facilite l'héritage de classes si besoin.
   // --------------------------------------------------------------------------
-  private readonly breakpointObserver = inject(BreakpointObserver);
-  private readonly router = inject(Router);
+  private readonly _breakpointService = inject(BreakpointService);
+  private readonly _router = inject(Router);
 
   // --------------------------------------------------------------------------
   // 2. ÉTAT DU COMPOSANT (SIGNALS)
@@ -38,17 +38,10 @@ export class Layout {
   // --------------------------------------------------------------------------
 
   /**
-   * isMobile : Signal qui vaut `true` si l'écran est petit (téléphone).
-   * Pourquoi toSignal ?
-   * On transforme le flux continu (Observable) du breakpointObserver en une valeur
-   * simple (Signal) qu'on peut lire facilement dans le HTML avec `@if (isMobile())`.
+   * isHandsetSignal : Signal qui vaut `true` si l'écran est petit (téléphone).
+   * Nous l'obtenons via le BreakpointService centralisé.
    */
-  readonly isMobile = toSignal(
-    this.breakpointObserver
-      .observe([Breakpoints.HandsetPortrait, '(max-width: 768px)'])
-      .pipe(map(result => result.matches)),
-    {initialValue: false} // Valeur par défaut avant la première évaluation
-  );
+  readonly isHandsetSignal = this._breakpointService.isHandsetSignal;
 
   /**
    * contentEl : Référence vers la balise <main #content> dans le HTML.
@@ -64,7 +57,7 @@ export class Layout {
   // pendant toute la durée de vie du composant.
   // --------------------------------------------------------------------------
   constructor() {
-    this.router.events
+    this._router.events
       .pipe(
         // On ne s'intéresse qu'aux événements qui signalent la fin du chargement d'une page
         filter((e): e is NavigationEnd => e instanceof NavigationEnd),

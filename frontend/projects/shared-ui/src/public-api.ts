@@ -15,3 +15,4 @@ export * from './lib/form-submit-button/form-submit-button';
 export * from './lib/page-title/page-title'
 export * from './lib/form-field-error/form-field-error'
 export * from './lib/contact/contact'
+export * from './lib/services/breakpoint.service';

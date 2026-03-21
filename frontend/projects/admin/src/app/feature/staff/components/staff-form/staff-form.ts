@@ -61,12 +61,12 @@ export class StaffForm {
   blobAvatarSignal = signal<Blob | undefined>(undefined)
 
   // Controls whether the existing remote avatar should be displayed
-  showExistingAvatarSignal = linkedSignal(() => !!this.staffSignal()?.fileName);
+  showExistingAvatarSignal = linkedSignal(() => !!this.staffSignal()?.avatarFileName);
 
   staffPreview = computed(() => ({
     ...this.staffFormModelSignal(),
     id: this.id() ?? '',
-    fileName: this.showExistingAvatarSignal() ? this.staffSignal()?.fileName : undefined,
+    avatarFileName: this.showExistingAvatarSignal() ? this.staffSignal()?.avatarFileName : undefined,
   } as Staff));
 
   private buildForm(): FieldTree<StaffFormModel> {
@@ -103,7 +103,7 @@ export class StaffForm {
           const updateStaffDTO: UpdateStaffDTO = {
             ...staffDTO,
             // If showExistingAvatarSignal is false, the user explicitly deleted it.
-            fileName: this.showExistingAvatarSignal() ? oldStaff.fileName : null,
+            avatarFileName: this.showExistingAvatarSignal() ? oldStaff.avatarFileName : null,
           }
 
           const updatedStaff = await firstValueFrom(this._staffsStore.updateStaff(oldStaff.id, updateStaffDTO, this.blobAvatarSignal()).pipe(
@@ -130,7 +130,7 @@ export class StaffForm {
   }
 }
 
-type StaffFormModel = Omit<Staff, 'id' | 'phone' | 'email' | 'fileName'> & {
+type StaffFormModel = Omit<Staff, 'id' | 'phone' | 'email' | 'avatarFileName'> & {
   phone: NonNullable<Staff['phone']>;
   email: NonNullable<Staff['email']>;
 };

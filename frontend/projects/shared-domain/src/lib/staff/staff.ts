@@ -6,5 +6,5 @@ export interface Staff {
   lastName: string;
   email: string | null;
   phone: string | null;
-  fileName: string | null;
+  avatarFileName: string | null;
 }

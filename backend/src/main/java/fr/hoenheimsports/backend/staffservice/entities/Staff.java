@@ -36,9 +36,9 @@ public class Staff {
     @AttributeOverride(name = "value", column = @Column(name = "phone", length = 20))
     @Valid
     private Phone phone;
-    @Column(name = "file_name", length = 50)
+    @Column(name = "avatar_file_name", length = 50)
     @Nullable
-    private String fileName;
+    private String avatarFileName;
 
     @Override
     public final boolean equals(Object o) {

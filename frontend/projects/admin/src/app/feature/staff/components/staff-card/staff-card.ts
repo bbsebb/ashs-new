@@ -54,7 +54,7 @@ export class StaffCard {
 
   private resolveAvatarUrl(): string {
     const previewImageSource = this.previewImageSourceSignal();
-    const avatarImageSource = previewImageSource ?? this.staffSignal().fileName;
+    const avatarImageSource = previewImageSource ?? this.staffSignal().avatarFileName;
 
     return buildCssBackgroundImageUrl(createImageSourceUrl(avatarImageSource));
   }

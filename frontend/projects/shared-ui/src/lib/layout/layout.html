@@ -8,17 +8,17 @@
 </app-header>
 
 <div class="app-body">
-  @if (!isMobile()) {
+  @if (!isHandsetSignal()) {
     <nav app-nav-rail></nav>
   }
 
 
-  <main #content class="content" [class.mobile-mode]="isMobile()">
+  <main #content class="content" [class.mobile-mode]="isHandsetSignal()">
     <router-outlet></router-outlet>
     <app-footer class="footer"></app-footer>
   </main>
 
-  @if (isMobile()) {
+  @if (isHandsetSignal()) {
     <nav app-bottom-bar></nav>
   }
 </div>

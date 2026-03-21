@@ -1,4 +1,4 @@
-import {Component, computed, inject, input, linkedSignal, Signal} from '@angular/core';
+import {Component, computed, effect, inject, input, linkedSignal, Signal} from '@angular/core';
 import {applyEach, FieldTree, form, FormField, max, min, required, submit, validateTree} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -15,7 +15,13 @@ import {
   TeamsStore,
   UpdateTeamDTO
 } from '@shared-api'
-import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
+import {
+  BreakpointService,
+  FormFieldErrorDirective,
+  FormSubmitButton,
+  NotificationService,
+  PageTitle
+} from '@shared-ui';
 import {DAY_OF_WEEKS, DayOfWeek, GENDER, Gender, STAFF_ROLE_VALUE, StaffRoleValue, Team} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
 import {TeamCard} from '../team-card/team-card';
@@ -24,7 +30,6 @@ import {MatIcon} from '@angular/material/icon';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 import {MatTimepicker, MatTimepickerInput, MatTimepickerToggle} from '@angular/material/timepicker';
 import {firstValueFrom, tap} from 'rxjs';
-import {JsonPipe} from '@angular/common';
 
 @Component({
   selector: 'app-team-form',
@@ -44,13 +49,21 @@ import {JsonPipe} from '@angular/common';
     FormDeleteButton,
     MatTimepickerInput,
     MatTimepickerToggle,
-    MatTimepicker,
-    JsonPipe
+    MatTimepicker
   ],
   templateUrl: './team-form.html',
   styleUrl: './team-form.scss',
 })
 export class TeamForm {
+  private readonly _breakpointService = inject(BreakpointService);
+  readonly isHandsetSignal = this._breakpointService.isHandsetSignal;
+
+  constructor() {
+    effect(() => {
+      console.log(this.isHandsetSignal())
+    });
+  }
+
   private readonly _formErrorHandler = inject(FormErrorHandleService);
   private readonly _teamsStore = inject(TeamsStore);
   private readonly _staffsStore = inject(StaffsStore);
@@ -158,8 +171,8 @@ export class TeamForm {
                 message: 'L\'heure de fin doit être supérieure à l\'heure de début',
               };
               return [
-                { ...error, fieldTree: context.fieldTree.startTime },
-                { ...error, fieldTree: context.fieldTree.endTime }
+                {...error, fieldTree: context.fieldTree.startTime},
+                {...error, fieldTree: context.fieldTree.endTime}
               ];
             }
           }

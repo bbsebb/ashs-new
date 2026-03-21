@@ -10,5 +10,5 @@ import java.util.UUID;
  * DTO for {@link Staff}
  */
 public record StaffResponseDto(UUID id, String firstName, String lastName,@Nullable String email,
-                               @Nullable String phone,@Nullable String fileName) implements Serializable {
+                               @Nullable String phone,@Nullable String avatarFileName) implements Serializable {
 }

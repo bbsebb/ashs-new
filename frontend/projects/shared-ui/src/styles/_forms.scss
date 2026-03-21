@@ -32,6 +32,12 @@
   gap: 18px;
   align-items: flex-start;
   align-content: center;
+  flex: 1 1 100%;
+}
+
+.optional-form-fields {
+  display: flex;
+  gap: 18px;
 }
 
 /* Les champs prennent 2 colonnes "logiques" via le wrapping */
@@ -48,6 +54,11 @@
 .field-compact {
   flex: 0 1 220px;
   max-width: 220px;
+}
+
+app-form-delete-button {
+  align-self: center;
+  padding-bottom: 1rem;
 }
 
 .actions {
@@ -90,6 +101,12 @@
   .form-fields {
     gap: 16px;
   }
+  .optional-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
 
   .field,
   .field-full,

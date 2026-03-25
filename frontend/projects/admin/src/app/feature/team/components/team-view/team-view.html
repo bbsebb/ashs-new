@@ -6,5 +6,18 @@
 } @else if (!team) {
   <p>Aucune équipe</p>
 } @else {
-  <app-team-card [team]="team"></app-team-card>
+  <lib-team-card [team]="team">
+    <mat-card-actions actions align="end">
+      <button mat-button routerLink="/teams">Retour</button>
+      <div class="spacer"></div>
+      <button mat-icon-button color="primary" routerLink="/teams/{{team.id}}/update" aria-label="Modifier">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <app-form-delete-button
+        confirmMessage="Êtes-vous sûr de vouloir supprimer cette équipe ?"
+        [iconOnly]="true"
+        (deleteConfirmed)="onDelete()">
+      </app-form-delete-button>
+    </mat-card-actions>
+  </lib-team-card>
 }

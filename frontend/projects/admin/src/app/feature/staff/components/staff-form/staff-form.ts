@@ -1,4 +1,4 @@
-import {Component, computed, inject, input, linkedSignal, signal, Signal} from '@angular/core';
+import {Component, computed, effect, inject, input, linkedSignal, signal, Signal} from '@angular/core';
 import {email, FieldTree, form, FormField, pattern, required, submit} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -8,10 +8,10 @@ import {CreateStaffDTO, FormErrorHandleService, StaffsStore, UpdateStaffDTO} fro
 import {BreakpointService, FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Staff} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
-import {StaffCard} from '../staff-card/staff-card';
+import {StaffCard} from '@shared-ui';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
-import {createImageSourceUrl} from '../../../../shared/image-cropper/utils/image-cropper-utils';
+import {ImageService} from '@shared-ui';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 import {NgOptimizedImage} from '@angular/common';
 
@@ -43,6 +43,7 @@ export class StaffForm {
   private readonly _staffsStore = inject(StaffsStore);
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
+  private readonly _imageService = inject(ImageService);
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   isLoading = this._staffsStore.isLoadingSignal;
   error = computed(() => !!this._staffsStore.errorSignal());
@@ -65,15 +66,38 @@ export class StaffForm {
 
   // New cropped avatar blob, resets when staffSignal changes
   blobAvatarSignal = signal<Blob | undefined>(undefined)
+  blobIsLoadingSignal = signal<boolean>(false)
+  blobErrorSignal = signal<Error | undefined>(undefined)
 
   // Controls whether the existing remote avatar should be displayed
   showExistingAvatarSignal = linkedSignal(() => !!this.staffSignal()?.avatarFileName);
 
-  staffPreview = computed(() => ({
-    ...this.staffFormModelSignal(),
-    id: this.id() ?? '',
-    avatarFileName: this.showExistingAvatarSignal() ? this.staffSignal()?.avatarFileName : undefined,
-  } as Staff));
+  previewAvatarUrlSignal = computed(() => {
+    const blob = this.blobAvatarSignal();
+    return blob ? URL.createObjectURL(blob) : undefined;
+  });
+
+  staffPreview = computed(() => {
+    const previewUrl = this.previewAvatarUrlSignal();
+    const existingAvatar = this.showExistingAvatarSignal() ? this.staffSignal()?.avatarFileName : undefined;
+
+    return {
+      ...this.staffFormModelSignal(),
+      id: this.id() ?? '',
+      avatarFileName: previewUrl ?? existingAvatar,
+    } as Staff;
+  });
+
+  constructor() {
+    effect((onCleanup) => {
+      const url = this.previewAvatarUrlSignal();
+      onCleanup(() => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    });
+  }
 
   private buildForm(): FieldTree<StaffFormModel> {
     return form(this.staffFormModelSignal, (path) => {
@@ -120,16 +144,23 @@ export class StaffForm {
         await this._router.navigateByUrl(`/staffs/${resultId}`);
         return undefined;
       } catch (error) {
-        return this._formErrorHandler.handleError(error, form);
+        const result = this._formErrorHandler.handleError(error, form);
+        if (typeof result === 'string') {
+          this._notificationService.show(result, 'error');
+          return undefined;
+        }
+        return result;
       }
     });
   }
 
-  protected onCroppedBlobChange($event: Blob | undefined) {
-    this.blobAvatarSignal.set($event);
+  protected onCroppedBlobChange($event: { value: Blob | undefined, isLoading: boolean, error: Error | undefined }) {
+    this.blobAvatarSignal.set($event.value);
+    this.blobIsLoadingSignal.set($event.isLoading);
+    this.blobErrorSignal.set($event.error);
   }
 
-  protected readonly createImageSourceUrl = createImageSourceUrl;
+  protected readonly createImageSourceUrl = (source: string | null | undefined) => this._imageService.createImageSourceUrl(source);
 
   protected deleteAvatar() {
     this.showExistingAvatarSignal.set(false);

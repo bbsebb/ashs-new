@@ -1,11 +1,17 @@
 @use '@angular/material' as mat;
 
+:host {
+  display: flex;
+  justify-content: center;
+}
+
 .team-card {
   width: 100%;
   max-width: 450px;
   overflow: hidden;
   border-radius: 16px;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
 
 }
 
@@ -122,99 +128,10 @@ mat-card-content {
   }
 }
 
-.staff-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.staff-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  .staff-info {
-    display: flex;
-    flex-direction: column;
-
-    .staff-name {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .staff-role {
-      font-size: 0.8rem;
-      color: var(--mat-sys-secondary);
-    }
-  }
-}
-
-.session-list {
+.staff-list, .session-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.session-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background-color: var(--mat-sys-surface-container-low);
-  border-radius: 12px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-
-  &:hover {
-    background-color: var(--mat-sys-surface-container-high);
-    border-color: var(--mat-sys-outline-variant);
-    transform: translateX(4px);
-  }
-
-  .session-day {
-    font-weight: 700;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    width: 40px;
-    color: var(--mat-sys-primary);
-    flex-shrink: 0;
-  }
-
-  .session-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-
-    .session-time {
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .session-hall {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.8rem;
-      color: var(--mat-sys-on-surface-variant);
-
-      mat-icon {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-      }
-    }
-  }
-
-  .chevron {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--mat-sys-outline);
-    opacity: 0.5;
-  }
 }
 
 .empty-state {
@@ -224,11 +141,4 @@ mat-card-content {
   margin: 0;
 }
 
-mat-card-actions {
-  padding: 8px 16px 16px;
-  gap: 8px;
 
-  .spacer {
-    flex: 1;
-  }
-}

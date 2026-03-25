@@ -58,7 +58,12 @@ export class AgeGroupForm {
         await this._router.navigateByUrl(`/teams`);
         return undefined;
       } catch (error) {
-        return this._formErrorHandler.handleError(error, form);
+        const result = this._formErrorHandler.handleError(error, form);
+        if (typeof result === 'string') {
+          this._notificationService.show(result, 'error');
+          return undefined;
+        }
+        return result;
       }
     });
   }

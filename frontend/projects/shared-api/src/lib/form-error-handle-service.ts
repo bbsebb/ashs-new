@@ -1,22 +1,17 @@
-import {inject, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FieldTree, ValidationError} from '@angular/forms/signals';
 import {ProblemDetail} from '@shared-domain';
 import {HttpErrorResponse} from '@angular/common/http';
-import {NotificationService} from '@shared-ui';
-
-
 
 @Injectable({
   providedIn: 'root',
 })
 export class FormErrorHandleService {
 
-
-  private readonly notificationService: NotificationService = inject(NotificationService);
   /**
    * Méthode principale à appeler dans le catch
    */
-  handleError<T>(error: unknown, form: FieldTree<T>): ValidationError.WithField[] | undefined {
+  handleError<T>(error: unknown, form: FieldTree<T>): ValidationError.WithFieldTree[] | string | undefined {
     console.error('Erreur attrapée par le service :', error);
 
     // 1) Cas HTTP avec payload exploitable
@@ -28,13 +23,11 @@ export class FormErrorHandleService {
       }
 
       // HTTP mais pas des erreurs de validation "form"
-      this.notifyTechnicalError(problemDetail);
-      return undefined;
+      return this.getTechnicalErrorMessage(problemDetail);
     }
 
     // 2) Cas non-HTTP (TypeError, erreur RxJS, bug front, etc.)
-    this.notifyTechnicalError();
-    return undefined;
+    return 'Une erreur inattendue est survenue. Veuillez réessayer.';
   }
 
   private tryParseProblemDetail(error: HttpErrorResponse): ProblemDetail | undefined {
@@ -50,8 +43,9 @@ export class FormErrorHandleService {
     }
   }
 
-  private mapServerErrorsToForm<T>(problemDetail: ProblemDetail, form: FieldTree<T>): ValidationError.WithField[] {
-    const validationErrors: ValidationError.WithField[] = [];
+  private mapServerErrorsToForm<T>(problemDetail: ProblemDetail, form: FieldTree<T>): ValidationError.WithFieldTree[] {
+    const validationErrors: ValidationError.WithFieldTree[] = [];
+
     const errorKind = problemDetail.type ?? 'server';
 
     // A. Mapping des champs
@@ -80,13 +74,10 @@ export class FormErrorHandleService {
     return validationErrors;
   }
 
-  private notifyTechnicalError(problemDetail?: ProblemDetail) {
-    const message =
-      problemDetail?.detail
+  private getTechnicalErrorMessage(problemDetail?: ProblemDetail): string {
+    return problemDetail?.detail
       ?? problemDetail?.title
       ?? 'Une erreur inattendue est survenue. Veuillez réessayer.';
-
-    this.notificationService.show(message, 'error');
   }
 
   // Utilitaire déplacé dans le service

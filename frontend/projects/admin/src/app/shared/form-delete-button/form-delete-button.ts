@@ -51,7 +51,7 @@ export class FormDeleteButton {
   private readonly _dialogService = inject(DialogService);
 
   /** Confirmation message to display in the dialog. */
-  confirmMessageSignal = input<string>('Êtes-vous sûr de vouloir supprimer cet élément ?', {alias: 'confirmMessage'});
+  confirmMessageSignal = input<string | null>('Êtes-vous sûr de vouloir supprimer cet élément ?', {alias: 'confirmMessage'});
 
   /** Whether the button is disabled. */
   disabledSignal = input<boolean>(false, {alias: 'disabled'});
@@ -65,8 +65,12 @@ export class FormDeleteButton {
   protected handleDelete(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-
-    this._dialogService.showConfirmation(this.confirmMessageSignal())
+    const confirmMessage = this.confirmMessageSignal()
+    if (!confirmMessage) {
+      this.deleteConfirmed.emit();
+      return;
+    }
+    this._dialogService.showConfirmation(confirmMessage)
       .pipe(take(1))
       .subscribe(confirmed => {
         if (confirmed) {

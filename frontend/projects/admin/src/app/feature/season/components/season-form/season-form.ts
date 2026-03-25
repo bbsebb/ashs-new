@@ -7,7 +7,7 @@ import {CreateSeasonDTO, dateToYyyyMmDd, UpdateSeasonDTO, FormErrorHandleService
 import {Season} from '@shared-domain';
 import {FieldTree, form, FormField, submit} from '@angular/forms/signals';
 import {firstValueFrom, tap} from 'rxjs';
-import {SeasonCard} from '../season-card/season-card';
+import {SeasonCard} from '@shared-ui';
 import {
   MatDatepickerModule,
   MatDatepickerToggle,
@@ -97,7 +97,12 @@ export class SeasonForm {
         await this.router.navigateByUrl(`/seasons/${resultId}`);
         return undefined;
       } catch (error) {
-        return this.formErrorHandler.handleError(error, form);
+        const result = this.formErrorHandler.handleError(error, form);
+        if (typeof result === 'string') {
+          this.notificationService.show(result, 'error');
+          return undefined;
+        }
+        return result;
       }
     });
   }

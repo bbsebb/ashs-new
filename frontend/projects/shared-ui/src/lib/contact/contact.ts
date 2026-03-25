@@ -80,7 +80,12 @@ export class Contact {
 
         return undefined;
       } catch (error) {
-        return this.formErrorHandler.handleError(error, formState);
+        const result = this.formErrorHandler.handleError(error, formState);
+        if (typeof result === 'string') {
+          this.notificationService.show(result, 'error');
+          return undefined;
+        }
+        return result;
       }
     });
   }

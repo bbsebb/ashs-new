@@ -1,5 +1,5 @@
 import {Component, inject} from '@angular/core';
-import {MENU_CONFIG} from '@shared-ui';
+import {MENU_CONFIG} from '../../menu-config';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {MatRipple} from '@angular/material/core';
 import {MatIcon} from '@angular/material/icon';

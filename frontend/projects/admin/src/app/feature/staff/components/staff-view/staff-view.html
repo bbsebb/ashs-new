@@ -6,5 +6,14 @@
 } @else if (!staff) {
   <p>Aucun membre de l'encadrement trouvé</p>
 } @else {
-  <app-staff-card [staff]="staff"></app-staff-card>
+  <lib-staff-card [staff]="staff">
+    <mat-card-actions actions align="end">
+      <button mat-button type="button" routerLink="/staffs">Retour</button>
+      <button mat-flat-button type="button" routerLink="/staffs/{{staff.id}}/update">Modifier</button>
+      <app-form-delete-button
+        confirmMessage="Êtes-vous sûr de vouloir supprimer ce membre de l'encadrement ?"
+        (deleteConfirmed)="onDelete()">
+      </app-form-delete-button>
+    </mat-card-actions>
+  </lib-staff-card>
 }

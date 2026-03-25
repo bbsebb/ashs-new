@@ -1,5 +1,3 @@
-import {environment} from '@environment';
-
 /**
  * Defines the complete geometry of the area to be cropped.
  * Uses explicit names to avoid confusion between source image coordinates
@@ -147,26 +145,4 @@ function loadImageElement(imageSource: string): Promise<HTMLImageElement> {
   });
 }
 
-export function createImageSourceUrl(source: string | null | undefined) {
 
-  const DEFAULT_AVATAR_IMAGE_PATH = '/shared-ui/avatar.png';
-  if (!source) {
-    return DEFAULT_AVATAR_IMAGE_PATH;
-  }
-  const isAbsoluteOrBrowserImageSource =
-    source.startsWith('http://') ||
-    source.startsWith('https://') ||
-    source.startsWith('blob:') ||
-    source.startsWith('data:');
-  if (isAbsoluteOrBrowserImageSource) {
-    return source;
-  }
-
-  const uploadsBaseUrl = `${environment.apiUrl}${environment.uploadsPath}`;
-
-  return `${uploadsBaseUrl}/${source}`;
-}
-
-export function buildCssBackgroundImageUrl(imageSource: string): string {
-  return `url(${imageSource})`;
-}

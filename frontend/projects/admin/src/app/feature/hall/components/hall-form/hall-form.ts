@@ -10,7 +10,7 @@ import {FormErrorHandleService, HallsStore} from '@shared-api'
 import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Hall} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
-import {HallCard} from '../hall-card/hall-card';
+import {HallCard} from '@shared-ui';
 
 @Component({
   selector: 'app-hall-form',
@@ -93,7 +93,12 @@ export class HallForm {
         await this.router.navigateByUrl(`/halls/${resultId}`);
         return undefined;
       } catch (error) {
-        return this.formErrorHandler.handleError(error, form);
+        const result = this.formErrorHandler.handleError(error, form);
+        if (typeof result === 'string') {
+          this.notificationService.show(result, 'error');
+          return undefined;
+        }
+        return result;
       }
     });
 

@@ -6,15 +6,13 @@
   <!-- Image de l'équipe -->
   <div class="image-container">
     @if (team.photoFileName) {
-      <img [ngSrc]="createImageSourceUrl(team.photoFileName)"
+      <img [src]="createImageSourceUrl(team.photoFileName)"
            alt="Photo de l'équipe {{ team.ageGroup.name }}"
-           fill
-           priority
            class="team-photo">
     } @else {
       <div class="photo-placeholder">
         <mat-icon>groups</mat-icon>
-        <span>Photo d'équipe</span>
+        <span>Pas de photo d'équipe</span>
       </div>
     }
 
@@ -25,15 +23,25 @@
                   [class.female]="team.gender === 'Female'"
                   [class.male]="team.gender === 'Male'"
                   [class.mixte]="team.gender === 'Mixte'">
-          {{ team.ageGroup.upperLimit | ageLimit }}{{ team.ageGroup.ageLimit }} {{ team.gender | gender }} {{ team.teamNumber }}
+          {{ team.ageGroup.upperLimit | ageLimit }}{{ team.ageGroup.ageLimit }} {{ team.gender | gender }}
         </mat-chip>
+        @if (team.teamNumber > 1) {
+          <mat-chip class="number-chip">Équipe {{ team.teamNumber }}</mat-chip>
+        }
       </mat-chip-set>
     </div>
   </div>
 
+  <mat-card-header>
+    <mat-card-title>
+      {{ team.ageGroup.upperLimit | ageLimit: 'long' }} {{ team.ageGroup.ageLimit }} ans
+      @if (team.teamNumber > 1) { ({{ team.teamNumber }}) }
+    </mat-card-title>
+    <mat-card-subtitle>{{ team.gender | gender }}</mat-card-subtitle>
+  </mat-card-header>
 
   <mat-card-content>
-
+    <mat-divider></mat-divider>
 
     <!-- Section Encadrants -->
     <section class="info-section">
@@ -44,12 +52,12 @@
       @if (enrichedStaffs.length > 0) {
         <div class="staff-list">
           @for (staff of enrichedStaffs; track staff.id) {
-            <app-staff-mini-card
+            <lib-staff-mini-card
               [staffId]="staff.staffId"
               [fullName]="staff.fullName"
               [role]="staff.role | roleStaff"
-              [avatar]="staff.avatar?? null">
-            </app-staff-mini-card>
+              [avatar]="staff.avatar">
+            </lib-staff-mini-card>
           }
         </div>
       } @else {
@@ -68,19 +76,13 @@
       @if (enrichedSessions.length > 0) {
         <div class="session-list">
           @for (session of enrichedSessions; track session.id) {
-            <a [routerLink]="['/halls', session.hallId]" class="session-item" title="Voir les détails de la salle">
-              <div class="session-day">{{ session.dayOfWeek | dayOfWeek }}</div>
-              <div class="session-details">
-                <span class="session-time">
-                  {{ session.timeSlot.startTime | date: 'HH:mm' }} - {{ session.timeSlot.endTime | date: 'HH:mm' }}
-                </span>
-                <span class="session-hall">
-                  <mat-icon>location_on</mat-icon>
-                  {{ session.hallName }}
-                </span>
-              </div>
-              <mat-icon class="chevron">chevron_right</mat-icon>
-            </a>
+            <lib-training-session-item
+              [dayOfWeek]="session.dayOfWeek"
+              [startTime]="session.timeSlot.startTime"
+              [endTime]="session.timeSlot.endTime"
+              [hallName]="session.hallName"
+              [hallId]="session.hallId">
+            </lib-training-session-item>
           }
         </div>
       } @else {
@@ -89,18 +91,5 @@
     </section>
   </mat-card-content>
 
-  @if (withActions()) {
-    <mat-card-actions align="end">
-      <button mat-button routerLink="/teams">Retour</button>
-      <div class="spacer"></div>
-      <button mat-icon-button color="primary" routerLink="/teams/{{team.id}}/update" aria-label="Modifier">
-        <mat-icon>edit</mat-icon>
-      </button>
-      <app-form-delete-button
-        confirmMessage="Êtes-vous sûr de vouloir supprimer cette équipe ?"
-        [iconOnly]="true"
-        (deleteConfirmed)="onDelete()">
-      </app-form-delete-button>
-    </mat-card-actions>
-  }
+  <ng-content select="[actions]"></ng-content>
 </mat-card>

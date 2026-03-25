@@ -98,7 +98,7 @@
           </mat-form-field>
         </div>
         <app-form-delete-button
-          confirmMessage="Êtes-vous sûr de vouloir supprimer cet encadrant ?"
+          [confirmMessage]="null"
           [iconOnly]="!isHandsetSignal()"
           (deleteConfirmed)="removeStaff($index)">
         </app-form-delete-button>
@@ -163,7 +163,7 @@
           </mat-form-field>
         </div>
         <app-form-delete-button
-          confirmMessage="Êtes-vous sûr de vouloir supprimer cet encadrant ?"
+          [confirmMessage]="null"
           [iconOnly]="!isHandsetSignal()"
           (deleteConfirmed)="removeTrainingSession($index)">
         </app-form-delete-button>
@@ -178,7 +178,8 @@
     @if (showExistingPhotoSignal()) {
       <div class="image-preview-container">
 
-        <img class="image-preview" [ngSrc]="createImageSourceUrl(teamSignal()?.photoFileName)" [height]="PHOTO_HEIGHT"
+        <img class="image-preview" [ngSrc]="createImageSourceUrl(teamSignal()?.photoFileName)"
+             [height]="PHOTO_HEIGHT"
              [width]="PHOTO_WIDTH"
              alt="avatar" priority/>
         <app-form-delete-button
@@ -198,6 +199,8 @@
         >
         </app-image-cropper>
         <app-image-cropper-preview
+          [isLoadingSignal]="blobIsLoadingSignal()"
+          [isErrorSignal]="!!blobErrorSignal()"
           [previewBlob]="blobPhotoSignal()"
           [previewHeightSignal]="PHOTO_HEIGHT"
           [previewWidthSignal]="PHOTO_WIDTH"
@@ -227,5 +230,5 @@
 
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <app-team-card [team]="teamPreview()" [withActions]="false"/>
+  <lib-team-card [team]="teamPreview()"/>
 </details>

@@ -1,4 +1,4 @@
-import {Component, computed, inject, input, linkedSignal, signal, Signal} from '@angular/core';
+import {Component, computed, effect, inject, input, linkedSignal, signal, Signal} from '@angular/core';
 import {applyEach, FieldTree, form, FormField, max, min, required, submit, validateTree} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -21,19 +21,19 @@ import {
   FormFieldErrorDirective,
   FormSubmitButton,
   GenderPipe,
+  ImageService,
   NotificationService,
   PageTitle,
-  RoleStaffPipe
+  RoleStaffPipe,
+  TeamCard
 } from '@shared-ui';
 import {DAY_OF_WEEKS, DayOfWeek, GENDER, Gender, STAFF_ROLE_VALUE, StaffRoleValue, Team} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
-import {TeamCard} from '../team-card/team-card';
 import {MatDivider} from '@angular/material/list';
 import {MatIcon} from '@angular/material/icon';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 import {MatTimepicker, MatTimepickerInput, MatTimepickerToggle} from '@angular/material/timepicker';
 import {firstValueFrom, tap} from 'rxjs';
-import {createImageSourceUrl} from '../../../../shared/image-cropper/utils/image-cropper-utils';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
 import {NgOptimizedImage} from '@angular/common';
@@ -68,8 +68,8 @@ import {NgOptimizedImage} from '@angular/common';
   styleUrl: './team-form.scss',
 })
 export class TeamForm {
-  readonly PHOTO_HEIGHT = 450;
-  readonly PHOTO_WIDTH = 800;
+  readonly PHOTO_HEIGHT = 250;
+  readonly PHOTO_WIDTH = 450;
 
   private readonly _breakpointService = inject(BreakpointService);
   private readonly _formErrorHandler = inject(FormErrorHandleService);
@@ -80,12 +80,16 @@ export class TeamForm {
   private readonly _hallsStore = inject(HallsStore);
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
+  private readonly _imageService = inject(ImageService);
+
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   staffsSignal = this._staffsStore.staffsSignal;
   seasonsSignal = this._seasonsStore.seasonsSignal;
   hallsSignal = this._hallsStore.hallsSignal;
   showExistingPhotoSignal = linkedSignal(() => !!this.teamSignal()?.photoFileName);
   blobPhotoSignal = signal<Blob | undefined>(undefined)
+  blobIsLoadingSignal = signal<boolean>(false);
+  blobErrorSignal = signal<Error | undefined>(undefined);
   isLoading = computed(() =>
     this._teamsStore.isLoadingSignal() &&
     this._seasonsStore.isLoadingSignal() &&
@@ -117,7 +121,7 @@ export class TeamForm {
       gender: team?.gender ?? 'Male',
       teamNumber: team?.teamNumber ?? 1,
       staffs: team?.staffs ?? [],
-      trainingSessions: team?.trainingSessions.map((session) => ({
+      trainingSessions: team?.trainingSessions?.map((session) => ({
         id: session.id,
         hallId: session.hallId,
         dayOfWeek: session.dayOfWeek,
@@ -131,24 +135,45 @@ export class TeamForm {
 
   teamForm = this.buildForm();
 
+  previewPhotoUrlSignal = computed(() => {
+    const blob = this.blobPhotoSignal();
+    return blob ? URL.createObjectURL(blob) : undefined;
+  });
+
   teamPreview = computed(() => {
     const model = this.teamFormModelSignal();
     const ageGroup = this.ageGroupsSignal().find(ag => ag.id === model.ageGroupId) ?? {
-      uuid: '',
+      id: '',
       ageLimit: 0,
-      isUpperLimit: false,
+      upperLimit: false,
       name: ''
     };
+
+    const previewUrl = this.previewPhotoUrlSignal();
+    const existingPhoto = this.showExistingPhotoSignal() ? this.teamSignal()?.photoFileName : null;
 
     return {
       id: this.id() ?? '',
       seasonId: model.seasonId,
       gender: model.gender,
       teamNumber: model.teamNumber,
+      photoFileName: previewUrl ?? existingPhoto,
       ageGroup: ageGroup,
-      staffs: model.staffs
+      staffs: model.staffs,
+      trainingSessions: model.trainingSessions
     } as Team;
   });
+
+  constructor() {
+    effect((onCleanup) => {
+      const url = this.previewPhotoUrlSignal();
+      onCleanup(() => {
+        if (url) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    });
+  }
 
   private buildForm(): FieldTree<TeamFormModel> {
     return form(this.teamFormModelSignal, (path) => {
@@ -250,7 +275,12 @@ export class TeamForm {
         await this._router.navigateByUrl(`/teams/${resultId}`);
         return undefined;
       } catch (error) {
-        return this._formErrorHandler.handleError(error, form);
+        const result = this._formErrorHandler.handleError(error, form);
+        if (typeof result === 'string') {
+          this._notificationService.show(result, 'error');
+          return undefined;
+        }
+        return result;
       }
     });
   }
@@ -303,14 +333,19 @@ export class TeamForm {
     }));
   }
 
-  protected readonly createImageSourceUrl = createImageSourceUrl;
 
-  protected onCroppedBlobChange($event: any) {
-    this.blobPhotoSignal.set($event);
+  protected onCroppedBlobChange($event: { error: Error | undefined, isLoading: boolean, value: Blob | undefined }) {
+    this.blobPhotoSignal.set($event.value);
+    this.blobIsLoadingSignal.set($event.isLoading);
+    this.blobErrorSignal.set($event.error);
   }
 
   protected deletePhoto() {
     this.showExistingPhotoSignal.set(false);
+  }
+
+  protected createImageSourceUrl(photoFileName: string | null | undefined) {
+    return this._imageService.createImageSourceUrl(photoFileName);
   }
 }
 

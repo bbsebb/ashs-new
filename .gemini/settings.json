@@ -16,5 +16,8 @@
         "postgresql://admin:admin@localhost:5432/ashs-db"
       ]
     }
+  },
+  "skills": {
+    "disabled": []
   }
 }

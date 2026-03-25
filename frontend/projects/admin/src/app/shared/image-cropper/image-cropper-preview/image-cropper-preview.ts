@@ -17,9 +17,8 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
   templateUrl: './image-cropper-preview.html',
   styleUrl: './image-cropper-preview.scss',
   host: {
-    '[style.--target-width.px]': 'calculatedWithSignal()',
-    '[style.--target-height.px]': 'calculatedHeightSignal()',
-    '[style.--aspect-ratio]': 'calculatedWithSignal() / calculatedHeightSignal()',
+    '[style.--target-width.px]': 'previewWidthSignal()',
+    '[style.--target-height.px]': 'previewHeightSignal()',
   }
 })
 export class ImageCropperPreview {
@@ -46,22 +45,6 @@ export class ImageCropperPreview {
 
   /** Whether the preview should be displayed as a circle. */
   isCircularSignal = input(false);
-
-  calculatedWithSignal = computed(() => {
-    if (this.isErrorSignal() || this.isLoadingSignal() || !this.previewImageSourceSignal()) {
-      return 300;
-    } else {
-      return this.previewWidthSignal();
-    }
-  });
-
-  calculatedHeightSignal = computed(() => {
-    if (this.isErrorSignal() || this.isLoadingSignal() || !this.previewImageSourceSignal()) {
-      return 300;
-    } else {
-      return this.previewHeightSignal();
-    }
-  });
 
   constructor() {
     effect((onCleanup) => {

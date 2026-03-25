@@ -50,7 +50,12 @@ export class ImageCropper {
   });
 
   /** Emits the resulting Blob whenever the crop is updated. */
-  croppedBlobChange = output<Blob | undefined>();
+  croppedBlobChange = output<{
+    error: Error | undefined;
+    isLoading: boolean;
+    value: Blob | undefined
+  }>();
+
 
   /** Internal state for the selected image source URL. */
   private readonly _selectedImageUrlSignal = signal<string | null>(null);
@@ -63,6 +68,11 @@ export class ImageCropper {
    * based on the selected image and current geometry.
    */
   protected readonly croppedBlobResource = this._initializeCroppedBlobResource();
+  protected readonly croppedBlobStateSignal = computed(() => ({
+    error: this.croppedBlobResource.error(),
+    isLoading: this.croppedBlobResource.isLoading(),
+    value: this.croppedBlobResource.value(),
+  }));
 
   /** Accessor for the selected image URL (used in template). */
   protected get selectedImageUrlSignal() {
@@ -73,8 +83,8 @@ export class ImageCropper {
     this._setupSourceUrlCleanup();
 
     // Émission du blob vers le parent via un observable pour garantir le déclenchement
-    toObservable(this.croppedBlobResource.value).subscribe(blob => {
-      this.croppedBlobChange.emit(blob);
+    toObservable(this.croppedBlobStateSignal).subscribe(blobState => {
+      this.croppedBlobChange.emit(blobState);
     });
   }
 

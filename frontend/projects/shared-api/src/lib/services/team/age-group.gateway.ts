@@ -2,7 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {AgeGroup} from '@shared-domain';
-import {APP_CONFIG} from '@shared-api';
+import {APP_CONFIG} from '../../configs/app-config';
 import {CreateAgeGroupDTO, UpdateAgeGroupDTO} from './age-group.dtos';
 
 const API_VERSION = '/api/v1';

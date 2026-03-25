@@ -1,15 +1,22 @@
 import {Component, effect, inject, input} from '@angular/core';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {HallsStore} from '@shared-api';
-import {ErrorData, LoadingData} from '@shared-ui';
-import {HallCard} from '../hall-card/hall-card';
+import {ErrorData, LoadingData, NotificationService} from '@shared-ui';
+import {HallCard} from '@shared-ui';
+import {MatCardActions} from '@angular/material/card';
+import {MatButton} from '@angular/material/button';
+import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 
 @Component({
   selector: 'app-hall-view',
   imports: [
     ErrorData,
     LoadingData,
-    HallCard
+    HallCard,
+    MatCardActions,
+    MatButton,
+    RouterLink,
+    FormDeleteButton
   ],
   templateUrl: './hall-view.html',
   styleUrl: './hall-view.scss',
@@ -18,6 +25,7 @@ import {HallCard} from '../hall-card/hall-card';
 export class HallView {
   private readonly hallsStore = inject(HallsStore);
   private readonly router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
 
   id = input.required<string>();
   hallSignal = this.hallsStore.hallById(this.id);
@@ -33,6 +41,19 @@ export class HallView {
       }
     });
   }
+
+  protected onDelete() {
+    const hall = this.hallSignal();
+    if (hall) {
+      this.hallsStore.deleteById(hall.id).subscribe({
+        next: () => {
+          this.notificationService.show("Salle supprimée avec succès", 'success');
+          void this.router.navigateByUrl('/halls');
+        }
+      });
+    }
+  }
+
   protected retry() {
     this.hallsStore.reload();
   }

@@ -9,29 +9,32 @@ import {environment} from '@environment';
 import {APP_CONFIG} from '@shared-api';
 import {MAT_DATE_LOCALE, provideNativeDateAdapter} from '@angular/material/core';
 import {registerLocaleData} from '@angular/common';
+
 /*export const delayInterceptor: HttpInterceptorFn = (req, next) => {
   // On ajoute un délai de 2 secondes en développement
   return next(req).pipe(delay(200));
 };*/
 
+
 registerLocaleData(localFr);
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     // provideHttpClient(withInterceptors([delayInterceptor])),
-    provideRouter(routes,withComponentInputBinding()),
+    provideRouter(routes, withComponentInputBinding()),
     provideSharedIcons(),
     provideNativeDateAdapter(),
     // Définit la locale pour Angular Material
-    { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
+    {provide: MAT_DATE_LOCALE, useValue: 'fr-FR'},
 
     // Définit la locale pour les pipes Angular (ex: {{ date | date }})
-    { provide: LOCALE_ID, useValue: 'fr-FR' },
+    {provide: LOCALE_ID, useValue: 'fr-FR'},
     {
       provide: MENU_CONFIG,
       useValue: menuItems
     }, {
-     provide: APP_CONFIG,
+      provide: APP_CONFIG,
       useValue: environment
     }
   ]

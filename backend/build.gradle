@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
-    implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
+    implementation 'org.springframework.modulith:spring-modulith-starter-jdbc'
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
     implementation("org.springframework.boot:spring-boot-starter-cache")

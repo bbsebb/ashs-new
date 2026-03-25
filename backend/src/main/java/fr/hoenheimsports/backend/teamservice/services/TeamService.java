@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.teamservice.services;
 
 import fr.hoenheimsports.backend.imagestorage.ImageStorageService;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
+import fr.hoenheimsports.backend.staffservice.StaffDeletedEvent;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamCreateRequest;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamReponseDTO;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamUpdateRequest;
@@ -9,9 +10,11 @@ import fr.hoenheimsports.backend.teamservice.entities.*;
 import fr.hoenheimsports.backend.teamservice.mappers.TeamMapper;
 import fr.hoenheimsports.backend.teamservice.repository.AgeGroupRepository;
 import fr.hoenheimsports.backend.teamservice.repository.TeamRepository;
+import fr.hoenheimsports.backend.teamservice.repository.TeamStaffRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
+import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TeamService {
     private final TeamRepository teamRepository;
+    private final TeamStaffRepository teamStaffRepository;
     private final AgeGroupRepository ageGroupRepository;
     private final TeamMapper teamMapper;
     private final ImageStorageService imageStorageService;
@@ -159,6 +163,7 @@ public class TeamService {
                     TrainingSession existingTrainingSession = existingTrainingSessionsById.get(dto.id());
                     if (existingTrainingSession != null) {
                         existingTrainingSession.setHallId(dto.hallId());
+                        existingTrainingSession.setDayOfWeek(dto.dayOfWeek());
                         existingTrainingSession.setTimeSlot(new TimeSlot(
                                 dto.timeSlot().startTime(),
                                 dto.timeSlot().endTime()
@@ -171,6 +176,7 @@ public class TeamService {
                 .forEach(dto -> {
                     TrainingSession newSession = new TrainingSession();
                     newSession.setHallId(dto.hallId());
+                    newSession.setDayOfWeek(dto.dayOfWeek());
                     newSession.setTimeSlot(new TimeSlot(dto.timeSlot().startTime(), dto.timeSlot().endTime()));
                     team.addTrainingSession(newSession);
                 });
@@ -182,6 +188,20 @@ public class TeamService {
             throw new EntityNotFoundException("La catégorie n'a pas été trouvée avec l'id: " + id);
         }
         return ageGroup.get();
+    }
+
+
+    @ApplicationModuleListener
+    public void onStaffDeleted(StaffDeletedEvent event) {
+        var teams = this.teamRepository.findDistinctByStaffs_StaffId(event.id());
+
+        for (var team : teams) {
+            new ArrayList<>(team.getStaffs()).stream()
+                    .filter(staff -> staff.getStaffId().equals(event.id()))
+                    .forEach(team::removeStaff);
+        }
+
+        this.teamRepository.saveAll(teams);
     }
 
 }

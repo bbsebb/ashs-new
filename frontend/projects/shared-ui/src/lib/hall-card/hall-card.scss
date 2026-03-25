@@ -1,3 +1,8 @@
+
+
+
+
+
 .title {
   margin: 0;
   font-size: 24px;
@@ -36,13 +41,4 @@
   word-break: break-word;
 }
 
-mat-card-actions {
-  padding: 16px 24px;
-  border-top: 1px solid var(--mat-sys-outline-variant);
-  gap: 8px;
-}
 
-.example-header-image {
-  background-image: var(--avatar-url);
-  background-size: cover;
-}

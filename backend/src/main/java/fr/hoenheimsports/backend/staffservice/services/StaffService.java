@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.staffservice.services;
 
 import fr.hoenheimsports.backend.imagestorage.ImageStorageService;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
+import fr.hoenheimsports.backend.staffservice.StaffDeletedEvent;
 import fr.hoenheimsports.backend.staffservice.dtos.StaffCreateRequest;
 import fr.hoenheimsports.backend.staffservice.dtos.StaffResponseDto;
 import fr.hoenheimsports.backend.staffservice.dtos.StaffUpdateRequest;
@@ -9,8 +10,10 @@ import fr.hoenheimsports.backend.staffservice.entities.Email;
 import fr.hoenheimsports.backend.staffservice.entities.Phone;
 import fr.hoenheimsports.backend.staffservice.mappers.StaffMapper;
 import fr.hoenheimsports.backend.staffservice.repositories.StaffRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +28,7 @@ public class StaffService {
     private final StaffRepository staffRepository;
     private final StaffMapper staffMapper;
     private final ImageStorageService imageStorageService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<StaffResponseDto> getAllStaff() {
         return this.staffRepository.findAll().stream().map(staffMapper::toDto).collect(Collectors.toList());
@@ -67,11 +71,13 @@ public class StaffService {
         }
     }
 
+    @Transactional
     public void deleteStaff(UUID id) {
         var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));
         if (staff.getAvatarFileName() != null) {
             imageStorageService.deleteImage(staff.getAvatarFileName());
         }
         this.staffRepository.delete(staff);
+        applicationEventPublisher.publishEvent(new StaffDeletedEvent(staff.getId()));
     }
 }

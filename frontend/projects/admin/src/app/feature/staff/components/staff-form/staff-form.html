@@ -71,6 +71,8 @@
         >
         </app-image-cropper>
         <app-image-cropper-preview
+          [isLoadingSignal]="blobIsLoadingSignal()"
+          [isErrorSignal]="!!blobErrorSignal()"
           [previewBlob]="blobAvatarSignal()"
           [previewHeightSignal]="100"
           [previewWidthSignal]="100"
@@ -90,5 +92,5 @@
 
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <app-staff-card [staff]="staffPreview()" [previewBlob]="blobAvatarSignal()" [withActions]="false"/>
+  <lib-staff-card [staff]="staffPreview()"/>
 </details>

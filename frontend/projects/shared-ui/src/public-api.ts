@@ -16,6 +16,13 @@ export * from './lib/page-title/page-title'
 export * from './lib/form-field-error/form-field-error'
 export * from './lib/contact/contact'
 export * from './lib/services/breakpoint.service';
+export * from './lib/services/image.service';
+export * from './lib/hall-card/hall-card';
+export * from './lib/season-card/season-card';
+export * from './lib/staff-card/staff-card';
+export * from './lib/staff-mini-card/staff-mini-card';
+export * from './lib/training-session-item/training-session-item';
+export * from './lib/team-card/team-card';
 export * from './lib/pipes/role-staff-pipe';
 export * from './lib/pipes/day-of-week-pipe';
 export * from './lib/pipes/gender-pipe';

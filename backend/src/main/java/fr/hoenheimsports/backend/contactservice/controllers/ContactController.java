@@ -14,6 +14,6 @@ public class ContactController {
 
     @PostMapping("/send")
     public void sendMail(@RequestBody @Valid ContactRequest contactRequest) {
-        contactService.sendmail(contactRequest.from(),contactRequest.subject(),contactRequest.content());
+        this.contactService.sendContactEmail(contactRequest.from(), contactRequest.subject(), contactRequest.content());
     }
 }

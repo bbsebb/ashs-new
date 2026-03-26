@@ -1,0 +1,64 @@
+:host {
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  margin: 0 8px;
+  font-weight: 500;
+}
+
+.user-header {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 220px;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.user-avatar-small {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+.user-avatar-large {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--mat-sys-primary);
+  margin-bottom: 4px;
+}
+
+.large-icon {
+  width: 64px;
+  height: 64px;
+  font-size: 64px;
+  color: var(--mat-sys-primary);
+}
+
+.full-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--mat-sys-on-surface);
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.user-details {
+  background-color: var(--mat-sys-surface-container-low);
+}

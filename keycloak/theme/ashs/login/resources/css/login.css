@@ -1,0 +1,109 @@
+/* keycloak/theme/ashs/login/resources/css/login.css */
+:root {
+  --primary-color: #007bff; /* Azure from Material palette approximate */
+  --surface-color: #ffffff;
+  --on-surface: rgba(0, 0, 0, 0.87);
+  --on-surface-variant: rgba(0, 0, 0, 0.6);
+  --border-radius: 8px;
+}
+
+body {
+  background-color: #f5f5f5;
+  font-family: 'Roboto', sans-serif;
+  color: var(--on-surface);
+}
+
+#kc-header {
+  display: none; /* Hide default Keycloak header */
+}
+
+.login-pf-page {
+  padding-top: 40px;
+}
+
+#kc-card-wrapper {
+  max-width: 450px;
+}
+
+.card-pf {
+  background: var(--surface-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12); /* Mat card shadow */
+  border: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+#kc-content-wrapper {
+  padding: 24px;
+}
+
+/* Logo integration */
+#kc-logo-wrapper {
+  background-image: url('../img/logo.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  height: 120px;
+  margin: 24px auto;
+  display: block;
+  width: 100%;
+}
+
+/* Titles */
+#kc-page-title {
+  font-size: 24px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--on-surface);
+}
+
+/* Form Fields */
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  margin-bottom: 8px;
+}
+
+.form-control {
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 12px;
+  height: auto;
+  box-shadow: none;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: inset 0 0 0 1px var(--primary-color);
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 10px 24px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.25px !important;
+  box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12) !important;
+}
+
+.btn-primary:hover {
+  filter: brightness(0.9);
+}
+
+/* Links */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}

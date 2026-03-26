@@ -45,7 +45,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     // Spring Boot 4 a amélioré l'auto-configuration pour les aspects
     runtimeOnly 'org.springframework.modulith:spring-modulith-runtime'
     compileOnly 'org.projectlombok:lombok'

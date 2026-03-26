@@ -9,26 +9,31 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ContactService {
-    private final JavaMailSender mailSender;
-    private final static String to ="sebastien.burckhardt@hoenheimsports.fr";
+    private final JavaMailSender javaMailSender;
+    private final static String ADMINISTRATOR_EMAIL_ADDRESS ="sebastien.burckhardt@hoenheimsports.fr";
 
 
-    // Injection par constructeur (recommandé en 2026)
-    public ContactService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    // Constructor injection (recommended in 2026)
+    public ContactService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
     }
 
-    public void sendmail(String from, String subject, String content) {
+    public void sendContactEmail(String senderEmailAddress, String contactMessageSubject, String contactMessageContent) {
         try {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(content);
+            SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+            simpleMailMessage.setFrom(senderEmailAddress);
+            simpleMailMessage.setTo(ADMINISTRATOR_EMAIL_ADDRESS);
+            simpleMailMessage.setSubject("Email reçu depuis contact : " + contactMessageSubject);
+            
+            String formattedEmailContent = "Expéditeur : " + senderEmailAddress + "\n" +
+                                          "Sujet : " + contactMessageSubject + "\n\n" +
+                                          "Message :\n" + contactMessageContent;
+            simpleMailMessage.setText(formattedEmailContent);
 
-        mailSender.send(message);
-        log.info("Email envoyé avec succès !");}
-        catch (Exception e) {
+            this.javaMailSender.send(simpleMailMessage);
+            log.info("Email envoyé avec succès !");
+        } catch (Exception exception) {
+            log.error("Error while sending email: {}", exception.getMessage());
             throw new MailServiceException("Erreur lors de l'envoi de l'email");
         }
     }

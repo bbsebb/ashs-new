@@ -1,0 +1,69 @@
+@let user = authService.userProfile.value();
+@if (authService.isLoggedIn()) {
+  <button
+    mat-button
+    [matMenuTriggerFor]="userMenu"
+    [matTooltip]="user?.fullName ?? 'Profil'"
+    aria-label="Menu utilisateur"
+  >
+    @if (user?.profilePicture) {
+      <img [src]="user?.profilePicture" class="user-avatar-small" alt="Avatar">
+    } @else {
+      <mat-icon>account_circle</mat-icon>
+    }
+    
+    @if (layoutService.isDesktopSignal()) {
+      <ng-container>
+        <span class="user-name">{{ user?.fullName }}</span>
+        <mat-icon iconPositionEnd>expand_more</mat-icon>
+      </ng-container>
+    }
+  </button>
+
+  <mat-menu #userMenu="matMenu" xPosition="before" class="auth-menu-panel">
+    <div class="user-details">
+      <div class="user-header">
+        @if (user?.profilePicture) {
+          <img [src]="user?.profilePicture" class="user-avatar-large" alt="Avatar">
+        } @else {
+          <mat-icon class="large-icon">account_circle</mat-icon>
+        }
+        <div class="user-info">
+          <span class="full-name">{{ user?.fullName }}</span>
+          @if (user?.email) {
+            <span class="user-email">{{ user?.email }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Déconnexion</span>
+    </button>
+  </mat-menu>
+} @else {
+  @if (layoutService.isDesktopSignal()) {
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="login()"
+      aria-label="Se connecter"
+    >
+      <mat-icon>login</mat-icon>
+      Connexion
+    </button>
+  } @else {
+    <button
+      mat-icon-button
+      color="primary"
+      (click)="login()"
+      [matTooltip]="'Connexion'"
+      aria-label="Se connecter"
+    >
+      <mat-icon>login</mat-icon>
+    </button>
+  }
+}

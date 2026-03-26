@@ -12,16 +12,17 @@ import {StaffView} from './feature/staff/components/staff-view/staff-view';
 import {TeamsList} from './feature/team/components/teams-list/teams-list';
 import {TeamForm} from './feature/team/components/team-form/team-form';
 import {TeamView} from './feature/team/components/team-view/team-view';
-import {ImageCropper} from './shared/image-cropper/image-cropper';
 import {AgeGroupList} from './feature/team/components/age-group-list/age-group-list';
 import {AgeGroupForm} from './feature/team/components/age-group-form/age-group-form';
+import {Dashboard} from "./feature/dashboard/dashboard";
+import {authGuard} from './core/guards/auth-guard';
 
 // noinspection SpellCheckingInspection
 export const routes: Routes = [
-  {path: '', redirectTo: 'halls', pathMatch: 'full'},
-  {path: 'image', component: ImageCropper, data: {withPreview: true}},
+  {path: '', component: Dashboard, pathMatch: 'full'},
   {
     path: 'halls',
+    canActivateChild: [authGuard],
     children: [
       {path: '', component: HallsList},       // /halls
       {path: 'create', component: HallForm},
@@ -31,6 +32,7 @@ export const routes: Routes = [
   },
   {
     path: 'seasons',
+    canActivateChild: [authGuard],
     children: [
       {path: '', component: SeasonsList},       // /halls
       {path: 'create', component: SeasonForm},
@@ -40,6 +42,7 @@ export const routes: Routes = [
   },
   {
     path: 'staffs',
+    canActivateChild: [authGuard],
     children: [
       {path: '', component: StaffsList},
       {path: 'create', component: StaffForm},
@@ -49,6 +52,7 @@ export const routes: Routes = [
   },
   {
     path: 'teams',
+    canActivateChild: [authGuard],
     children: [
       {path: '', component: TeamsList},
       {path: 'create', component: TeamForm},
@@ -58,6 +62,7 @@ export const routes: Routes = [
   },
   {
     path: 'age-groups',
+    canActivateChild: [authGuard],
     children: [
       {path: '', component: AgeGroupList},
       {path: 'create', component: AgeGroupForm},

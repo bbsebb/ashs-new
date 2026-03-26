@@ -12,6 +12,12 @@ spring:
     clean-disabled: false
     validate-on-migrate: false
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # L'URL exacte de ton Realm Keycloak
+          issuer-uri: http://localhost:8081/realms/ashs
 
 logging:
   level:

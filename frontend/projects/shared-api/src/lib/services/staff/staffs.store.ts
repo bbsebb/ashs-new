@@ -3,12 +3,14 @@ import {Observable, tap} from 'rxjs';
 import {Staff} from '@shared-domain';
 import {StaffGateway} from './staff.gateway';
 import {CreateStaffDTO, UpdateStaffDTO} from './staff.dtos';
+import {TeamsStore} from '../team/teams.store';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class StaffsStore {
+  private readonly _teamsStore = inject(TeamsStore);
   private readonly _staffGateway = inject(StaffGateway);
   private readonly _staffsResource = this._staffGateway.getStaffs();
   readonly staffsSignal: Signal<Staff[]> = computed(() => this._staffsResource.hasValue() ? this._staffsResource.value() : []);
@@ -38,7 +40,8 @@ export class StaffsStore {
 
   deleteById(staffId: string): Observable<void> {
     return this._staffGateway.deleteById(staffId).pipe(
-      tap(() => this._staffsResource.update(staffsList => staffsList ? staffsList.filter(staff => staff.id !== staffId) : []))
+      tap(() => this._staffsResource.update(staffsList => staffsList ? staffsList.filter(staff => staff.id !== staffId) : [])),
+      tap(() => this._teamsStore.onStaffDeleted(staffId))
     );
   }
 

@@ -48,4 +48,13 @@ export class TeamsStore {
       tap((updatedTeam) => this._teamsResource.update(teamsList => teamsList.map(team => team.id === updatedTeam.id ? updatedTeam : team)))
     );
   }
+
+  onStaffDeleted(staffID: string) {
+    this._teamsResource.update(teamsList => teamsList.map(team => {
+      return {
+        ...team,
+        staffs: team.staffs.filter(staff => staff.staffId !== staffID)
+      }
+    }))
+  }
 }

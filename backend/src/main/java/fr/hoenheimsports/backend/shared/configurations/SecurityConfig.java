@@ -42,6 +42,7 @@ public class SecurityConfig {
 
                 // 4. Règles de protection des routes
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()// Route publique
                         .anyRequest().authenticated()                 // Tout le reste nécessite un token valide
                 )

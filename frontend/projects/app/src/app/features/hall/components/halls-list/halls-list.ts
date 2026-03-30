@@ -1,14 +1,16 @@
 import {Component, inject} from '@angular/core';
 import {HallsStore} from '@shared-api';
-import {ErrorData, LoadingData} from '@shared-ui';
-import {HallCard} from '../hall-card/hall-card';
+import {ErrorData, HallCard, LoadingData, PageTitle} from '@shared-ui';
+import {MatIconModule} from "@angular/material/icon";
 
 @Component({
   selector: 'app-halls-list',
   imports: [
     LoadingData,
     ErrorData,
-    HallCard
+    HallCard,
+    PageTitle,
+    MatIconModule
   ],
   templateUrl: './halls-list.html',
   styleUrl: './halls-list.scss',

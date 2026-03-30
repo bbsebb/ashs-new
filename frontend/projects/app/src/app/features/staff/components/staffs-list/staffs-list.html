@@ -1,0 +1,20 @@
+<app-page-title title="Notre Staff" subtitle="Découvrez les visages qui font vivre l'association et encadrent nos équipes."></app-page-title>
+
+<div class="container">
+  @if (isLoading()) {
+    <app-loading-data label="Chargement du staff" [isLoading]="isLoading()"/>
+  } @else if (error()) {
+    <app-error-data dataName="staff" (onRetry)="retry()"/>
+  } @else {
+    <section class="staff-grid">
+      @for (staff of staffsSignal(); track staff.id) {
+        <lib-staff-card [staff]="staff"></lib-staff-card>
+      } @empty {
+        <div class="empty-state">
+          <mat-icon>supervisor_account</mat-icon>
+          <p>Aucun membre du staff n'est répertorié pour le moment.</p>
+        </div>
+      }
+    </section>
+  }
+</div>

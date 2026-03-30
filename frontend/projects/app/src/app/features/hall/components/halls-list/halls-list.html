@@ -1,13 +1,20 @@
-@if (isLoading()) {
-  <app-loading-data label="Chargement des salles" [isLoading]="isLoading()"/>
-} @else if (error()) {
-  <app-error-data dataName="salles" (onRetry)="retry()"/>
-} @else {
-  <section class="halls-list">
-    @for (hall of hallsSignal(); track hall.id) {
-      <app-hall-card [hall]="hall"></app-hall-card>
-    } @empty {
-      <p>Aucune salle n'est présente</p>
-    }
-  </section>
-}
+<app-page-title title="Nos Salles" subtitle="Découvrez les lieux où nos équipes s'entraînent et jouent leurs matchs."></app-page-title>
+
+<div class="container">
+  @if (isLoading()) {
+    <app-loading-data label="Chargement des salles" [isLoading]="isLoading()"/>
+  } @else if (error()) {
+    <app-error-data dataName="salles" (onRetry)="retry()"/>
+  } @else {
+    <section class="halls-grid">
+      @for (hall of hallsSignal(); track hall.id) {
+        <lib-hall-card [hall]="hall"></lib-hall-card>
+      } @empty {
+        <div class="empty-state">
+          <mat-icon>stadium</mat-icon>
+          <p>Aucune salle n'est répertoriée pour le moment.</p>
+        </div>
+      }
+    </section>
+  }
+</div>

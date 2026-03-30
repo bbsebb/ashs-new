@@ -18,6 +18,8 @@ spring:
     validate-on-migrate: true
 
 
+
+
 logging:
   level:
     # On réduit drastiquement les logs pour ne pas saturer l'espace disque du VPS

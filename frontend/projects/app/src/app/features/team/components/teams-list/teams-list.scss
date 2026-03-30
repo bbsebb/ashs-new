@@ -1,0 +1,53 @@
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-section {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: flex-start;
+
+  mat-form-field {
+    min-width: 250px;
+  }
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 32px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 0;
+  color: var(--mat-sys-on-surface-variant);
+  gap: 16px;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .container {
+    padding: 16px;
+  }
+
+  .teams-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .filter-section mat-form-field {
+    width: 100%;
+  }
+}

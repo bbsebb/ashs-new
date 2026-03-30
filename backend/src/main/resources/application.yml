@@ -43,6 +43,13 @@ spring:
       jdbc:
         schema: modulith_schema
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # L'URL exacte de ton Realm Keycloak
+          issuer-uri: ${RESOURCE_SERVER_ISSUER_URI:http://localhost:8081/realms/ashs}
+
 meta:
   page-access-token: ${PAGE_ACCESS_TOKEN}
   version: v24.0

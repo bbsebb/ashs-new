@@ -65,6 +65,17 @@
                   "with": "projects/app/src/environments/environment.development.ts"
                 }
               ]
+            },
+            "staging": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/app/src/environments/environment.ts",
+                  "with": "projects/app/src/environments/environment.staging.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -77,6 +88,9 @@
             },
             "development": {
               "buildTarget": "app:build:development"
+            },
+            "staging": {
+              "buildTarget": "app:build:staging"
             }
           },
           "defaultConfiguration": "development"
@@ -144,6 +158,17 @@
                   "with": "projects/admin/src/environments/environment.development.ts"
                 }
               ]
+            },
+            "staging": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "projects/admin/src/environments/environment.ts",
+                  "with": "projects/admin/src/environments/environment.staging.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -156,6 +181,9 @@
             },
             "development": {
               "buildTarget": "admin:build:development"
+            },
+            "staging": {
+              "buildTarget": "admin:build:staging"
             }
           },
           "defaultConfiguration": "development"
@@ -178,6 +206,9 @@
               "tsConfig": "projects/shared-ui/tsconfig.lib.prod.json"
             },
             "development": {
+              "tsConfig": "projects/shared-ui/tsconfig.lib.json"
+            },
+            "staging": {
               "tsConfig": "projects/shared-ui/tsconfig.lib.json"
             }
           },
@@ -205,6 +236,9 @@
             },
             "development": {
               "tsConfig": "projects/shared-domain/tsconfig.lib.json"
+            },
+            "staging": {
+              "tsConfig": "projects/shared-domain/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -230,6 +264,9 @@
               "tsConfig": "projects/shared-api/tsconfig.lib.prod.json"
             },
             "development": {
+              "tsConfig": "projects/shared-api/tsconfig.lib.json"
+            },
+            "staging": {
               "tsConfig": "projects/shared-api/tsconfig.lib.json"
             }
           },

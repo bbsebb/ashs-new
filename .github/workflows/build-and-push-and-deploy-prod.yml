@@ -160,6 +160,7 @@ jobs:
           SPRING_DATASOURCE_URL=${{ vars.DB_URL }}
           SPRING_DATASOURCE_USERNAME=${{ vars.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
+          RESOURCE_SERVER_ISSUER_URI=${{ vars.RESOURCE_SERVER_ISSUER_URI }}
           IMAGE_TAG=${{ github.ref_name }}
           EOF
 

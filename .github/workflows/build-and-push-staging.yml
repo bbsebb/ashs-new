@@ -62,7 +62,7 @@ jobs:
 
       - name: Build Angular (shared-ui + app + admin)
         working-directory: frontend
-        run: npm run build:all
+        run: npm run build:all:staging
 
       - name: Create Dockerfiles for Angular apps
         working-directory: frontend

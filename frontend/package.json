@@ -6,6 +6,8 @@
     "start:app": "ng serve app",
     "start:admin": "ng serve admin",
     "build:all": "ng build app && ng build admin",
+    "build:all:staging": "ng build app --configuration staging && ng build admin --configuration staging",
+    "build:all:development": "ng build app --configuration development && ng build admin --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

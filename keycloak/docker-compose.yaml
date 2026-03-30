@@ -15,7 +15,7 @@ services:
       # Configuration du thème personnalisé
       - KC_THEME_DEFAULT=ashs
     ports:
-      - "8081:8080" # Accessible sur http://localhost:8081
+      - "8079:8080" # Accessible sur http://localhost:8079
     volumes:
       - ./theme/ashs:/opt/keycloak/themes/ashs:z
     depends_on:

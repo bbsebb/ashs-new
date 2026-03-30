@@ -1,4 +1,4 @@
-import {effect, Injectable, resource, signal} from '@angular/core';
+import {Injectable, resource, signal} from '@angular/core';
 import Keycloak from 'keycloak-js';
 import {environment} from '@environment';
 
@@ -47,11 +47,6 @@ export class AuthService {
     }
   });
 
-  constructor() {
-    effect(() => {
-      console.log('user', this.userProfile.value());
-    });
-  }
 
   public async init(): Promise<void> {
     try {

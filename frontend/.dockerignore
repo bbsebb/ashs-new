@@ -1,8 +1,8 @@
-# Ignore everything by default
-*
+# Ignorer les sources lourdes
+node_modules/
+.angular/
+projects/
+src/
 
-# Include the build output (dist/) and Nginx configs
-!dist/
-!dist/**
-!Dockerfile.*
-!nginx.*.conf
+# S'assurer que le dossier dist/ est bien présent
+# (Il sera dans le contexte local ./frontend)

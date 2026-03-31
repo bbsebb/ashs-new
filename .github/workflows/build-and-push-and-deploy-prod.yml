@@ -41,7 +41,8 @@ jobs:
           FROM eclipse-temurin:25-jre-jammy
           WORKDIR /app
           RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
-          COPY build/libs/*.jar app.jar
+          # On cible spécifiquement le jar qui ne finit pas par -plain.jar
+          COPY build/libs/*[!plain].jar app.jar
           EXPOSE 8080
           ENTRYPOINT ["java", "-jar", "app.jar"]
           EOF
@@ -104,7 +105,7 @@ jobs:
 
       # --- CONNEXION ET PUSH (Adaptés pour les tags) ---
       - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -112,7 +113,7 @@ jobs:
 
       # PUSH BACKEND
       - name: Build and push Backend image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           push: true
@@ -122,7 +123,7 @@ jobs:
 
       # PUSH FRONTEND APP
       - name: Build and push Angular APP image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           file: ./frontend/Dockerfile.app
@@ -133,7 +134,7 @@ jobs:
 
       # PUSH FRONTEND ADMIN
       - name: Build and push Angular ADMIN image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           file: ./frontend/Dockerfile.admin

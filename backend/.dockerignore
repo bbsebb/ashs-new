@@ -1,0 +1,10 @@
+# Ignore everything by default
+*
+
+# Allow the Dockerfile itself
+!Dockerfile
+
+# Allow the build/libs directory and its contents
+!build/
+!build/libs/
+!build/libs/**

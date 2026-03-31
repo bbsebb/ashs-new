@@ -1,0 +1,8 @@
+# Ignore everything by default
+*
+
+# Include the build output (dist/) and Nginx configs
+!dist/
+!dist/**
+!Dockerfile.*
+!nginx.*.conf

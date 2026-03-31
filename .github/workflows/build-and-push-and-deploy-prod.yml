@@ -41,8 +41,8 @@ jobs:
           FROM eclipse-temurin:25-jre-jammy
           WORKDIR /app
           RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
-          # On cible spécifiquement le jar qui ne finit pas par -plain.jar
-          COPY build/libs/*[!plain].jar app.jar
+          # On cible tous les .jar du dossier build/libs
+          COPY build/libs/*.jar app.jar
           EXPOSE 8080
           ENTRYPOINT ["java", "-jar", "app.jar"]
           EOF
@@ -116,7 +116,7 @@ jobs:
 
       # PUSH BACKEND
       - name: Build and push Backend image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v6
         with:
           context: ./backend
           push: true
@@ -126,7 +126,7 @@ jobs:
 
       # PUSH FRONTEND APP
       - name: Build and push Angular APP image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v6
         with:
           context: ./frontend
           file: ./frontend/Dockerfile.app
@@ -137,7 +137,7 @@ jobs:
 
       # PUSH FRONTEND ADMIN
       - name: Build and push Angular ADMIN image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@v6
         with:
           context: ./frontend
           file: ./frontend/Dockerfile.admin

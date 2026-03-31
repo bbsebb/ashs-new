@@ -1,8 +1,10 @@
-# Ignorer les dossiers lourds et inutiles
-.git
-.gradle
-.idea
-src/
+# Ignorer tout par défaut
+*
 
-# S'assurer que le dossier build/libs et le Dockerfile sont inclus
-# On n'utilise pas le "*" global ici pour éviter les conflits avec certains drivers
+# Autoriser explicitement le Dockerfile
+!Dockerfile
+
+# Autoriser explicitement le dossier build/libs et son contenu
+!build/
+!build/libs/
+!build/libs/**

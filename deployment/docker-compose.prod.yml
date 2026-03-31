@@ -27,7 +27,7 @@ services:
     container_name: spring-app-prod
     restart: always
     ports:
-      - "8080:8080" # Tu pourras restreindre ça à "127.0.0.1:8080:8080" si tu utilises un reverse proxy comme Nginx sur le VPS
+      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod # Changé de staging à prod
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}

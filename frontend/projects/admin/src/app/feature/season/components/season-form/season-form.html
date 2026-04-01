@@ -37,7 +37,7 @@
         [disabled]="seasonForm().submitting() || seasonForm().invalid()"
         [content]="isCreateForm() ? 'Enregistrer' : 'Modifier'"
         [submitting]="seasonForm().submitting()"  />
-      <button mat-button type="button" routerLink="/seasons">Retour</button>
+      <button mat-button type="button" (click)="cancel()">Retour</button>
     </div>
   </form>
 </section>

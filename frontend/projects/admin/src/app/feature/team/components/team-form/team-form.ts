@@ -27,7 +27,7 @@ import {
   RoleStaffPipe,
   TeamCard
 } from '@shared-ui';
-import {DAY_OF_WEEKS, DayOfWeek, GENDER, Gender, STAFF_ROLE_VALUE, StaffRoleValue, Team} from '@shared-domain';
+import {DAY_OF_WEEKS, DayOfWeek, GENDER, Gender, STAFF_ROLE_VALUE, StaffRoleValue, Team, Season, AgeGroup, Hall, Staff} from '@shared-domain';
 import {Router, RouterLink} from '@angular/router';
 import {MatDivider} from '@angular/material/list';
 import {MatIcon} from '@angular/material/icon';
@@ -37,6 +37,11 @@ import {firstValueFrom, tap} from 'rxjs';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
 import {NgOptimizedImage} from '@angular/common';
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {SeasonForm} from '../../../season/components/season-form/season-form';
+import {AgeGroupForm} from '../age-group-form/age-group-form';
+import {HallForm} from '../../../hall/components/hall-form/hall-form';
+import {StaffForm} from '../../../staff/components/staff-form/staff-form';
 
 @Component({
   selector: 'app-team-form',
@@ -62,7 +67,8 @@ import {NgOptimizedImage} from '@angular/common';
     NgOptimizedImage,
     RoleStaffPipe,
     DayOfWeekPipe,
-    GenderPipe
+    GenderPipe,
+    MatDialogModule
   ],
   templateUrl: './team-form.html',
   styleUrl: './team-form.scss',
@@ -81,6 +87,7 @@ export class TeamForm {
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
   private readonly _imageService = inject(ImageService);
+  private readonly _dialogService = inject(MatDialog);
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   staffsSignal = this._staffsStore.staffsSignal;
@@ -286,15 +293,79 @@ export class TeamForm {
   }
 
   protected addSeason() {
-    void this._router.navigateByUrl(`/seasons`);
+    const dialogReference = this._dialogService.open(SeasonForm, {
+      width: '600px',
+    });
+
+    void firstValueFrom(dialogReference.afterClosed()).then((result: Season | undefined) => {
+      if (result) {
+        this.teamFormModelSignal.update(currentModel => ({
+          ...currentModel,
+          seasonId: result.id
+        }));
+      }
+    });
   }
 
   protected addAgeGroup() {
-    void this._router.navigateByUrl(`/age-groups`);
+    const dialogReference = this._dialogService.open(AgeGroupForm, {
+      width: '600px',
+    });
+
+    void firstValueFrom(dialogReference.afterClosed()).then((result: AgeGroup | undefined) => {
+      if (result) {
+        this.teamFormModelSignal.update(currentModel => ({
+          ...currentModel,
+          ageGroupId: result.id
+        }));
+      }
+    });
   }
 
-  protected addHall() {
-    void this._router.navigateByUrl(`/halls`);
+  protected addHall(trainingSessionIndex?: number) {
+    const dialogReference = this._dialogService.open(HallForm, {
+      width: '600px',
+    });
+
+    void firstValueFrom(dialogReference.afterClosed()).then((result: Hall | undefined) => {
+      if (result) {
+        if (trainingSessionIndex !== undefined) {
+          this.teamFormModelSignal.update(currentModel => {
+            const updatedSessions = [...currentModel.trainingSessions];
+            updatedSessions[trainingSessionIndex] = {
+              ...updatedSessions[trainingSessionIndex],
+              hallId: result.id
+            };
+            return {
+              ...currentModel,
+              trainingSessions: updatedSessions
+            };
+          });
+        }
+      }
+    });
+  }
+
+  protected addStaffMember(staffIndex: number) {
+    const dialogReference = this._dialogService.open(StaffForm, {
+      width: '600px',
+    });
+
+    void firstValueFrom(dialogReference.afterClosed()).then((result: Staff | undefined) => {
+      if (result) {
+        this.teamFormModelSignal.update(currentModel => {
+          const updatedStaffs = [...currentModel.staffs];
+          updatedStaffs[staffIndex] = {
+            ...updatedStaffs[staffIndex],
+            staffId: result.id
+          };
+          return {
+            ...currentModel,
+            staffs: updatedStaffs
+          };
+        });
+      }
+    });
   }
 
   protected addStaff() {

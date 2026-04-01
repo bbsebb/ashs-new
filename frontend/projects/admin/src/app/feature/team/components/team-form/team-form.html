@@ -91,6 +91,7 @@
                   {{ staff.firstName }} {{ staff.lastName }}
                 </mat-option>
               }
+              <mat-option (onSelectionChange)="addStaffMember($index)" [value]="null">Ajouter un encadrant</mat-option>
             </mat-select>
             <mat-error *appError="teamForm.staffs[$index].staffId; let errorMsg">
               {{ errorMsg }}
@@ -123,7 +124,7 @@
               @for (hall of hallsSignal(); track hall.id) {
                 <mat-option [value]="hall.id">{{ hall.name }}</mat-option>
               }
-              <mat-option (onSelectionChange)="addHall()" [value]="null">Ajouter une salle</mat-option>
+              <mat-option (onSelectionChange)="addHall($index)" [value]="null">Ajouter une salle</mat-option>
             </mat-select>
             <mat-error *appError="teamForm.trainingSessions[$index].hallId; let errorMsg">
               {{ errorMsg }}

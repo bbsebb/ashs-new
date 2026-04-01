@@ -48,7 +48,7 @@
         [disabled]="ageGroupForm().submitting() || ageGroupForm().invalid()"
         content="Enregistrer"
         [submitting]="ageGroupForm().submitting()"/>
-      <button mat-button type="button" routerLink="/age-groups">Retour</button>
+      <button mat-button type="button" (click)="cancel()">Retour</button>
     </div>
   </form>
 </section>

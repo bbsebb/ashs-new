@@ -9,8 +9,9 @@ import {firstValueFrom, tap} from 'rxjs';
 import {FormErrorHandleService, HallsStore} from '@shared-api'
 import {FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Hall} from '@shared-domain';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {HallCard} from '@shared-ui';
+import {MatDialogRef} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-hall-form',
@@ -20,7 +21,6 @@ import {HallCard} from '@shared-ui';
     MatFormFieldModule,
     MatInputModule,
     FormSubmitButton,
-    RouterLink,
     PageTitle,
     FormFieldErrorDirective,
     HallCard
@@ -29,15 +29,17 @@ import {HallCard} from '@shared-ui';
   styleUrl: './hall-form.scss',
 })
 export class HallForm {
-  private readonly formErrorHandler = inject(FormErrorHandleService);
-  private readonly hallsStore = inject(HallsStore);
-  private readonly router = inject(Router);
-  private readonly notificationService = inject(NotificationService);
-  isLoading = this.hallsStore.isLoadingSignal;
-  error = computed(() => !!this.hallsStore.errorSignal());
+  private readonly _formErrorHandler = inject(FormErrorHandleService);
+  private readonly _hallsStore = inject(HallsStore);
+  private readonly _router = inject(Router);
+  private readonly _notificationService = inject(NotificationService);
+  private readonly _dialogReference = inject(MatDialogRef, {optional: true});
+
+  isLoading = this._hallsStore.isLoadingSignal;
+  error = computed(() => !!this._hallsStore.errorSignal());
   id = input<string | undefined>(undefined);
-  hallSignal: Signal<Hall | undefined> = this.hallsStore.hallById(this.id);
-  isCreateForm = computed(() => !this.id());  // Or it's an "update" form if id is defined.
+  hallSignal: Signal<Hall | undefined> = this._hallsStore.hallById(this.id);
+  isCreateForm = computed(() => !this.id());
 
   // Form model reset automatically when hallSignal changes
   hallModelSignal = linkedSignal<HallFormeModel>(() => {
@@ -75,33 +77,48 @@ export class HallForm {
 
   protected submitForm(event: Event) {
     event.preventDefault();
-    const id = this.id();
+    const currentId = this.id();
 
     void submit(this.hallForm, async (form) => {
       try {
-        let resultId = id;
-        if (!id) {
-          const newHall = await firstValueFrom(this.hallsStore.createHall(this.hallModelSignal()).pipe(
-            tap(() => this.notificationService.show('La salle a été enregistrée', 'success'))
+        let resultId = currentId;
+        let createdOrUpdatedHall: Hall | undefined;
+
+        if (!currentId) {
+          createdOrUpdatedHall = await firstValueFrom(this._hallsStore.createHall(this.hallModelSignal()).pipe(
+            tap(() => this._notificationService.show('La salle a été enregistrée', 'success'))
           ));
-          resultId = newHall.id;
+          resultId = createdOrUpdatedHall.id;
         } else {
-          await firstValueFrom(this.hallsStore.updateHall(id, this.hallModelSignal()).pipe(
-            tap(() => this.notificationService.show('La salle a été mise à jour', 'success'))
+          createdOrUpdatedHall = await firstValueFrom(this._hallsStore.updateHall(currentId, this.hallModelSignal()).pipe(
+            tap(() => this._notificationService.show('La salle a été mise à jour', 'success'))
           ));
         }
-        await this.router.navigateByUrl(`/halls/${resultId}`);
+
+        if (this._dialogReference) {
+          this._dialogReference.close(createdOrUpdatedHall);
+        } else {
+          await this._router.navigateByUrl(`/halls/${resultId}`);
+        }
         return undefined;
       } catch (error) {
-        const result = this.formErrorHandler.handleError(error, form);
+        const result = this._formErrorHandler.handleError(error, form);
         if (typeof result === 'string') {
-          this.notificationService.show(result, 'error');
+          this._notificationService.show(result, 'error');
           return undefined;
         }
         return result;
       }
     });
 
+  }
+
+  protected cancel(): void {
+    if (this._dialogReference) {
+      this._dialogReference.close();
+    } else {
+      void this._router.navigateByUrl(`/halls`);
+    }
   }
 }
 

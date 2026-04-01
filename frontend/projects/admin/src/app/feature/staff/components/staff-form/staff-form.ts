@@ -7,13 +7,14 @@ import {firstValueFrom, tap} from 'rxjs';
 import {CreateStaffDTO, FormErrorHandleService, StaffsStore, UpdateStaffDTO} from '@shared-api'
 import {BreakpointService, FormFieldErrorDirective, FormSubmitButton, NotificationService, PageTitle} from '@shared-ui';
 import {Staff} from '@shared-domain';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {StaffCard} from '@shared-ui';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
 import {ImageService} from '@shared-ui';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 import {NgOptimizedImage} from '@angular/common';
+import {MatDialogRef} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-staff-form',
@@ -23,7 +24,6 @@ import {NgOptimizedImage} from '@angular/common';
     MatFormFieldModule,
     MatInputModule,
     FormSubmitButton,
-    RouterLink,
     PageTitle,
     FormFieldErrorDirective,
     StaffCard,
@@ -44,6 +44,8 @@ export class StaffForm {
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
   private readonly _imageService = inject(ImageService);
+  private readonly _dialogReference = inject(MatDialogRef, {optional: true});
+
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   isLoading = this._staffsStore.isLoadingSignal;
   error = computed(() => !!this._staffsStore.errorSignal());
@@ -110,6 +112,7 @@ export class StaffForm {
 
   protected submitForm(event: Event) {
     event.preventDefault();
+    const currentId = this.id();
     const oldStaff = this.staffSignal();
 
     void submit(this.staffForm, async (form) => {
@@ -122,12 +125,14 @@ export class StaffForm {
         }
 
         let resultId: string | undefined;
+        let createdOrUpdatedStaff: Staff | undefined;
+
         if (!oldStaff) {
           // Mode Création
-          const newStaff = await firstValueFrom(this._staffsStore.createStaff(staffDTO as CreateStaffDTO, this.blobAvatarSignal()).pipe(
+          createdOrUpdatedStaff = await firstValueFrom(this._staffsStore.createStaff(staffDTO as CreateStaffDTO, this.blobAvatarSignal()).pipe(
             tap(() => this._notificationService.show('Le membre de l\'encadrement a été enregistré', 'success'))
           ));
-          resultId = newStaff.id;
+          resultId = createdOrUpdatedStaff.id;
         } else {
           // Mode Modification
           const updateStaffDTO: UpdateStaffDTO = {
@@ -136,12 +141,17 @@ export class StaffForm {
             avatarFileName: this.showExistingAvatarSignal() ? oldStaff.avatarFileName : null,
           }
 
-          const updatedStaff = await firstValueFrom(this._staffsStore.updateStaff(oldStaff.id, updateStaffDTO, this.blobAvatarSignal()).pipe(
+          createdOrUpdatedStaff = await firstValueFrom(this._staffsStore.updateStaff(oldStaff.id, updateStaffDTO, this.blobAvatarSignal()).pipe(
             tap(() => this._notificationService.show('Le membre de l\'encadrement a été mis à jour', 'success'))
           ));
-          resultId = updatedStaff.id;
+          resultId = createdOrUpdatedStaff.id;
         }
-        await this._router.navigateByUrl(`/staffs/${resultId}`);
+
+        if (this._dialogReference) {
+          this._dialogReference.close(createdOrUpdatedStaff);
+        } else {
+          await this._router.navigateByUrl(`/staffs/${resultId}`);
+        }
         return undefined;
       } catch (error) {
         const result = this._formErrorHandler.handleError(error, form);
@@ -152,6 +162,14 @@ export class StaffForm {
         return result;
       }
     });
+  }
+
+  protected cancel(): void {
+    if (this._dialogReference) {
+      this._dialogReference.close();
+    } else {
+      void this._router.navigateByUrl(`/staffs`);
+    }
   }
 
   protected onCroppedBlobChange($event: { value: Blob | undefined, isLoading: boolean, error: Error | undefined }) {

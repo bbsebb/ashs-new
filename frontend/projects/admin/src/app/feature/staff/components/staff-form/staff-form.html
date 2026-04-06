@@ -5,92 +5,97 @@
     subtitle="Renseignez le prénom, le nom, l'email et le numéro de téléphone."
   />
 
-  <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
-    <div class="form-fields">
-      <mat-form-field class="field" appearance="outline">
-        <mat-label>Prénom</mat-label>
-        <input matInput type="text" [formField]="staffForm.firstName" autocomplete="given-name"/>
-        <mat-error *appError="staffForm.firstName; let errorMsg">
-          {{ errorMsg }}
-        </mat-error>
-      </mat-form-field>
+  <form class="content" autocomplete="off" [formRoot]="staffFormService.staffForm">
+    <mat-dialog-content class="mat-typography">
+      <div class="form-fields">
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Prénom</mat-label>
+          <input matInput type="text" [formField]="staffFormService.staffForm.firstName" autocomplete="given-name"/>
+          <mat-error *appError="staffFormService.staffForm.firstName; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="field" appearance="outline">
-        <mat-label>Nom</mat-label>
-        <input matInput type="text" [formField]="staffForm.lastName" autocomplete="family-name"/>
-        <mat-error *appError="staffForm.lastName; let errorMsg">
-          {{ errorMsg }}
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Nom</mat-label>
+          <input matInput type="text" [formField]="staffFormService.staffForm.lastName" autocomplete="family-name"/>
+          <mat-error *appError="staffFormService.staffForm.lastName; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="field field-full" appearance="outline">
-        <mat-label>Email</mat-label>
-        <input matInput type="email" [formField]="staffForm.email" autocomplete="email"/>
-        <mat-error *appError="staffForm.email; let errorMsg">
-          {{ errorMsg }}
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field class="field field-full" appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [formField]="staffFormService.staffForm.email" autocomplete="email"/>
+          <mat-error *appError="staffFormService.staffForm.email; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field class="field field-full" appearance="outline">
-        <mat-label>Téléphone</mat-label>
-        <input matInput type="tel" [formField]="staffForm.phone" autocomplete="tel"/>
-        <mat-error *appError="staffForm.phone; let errorMsg">
-          {{ errorMsg }}
-        </mat-error>
-      </mat-form-field>
-    </div>
+        <mat-form-field class="field field-full" appearance="outline">
+          <mat-label>Téléphone</mat-label>
+          <input matInput type="tel" [formField]="staffFormService.staffForm.phone" autocomplete="tel"/>
+          <mat-error *appError="staffFormService.staffForm.phone; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-    @let globalErrors = staffForm().errors();
-    @if (globalErrors.length > 0) {
-      @for (globalError of globalErrors; track globalError.kind) {
-        <mat-error class="alert alert-danger">
-          {{ globalError.message }}
-        </mat-error>
+      @let globalErrors = staffFormService.staffForm().errors();
+      @if (globalErrors.length > 0) {
+        @for (globalError of globalErrors; track globalError.kind) {
+          <mat-error class="alert alert-danger">
+            {{ globalError.message }}
+          </mat-error>
+        }
       }
-    }
-    @if (showExistingAvatarSignal()) {
-      <div class="image-preview-container">
+      @if (staffFormService.showExistingAvatarSignal()) {
+        <div class="image-preview-container">
 
-        <img class="image-preview" [ngSrc]="createImageSourceUrl(staffSignal()?.avatarFileName)" [height]="PHOTO_HEIGHT"
-             [width]="PHOTO_WIDTH"
-             alt="avatar" priority/>
-        <app-form-delete-button
-          confirmMessage="Êtes-vous sûr de vouloir supprimer la photo d'équipe ?"
-          [iconOnly]="!isHandsetSignal()"
-          (deleteConfirmed)="deleteAvatar()">
-        </app-form-delete-button>
+          <img class="image-preview" [ngSrc]="createImageSourceUrl(staffFormService.staffSignal()?.avatarFileName)"
+               [height]="PHOTO_HEIGHT"
+               [width]="PHOTO_WIDTH"
+               alt="avatar" priority/>
+          <app-form-delete-button
+            confirmMessage="Êtes-vous sûr de vouloir supprimer la photo d'équipe ?"
+            [iconOnly]="!isHandsetSignal()"
+            (deleteConfirmed)="deleteAvatar()">
+          </app-form-delete-button>
+        </div>
+      } @else {
+        <div class="image-container">
+          <app-image-cropper
+            (croppedBlobChange)="onCroppedBlobChange($event)"
+            [withPreview]="false"
+            [isCircular]="true"
+            [cropMaskHeight]="100"
+            [cropMaskWidth]="100"
+          >
+          </app-image-cropper>
+          <app-image-cropper-preview
+            [isLoadingSignal]="staffFormService.blobIsLoadingSignal()"
+            [isErrorSignal]="!!staffFormService.blobErrorSignal()"
+            [previewBlob]="staffFormService.blobAvatarSignal()"
+            [previewHeightSignal]="100"
+            [previewWidthSignal]="100"
+          >
+          </app-image-cropper-preview>
+        </div>
+      }
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <div class="actions">
+        <app-form-submit-button
+          [disabled]="staffFormService.staffForm().submitting() || staffFormService.staffForm().invalid()"
+          [content]="staffFormService.staffSignal() ? 'Modifier' : 'Enregistrer'"
+          [submitting]="staffFormService.staffForm().submitting()"/>
+        <button mat-button type="button" (click)="cancel()">Retour</button>
       </div>
-    } @else {
-      <div class="image-container">
-        <app-image-cropper
-          (croppedBlobChange)="onCroppedBlobChange($event)"
-          [withPreview]="false"
-          [isCircular]="true"
-          [cropMaskHeight]="100"
-          [cropMaskWidth]="100"
-        >
-        </app-image-cropper>
-        <app-image-cropper-preview
-          [isLoadingSignal]="blobIsLoadingSignal()"
-          [isErrorSignal]="!!blobErrorSignal()"
-          [previewBlob]="blobAvatarSignal()"
-          [previewHeightSignal]="100"
-          [previewWidthSignal]="100"
-        >
-        </app-image-cropper-preview>
-      </div>
-    }
-    <div class="actions">
-      <app-form-submit-button
-        [disabled]="staffForm().submitting() || staffForm().invalid()"
-        [content]="isCreateForm() ? 'Enregistrer' : 'Modifier'"
-        [submitting]="staffForm().submitting()"/>
-      <button mat-button type="button" (click)="cancel()">Retour</button>
-    </div>
+    </mat-dialog-actions>
   </form>
 </section>
 
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <lib-staff-card [staff]="staffPreview()"/>
+  <lib-staff-card [staff]="staffFormService.staffPreview()"/>
 </details>

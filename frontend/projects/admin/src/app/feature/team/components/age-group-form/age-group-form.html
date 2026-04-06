@@ -5,52 +5,54 @@
     subtitle="Renseignez l'âge limite"
   />
 
-  <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
-    <div class="form-fields">
+  <form class="content" autocomplete="off" [formRoot]="ageGroupFormService.ageGroupForm">
+    <mat-dialog-content class="mat-typography">
+      <div class="form-fields">
 
-      <mat-form-field class="field" appearance="outline">
-        <mat-label>Sens de la limite</mat-label>
-        <mat-select [formField]="ageGroupForm.upperLimit">
-          <mat-option [value]="true">Moins de</mat-option>
-          <mat-option [value]="false">Plus de</mat-option>
-        </mat-select>
-        <mat-error *appError="ageGroupForm.upperLimit; let errorMsg">
-          {{ errorMsg }}
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Sens de la limite</mat-label>
+          <mat-select [formField]="ageGroupFormService.ageGroupForm.upperLimit">
+            <mat-option [value]="true">Moins de</mat-option>
+            <mat-option [value]="false">Plus de</mat-option>
+          </mat-select>
+          <mat-error *appError="ageGroupFormService.ageGroupForm.upperLimit; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
 
 
-      <mat-form-field class="field age-limit" appearance="outline">
-        <mat-label>Limite d'âge</mat-label>
-        <input matInput type="number" [formField]="ageGroupForm.ageLimit"/>
-        <span matTextSuffix>ans</span>
-        <mat-error *appError="ageGroupForm.ageLimit; let errorMsg">
-          {{ errorMsg }}
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field class="field age-limit" appearance="outline">
+          <mat-label>Limite d'âge</mat-label>
+          <input matInput type="number" [formField]="ageGroupFormService.ageGroupForm.ageLimit"/>
+          <span matTextSuffix>ans</span>
+          <mat-error *appError="ageGroupFormService.ageGroupForm.ageLimit; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
 
-    </div>
+      </div>
 
-    @let globalErrors = ageGroupForm().errors();
-    @if (globalErrors.length > 0) {
-      @for (globalError of globalErrors; track globalError.kind) {
-        <mat-error class="alert alert-danger">
-          {{ globalError.message }}
-        </mat-error>
+      @let globalErrors = ageGroupFormService.ageGroupForm().errors();
+      @if (globalErrors.length > 0) {
+        @for (globalError of globalErrors; track globalError.kind) {
+          <mat-error class="alert alert-danger">
+            {{ globalError.message }}
+          </mat-error>
+        }
       }
-    }
-    <div class="preview-section">
-      <span class="preview-label">Aperçu :</span>
-      <div class="preview-badge">{{ ageGroupPreviewSignal() }}</div>
-    </div>
-    <div class="actions">
-      <app-form-submit-button
-        [disabled]="ageGroupForm().submitting() || ageGroupForm().invalid()"
-        content="Enregistrer"
-        [submitting]="ageGroupForm().submitting()"/>
-      <button mat-button type="button" (click)="cancel()">Retour</button>
-    </div>
+      <div class="preview-section">
+        <span class="preview-label">Aperçu :</span>
+        <div class="preview-badge">{{ ageGroupFormService.ageGroupPreviewSignal() }}</div>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <div class="actions">
+        <app-form-submit-button
+          [disabled]="ageGroupFormService.ageGroupForm().submitting() || ageGroupFormService.ageGroupForm().invalid()"
+          content="Enregistrer"
+          [submitting]="ageGroupFormService.ageGroupForm().submitting()"/>
+        <button mat-button type="button" (click)="cancel()">Retour</button>
+      </div>
+    </mat-dialog-actions>
   </form>
 </section>
-
-

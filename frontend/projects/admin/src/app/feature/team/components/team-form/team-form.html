@@ -5,181 +5,75 @@
     subtitle="Renseignez la catégorie, le genre et le numéro de l'équipe."
   />
 
-  <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
+  <form class="content" autocomplete="off" [formRoot]="teamFormService.teamForm">
     <div class="form-fields">
       <mat-form-field class="field" appearance="outline">
         <mat-label>Saison</mat-label>
-        <mat-select [formField]="teamForm.seasonId">
-          @for (season of seasonsSignal(); track season.id) {
+        <mat-select [formField]="teamFormService.teamForm.seasonId">
+          @for (season of teamFormService.seasonsSignal(); track season.id) {
             <mat-option [value]="season.id">
               {{ season.name }} ans
             </mat-option>
           }
-          <mat-option (onSelectionChange)="addSeason()" [value]="null">Ajouter une season</mat-option>
+          <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addSeason()" [value]="null">Ajouter une season</mat-option>
         </mat-select>
-        <mat-error *appError="teamForm.seasonId; let errorMsg">
+        <mat-error *appError="teamFormService.teamForm.seasonId; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field class="field" appearance="outline">
         <mat-label>Catégorie</mat-label>
-        <mat-select [formField]="teamForm.ageGroupId">
-          @for (ageGroup of ageGroupsSignal(); track ageGroup.id) {
+        <mat-select [formField]="teamFormService.teamForm.ageGroupId">
+          @for (ageGroup of teamFormService.ageGroupsSignal(); track ageGroup.id) {
             <mat-option [value]="ageGroup.id">
               {{ ageGroup.upperLimit ? 'Moins de' : 'Plus de' }} {{ ageGroup.ageLimit }} ans
             </mat-option>
           }
-          <mat-option (onSelectionChange)="addAgeGroup()" [value]="null">Ajouter une catégorie</mat-option>
+          <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addAgeGroup()" [value]="null">Ajouter une catégorie</mat-option>
         </mat-select>
-        <mat-error *appError="teamForm.ageGroupId; let errorMsg">
+        <mat-error *appError="teamFormService.teamForm.ageGroupId; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field class="field" appearance="outline">
         <mat-label>Genre</mat-label>
-        <mat-select [formField]="teamForm.gender">
+        <mat-select [formField]="teamFormService.teamForm.gender">
           @for (gender of genders; track gender) {
             <mat-option [value]="gender">{{ gender | gender }}</mat-option>
           }
         </mat-select>
-        <mat-error *appError="teamForm.gender; let errorMsg">
+        <mat-error *appError="teamFormService.teamForm.gender; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
 
       <mat-form-field class="field" appearance="outline">
         <mat-label>Numéro d'équipe</mat-label>
-        <input matInput type="number" [formField]="teamForm.teamNumber"/>
-        <mat-error *appError="teamForm.teamNumber; let errorMsg">
+        <input matInput type="number" [formField]="teamFormService.teamForm.teamNumber"/>
+        <mat-error *appError="teamFormService.teamForm.teamNumber; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
 
     </div>
+    
     <mat-divider/>
-    <div class="table-toolbar">
-      <app-page-title title="Encadrants"/>
-      <button mat-fab type="button" extended aria-label="Ajouter un encadrant" (click)="addStaff()">
-        <mat-icon>add</mat-icon>
-        Ajouter
-      </button>
-    </div>
-
-    @for (staff of teamFormModelSignal().staffs; track $index || staff.id) {
-      <div class="optional-form-fields">
-        <div class="form-fields">
-          <mat-form-field class="field" appearance="outline">
-            <mat-label>Rôle</mat-label>
-            <mat-select [formField]="teamForm.staffs[$index].role">
-              @for (staffRole of staffRoles; track staffRole) {
-                <mat-option [value]="staffRole">
-                  {{ staffRole | roleStaff }}
-                </mat-option>
-              }
-            </mat-select>
-            <mat-error *appError="teamForm.staffs[$index].role; let errorMsg">
-              {{ errorMsg }}
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field class="field" appearance="outline">
-            <mat-label>Encadrant</mat-label>
-            <mat-select [formField]="teamForm.staffs[$index].staffId">
-              @for (staff of staffsSignal(); track staff.id) {
-                <mat-option [value]="staff.id">
-                  {{ staff.firstName }} {{ staff.lastName }}
-                </mat-option>
-              }
-              <mat-option (onSelectionChange)="addStaffMember($index)" [value]="null">Ajouter un encadrant</mat-option>
-            </mat-select>
-            <mat-error *appError="teamForm.staffs[$index].staffId; let errorMsg">
-              {{ errorMsg }}
-            </mat-error>
-          </mat-form-field>
-        </div>
-        <app-form-delete-button
-          [confirmMessage]="null"
-          [iconOnly]="!isHandsetSignal()"
-          (deleteConfirmed)="removeStaff($index)">
-        </app-form-delete-button>
-      </div>
-    }
+    <app-team-staff-fields [staffsArray]="teamFormService.teamForm.staffs" />
 
     <mat-divider/>
-    <div class="table-toolbar">
-      <app-page-title title="Créneaux d'entrainement"/>
-      <button mat-fab type="button" extended aria-label="Ajouter un créneau" (click)="addTrainingSession()">
-        <mat-icon>add</mat-icon>
-        Ajouter
-      </button>
-    </div>
-
-    @for (trainingSession of teamFormModelSignal().trainingSessions; track $index || trainingSession.id) {
-      <div class="optional-form-fields">
-        <div class="form-fields">
-          <mat-form-field class="field" appearance="outline">
-            <mat-label>Salle</mat-label>
-            <mat-select [formField]="teamForm.trainingSessions[$index].hallId">
-              @for (hall of hallsSignal(); track hall.id) {
-                <mat-option [value]="hall.id">{{ hall.name }}</mat-option>
-              }
-              <mat-option (onSelectionChange)="addHall($index)" [value]="null">Ajouter une salle</mat-option>
-            </mat-select>
-            <mat-error *appError="teamForm.trainingSessions[$index].hallId; let errorMsg">
-              {{ errorMsg }}
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="field" appearance="outline">
-            <mat-label>Jour</mat-label>
-            <mat-select [formField]="teamForm.trainingSessions[$index].dayOfWeek">
-              @for (dayOfWeek of dayOfWeeks; track dayOfWeek) {
-                <mat-option [value]="dayOfWeek">{{ dayOfWeek | dayOfWeek }}</mat-option>
-              }
-            </mat-select>
-            <mat-error *appError="teamForm.trainingSessions[$index].dayOfWeek; let errorMsg">
-              {{ errorMsg }}
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field class="field" appearance="outline">
-            <mat-label>Heure de début</mat-label>
-            <input matInput [matTimepicker]="pickerStart"
-                   [formField]="teamForm.trainingSessions[$index].timeSlot.startTime">
-            <mat-timepicker-toggle matSuffix [for]="pickerStart"></mat-timepicker-toggle>
-            <mat-timepicker #pickerStart></mat-timepicker>
-            <mat-error *appError="teamForm.trainingSessions[$index].timeSlot.startTime; let errorMsg">
-              {{ errorMsg }}
-            </mat-error>
-          </mat-form-field>
-          <mat-form-field class="field" appearance="outline">
-            <mat-label>Heure de fin</mat-label>
-            <input matInput [matTimepicker]="pickerEnd"
-                   [formField]="teamForm.trainingSessions[$index].timeSlot.endTime">
-            <mat-timepicker-toggle matSuffix [for]="pickerEnd"></mat-timepicker-toggle>
-            <mat-timepicker #pickerEnd></mat-timepicker>
-            <mat-error *appError="teamForm.trainingSessions[$index].timeSlot.endTime; let errorMsg">
-              {{ errorMsg }}
-            </mat-error>
-          </mat-form-field>
-        </div>
-        <app-form-delete-button
-          [confirmMessage]="null"
-          [iconOnly]="!isHandsetSignal()"
-          (deleteConfirmed)="removeTrainingSession($index)">
-        </app-form-delete-button>
-      </div>
-    }
+    <app-team-training-session-fields [sessionsArray]="teamFormService.teamForm.trainingSessions" />
+    
     <mat-divider/>
-
 
     <div class="table-toolbar">
       <app-page-title title="Photo d'équipe"/>
     </div>
-    @if (showExistingPhotoSignal()) {
+    @if (teamFormService.showExistingPhoto()) {
       <div class="image-preview-container">
 
-        <img class="image-preview" [ngSrc]="createImageSourceUrl(teamSignal()?.photoFileName)"
+        <img class="image-preview" [ngSrc]="createImageSourceUrl(teamFormService.teamSignal()?.photoFileName)"
              [height]="PHOTO_HEIGHT"
              [width]="PHOTO_WIDTH"
              alt="avatar" priority/>
@@ -200,9 +94,9 @@
         >
         </app-image-cropper>
         <app-image-cropper-preview
-          [isLoadingSignal]="blobIsLoadingSignal()"
-          [isErrorSignal]="!!blobErrorSignal()"
-          [previewBlob]="blobPhotoSignal()"
+          [isLoadingSignal]="teamFormService.photoIsLoading()"
+          [isErrorSignal]="!!teamFormService.photoError()"
+          [previewBlob]="teamFormService.photoBlob()"
           [previewHeightSignal]="PHOTO_HEIGHT"
           [previewWidthSignal]="PHOTO_WIDTH"
         >
@@ -210,7 +104,7 @@
       </div>
     }
 
-    @let globalErrors = teamForm().errors();
+    @let globalErrors = teamFormService.teamForm().errors();
     @if (globalErrors.length > 0) {
       @for (globalError of globalErrors; track globalError.kind) {
         <mat-error class="alert alert-danger">
@@ -221,10 +115,10 @@
 
     <div class="actions">
       <app-form-submit-button
-        [disabled]="teamForm().submitting() || teamForm().invalid()"
-        [content]="isCreateForm() ? 'Enregistrer' : 'Modifier'"
-        [submitting]="teamForm().submitting()"/>
-      <button mat-button type="submit" routerLink="/teams">Retour</button>
+        [disabled]="teamFormService.teamForm().submitting() || teamFormService.teamForm().invalid()"
+        [content]="(id() ? 'Modifier' : 'Enregistrer')"
+        [submitting]="teamFormService.teamForm().submitting()"/>
+      <button mat-button type="button" routerLink="/teams">Retour</button>
     </div>
   </form>
 </section>

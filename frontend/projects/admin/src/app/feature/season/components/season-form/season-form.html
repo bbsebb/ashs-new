@@ -5,44 +5,47 @@
     subtitle="Renseignez les dates de début et de fin pour l'enregistrement."
   />
 
-  <form class="content" autocomplete="off"  (submit)="submitForm($event); $event.preventDefault()">
-    <div class="form-fields">
-      <mat-form-field class="field field-full" appearance="outline">
-        <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input   [rangePicker]="picker">
-          <input matStartDate [formField]="seasonForm.startDate" placeholder="Start date">
-          <input matEndDate [formField]="seasonForm.endDate" placeholder="End date">
-        </mat-date-range-input>
-        <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-        <mat-error *appError="seasonForm.startDate; let errorMsg">
-          {{errorMsg}}
-        </mat-error>
-      </mat-form-field>
+  <form class="content" autocomplete="off" [formRoot]="seasonFormService.seasonForm">
+    <mat-dialog-content class="mat-typography">
+      <div class="form-fields">
+        <mat-form-field class="field field-full" appearance="outline">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate [formField]="seasonFormService.seasonForm.startDate" placeholder="Start date">
+            <input matEndDate [formField]="seasonFormService.seasonForm.endDate" placeholder="End date">
+          </mat-date-range-input>
+          <mat-hint>DD/MM/YYYY – DD/MM/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+          <mat-error *appError="seasonFormService.seasonForm.startDate; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-    </div>
-    @let globalErrors = seasonForm().errors();
-    @if (globalErrors.length > 0) {
-      @for(globalError of globalErrors; track globalError.kind) {
-        <mat-error class="alert alert-danger">
-          {{ globalError.message }}
-        </mat-error>
+      @let globalErrors = seasonFormService.seasonForm().errors();
+      @if (globalErrors.length > 0) {
+        @for (globalError of globalErrors; track globalError.kind) {
+          <mat-error class="alert alert-danger">
+            {{ globalError.message }}
+          </mat-error>
+        }
       }
-    }
+    </mat-dialog-content>
 
-    <div class="actions">
-
-      <app-form-submit-button
-        [disabled]="seasonForm().submitting() || seasonForm().invalid()"
-        [content]="isCreateForm() ? 'Enregistrer' : 'Modifier'"
-        [submitting]="seasonForm().submitting()"  />
-      <button mat-button type="button" (click)="cancel()">Retour</button>
-    </div>
+    <mat-dialog-actions align="end">
+      <div class="actions">
+        <app-form-submit-button
+          [disabled]="seasonFormService.seasonForm().submitting() || seasonFormService.seasonForm().invalid()"
+          [content]="seasonFormService.seasonSignal() ? 'Modifier' : 'Enregistrer'"
+          [submitting]="seasonFormService.seasonForm().submitting()"/>
+        <button mat-button type="button" (click)="cancel()">Retour</button>
+      </div>
+    </mat-dialog-actions>
   </form>
 </section>
 
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <lib-season-card [season]="seasonPreview()" />
+  <lib-season-card [season]="seasonFormService.seasonPreview()" />
 </details>

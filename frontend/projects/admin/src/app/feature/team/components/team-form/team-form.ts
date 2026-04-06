@@ -1,50 +1,32 @@
-import {Component, computed, effect, inject, input, linkedSignal, signal, Signal} from '@angular/core';
-import {applyEach, FieldTree, form, FormField, max, min, required, submit, validateTree} from '@angular/forms/signals';
+import {Component, computed, effect, inject, input} from '@angular/core';
+import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import {
-  AgeGroupStore,
-  CreateTeamDTO,
-  dateToLocalDateTime,
-  FormErrorHandleService,
-  HallsStore,
-  SeasonsStore,
-  StaffsStore,
-  TeamsStore,
-  UpdateTeamDTO
-} from '@shared-api'
-import {
   BreakpointService,
-  DayOfWeekPipe,
   FormFieldErrorDirective,
   FormSubmitButton,
   GenderPipe,
   ImageService,
-  NotificationService,
   PageTitle,
-  RoleStaffPipe,
   TeamCard
 } from '@shared-ui';
-import {DAY_OF_WEEKS, DayOfWeek, GENDER, Gender, STAFF_ROLE_VALUE, StaffRoleValue, Team, Season, AgeGroup, Hall, Staff} from '@shared-domain';
-import {Router, RouterLink} from '@angular/router';
+import {GENDER} from '@shared-domain';
+import {RouterLink} from '@angular/router';
 import {MatDivider} from '@angular/material/list';
-import {MatIcon} from '@angular/material/icon';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
-import {MatTimepicker, MatTimepickerInput, MatTimepickerToggle} from '@angular/material/timepicker';
-import {firstValueFrom, tap} from 'rxjs';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
 import {NgOptimizedImage} from '@angular/common';
-import {MatDialog, MatDialogModule} from '@angular/material/dialog';
-import {SeasonForm} from '../../../season/components/season-form/season-form';
-import {AgeGroupForm} from '../age-group-form/age-group-form';
-import {HallForm} from '../../../hall/components/hall-form/hall-form';
-import {StaffForm} from '../../../staff/components/staff-form/staff-form';
+import {TeamFormService} from '../../services/team-form.service';
+import {TeamStaffFields} from './team-staff-fields/team-staff-fields';
+import {TeamTrainingSessionFields} from './team-training-session-fields/team-training-session-fields';
 
 @Component({
   selector: 'app-team-form',
+  providers: [TeamFormService],
   imports: [
     FormField,
     MatButtonModule,
@@ -57,18 +39,14 @@ import {StaffForm} from '../../../staff/components/staff-form/staff-form';
     FormFieldErrorDirective,
     TeamCard,
     MatDivider,
-    MatIcon,
     FormDeleteButton,
-    MatTimepickerInput,
-    MatTimepickerToggle,
-    MatTimepicker,
     ImageCropper,
     ImageCropperPreview,
     NgOptimizedImage,
-    RoleStaffPipe,
-    DayOfWeekPipe,
     GenderPipe,
-    MatDialogModule
+    FormRoot,
+    TeamStaffFields,
+    TeamTrainingSessionFields
   ],
   templateUrl: './team-form.html',
   styleUrl: './team-form.scss',
@@ -78,100 +56,21 @@ export class TeamForm {
   readonly PHOTO_WIDTH = 450;
 
   private readonly _breakpointService = inject(BreakpointService);
-  private readonly _formErrorHandler = inject(FormErrorHandleService);
-  private readonly _teamsStore = inject(TeamsStore);
-  private readonly _staffsStore = inject(StaffsStore);
-  private readonly _seasonsStore = inject(SeasonsStore);
-  private readonly _ageGroupStore = inject(AgeGroupStore);
-  private readonly _hallsStore = inject(HallsStore);
-  private readonly _router = inject(Router);
-  private readonly _notificationService = inject(NotificationService);
   private readonly _imageService = inject(ImageService);
-  private readonly _dialogService = inject(MatDialog);
+  protected readonly teamFormService = inject(TeamFormService);
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
-  staffsSignal = this._staffsStore.staffsSignal;
-  seasonsSignal = this._seasonsStore.seasonsSignal;
-  hallsSignal = this._hallsStore.hallsSignal;
-  showExistingPhotoSignal = linkedSignal(() => !!this.teamSignal()?.photoFileName);
-  blobPhotoSignal = signal<Blob | undefined>(undefined)
-  blobIsLoadingSignal = signal<boolean>(false);
-  blobErrorSignal = signal<Error | undefined>(undefined);
-  isLoading = computed(() =>
-    this._teamsStore.isLoadingSignal() &&
-    this._seasonsStore.isLoadingSignal() &&
-    this._staffsStore.isLoadingSignal() &&
-    this._hallsStore.isLoadingSignal()
-  );
-  error = computed(() =>
-    !!this._teamsStore.errorSignal() &&
-    !!this._staffsStore.errorSignal() &&
-    !!this._seasonsStore.errorSignal() &&
-    !!this._hallsStore.errorSignal()
-  );
   id = input<string | undefined>(undefined);
-  teamSignal: Signal<Team | undefined> = this._teamsStore.teamById(this.id);
-  isCreateForm = computed(() => !this.id());
-
-  ageGroupsSignal = this._ageGroupStore.ageGroupsSignal;
+  
   genders = Object.values(GENDER);
-  staffRoles = Object.values(STAFF_ROLE_VALUE);
-  dayOfWeeks = Object.values(DAY_OF_WEEKS);
-
-
-  // Form model reset automatically when teamSignal changes
-  teamFormModelSignal = linkedSignal<TeamFormModel>(() => {
-    const team = this.teamSignal();
-    return {
-      seasonId: team?.seasonId ?? '',
-      ageGroupId: team?.ageGroup.id ?? '',
-      gender: team?.gender ?? 'Male',
-      teamNumber: team?.teamNumber ?? 1,
-      staffs: team?.staffs ?? [],
-      trainingSessions: team?.trainingSessions?.map((session) => ({
-        id: session.id,
-        hallId: session.hallId,
-        dayOfWeek: session.dayOfWeek,
-        timeSlot: {
-          startTime: session.timeSlot.startTime,
-          endTime: session.timeSlot.endTime
-        }
-      })) ?? []
-    };
-  });
-
-  teamForm = this.buildForm();
-
-  previewPhotoUrlSignal = computed(() => {
-    const blob = this.blobPhotoSignal();
-    return blob ? URL.createObjectURL(blob) : undefined;
-  });
-
-  teamPreview = computed(() => {
-    const model = this.teamFormModelSignal();
-    const ageGroup = this.ageGroupsSignal().find(ag => ag.id === model.ageGroupId) ?? {
-      id: '',
-      ageLimit: 0,
-      upperLimit: false,
-      name: ''
-    };
-
-    const previewUrl = this.previewPhotoUrlSignal();
-    const existingPhoto = this.showExistingPhotoSignal() ? this.teamSignal()?.photoFileName : null;
-
-    return {
-      id: this.id() ?? '',
-      seasonId: model.seasonId,
-      gender: model.gender,
-      teamNumber: model.teamNumber,
-      photoFileName: previewUrl ?? existingPhoto,
-      ageGroup: ageGroup,
-      staffs: model.staffs,
-      trainingSessions: model.trainingSessions
-    } as Team;
-  });
 
   constructor() {
+    // Initialize service with ID
+    effect(() => {
+      this.teamFormService.init(this.id());
+    });
+
+    // Cleanup preview URL
     effect((onCleanup) => {
       const url = this.previewPhotoUrlSignal();
       onCleanup(() => {
@@ -182,261 +81,34 @@ export class TeamForm {
     });
   }
 
-  private buildForm(): FieldTree<TeamFormModel> {
-    return form(this.teamFormModelSignal, (path) => {
-      required(path.seasonId, {message: 'La saison est requise.'});
-      required(path.ageGroupId, {message: 'La catégorie est requise.'});
-      required(path.gender, {message: 'Le genre est requis.'});
-      required(path.teamNumber, {message: "Le numéro d'équipe est requis."});
-      min(path.teamNumber, 1, {message: "Le numéro d'équipe doit être au moins 1."});
-      max(path.teamNumber, 9, {message: "Le numéro d'équipe ne doit pas dépasser 9."});
-      applyEach(path.staffs, (staff) => {
-        required(staff.role, {message: 'Le rôle est requis.'});
-        required(staff.staffId, {message: 'Un encadrant est requis'});
-      })
-      applyEach(path.trainingSessions, (session) => {
-        required(session.hallId, {message: 'La salle est requise'});
-        required(session.dayOfWeek, {message: 'Le jour de la semaine est requis'});
-        required(session.timeSlot.endTime, {message: 'Le créneau horaire est requis'});
-        required(session.timeSlot.startTime, {message: 'Le créneau horaire est requis'});
-        validateTree(session.timeSlot, (context) => {
-          const startTime = context.valueOf(session.timeSlot.startTime);
-          const endTime = context.valueOf(session.timeSlot.endTime);
-
-          if (startTime && endTime) {
-            const startMinutes = startTime.getHours() * 60 + startTime.getMinutes();
-            const endMinutes = endTime.getHours() * 60 + endTime.getMinutes();
-
-            if (startMinutes >= endMinutes) {
-              const error = {
-                kind: 'error',
-                message: 'L\'heure de fin doit être supérieure à l\'heure de début',
-              };
-              return [
-                {...error, fieldTree: context.fieldTree.startTime},
-                {...error, fieldTree: context.fieldTree.endTime}
-              ];
-            }
-          }
-          return null;
-        })
-      })
-    });
-
+  // Bridging photo state to service
+  onCroppedBlobChange($event: { error: Error | undefined, isLoading: boolean, value: Blob | undefined }) {
+    this.teamFormService.photoBlob.set($event.value);
+    this.teamFormService.photoIsLoading.set($event.isLoading);
+    this.teamFormService.photoError.set($event.error);
   }
 
-  protected submitForm(event: Event) {
-    event.preventDefault();
-    const oldTeam = this.teamSignal();
+  previewPhotoUrlSignal = computed(() => {
+    const blob = this.teamFormService.photoBlob();
+    return blob ? URL.createObjectURL(blob) : undefined;
+  });
 
+  teamPreview = computed(() => {
+    const preview = this.teamFormService.teamPreview();
+    const previewUrl = this.previewPhotoUrlSignal();
+    const existingPhoto = this.teamFormService.showExistingPhoto() ? this.teamFormService.teamSignal()?.photoFileName : null;
 
-    void submit(this.teamForm, async (form) => {
-      try {
+    return {
+      ...preview,
+      photoFileName: (previewUrl ?? existingPhoto) ?? null
+    };
+  });
 
-
-        let resultId: string | undefined;
-        if (!oldTeam) {
-          const createTeamDTO: CreateTeamDTO = {
-            ...this.teamFormModelSignal(),
-            staffs: this.teamFormModelSignal().staffs.map(staff => ({
-              role: staff.role,
-              staffId: staff.staffId
-            })),
-            trainingSessions: this.teamFormModelSignal().trainingSessions.map(session => ({
-              hallId: session.hallId,
-              dayOfWeek: session.dayOfWeek,
-              timeSlot: {
-                startTime: dateToLocalDateTime(session.timeSlot.startTime),
-                endTime: dateToLocalDateTime(session.timeSlot.endTime)
-              }
-            }))
-          };
-          const newTeam = await firstValueFrom(this._teamsStore.createTeam(createTeamDTO, this.blobPhotoSignal()).pipe(
-            tap(() => this._notificationService.show("L'équipe a été enregistrée", 'success'))
-          ));
-          resultId = newTeam.id;
-        } else {
-          const updateTeamDTO: UpdateTeamDTO = {
-            ...this.teamFormModelSignal(),
-            photoFileName: this.showExistingPhotoSignal() ? oldTeam.photoFileName : null,
-            staffs: this.teamFormModelSignal().staffs.map(staff => ({
-              id: staff.id?.trim() ? staff.id : null,
-              role: staff.role,
-              staffId: staff.staffId
-            })),
-            trainingSessions: this.teamFormModelSignal().trainingSessions.map(session => ({
-              id: session.id?.trim() ? session.id : null,
-              hallId: session.hallId,
-              dayOfWeek: session.dayOfWeek,
-              timeSlot: {
-                startTime: dateToLocalDateTime(session.timeSlot.startTime),
-                endTime: dateToLocalDateTime(session.timeSlot.endTime)
-              }
-            }))
-          };
-          const updatedTeam = await firstValueFrom(this._teamsStore.updateTeam(oldTeam.id, updateTeamDTO, this.blobPhotoSignal()).pipe(
-            tap(() => this._notificationService.show("L'équipe a été mise à jour", 'success'))
-          ));
-          resultId = updatedTeam.id;
-        }
-        await this._router.navigateByUrl(`/teams/${resultId}`);
-        return undefined;
-      } catch (error) {
-        const result = this._formErrorHandler.handleError(error, form);
-        if (typeof result === 'string') {
-          this._notificationService.show(result, 'error');
-          return undefined;
-        }
-        return result;
-      }
-    });
+  deletePhoto() {
+    this.teamFormService.showExistingPhoto.set(false);
   }
 
-  protected addSeason() {
-    const dialogReference = this._dialogService.open(SeasonForm, {
-      width: '600px',
-    });
-
-    void firstValueFrom(dialogReference.afterClosed()).then((result: Season | undefined) => {
-      if (result) {
-        this.teamFormModelSignal.update(currentModel => ({
-          ...currentModel,
-          seasonId: result.id
-        }));
-      }
-    });
-  }
-
-  protected addAgeGroup() {
-    const dialogReference = this._dialogService.open(AgeGroupForm, {
-      width: '600px',
-    });
-
-    void firstValueFrom(dialogReference.afterClosed()).then((result: AgeGroup | undefined) => {
-      if (result) {
-        this.teamFormModelSignal.update(currentModel => ({
-          ...currentModel,
-          ageGroupId: result.id
-        }));
-      }
-    });
-  }
-
-  protected addHall(trainingSessionIndex?: number) {
-    const dialogReference = this._dialogService.open(HallForm, {
-      width: '600px',
-    });
-
-    void firstValueFrom(dialogReference.afterClosed()).then((result: Hall | undefined) => {
-      if (result) {
-        if (trainingSessionIndex !== undefined) {
-          this.teamFormModelSignal.update(currentModel => {
-            const updatedSessions = [...currentModel.trainingSessions];
-            updatedSessions[trainingSessionIndex] = {
-              ...updatedSessions[trainingSessionIndex],
-              hallId: result.id
-            };
-            return {
-              ...currentModel,
-              trainingSessions: updatedSessions
-            };
-          });
-        }
-      }
-    });
-  }
-
-  protected addStaffMember(staffIndex: number) {
-    const dialogReference = this._dialogService.open(StaffForm, {
-      width: '600px',
-    });
-
-    void firstValueFrom(dialogReference.afterClosed()).then((result: Staff | undefined) => {
-      if (result) {
-        this.teamFormModelSignal.update(currentModel => {
-          const updatedStaffs = [...currentModel.staffs];
-          updatedStaffs[staffIndex] = {
-            ...updatedStaffs[staffIndex],
-            staffId: result.id
-          };
-          return {
-            ...currentModel,
-            staffs: updatedStaffs
-          };
-        });
-      }
-    });
-  }
-
-  protected addStaff() {
-    this.teamFormModelSignal.update(teamFormModel => ({
-      ...teamFormModel,
-      staffs: [...teamFormModel.staffs, {id: '', role: 'COACH', staffId: ''}]
-    }))
-  }
-
-  protected addTrainingSession() {
-    this.teamFormModelSignal.update(teamFormModel => ({
-      ...teamFormModel,
-      trainingSessions: [...teamFormModel.trainingSessions, {
-        id: '',
-        hallId: '',
-        dayOfWeek: 'MONDAY',
-        timeSlot: {startTime: new Date(), endTime: new Date()}
-      }]
-    }))
-  }
-
-
-  protected removeStaff(index: number) {
-    this.teamFormModelSignal.update(teamFormModel => ({
-      ...teamFormModel,
-      staffs: teamFormModel.staffs.filter((_, currentIndex) => currentIndex !== index)
-    }));
-  }
-
-
-  protected removeTrainingSession($index: number) {
-
-    this.teamFormModelSignal.update(teamFormModel => ({
-      ...teamFormModel,
-      trainingSessions: teamFormModel.trainingSessions.filter((_, currentIndex) => currentIndex !== $index)
-    }));
-  }
-
-
-  protected onCroppedBlobChange($event: { error: Error | undefined, isLoading: boolean, value: Blob | undefined }) {
-    this.blobPhotoSignal.set($event.value);
-    this.blobIsLoadingSignal.set($event.isLoading);
-    this.blobErrorSignal.set($event.error);
-  }
-
-  protected deletePhoto() {
-    this.showExistingPhotoSignal.set(false);
-  }
-
-  protected createImageSourceUrl(photoFileName: string | null | undefined) {
+  createImageSourceUrl(photoFileName: string | null | undefined) {
     return this._imageService.createImageSourceUrl(photoFileName);
   }
-}
-
-interface TeamFormModel {
-  seasonId: string;
-  ageGroupId: string;
-  gender: Gender;
-  teamNumber: number;
-  staffs: {
-    id: string,
-    role: StaffRoleValue,
-    staffId: string
-  }[],
-  trainingSessions: {
-    id: string;
-    hallId: string;
-    dayOfWeek: DayOfWeek;
-    timeSlot: {
-      startTime: Date,
-      endTime: Date
-    };
-  }[]
 }

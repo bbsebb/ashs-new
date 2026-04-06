@@ -11,7 +11,7 @@ export class FormErrorHandleService {
   /**
    * Méthode principale à appeler dans le catch
    */
-  handleError<T>(error: unknown, form: FieldTree<T>): ValidationError.WithFieldTree[] | string | undefined {
+  handleError<T>(error: unknown, form: FieldTree<T>): ValidationError.WithFieldTree[] | string {
     console.error('Erreur attrapée par le service :', error);
 
     // 1) Cas HTTP avec payload exploitable

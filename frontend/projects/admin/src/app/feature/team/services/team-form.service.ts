@@ -1,0 +1,306 @@
+import {computed, inject, Injectable, linkedSignal, signal, Signal} from '@angular/core';
+import {applyEach, FieldTree, form, max, min, required, validateTree} from '@angular/forms/signals';
+import {
+  AgeGroupStore,
+  dateToLocalDateTime,
+  FormErrorHandleService,
+  HallsStore,
+  SeasonsStore,
+  StaffsStore,
+  TeamsStore
+} from '@shared-api'
+import {NotificationService} from '@shared-ui';
+import {DayOfWeek, Gender, StaffRoleValue, Team} from '@shared-domain';
+import {Router} from '@angular/router';
+import {catchError, firstValueFrom, map, of, tap} from 'rxjs';
+import {AdminDialogService} from '../../../shared/services/admin-dialog.service';
+
+export interface TeamFormModel {
+  seasonId: string;
+  ageGroupId: string;
+  gender: Gender;
+  teamNumber: number;
+  staffs: {
+    id: string,
+    role: StaffRoleValue,
+    staffId: string
+  }[],
+  trainingSessions: {
+    id: string;
+    hallId: string;
+    dayOfWeek: DayOfWeek;
+    timeSlot: {
+      startTime: Date,
+      endTime: Date
+    };
+  }[]
+}
+
+@Injectable()
+export class TeamFormService {
+  private readonly _formErrorHandler = inject(FormErrorHandleService);
+  private readonly _teamsStore = inject(TeamsStore);
+  private readonly _staffsStore = inject(StaffsStore);
+  private readonly _seasonsStore = inject(SeasonsStore);
+  private readonly _ageGroupStore = inject(AgeGroupStore);
+  private readonly _hallsStore = inject(HallsStore);
+  private readonly _router = inject(Router);
+  private readonly _notificationService = inject(NotificationService);
+  private readonly _adminDialogs = inject(AdminDialogService);
+
+  private _teamId = signal<string | undefined>(undefined);
+
+  readonly teamSignal: Signal<Team | undefined> = this._teamsStore.teamById(this._teamId);
+  readonly staffsSignal = this._staffsStore.staffsSignal;
+  readonly seasonsSignal = this._seasonsStore.seasonsSignal;
+  readonly hallsSignal = this._hallsStore.hallsSignal;
+  readonly ageGroupsSignal = this._ageGroupStore.ageGroupsSignal;
+
+  readonly teamFormModelSignal = linkedSignal<TeamFormModel>(() => {
+    const team = this.teamSignal();
+    return {
+      seasonId: team?.seasonId ?? '',
+      ageGroupId: team?.ageGroup.id ?? '',
+      gender: team?.gender ?? 'Male',
+      teamNumber: team?.teamNumber ?? 1,
+      staffs: team?.staffs ?? [],
+      trainingSessions: team?.trainingSessions?.map((session) => ({
+        id: session.id,
+        hallId: session.hallId,
+        dayOfWeek: session.dayOfWeek,
+        timeSlot: {
+          startTime: session.timeSlot.startTime,
+          endTime: session.timeSlot.endTime
+        }
+      })) ?? []
+    };
+  });
+
+  readonly teamForm = this.buildForm();
+
+  readonly teamPreview = computed(() => {
+    const model = this.teamFormModelSignal();
+    const ageGroup = this.ageGroupsSignal().find(ag => ag.id === model.ageGroupId) ?? {
+      id: '',
+      ageLimit: 0,
+      upperLimit: false,
+      name: ''
+    };
+
+    return {
+      id: this._teamId() ?? '',
+      seasonId: model.seasonId,
+      gender: model.gender,
+      teamNumber: model.teamNumber,
+      ageGroup: ageGroup,
+      staffs: model.staffs,
+      trainingSessions: model.trainingSessions
+    } as Team;
+  });
+
+  init(id: string | undefined) {
+    this._teamId.set(id);
+  }
+
+  private buildForm(): FieldTree<TeamFormModel> {
+    return form(this.teamFormModelSignal, (path) => {
+      required(path.seasonId, {message: 'La saison est requise.'});
+      required(path.ageGroupId, {message: 'La catégorie est requise.'});
+      required(path.gender, {message: 'Le genre est requis.'});
+      required(path.teamNumber, {message: "Le numéro d'équipe est requis."});
+      min(path.teamNumber, 1, {message: "Le numéro d'équipe doit être au moins 1."});
+      max(path.teamNumber, 9, {message: "Le numéro d'équipe ne doit pas dépasser 9."});
+      applyEach(path.staffs, (staff) => {
+        required(staff.role, {message: 'Le rôle est requis.'});
+        required(staff.staffId, {message: 'Un encadrant est requis'});
+      })
+      applyEach(path.trainingSessions, (session) => {
+        required(session.hallId, {message: 'La salle est requise'});
+        required(session.dayOfWeek, {message: 'Le jour de la semaine est requis'});
+        required(session.timeSlot.endTime, {message: 'Le créneau horaire est requis'});
+        required(session.timeSlot.startTime, {message: 'Le créneau horaire est requis'});
+        validateTree(session.timeSlot, (context) => {
+          const startTime = context.valueOf(session.timeSlot.startTime);
+          const endTime = context.valueOf(session.timeSlot.endTime);
+
+          if (startTime && endTime) {
+            const startMinutes = startTime.getHours() * 60 + startTime.getMinutes();
+            const endMinutes = endTime.getHours() * 60 + endTime.getMinutes();
+
+            if (startMinutes >= endMinutes) {
+              const error = {
+                kind: 'error',
+                message: 'L\'heure de fin doit être supérieure à l\'heure de début',
+              };
+              return [
+                {...error, fieldTree: context.fieldTree.startTime},
+                {...error, fieldTree: context.fieldTree.endTime}
+              ];
+            }
+          }
+          return null;
+        })
+      })
+    }, {
+      submission: {
+        action: (form) => {
+          const oldTeam = this.teamSignal();
+          const model = this.teamFormModelSignal();
+          // Photo logic will be handled by the component and passed to the store
+          // But wait, the component needs to set the blob in the service or
+          // we need a way to access it here.
+          // Let's assume the component sets it in the service.
+          const photo = this.photoBlob();
+
+          const staffs = model.staffs.map(staff => ({
+            id: staff.id?.trim() ? staff.id : null,
+            role: staff.role,
+            staffId: staff.staffId
+          }));
+
+          const trainingSessions = model.trainingSessions.map(session => ({
+            id: session.id?.trim() ? session.id : null,
+            hallId: session.hallId,
+            dayOfWeek: session.dayOfWeek,
+            timeSlot: {
+              startTime: dateToLocalDateTime(session.timeSlot.startTime),
+              endTime: dateToLocalDateTime(session.timeSlot.endTime)
+            }
+          }));
+
+          const request$ = oldTeam
+            ? this._teamsStore.updateTeam(oldTeam.id, {
+              ...model,
+              photoFileName: this.showExistingPhoto() ? oldTeam.photoFileName : null,
+              staffs,
+              trainingSessions
+            }, photo)
+            : this._teamsStore.createTeam({...model, staffs, trainingSessions}, photo);
+
+          return firstValueFrom(request$.pipe(
+            tap((result) => {
+              this._notificationService.show(`L'équipe a été ${oldTeam ? 'mise à jour' : 'enregistrée'}`, 'success');
+              void this._router.navigateByUrl(`/teams/${result.id}`);
+            }),
+            map(() => undefined),
+            catchError(error => {
+              const result = this._formErrorHandler.handleError(error, form);
+              if (typeof result === 'string') {
+                this._notificationService.show(result, 'error');
+                return of(undefined);
+              }
+              return of(result);
+            })
+          ));
+        }
+      }
+    });
+  }
+
+  // Photo management
+  photoBlob = signal<Blob | undefined>(undefined);
+  photoIsLoading = signal<boolean>(false);
+  photoError = signal<Error | undefined>(undefined);
+  showExistingPhoto = linkedSignal(() => !!this.teamSignal()?.photoFileName);
+
+  // Dialog methods
+  addSeason() {
+    this._adminDialogs.openSeasonForm().subscribe((result) => {
+      if (result) {
+        queueMicrotask(() => {
+          this.teamFormModelSignal.update(currentModel => ({
+            ...currentModel,
+            seasonId: result.id
+          }));
+        });
+      }
+    });
+  }
+
+  addAgeGroup() {
+    this._adminDialogs.openAgeGroupForm().subscribe((result) => {
+      if (result) {
+        queueMicrotask(() => {
+          this.teamFormModelSignal.update(currentModel => ({
+            ...currentModel,
+            ageGroupId: result.id
+          }));
+        });
+      }
+    });
+  }
+
+  addHall(trainingSessionIndex?: number) {
+    this._adminDialogs.openHallForm().subscribe((result) => {
+      if (result && trainingSessionIndex !== undefined) {
+        queueMicrotask(() => {
+          this.teamFormModelSignal.update(currentModel => {
+            const updatedSessions = [...currentModel.trainingSessions];
+            updatedSessions[trainingSessionIndex] = {
+              ...updatedSessions[trainingSessionIndex],
+              hallId: result.id
+            };
+            return {
+              ...currentModel,
+              trainingSessions: updatedSessions
+            };
+          });
+        });
+      }
+    });
+  }
+
+  addStaffMember(staffIndex: number) {
+    this._adminDialogs.openStaffForm().subscribe((result) => {
+      if (result) {
+        queueMicrotask(() => {
+          this.teamFormModelSignal.update(currentModel => {
+            const updatedStaffs = [...currentModel.staffs];
+            updatedStaffs[staffIndex] = {
+              ...updatedStaffs[staffIndex],
+              staffId: result.id
+            };
+            return {
+              ...currentModel,
+              staffs: updatedStaffs
+            };
+          });
+        });
+      }
+    });
+  }
+
+  // Array management
+  addStaff() {
+    this.teamFormModelSignal.update(teamFormModel => ({
+      ...teamFormModel,
+      staffs: [...teamFormModel.staffs, {id: '', role: 'COACH', staffId: ''}]
+    }))
+  }
+
+  removeStaff(index: number) {
+    this.teamFormModelSignal.update(teamFormModel => ({
+      ...teamFormModel,
+      staffs: teamFormModel.staffs.filter((_, currentIndex) => currentIndex !== index)
+    }));
+  }
+
+  addTrainingSession() {
+    this.teamFormModelSignal.update(teamFormModel => ({
+      ...teamFormModel,
+      trainingSessions: [...teamFormModel.trainingSessions, {
+        id: '',
+        hallId: '',
+        dayOfWeek: 'MONDAY',
+        timeSlot: {startTime: new Date(), endTime: new Date()}
+      }]
+    }))
+  }
+
+  removeTrainingSession(index: number) {
+    this.teamFormModelSignal.update(teamFormModel => ({
+      ...teamFormModel,
+      trainingSessions: teamFormModel.trainingSessions.filter((_, currentIndex) => currentIndex !== index)
+    }));
+  }
+}

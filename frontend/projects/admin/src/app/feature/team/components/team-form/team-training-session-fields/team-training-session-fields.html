@@ -1,0 +1,63 @@
+<div class="table-toolbar">
+  <app-page-title title="Créneaux d'entrainement"/>
+  <button mat-fab type="button" extended aria-label="Ajouter un créneau" (click)="teamFormService.addTrainingSession()">
+    <mat-icon>add</mat-icon>
+    Ajouter
+  </button>
+</div>
+
+@for (trainingSession of sessionsArray(); track $index) {
+  <div class="optional-form-fields">
+    <div class="form-fields">
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Salle</mat-label>
+        <mat-select [formField]="sessionsArray()[$index].hallId">
+          @for (hall of hallsSignal(); track hall.id) {
+            <mat-option [value]="hall.id">{{ hall.name }}</mat-option>
+          }
+          <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addHall($index)" [value]="null">Ajouter une salle</mat-option>
+        </mat-select>
+        <mat-error *appError="sessionsArray()[$index].hallId; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Jour</mat-label>
+        <mat-select [formField]="sessionsArray()[$index].dayOfWeek">
+          @for (dayOfWeek of dayOfWeeks; track dayOfWeek) {
+            <mat-option [value]="dayOfWeek">{{ dayOfWeek | dayOfWeek }}</mat-option>
+          }
+        </mat-select>
+        <mat-error *appError="sessionsArray()[$index].dayOfWeek; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Heure de début</mat-label>
+        <input matInput [matTimepicker]="pickerStart"
+               [formField]="sessionsArray()[$index].timeSlot.startTime">
+        <mat-timepicker-toggle matSuffix [for]="pickerStart"></mat-timepicker-toggle>
+        <mat-timepicker #pickerStart></mat-timepicker>
+        <mat-error *appError="sessionsArray()[$index].timeSlot.startTime; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Heure de fin</mat-label>
+        <input matInput [matTimepicker]="pickerEnd"
+               [formField]="sessionsArray()[$index].timeSlot.endTime">
+        <mat-timepicker-toggle matSuffix [for]="pickerEnd"></mat-timepicker-toggle>
+        <mat-timepicker #pickerEnd></mat-timepicker>
+        <mat-error *appError="sessionsArray()[$index].timeSlot.endTime; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <app-form-delete-button
+      [confirmMessage]="null"
+      [iconOnly]="!isHandsetSignal()"
+      (deleteConfirmed)="teamFormService.removeTrainingSession($index)">
+    </app-form-delete-button>
+  </div>
+}

@@ -1,0 +1,16 @@
+<div class="admin-page-container">
+  <div class="page-header">
+    <app-page-title
+      [title]="title()"
+      [subtitle]="subtitle()"
+      [eyebrow]="eyebrow()"
+    />
+    <div class="header-actions">
+      <ng-content select="[header-actions]"></ng-content>
+    </div>
+  </div>
+
+  <main class="page-content">
+    <ng-content></ng-content>
+  </main>
+</div>

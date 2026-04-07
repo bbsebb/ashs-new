@@ -3,60 +3,60 @@
 } @else if (errorSignal()) {
   <app-error-data dataName="équipes" (onRetry)="retry()"/>
 } @else {
-  <div class="table-toolbar">
-    <app-page-title title="Équipes" subtitle="Gestion des équipes"/>
-    <a mat-fab extended routerLink="/teams/create" aria-label="Ajouter une équipe">
+  <app-admin-page-container title="Équipes" subtitle="Gestion des équipes">
+    <a mat-fab extended routerLink="/teams/create" aria-label="Ajouter une équipe" header-actions>
       <mat-icon>add</mat-icon>
       Ajouter
     </a>
-  </div>
-  <div class="table-container">
-    <table mat-table [dataSource]="dataSource" matSort>
 
-      <ng-container matColumnDef="category">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Catégorie</th>
-        <td mat-cell *matCellDef="let team" data-label="Catégorie">
-          {{ team.ageGroup.isUpperLimit ? 'U' : '' }}{{ team.ageGroup.ageLimit }}
-        </td>
-      </ng-container>
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort>
 
-      <ng-container matColumnDef="gender">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Genre</th>
-        <td mat-cell *matCellDef="let team" data-label="Genre"> {{ team.gender }}</td>
-      </ng-container>
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Catégorie</th>
+          <td mat-cell *matCellDef="let team" data-label="Catégorie">
+            {{ team.ageGroup.isUpperLimit ? 'U' : '' }}{{ team.ageGroup.ageLimit }}
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="teamNumber">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> N°</th>
-        <td mat-cell *matCellDef="let team" data-label="N°"> {{ team.teamNumber }}</td>
-      </ng-container>
+        <ng-container matColumnDef="gender">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Genre</th>
+          <td mat-cell *matCellDef="let team" data-label="Genre"> {{ team.gender }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions</th>
-        <td mat-cell *matCellDef="let team" data-label="Actions">
-          <button mat-icon-button type="button" aria-label="Voir" routerLink="/teams/{{team.id}}">
-            <mat-icon>visibility</mat-icon>
-          </button>
-          <button mat-icon-button type="button" aria-label="Modifier" routerLink="/teams/{{team.id}}/update">
-            <mat-icon>edit</mat-icon>
-          </button>
+        <ng-container matColumnDef="teamNumber">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> N°</th>
+          <td mat-cell *matCellDef="let team" data-label="N°"> {{ team.teamNumber }}</td>
+        </ng-container>
 
-          <app-form-delete-button
-            confirmMessage="Êtes-vous sûr de vouloir supprimer cette équipe ?"
-            [iconOnly]="true"
-            (deleteConfirmed)="onDelete(team.id)">
-          </app-form-delete-button>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions</th>
+          <td mat-cell *matCellDef="let team" data-label="Actions">
+            <button mat-icon-button type="button" aria-label="Voir" routerLink="/teams/{{team.id}}">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button type="button" aria-label="Modifier" routerLink="/teams/{{team.id}}/update">
+              <mat-icon>edit</mat-icon>
+            </button>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
-      <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" [attr.colspan]="displayedColumns().length">
-          Aucune équipe à afficher.
-        </td>
-      </tr>
-    </table>
+            <app-form-delete-button
+              confirmMessage="Êtes-vous sûr de vouloir supprimer cette équipe ?"
+              [iconOnly]="true"
+              (deleteConfirmed)="onDelete(team.id)">
+            </app-form-delete-button>
+          </td>
+        </ng-container>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-  </div>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+        <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns().length">
+            Aucune équipe à afficher.
+          </td>
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  </app-admin-page-container>
 }

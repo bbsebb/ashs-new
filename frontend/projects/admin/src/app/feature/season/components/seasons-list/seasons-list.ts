@@ -3,7 +3,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {LayoutService, SeasonsStore} from '@shared-api';
-import {ErrorData, LoadingData, NotificationService, PageTitle} from '@shared-ui';
+import {AdminPageContainer, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {MatFabButton, MatIconButton} from '@angular/material/button';
 import {RouterLink} from '@angular/router';
 import {MatIcon} from '@angular/material/icon';
@@ -30,7 +30,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
 
 @Component({
   selector: 'app-seasons-list',
-  imports: [MatFormFieldModule, MatSortHeader, MatInputModule, MatDatepickerModule, LoadingData, ErrorData, PageTitle, MatFabButton, RouterLink, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, MatIconButton, MatHeaderRow, MatRow, MatHeaderRowDef, MatRowDef, MatNoDataRow, MatPaginator, DatePipe, FormDeleteButton],
+  imports: [MatFormFieldModule, MatSortHeader, MatInputModule, MatDatepickerModule, LoadingData, ErrorData, AdminPageContainer, MatFabButton, RouterLink, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, MatIconButton, MatHeaderRow, MatRow, MatHeaderRowDef, MatRowDef, MatNoDataRow, MatPaginator, DatePipe, FormDeleteButton],
   templateUrl: './seasons-list.html',
   styleUrl: './seasons-list.scss',
 })

@@ -1,6 +1,6 @@
 import {Component, computed, effect, inject, viewChild} from '@angular/core';
 import {LayoutService, StaffsStore} from '@shared-api';
-import {ErrorData, LoadingData, NotificationService, PageTitle} from '@shared-ui';
+import {AdminPageContainer, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {
   MatCell,
   MatCellDef,
@@ -28,6 +28,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   imports: [
     LoadingData,
     ErrorData,
+    AdminPageContainer,
     MatTable,
     MatColumnDef,
     MatHeaderCell,
@@ -46,7 +47,6 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
     MatIcon,
     MatNoDataRow,
     MatFabButton,
-    PageTitle,
     FormDeleteButton
   ],
   templateUrl: './staffs-list.html',

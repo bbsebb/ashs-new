@@ -26,8 +26,6 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration/__root
-    create-schemas: true
     schemas: hall_schema, staff_schema, team_schema, flyway_schema, season_schema, modulith_schema
     default-schema: flyway_schema
 
@@ -42,6 +40,8 @@ spring:
     events:
       jdbc:
         schema: modulith_schema
+        schema-initialization:
+          enabled: false
 
   security:
     oauth2:

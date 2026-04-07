@@ -9,6 +9,8 @@ spring:
       file: ./backend/compose.yaml
 
   flyway:
+    enabled: true
+    create-schemas: true
     clean-disabled: false
     validate-on-migrate: false
 

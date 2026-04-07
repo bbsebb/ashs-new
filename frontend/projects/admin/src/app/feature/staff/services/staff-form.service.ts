@@ -1,4 +1,4 @@
-import {computed, effect, inject, Injectable, linkedSignal, signal, Signal} from '@angular/core';
+import {computed, effect, inject, Injectable, linkedSignal, resource, signal, Signal} from '@angular/core';
 import {email, FieldTree, form, pattern, required, SchemaPathTree} from '@angular/forms/signals';
 import {CreateStaffDTO, FormErrorHandleService, StaffsStore, UpdateStaffDTO} from '@shared-api'
 import {NotificationService} from '@shared-ui';
@@ -36,7 +36,23 @@ export class StaffFormService {
   readonly blobErrorSignal = signal<Error | undefined>(undefined);
   readonly showExistingAvatarSignal = linkedSignal(() => !!this.staffSignal()?.avatarFileName);
 
-  readonly previewAvatarUrlSignal = signal<string | undefined>(undefined);
+  /**
+   * Resource managing the lifecycle of the object URL for the avatar preview.
+   * This replaces the manual effect and ensures proper cleanup.
+   */
+  readonly previewAvatarResource = resource({
+    params: () => this.blobAvatarSignal(),
+    loader: async ({params: blob}) => {
+      if (!blob) return undefined;
+      const url = URL.createObjectURL(blob);
+      return {
+        url,
+        cleanup: () => URL.revokeObjectURL(url)
+      };
+    }
+  });
+
+  readonly previewAvatarUrlSignal = computed(() => this.previewAvatarResource.value()?.url);
 
   readonly staffPreview = computed(() => {
     const previewUrl = this.previewAvatarUrlSignal();
@@ -54,23 +70,19 @@ export class StaffFormService {
 
   constructor() {
     this.staffForm = this._buildForm();
-    this._setupAvatarCleanup();
+    this._initializeAvatarCleanup();
   }
 
   init(id: string | undefined) {
     this._staffId.set(id);
   }
 
-  private _setupAvatarCleanup() {
+  private _initializeAvatarCleanup() {
     effect((onCleanup) => {
-      const blob = this.blobAvatarSignal();
-      const url = blob ? URL.createObjectURL(blob) : undefined;
-      this.previewAvatarUrlSignal.set(url);
-      onCleanup(() => {
-        if (url) {
-          URL.revokeObjectURL(url);
-        }
-      });
+      const resourceValue = this.previewAvatarResource.value();
+      if (resourceValue) {
+        onCleanup(() => resourceValue.cleanup());
+      }
     });
   }
 
@@ -101,7 +113,7 @@ export class StaffFormService {
 
     try {
       const result = await firstValueFrom(request$);
-      this._notificationService.show(`Le membre de l'encadrement a été ${!oldStaff ? 'enregistré' : 'mis à jour'}`, 'success');
+      this._notificationService.show(`Le membre de l'encadrement a été ${!oldStaff ? 'enregistré' : 'mise à jour'}`, 'success');
       
       if (this._dialogReference) {
         this._dialogReference.close(result);

@@ -7,7 +7,8 @@ import {
   HallsStore,
   SeasonsStore,
   StaffsStore,
-  TeamsStore
+  TeamsStore,
+  validateTimeRange
 } from '@shared-api'
 import {NotificationService} from '@shared-ui';
 import {DayOfWeek, Gender, StaffRoleValue, Team} from '@shared-domain';
@@ -120,29 +121,7 @@ export class TeamFormService {
       required(session.timeSlot.endTime, {message: 'Le créneau horaire est requis'});
       required(session.timeSlot.startTime, {message: 'Le créneau horaire est requis'});
 
-      validateTree(session.timeSlot, (context) => {
-        const startTime = context.valueOf(session.timeSlot.startTime);
-        const endTime = context.valueOf(session.timeSlot.endTime);
-
-        if (startTime && endTime) {
-          const startMinutes = startTime.getHours() * 60 + startTime.getMinutes();
-          const endMinutes = endTime.getHours() * 60 + endTime.getMinutes();
-
-          if (startMinutes >= endMinutes) {
-            const error = {
-              kind: 'error',
-              message: "L'heure de fin doit être supérieure à l'heure de début",
-            };
-
-            return [
-              {...error, fieldTree: context.fieldTree.startTime},
-              {...error, fieldTree: context.fieldTree.endTime}
-            ];
-          }
-        }
-
-        return null;
-      });
+      validateTree(session.timeSlot, (context) => validateTimeRange(context));
     });
   }
 

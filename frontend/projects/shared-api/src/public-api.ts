@@ -1,6 +1,7 @@
 export * from './lib/form-error-handle-service';
 export * from './lib/configs/app-config';
 export * from './lib/utils/date-mapper';
+export * from './lib/utils/time-validators';
 
 // Contact
 export * from './lib/services/contact/contact.gateway';

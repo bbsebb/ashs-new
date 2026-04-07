@@ -62,7 +62,7 @@
     <mat-dialog-actions align="end">
       <div class="actions">
         <app-form-submit-button
-          [disabled]="hallFormService.hallForm().submitting() || hallFormService.hallForm().invalid()"
+          [disabled]="hallFormService.isSubmitDisabledSignal()"
           [content]="hallFormService.hallSignal() ? 'Modifier' : 'Enregistrer'"
           [submitting]="hallFormService.hallForm().submitting()"/>
         <button mat-button type="button" (click)="cancel()">Retour</button>

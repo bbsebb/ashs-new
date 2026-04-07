@@ -49,6 +49,7 @@ export class StaffFormService {
     } as Staff;
   });
 
+  readonly isSubmitDisabledSignal = computed(() => this.staffForm().submitting() || this.staffForm().invalid());
   readonly staffForm: FieldTree<StaffFormModel>;
 
   constructor() {

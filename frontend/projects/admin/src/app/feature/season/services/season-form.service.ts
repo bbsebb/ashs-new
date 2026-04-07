@@ -37,6 +37,7 @@ export class SeasonFormService {
   });
 
   readonly seasonForm: FieldTree<SeasonFormModel>;
+  readonly isSubmitDisabledSignal = computed(() => this.seasonForm().submitting() || this.seasonForm().invalid());
   readonly seasonPreview = computed(() => this._mapToSeason(this.seasonModelSignal()));
 
   constructor() {

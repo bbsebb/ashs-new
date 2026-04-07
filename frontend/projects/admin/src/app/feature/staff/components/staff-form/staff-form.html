@@ -86,7 +86,7 @@
     <mat-dialog-actions align="end">
       <div class="actions">
         <app-form-submit-button
-          [disabled]="staffFormService.staffForm().submitting() || staffFormService.staffForm().invalid()"
+          [disabled]="staffFormService.isSubmitDisabledSignal()"
           [content]="staffFormService.staffSignal() ? 'Modifier' : 'Enregistrer'"
           [submitting]="staffFormService.staffForm().submitting()"/>
         <button mat-button type="button" (click)="cancel()">Retour</button>

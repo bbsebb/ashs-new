@@ -48,7 +48,7 @@
     <mat-dialog-actions align="end">
       <div class="actions">
         <app-form-submit-button
-          [disabled]="ageGroupFormService.ageGroupForm().submitting() || ageGroupFormService.ageGroupForm().invalid()"
+          [disabled]="ageGroupFormService.isSubmitDisabledSignal()"
           content="Enregistrer"
           [submitting]="ageGroupFormService.ageGroupForm().submitting()"/>
         <button mat-button type="button" (click)="cancel()">Retour</button>

@@ -33,6 +33,7 @@ export class HallFormService {
   });
 
   readonly hallPreview = computed(() => this.hallModelSignal() as Hall);
+  readonly isSubmitDisabledSignal = computed(() => this.hallForm().submitting() || this.hallForm().invalid());
   readonly hallForm: FieldTree<HallFormModel>;
 
   constructor() {

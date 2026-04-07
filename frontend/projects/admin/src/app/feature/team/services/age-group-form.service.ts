@@ -23,6 +23,7 @@ export class AgeGroupFormService {
   });
 
   readonly ageGroupPreviewSignal = computed(() => this._preview(this.ageGroupModelSignal()));
+  readonly isSubmitDisabledSignal = computed(() => this.ageGroupForm().submitting() || this.ageGroupForm().invalid());
   readonly ageGroupForm: FieldTree<AgeGroupFormModel>;
 
   constructor() {

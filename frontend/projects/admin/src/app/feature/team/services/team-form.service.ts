@@ -83,6 +83,7 @@ export class TeamFormService {
   });
 
   // On initialise le formulaire APRES les méthodes pour éviter le problème d'ordre d'initialisation
+  readonly isSubmitDisabledSignal = computed(() => this.teamForm().submitting() || this.teamForm().invalid());
   readonly teamForm: FieldTree<TeamFormModel>;
 
   constructor() {

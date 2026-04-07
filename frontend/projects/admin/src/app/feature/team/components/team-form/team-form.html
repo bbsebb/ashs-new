@@ -115,7 +115,7 @@
 
     <div class="actions">
       <app-form-submit-button
-        [disabled]="teamFormService.teamForm().submitting() || teamFormService.teamForm().invalid()"
+        [disabled]="teamFormService.isSubmitDisabledSignal()"
         [content]="(id() ? 'Modifier' : 'Enregistrer')"
         [submitting]="teamFormService.teamForm().submitting()"/>
       <button mat-button type="button" routerLink="/teams">Retour</button>

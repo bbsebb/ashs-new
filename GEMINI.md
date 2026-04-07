@@ -9,8 +9,9 @@
 - **Langue :** Réponds toujours en français.
 - **Ton :** Direct et technique. Pas de préambules inutiles.
 - **Conventions de Code Générales :**
-    - **Style :** Privilégie des noms de variables longs et explicites. **Aucune abréviation autorisée** (ex: utilise
-      `userAuthenticationStatus` et non `authStatus`).
+    - **Style :** Privilégie des noms de variables longs et explicites.
+      - **Exception acceptée :** Les abréviations universelles et standards du métier (`id`, `init`, `url`, `config`, `dto`) sont autorisées.
+      - **Interdiction :** Aucune autre abréviation contextuelle n'est autorisée (ex: utilise `userAuthenticationStatus` et non `authStatus`).
     - **Commentaire** : tous les commentaires doivent être en anglais.
     - **Atomicité :** Favorise les commits atomiques regroupant à la fois les changements backend (API) et frontend (Consommation) pour une fonctionnalité donnée.
 

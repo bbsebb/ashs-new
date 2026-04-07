@@ -1,0 +1,19 @@
+@if (iconOnlySignal()) {
+  <button mat-icon-button
+          type="button"
+          class="delete-icon-btn"
+          (click)="handleDelete($event)"
+          [disabled]="disabledSignal()"
+          [attr.aria-label]="confirmMessageSignal()">
+    <mat-icon>delete</mat-icon>
+  </button>
+} @else {
+  <button mat-flat-button
+          type="button"
+          class="delete-btn"
+          (click)="handleDelete($event)"
+          [disabled]="disabledSignal()">
+    <mat-icon>delete</mat-icon>
+    Supprimer
+  </button>
+}

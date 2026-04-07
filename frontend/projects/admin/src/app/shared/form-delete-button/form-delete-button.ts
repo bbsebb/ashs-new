@@ -15,37 +15,8 @@ import {take} from 'rxjs';
     MatButtonModule,
     MatIconModule
   ],
-  template: `
-    @if (iconOnlySignal()) {
-      <button mat-icon-button
-              type="button"
-              class="delete-icon-btn"
-              (click)="handleDelete($event)"
-              [disabled]="disabledSignal()"
-              [attr.aria-label]="confirmMessageSignal()">
-        <mat-icon>delete</mat-icon>
-      </button>
-    } @else {
-      <button mat-flat-button
-              type="button"
-              class="delete-btn"
-              (click)="handleDelete($event)"
-              [disabled]="disabledSignal()">
-        <mat-icon>delete</mat-icon>
-        Supprimer
-      </button>
-    }
-  `,
-  styles: `
-    .delete-btn {
-      background-color: var(--mat-sys-error);
-      color: var(--mat-sys-on-error);
-    }
-
-    .delete-icon-btn {
-      color: var(--mat-sys-error);
-    }
-  `
+  templateUrl: './form-delete-button.html',
+  styleUrl: './form-delete-button.scss'
 })
 export class FormDeleteButton {
   private readonly _dialogService = inject(DialogService);

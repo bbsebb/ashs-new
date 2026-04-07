@@ -17,11 +17,11 @@ export interface UserProfile {
 export class AuthService {
   private readonly keycloak = new Keycloak(environment.keycloakConfig);
   // Signal simple pour l'état d'authentification
-  public isLoggedIn = signal(false);
+  public isAuthenticatedSignal = signal(false);
 
   // 🚀 Utilisation de la nouvelle API resource !
   public userProfile = resource({
-    params: () => this.isLoggedIn(),
+    params: () => this.isAuthenticatedSignal(),
 
     loader: async ({params: loggedIn}): Promise<UserProfile | null> => {
       if (!loggedIn) return null;
@@ -48,7 +48,11 @@ export class AuthService {
   });
 
 
-  public async init(): Promise<void> {
+  public initialize(): Promise<void> {
+    return this.init();
+  }
+
+  private async init(): Promise<void> {
     try {
       const authenticated = await this.keycloak.init({
         onLoad: 'check-sso', // Vérifie la session silencieusement
@@ -56,7 +60,7 @@ export class AuthService {
       });
 
       // Mettre à jour ce signal va automatiquement déclencher le loader de la `resource` ci-dessus !
-      this.isLoggedIn.set(authenticated);
+      this.isAuthenticatedSignal.set(authenticated);
     } catch (error) {
       console.error('Erreur lors de l\'initialisation de Keycloak', error);
     }

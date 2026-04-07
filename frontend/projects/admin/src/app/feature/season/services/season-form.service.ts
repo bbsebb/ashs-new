@@ -1,11 +1,11 @@
 import {computed, inject, Injectable, linkedSignal, signal, Signal} from '@angular/core';
-import {FieldTree, form, schema} from '@angular/forms/signals';
+import {FieldTree, form, schema, SchemaPathTree} from '@angular/forms/signals';
 import {CreateSeasonDTO, dateToYyyyMmDd, FormErrorHandleService, SeasonsStore, UpdateSeasonDTO} from '@shared-api';
 import {Season} from '@shared-domain';
 import {NotificationService} from '@shared-ui';
 import {Router} from '@angular/router';
 import {MatDialogRef} from '@angular/material/dialog';
-import {catchError, firstValueFrom, map, of, tap} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 
 export interface SeasonFormModel {
   endDate: Date;
@@ -23,7 +23,7 @@ export class SeasonFormService {
   private _seasonId = signal<string | undefined>(undefined);
   
   readonly seasonSignal: Signal<Season | undefined> = this._seasonsStore.seasonById(this._seasonId);
-  readonly isLoading = this._seasonsStore.isLoadingSignal;
+  readonly isLoadingSignal = this._seasonsStore.isLoadingSignal;
 
   readonly seasonModelSignal = linkedSignal<SeasonFormModel>(() => {
     const season = this.seasonSignal();
@@ -40,51 +40,63 @@ export class SeasonFormService {
     };
   });
 
-  readonly seasonForm = this.buildForm();
+  readonly seasonForm: FieldTree<SeasonFormModel>;
+  readonly seasonPreview = computed(() => this._mapToSeason(this.seasonModelSignal()));
 
-  readonly seasonPreview = computed(() => this.mapToSeason(this.seasonModelSignal()));
+  constructor() {
+    this.seasonForm = this._buildForm();
+  }
 
   init(id: string | undefined) {
     this._seasonId.set(id);
   }
 
-  private buildForm(): FieldTree<SeasonFormModel> {
-    return form(this.seasonModelSignal, schema((p) => {
-      return
-    }), {
-      submission: {
-        action: (form) => {
-          const currentId = this._seasonId();
-          const model = this.seasonModelSignal();
-          const request$ = !currentId
-            ? this._seasonsStore.createSeason(this.mapToCreateSeasonDTO(model))
-            : this._seasonsStore.updateSeason(currentId, this.mapToCreateSeasonDTO(model));
+  private _applyValidationSchema(path: SchemaPathTree<SeasonFormModel>) {
+    // Schema logic if needed
+  }
 
-          return firstValueFrom(request$.pipe(
-            tap((createdOrUpdatedSeason) => {
-              this._notificationService.show(`La saison a été ${!currentId ? 'enregistrée' : 'mise à jour'}`, 'success');
-              if (this._dialogReference) {
-                this._dialogReference.close(createdOrUpdatedSeason);
-              } else {
-                void this._router.navigateByUrl(`/seasons/${createdOrUpdatedSeason.id}`);
-              }
-            }),
-            map(() => undefined),
-            catchError(error => {
-              const result = this._formErrorHandler.handleError(error, form);
-              if (typeof result === 'string') {
-                this._notificationService.show(result, 'error');
-                return of(undefined);
-              }
-              return of(result);
-            })
-          ));
-        }
+  private _handleSeasonSubmission = async (form: FieldTree<SeasonFormModel>) => {
+    const currentIdentifier = this._seasonId();
+    const model = this.seasonModelSignal();
+    const seasonData = this._mapToCreateSeasonDTO(model);
+    
+    const request$ = !currentIdentifier
+      ? this._seasonsStore.createSeason(seasonData)
+      : this._seasonsStore.updateSeason(currentIdentifier, seasonData);
+
+    try {
+      const result = await firstValueFrom(request$);
+      this._notificationService.show(`La saison a été ${!currentIdentifier ? 'enregistrée' : 'mise à jour'}`, 'success');
+      
+      if (this._dialogReference) {
+        this._dialogReference.close(result);
+      } else {
+        void this._router.navigateByUrl(`/seasons/${result.id}`);
+      }
+      return undefined;
+    } catch (error) {
+      return this._handleSubmissionError(error, form);
+    }
+  };
+
+  private _handleSubmissionError(error: unknown, form: FieldTree<SeasonFormModel>) {
+    const errorResult = this._formErrorHandler.handleError(error, form);
+    if (typeof errorResult === 'string') {
+      this._notificationService.show(errorResult, 'error');
+      return undefined;
+    }
+    return errorResult;
+  }
+
+  private _buildForm(): FieldTree<SeasonFormModel> {
+    return form(this.seasonModelSignal, schema((path) => this._applyValidationSchema(path)), {
+      submission: {
+        action: this._handleSeasonSubmission
       }
     });
   }
 
-  private mapToSeason(seasonFormModel: SeasonFormModel): Season {
+  private _mapToSeason(seasonFormModel: SeasonFormModel): Season {
     const StartDate = new Date(seasonFormModel.startDate);
     const EndDate = new Date(seasonFormModel.endDate);
     return {
@@ -98,7 +110,7 @@ export class SeasonFormService {
     }
   }
 
-  private mapToCreateSeasonDTO<T extends CreateSeasonDTO | UpdateSeasonDTO>(seasonForm: SeasonFormModel): T {
+  private _mapToCreateSeasonDTO<T extends CreateSeasonDTO | UpdateSeasonDTO>(seasonForm: SeasonFormModel): T {
     return {
       endDate: dateToYyyyMmDd(seasonForm.endDate),
       startDate: dateToYyyyMmDd(seasonForm.startDate),

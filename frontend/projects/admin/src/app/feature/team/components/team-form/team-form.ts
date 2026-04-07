@@ -83,20 +83,20 @@ export class TeamForm {
 
   // Bridging photo state to service
   onCroppedBlobChange($event: { error: Error | undefined, isLoading: boolean, value: Blob | undefined }) {
-    this.teamFormService.photoBlob.set($event.value);
-    this.teamFormService.photoIsLoading.set($event.isLoading);
-    this.teamFormService.photoError.set($event.error);
+    this.teamFormService.photoBlobSignal.set($event.value);
+    this.teamFormService.photoIsLoadingSignal.set($event.isLoading);
+    this.teamFormService.photoErrorSignal.set($event.error);
   }
 
   previewPhotoUrlSignal = computed(() => {
-    const blob = this.teamFormService.photoBlob();
+    const blob = this.teamFormService.photoBlobSignal();
     return blob ? URL.createObjectURL(blob) : undefined;
   });
 
   teamPreview = computed(() => {
     const preview = this.teamFormService.teamPreview();
     const previewUrl = this.previewPhotoUrlSignal();
-    const existingPhoto = this.teamFormService.showExistingPhoto() ? this.teamFormService.teamSignal()?.photoFileName : null;
+    const existingPhoto = this.teamFormService.showExistingPhotoSignal() ? this.teamFormService.teamSignal()?.photoFileName : null;
 
     return {
       ...preview,
@@ -105,7 +105,7 @@ export class TeamForm {
   });
 
   deletePhoto() {
-    this.teamFormService.showExistingPhoto.set(false);
+    this.teamFormService.showExistingPhotoSignal.set(false);
   }
 
   createImageSourceUrl(photoFileName: string | null | undefined) {

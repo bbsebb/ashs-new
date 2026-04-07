@@ -39,8 +39,8 @@ export class SeasonsList {
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
   seasonsSignal = this.seasonsStore.seasonsSignal;
-  isLoading = this.seasonsStore.isLoadingSignal;
-  error = computed(() => !!this.seasonsStore.errorSignal());
+  isLoadingSignal = this.seasonsStore.isLoadingSignal;
+  errorSignal = computed(() => !!this.seasonsStore.errorSignal());
 
 
 

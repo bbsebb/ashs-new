@@ -1,5 +1,5 @@
 @let user = authService.userProfile.value();
-@if (authService.isLoggedIn()) {
+@if (authService.isAuthenticatedSignal()) {
   <button
     mat-button
     [matMenuTriggerFor]="userMenu"

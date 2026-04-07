@@ -30,13 +30,13 @@ export class StaffView {
   id = input.required<string>();
   staffSignal = this.staffsStore.staffById(this.id);
 
-  isLoading = this.staffsStore.isLoadingSignal;
-  error = this.staffsStore.errorSignal;
+  isLoadingSignal = this.staffsStore.isLoadingSignal;
+  errorSignal = this.staffsStore.errorSignal;
 
 
   constructor() {
     effect(() => {
-      if (!this.isLoading() && !this.error() && !this.staffSignal()) {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.staffSignal()) {
         void this.router.navigateByUrl('/404');
       }
     });

@@ -1,7 +1,7 @@
 @let hall = hallSignal();
-@if(isLoading()) {
-  <app-loading-data label="Chargement de la salle" [isLoading]="isLoading()" />
-} @else if(error()) {
+@if(isLoadingSignal()) {
+  <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()" />
+} @else if(errorSignal()) {
   <app-error-data dataName="salles" (onRetry)="retry()" />
 } @else if (!hall) {
   <p>Aucune salle</p>

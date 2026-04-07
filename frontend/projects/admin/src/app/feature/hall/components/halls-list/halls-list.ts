@@ -57,8 +57,8 @@ export class HallsList {
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
   hallsSignal = this.hallsStore.hallsSignal;
-  isLoading = this.hallsStore.isLoadingSignal;
-  error = computed(() => !!this.hallsStore.errorSignal());
+  isLoadingSignal = this.hallsStore.isLoadingSignal;
+  errorSignal = computed(() => !!this.hallsStore.errorSignal());
 
 
 

@@ -33,13 +33,13 @@ export class TeamView {
   id = input.required<string>();
   teamSignal = this._teamsStore.teamById(this.id);
 
-  isLoading = this._teamsStore.isLoadingSignal;
-  error = this._teamsStore.errorSignal;
+  isLoadingSignal = this._teamsStore.isLoadingSignal;
+  errorSignal = this._teamsStore.errorSignal;
 
 
   constructor() {
     effect(() => {
-      if (!this.isLoading() && !this.error() && !this.teamSignal()) {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.teamSignal()) {
         void this._router.navigateByUrl('/404');
       }
     });

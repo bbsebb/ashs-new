@@ -1,7 +1,7 @@
 @let staff = staffSignal();
-@if (isLoading()) {
-  <app-loading-data label="Chargement du membre de l'encadrement" [isLoading]="isLoading()"/>
-} @else if (error()) {
+@if (isLoadingSignal()) {
+  <app-loading-data label="Chargement du membre de l'encadrement" [isLoading]="isLoadingSignal()"/>
+} @else if (errorSignal()) {
   <app-error-data dataName="encadrant" (onRetry)="retry()"/>
 } @else if (!staff) {
   <p>Aucun membre de l'encadrement trouvé</p>

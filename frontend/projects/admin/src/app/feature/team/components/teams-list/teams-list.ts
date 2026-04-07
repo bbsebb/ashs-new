@@ -58,8 +58,8 @@ export class TeamsList {
   private readonly _notificationService = inject(NotificationService);
 
   teamsSignal = this._teamsStore.teamsSignal;
-  isLoading = this._teamsStore.isLoadingSignal;
-  error = computed(() => !!this._teamsStore.errorSignal());
+  isLoadingSignal = this._teamsStore.isLoadingSignal;
+  errorSignal = computed(() => !!this._teamsStore.errorSignal());
 
   displayedColumns = computed(() => this._layoutService.isDesktopSignal() ? ['category', 'gender', 'teamNumber', 'actions'] : ['category', 'gender', 'actions']);
 

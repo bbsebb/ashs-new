@@ -39,7 +39,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAppInitializer(() => {
       // Bloque l'affichage tant que Keycloak n'a pas fini de s'initialiser
-      return inject(AuthService).init();
+      return inject(AuthService).initialize();
     }),
     // Définit la locale pour Angular Material
     {provide: MAT_DATE_LOCALE, useValue: 'fr-FR'},

@@ -70,7 +70,7 @@
     <div class="table-toolbar">
       <app-page-title title="Photo d'équipe"/>
     </div>
-    @if (teamFormService.showExistingPhoto()) {
+    @if (teamFormService.showExistingPhotoSignal()) {
       <div class="image-preview-container">
 
         <img class="image-preview" [ngSrc]="createImageSourceUrl(teamFormService.teamSignal()?.photoFileName)"
@@ -94,9 +94,9 @@
         >
         </app-image-cropper>
         <app-image-cropper-preview
-          [isLoadingSignal]="teamFormService.photoIsLoading()"
-          [isErrorSignal]="!!teamFormService.photoError()"
-          [previewBlob]="teamFormService.photoBlob()"
+          [isLoadingSignal]="teamFormService.photoIsLoadingSignal()"
+          [isErrorSignal]="!!teamFormService.photoErrorSignal()"
+          [previewBlob]="teamFormService.photoBlobSignal()"
           [previewHeightSignal]="PHOTO_HEIGHT"
           [previewWidthSignal]="PHOTO_WIDTH"
         >

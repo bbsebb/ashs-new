@@ -57,8 +57,8 @@ export class StaffsList {
   private readonly layoutService = inject(LayoutService);
   private readonly notificationService = inject(NotificationService);
   staffsSignal = this.staffsStore.staffsSignal;
-  isLoading = this.staffsStore.isLoadingSignal;
-  error = computed(() => !!this.staffsStore.errorSignal());
+  isLoadingSignal = this.staffsStore.isLoadingSignal;
+  errorSignal = computed(() => !!this.staffsStore.errorSignal());
 
 
   displayedColumns = computed(() => this.layoutService.isDesktopSignal() ? ['firstName', 'lastName', 'email', 'phone', 'actions'] : ['firstName', 'lastName', 'actions']);

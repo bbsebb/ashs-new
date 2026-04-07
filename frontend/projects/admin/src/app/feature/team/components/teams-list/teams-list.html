@@ -1,6 +1,6 @@
-@if (isLoading()) {
-  <app-loading-data label="Chargement des équipes" [isLoading]="isLoading()"/>
-} @else if (error()) {
+@if (isLoadingSignal()) {
+  <app-loading-data label="Chargement des équipes" [isLoading]="isLoadingSignal()"/>
+} @else if (errorSignal()) {
   <app-error-data dataName="équipes" (onRetry)="retry()"/>
 } @else {
   <div class="table-toolbar">

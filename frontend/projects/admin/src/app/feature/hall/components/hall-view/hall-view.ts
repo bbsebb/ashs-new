@@ -30,13 +30,13 @@ export class HallView {
   id = input.required<string>();
   hallSignal = this.hallsStore.hallById(this.id);
 
-  isLoading = this.hallsStore.isLoadingSignal;
-  error = this.hallsStore.errorSignal;
+  isLoadingSignal = this.hallsStore.isLoadingSignal;
+  errorSignal = this.hallsStore.errorSignal;
 
 
   constructor() {
     effect(() => {
-      if (!this.isLoading() && !this.error() && !this.hallSignal()) {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.hallSignal()) {
         void this.router.navigateByUrl('/404');
       }
     });

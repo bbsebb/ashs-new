@@ -14,27 +14,7 @@ import {DayOfWeek, Gender, StaffRoleValue, Team} from '@shared-domain';
 import {Router} from '@angular/router';
 import {firstValueFrom} from 'rxjs';
 import {AdminDialogService} from '../../../shared/services/admin-dialog.service';
-
-export interface TeamFormModel {
-  seasonId: string;
-  ageGroupId: string;
-  gender: Gender;
-  teamNumber: number;
-  staffs: {
-    id: string,
-    role: StaffRoleValue,
-    staffId: string
-  }[],
-  trainingSessions: {
-    id: string;
-    hallId: string;
-    dayOfWeek: DayOfWeek;
-    timeSlot: {
-      startTime: Date,
-      endTime: Date
-    };
-  }[]
-}
+import {TeamFormModel} from './team.dtos';
 
 @Injectable()
 export class TeamFormService {

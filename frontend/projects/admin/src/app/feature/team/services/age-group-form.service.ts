@@ -5,11 +5,7 @@ import {NotificationService} from '@shared-ui';
 import {FieldTree, form, schema, SchemaPathTree} from '@angular/forms/signals';
 import {catchError, firstValueFrom, map, of, tap} from 'rxjs';
 import {MatDialogRef} from '@angular/material/dialog';
-
-export interface AgeGroupModel {
-  ageLimit: number;
-  upperLimit: boolean;
-}
+import {AgeGroupFormModel} from './age-group.dtos';
 
 @Injectable()
 export class AgeGroupFormService {
@@ -19,7 +15,7 @@ export class AgeGroupFormService {
   private readonly _notificationService = inject(NotificationService);
   private readonly _dialogReference = inject(MatDialogRef, {optional: true});
 
-  readonly ageGroupModelSignal = linkedSignal<AgeGroupModel>(() => {
+  readonly ageGroupModelSignal = linkedSignal<AgeGroupFormModel>(() => {
     return {
       ageLimit: 0,
       upperLimit: false,
@@ -27,17 +23,17 @@ export class AgeGroupFormService {
   });
 
   readonly ageGroupPreviewSignal = computed(() => this._preview(this.ageGroupModelSignal()));
-  readonly ageGroupForm: FieldTree<AgeGroupModel>;
+  readonly ageGroupForm: FieldTree<AgeGroupFormModel>;
 
   constructor() {
     this.ageGroupForm = this._buildForm();
   }
 
-  private _applyValidationSchema(path: SchemaPathTree<AgeGroupModel>) {
+  private _applyValidationSchema(path: SchemaPathTree<AgeGroupFormModel>) {
     // Schema logic if needed
   }
 
-  private _handleAgeGroupSubmission = async (form: FieldTree<AgeGroupModel>) => {
+  private _handleAgeGroupSubmission = async (form: FieldTree<AgeGroupFormModel>) => {
     const model = this.ageGroupModelSignal();
     const ageGroupDTO: CreateAgeGroupDTO = {
       ...model,
@@ -58,7 +54,7 @@ export class AgeGroupFormService {
     }
   };
 
-  private _handleSubmissionError(error: unknown, form: FieldTree<AgeGroupModel>) {
+  private _handleSubmissionError(error: unknown, form: FieldTree<AgeGroupFormModel>) {
     const errorResult = this._formErrorHandler.handleError(error, form);
     if (typeof errorResult === 'string') {
       this._notificationService.show(errorResult, 'error');
@@ -67,7 +63,7 @@ export class AgeGroupFormService {
     return errorResult;
   }
 
-  private _buildForm(): FieldTree<AgeGroupModel> {
+  private _buildForm(): FieldTree<AgeGroupFormModel> {
     return form(this.ageGroupModelSignal, schema((path) => this._applyValidationSchema(path)), {
       submission: {
         action: this._handleAgeGroupSubmission
@@ -75,7 +71,7 @@ export class AgeGroupFormService {
     });
   }
 
-  private _preview(ageGroupModel: AgeGroupModel): string {
+  private _preview(ageGroupModel: AgeGroupFormModel): string {
     const sign = ageGroupModel.upperLimit ? "-" : "+";
     return `${sign}${ageGroupModel.ageLimit} ans`;
   }

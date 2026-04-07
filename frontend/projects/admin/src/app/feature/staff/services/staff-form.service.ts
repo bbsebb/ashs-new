@@ -6,11 +6,7 @@ import {Staff} from '@shared-domain';
 import {Router} from '@angular/router';
 import {MatDialogRef} from '@angular/material/dialog';
 import {firstValueFrom} from 'rxjs';
-
-export type StaffFormModel = Omit<Staff, 'id' | 'phone' | 'email' | 'avatarFileName'> & {
-  phone: NonNullable<Staff['phone']>;
-  email: NonNullable<Staff['email']>;
-};
+import {StaffFormModel} from './staff.dtos';
 
 @Injectable()
 export class StaffFormService {

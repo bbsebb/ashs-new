@@ -12,7 +12,8 @@ import {
 } from '@shared-ui';
 import {STAFF_ROLE_VALUE} from '@shared-domain';
 import {FormDeleteButton} from '../../../../../shared/form-delete-button/form-delete-button';
-import {TeamFormModel, TeamFormService} from '../../../services/team-form.service';
+import {TeamFormService} from '../../../services/team-form.service';
+import {TeamFormModel} from '../../../services/team.dtos';
 
 @Component({
   selector: 'app-team-staff-fields',

@@ -6,11 +6,7 @@ import {NotificationService} from '@shared-ui';
 import {Router} from '@angular/router';
 import {MatDialogRef} from '@angular/material/dialog';
 import {firstValueFrom} from 'rxjs';
-
-export interface SeasonFormModel {
-  endDate: Date;
-  startDate: Date;
-}
+import {SeasonFormModel} from './season.dtos';
 
 @Injectable()
 export class SeasonFormService {

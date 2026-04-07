@@ -6,8 +6,7 @@ import {Hall} from '@shared-domain';
 import {Router} from '@angular/router';
 import {MatDialogRef} from '@angular/material/dialog';
 import {catchError, firstValueFrom, map, of, tap} from 'rxjs';
-
-export type HallFormModel = Omit<Hall, 'id'>;
+import {HallFormModel} from './hall.dtos';
 
 @Injectable()
 export class HallFormService {

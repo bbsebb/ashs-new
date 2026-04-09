@@ -4,8 +4,6 @@ import {TeamsList} from './teams-list';
 import {SeasonsStore, TeamsStore, APP_CONFIG} from '@shared-api';
 import {signal} from '@angular/core';
 import {provideRouter} from '@angular/router';
-import userEvent from '@testing-library/user-event';
-import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 
 describe('TeamsList Public Component', () => {
   const mockTeams = [
@@ -44,8 +42,7 @@ describe('TeamsList Public Component', () => {
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
-      ],
-      imports: [NoopAnimationsModule] // Pour éviter les soucis avec Angular Material Select
+      ]
     });
 
     // Seulement l'équipe de la saison 2 devrait être visible (Fém. U15)

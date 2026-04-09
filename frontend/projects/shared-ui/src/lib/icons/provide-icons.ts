@@ -1,27 +1,34 @@
-// projects/shared-ui/icons/src/provide-icons.ts
-import { provideAppInitializer, inject } from '@angular/core';
-import { MatIconRegistry } from '@angular/material/icon';
-import { DomSanitizer } from '@angular/platform-browser';
+import {inject, provideAppInitializer} from '@angular/core';
+import {MatIconRegistry} from '@angular/material/icon';
+import {DomSanitizer} from '@angular/platform-browser';
+
+interface SvgIconConfiguration {
+  name: string;
+  path: string;
+}
 
 /**
- * Fournit les icônes SVG de la bibliothèque shared-ui.
+ * List of custom SVG icons used across the shared-ui library and applications.
+ */
+const SHARED_ICONS_CONFIGURATION: SvgIconConfiguration[] = [
+  { name: 'instagram', path: 'shared-ui/icons/instagram.svg' },
+];
+
+/**
+ * Configures the MatIconRegistry to include shared SVG icons during application startup.
+ * @returns A set of providers for application initialization.
  */
 export function provideSharedIcons() {
   return [
     provideAppInitializer(() => {
-      // On utilise inject() directement dans la fonction
-      const registry = inject(MatIconRegistry);
-      const sanitizer = inject(DomSanitizer);
+      const iconRegistry = inject(MatIconRegistry);
+      const domSanitizer = inject(DomSanitizer);
 
-      const icons = [
-        { name: 'instagram', path: 'shared-ui/icons/instagram.svg' },
-      ];
-
-      icons.forEach(icon => {
-        registry.addSvgIcon(
+      SHARED_ICONS_CONFIGURATION.forEach(icon => {
+        iconRegistry.addSvgIcon(
           icon.name,
-          sanitizer.bypassSecurityTrustResourceUrl(icon.path)
-        )
+          domSanitizer.bypassSecurityTrustResourceUrl(icon.path)
+        );
       });
     })
   ];

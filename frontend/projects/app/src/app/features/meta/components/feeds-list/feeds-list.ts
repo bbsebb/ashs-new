@@ -18,9 +18,9 @@ import {LoadingData, ErrorData} from '@shared-ui';
 })
 export class FeedsList {
   private readonly metaStore = inject(MetaStore);
-  readonly feedsSignal:Signal<FeedDTO[]> = this.metaStore.feeds;
-  readonly error:Signal<Error | undefined> = this.metaStore.error;
-  readonly isLoading:Signal<boolean> = this.metaStore.isLoading;
+  readonly feedsSignal:Signal<FeedDTO[]> = this.metaStore.feedsSignal;
+  readonly errorSignal:Signal<Error | undefined> = this.metaStore.errorSignal;
+  readonly isLoadingSignal:Signal<boolean> = this.metaStore.isLoadingSignal;
 
   retry() {
     this.metaStore.reloadFeeds();

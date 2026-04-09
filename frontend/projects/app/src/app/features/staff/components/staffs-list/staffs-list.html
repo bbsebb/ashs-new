@@ -1,9 +1,9 @@
 <app-page-title title="Notre Staff" subtitle="Découvrez les visages qui font vivre l'association et encadrent nos équipes."></app-page-title>
 
 <div class="container">
-  @if (isLoading()) {
-    <app-loading-data label="Chargement du staff" [isLoading]="isLoading()"/>
-  } @else if (error()) {
+  @if (isLoadingSignal()) {
+    <app-loading-data label="Chargement du staff" [isLoading]="isLoadingSignal()"/>
+  } @else if (errorSignal()) {
     <app-error-data dataName="staff" (onRetry)="retry()"/>
   } @else {
     <section class="staff-grid">

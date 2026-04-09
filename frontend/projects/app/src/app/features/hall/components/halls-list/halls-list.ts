@@ -18,8 +18,8 @@ import {MatIconModule} from "@angular/material/icon";
 export class HallsList {
   private readonly hallsStore = inject(HallsStore);
   hallsSignal = this.hallsStore.hallsSignal;
-  isLoading = this.hallsStore.isLoadingSignal;
-  error = this.hallsStore.errorSignal;
+  isLoadingSignal = this.hallsStore.isLoadingSignal;
+  errorSignal = this.hallsStore.errorSignal;
 
   protected retry() {
     this.hallsStore.reload();

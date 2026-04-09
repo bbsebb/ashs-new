@@ -1,9 +1,9 @@
 <app-page-title title="Nos Salles" subtitle="Découvrez les lieux où nos équipes s'entraînent et jouent leurs matchs."></app-page-title>
 
 <div class="container">
-  @if (isLoading()) {
-    <app-loading-data label="Chargement des salles" [isLoading]="isLoading()"/>
-  } @else if (error()) {
+  @if (isLoadingSignal()) {
+    <app-loading-data label="Chargement des salles" [isLoading]="isLoadingSignal()"/>
+  } @else if (errorSignal()) {
     <app-error-data dataName="salles" (onRetry)="retry()"/>
   } @else {
     <section class="halls-grid">

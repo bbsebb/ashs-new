@@ -1,15 +1,15 @@
 <app-page-title title="Nos Équipes" subtitle="Retrouvez toutes les équipes de l'association par saison."></app-page-title>
 
 <div class="container">
-  @if (isLoading()) {
-    <app-loading-data label="Chargement des équipes" [isLoading]="isLoading()"/>
-  } @else if (error()) {
+  @if (isLoadingSignal()) {
+    <app-loading-data label="Chargement des équipes" [isLoading]="isLoadingSignal()"/>
+  } @else if (errorSignal()) {
     <app-error-data dataName="équipes" (onRetry)="retry()"/>
   } @else {
     <div class="filter-section">
       <mat-form-field appearance="outline">
         <mat-label>Saison</mat-label>
-        <mat-select [value]="selectedSeasonId()" (selectionChange)="onSeasonChange($event.value)">
+        <mat-select [value]="selectedSeasonIdSignal()" (selectionChange)="onSeasonChange($event.value)">
           @for (season of seasonsSignal(); track season.id) {
             <mat-option [value]="season.id">
               {{ season.name }} @if (season.isCurrent) { (Actuelle) }
@@ -20,7 +20,7 @@
     </div>
 
     <section class="teams-grid">
-      @for (team of filteredTeams(); track team.id) {
+      @for (team of filteredTeamsSignal(); track team.id) {
         <lib-team-card [team]="team"></lib-team-card>
       } @empty {
         <div class="empty-state">

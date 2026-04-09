@@ -19,8 +19,8 @@ import { MatIconModule } from '@angular/material/icon';
 export class StaffsList {
   private readonly staffsStore = inject(StaffsStore);
   staffsSignal = this.staffsStore.staffsSignal;
-  isLoading = this.staffsStore.isLoadingSignal;
-  error = this.staffsStore.errorSignal;
+  isLoadingSignal = this.staffsStore.isLoadingSignal;
+  errorSignal = this.staffsStore.errorSignal;
 
   protected retry() {
     this.staffsStore.reload();

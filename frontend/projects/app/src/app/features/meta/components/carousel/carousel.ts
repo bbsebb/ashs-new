@@ -21,30 +21,30 @@ import {SubAttachmentDTO} from '../../models/subAttachmentDTO';
 export class Carousel {
 
   subAttachmentsSignal = input.required<SubAttachmentDTO[]>({alias: 'subAttachments'});
-  currentIndex = signal(0);
+  currentIndexSignal = signal(0);
 
-  readonly length = computed(() => this.subAttachmentsSignal().length);
+  readonly lengthSignal = computed(() => this.subAttachmentsSignal().length);
 
-  readonly currentSubAttachment = computed(() => {
+  readonly currentSubAttachmentSignal = computed(() => {
     const items = this.subAttachmentsSignal();
     const len = items.length;
     if (len === 0) return null;
-    const safeIndex = ((this.currentIndex() % len) + len) % len;
+    const safeIndex = ((this.currentIndexSignal() % len) + len) % len;
     return items[safeIndex];
   });
 
-  readonly canNavigate = computed(() => this.length() > 1);
+  readonly canNavigateSignal = computed(() => this.lengthSignal() > 1);
 
 
   prevSlide() {
-    const len = this.subAttachmentsSignal().length;
+    const len = this.lengthSignal();
     if (len <= 1) return;
-    this.currentIndex.update((index) => (index - 1 + len) % len);
+    this.currentIndexSignal.update((index) => (index - 1 + len) % len);
   }
 
   nextSlide() {
-    const len = this.subAttachmentsSignal().length;
+    const len = this.lengthSignal();
     if (len <= 1) return;
-    this.currentIndex.update((index) => (index + 1) % len);
+    this.currentIndexSignal.update((index) => (index + 1) % len);
   }
 }

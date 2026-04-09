@@ -27,14 +27,14 @@ export class TeamsList {
   private readonly seasonsStore = inject(SeasonsStore);
 
   seasonsSignal = this.seasonsStore.seasonsSignal;
-  selectedSeasonId = signal<string | null>(null);
+  selectedSeasonIdSignal = signal<string | null>(null);
 
-  isLoading = computed(() => this.teamsStore.isLoadingSignal() || this.seasonsStore.isLoadingSignal());
-  error = computed(() => this.teamsStore.errorSignal() || this.seasonsStore.errorSignal());
+  isLoadingSignal = computed(() => this.teamsStore.isLoadingSignal() || this.seasonsStore.isLoadingSignal());
+  errorSignal = computed(() => this.teamsStore.errorSignal() || this.seasonsStore.errorSignal());
 
-  filteredTeams = computed(() => {
+  filteredTeamsSignal = computed(() => {
     const teams = this.teamsStore.teamsSignal();
-    const seasonId = this.selectedSeasonId();
+    const seasonId = this.selectedSeasonIdSignal();
     if (!seasonId) return teams;
     return teams.filter(t => t.seasonId === seasonId);
   });
@@ -42,16 +42,16 @@ export class TeamsList {
   constructor() {
     effect(() => {
       const seasons = this.seasonsSignal();
-      if (seasons.length > 0 && !this.selectedSeasonId()) {
+      if (seasons.length > 0 && !this.selectedSeasonIdSignal()) {
         const current = seasons.find(s => s.isCurrent) || seasons[0];
-        this.selectedSeasonId.set(current.id);
+        this.selectedSeasonIdSignal.set(current.id);
       }
     });
     this.seasonsStore.reload();
   }
 
   protected onSeasonChange(id: string) {
-    this.selectedSeasonId.set(id);
+    this.selectedSeasonIdSignal.set(id);
   }
 
   protected retry() {

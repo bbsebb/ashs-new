@@ -1,6 +1,6 @@
-@if (isLoading()) {
+@if (isLoadingSignal()) {
   <app-loading-data />
-} @else if (error()) {
+} @else if (errorSignal()) {
   <app-error-data dataName="médias" (onRetry)="retry()"   />
 } @else {
   <div class="feeds-container">

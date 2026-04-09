@@ -1,6 +1,4 @@
-<app-page-title title="Nos Salles" subtitle="Découvrez les lieux où nos équipes s'entraînent et jouent leurs matchs."></app-page-title>
-
-<div class="container">
+<app-public-page-container title="Nos Salles" subtitle="Découvrez les lieux où nos équipes s'entraînent et jouent leurs matchs.">
   @if (isLoadingSignal()) {
     <app-loading-data label="Chargement des salles" [isLoading]="isLoadingSignal()"/>
   } @else if (errorSignal()) {
@@ -17,4 +15,4 @@
       }
     </section>
   }
-</div>
+</app-public-page-container>

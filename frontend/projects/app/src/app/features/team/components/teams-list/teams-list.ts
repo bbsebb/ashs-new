@@ -1,6 +1,6 @@
 import { Component, computed, inject, linkedSignal } from '@angular/core';
 import { SeasonsStore, TeamsStore } from '@shared-api';
-import { ErrorData, LoadingData, PageTitle, TeamCard } from '@shared-ui';
+import { ErrorData, LoadingData, PublicPageContainer, TeamCard } from '@shared-ui';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -12,7 +12,7 @@ import { MatOptionModule } from '@angular/material/core';
   imports: [
     LoadingData,
     ErrorData,
-    PageTitle,
+    PublicPageContainer,
     TeamCard,
     MatIconModule,
     MatFormFieldModule,

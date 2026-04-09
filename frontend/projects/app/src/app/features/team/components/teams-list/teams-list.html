@@ -1,6 +1,4 @@
-<app-page-title title="Nos Équipes" subtitle="Retrouvez toutes les équipes de l'association par saison."></app-page-title>
-
-<div class="container">
+<app-public-page-container title="Nos Équipes" subtitle="Retrouvez toutes les équipes de l'association par saison.">
   @if (isLoadingSignal()) {
     <app-loading-data label="Chargement des équipes" [isLoading]="isLoadingSignal()"/>
   } @else if (errorSignal()) {
@@ -30,4 +28,4 @@
       }
     </section>
   }
-</div>
+</app-public-page-container>

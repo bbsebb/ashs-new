@@ -23,6 +23,7 @@ export * from './lib/staff-card/staff-card';
 export * from './lib/staff-mini-card/staff-mini-card';
 export * from './lib/training-session-item/training-session-item';
 export * from './lib/admin-page-container/admin-page-container';
+export * from './lib/public-page-container/public-page-container';
 export * from './lib/team-card/team-card';
 export * from './lib/pipes/role-staff-pipe';
 export * from './lib/pipes/day-of-week-pipe';

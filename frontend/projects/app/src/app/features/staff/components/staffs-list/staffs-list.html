@@ -1,6 +1,4 @@
-<app-page-title title="Notre Staff" subtitle="Découvrez les visages qui font vivre l'association et encadrent nos équipes."></app-page-title>
-
-<div class="container">
+<app-public-page-container title="Notre Staff" subtitle="Découvrez les visages qui font vivre l'association et encadrent nos équipes.">
   @if (isLoadingSignal()) {
     <app-loading-data label="Chargement du staff" [isLoading]="isLoadingSignal()"/>
   } @else if (errorSignal()) {
@@ -17,4 +15,4 @@
       }
     </section>
   }
-</div>
+</app-public-page-container>

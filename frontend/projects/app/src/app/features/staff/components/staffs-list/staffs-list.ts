@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { StaffsStore } from '@shared-api';
-import { ErrorData, LoadingData, PageTitle, StaffCard } from '@shared-ui';
+import { ErrorData, LoadingData, PublicPageContainer, StaffCard } from '@shared-ui';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [
     LoadingData,
     ErrorData,
-    PageTitle,
+    PublicPageContainer,
     StaffCard,
     MatIconModule
   ],

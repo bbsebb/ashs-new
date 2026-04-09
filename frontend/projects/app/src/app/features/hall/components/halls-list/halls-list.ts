@@ -1,6 +1,6 @@
 import {Component, inject} from '@angular/core';
 import {HallsStore} from '@shared-api';
-import {ErrorData, HallCard, LoadingData, PageTitle} from '@shared-ui';
+import {ErrorData, HallCard, LoadingData, PublicPageContainer} from '@shared-ui';
 import {MatIconModule} from "@angular/material/icon";
 
 @Component({
@@ -9,7 +9,7 @@ import {MatIconModule} from "@angular/material/icon";
     LoadingData,
     ErrorData,
     HallCard,
-    PageTitle,
+    PublicPageContainer,
     MatIconModule
   ],
   templateUrl: './halls-list.html',

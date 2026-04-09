@@ -1,0 +1,15 @@
+.public-page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-content {
+  margin-top: 32px;
+}
+
+@media (max-width: 600px) {
+  .public-page-container {
+    padding: 16px;
+  }
+}

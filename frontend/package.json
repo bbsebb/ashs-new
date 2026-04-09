@@ -54,6 +54,9 @@
     "msw": "^2.13.2",
     "ng-packagr": "^21.2.0",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "@emnapi/core": "1.9.2",
+    "@emnapi/runtime": "1.9.2",
+    "@emnapi/wasi-threads": "1.2.1"
   }
 }

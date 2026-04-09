@@ -1,5 +1,5 @@
 import {Component, inject, Signal} from '@angular/core';
-import {FeedDTO} from '../../models/feedDTO';
+import {FeedDTO} from '../../models/meta.dtos';
 import {Feed} from '../feed/feed';
 import {MetaStore} from '../../meta-store';
 import {LoadingData, ErrorData} from '@shared-ui';

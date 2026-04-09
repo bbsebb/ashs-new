@@ -1,7 +1,7 @@
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 import {NgOptimizedImage} from '@angular/common';
-import {MediaDTO} from '../../models/mediaDTO';
+import {MediaDTO} from '../../models/meta.dtos';
 
 
 @Component({

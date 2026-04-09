@@ -3,7 +3,7 @@ import {Component, computed, input, signal} from '@angular/core';
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {Media} from '../media/media';
-import {SubAttachmentDTO} from '../../models/subAttachmentDTO';
+import {SubAttachmentDTO} from '../../models/meta.dtos';
 
 
 @Component({

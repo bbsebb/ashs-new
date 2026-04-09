@@ -1,7 +1,7 @@
 import {Component, computed, inject, input} from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';
-import {FeedDTO} from '../../models/feedDTO';
+import {FeedDTO} from '../../models/meta.dtos';
 import {Carousel} from '../carousel/carousel';
 import {Media} from '../media/media';
 import {DatePipe} from '@angular/common';

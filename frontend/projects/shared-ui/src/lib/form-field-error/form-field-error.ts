@@ -1,8 +1,8 @@
-import {Directive, TemplateRef, ViewContainerRef, computed, effect, input, inject} from '@angular/core';
-import { FieldTree } from '@angular/forms/signals';
+import {computed, Directive, effect, inject, input, TemplateRef, ViewContainerRef} from '@angular/core';
+import {FieldTree} from '@angular/forms/signals';
 
 interface ErrorContext {
-  $implicit: string; // C'est cette clé magique qui remplit le "let errorMsg"
+  $implicit: string; // Used by "let errorMsg" in template
 }
 
 @Directive({
@@ -10,57 +10,55 @@ interface ErrorContext {
   standalone: true
 })
 export class FormFieldErrorDirective {
-  // Vos inputs
-  field = input.required<FieldTree<unknown>>({ alias: 'appError' });
-  fallback = input('Il y a une erreur sur ce champs', { alias: 'appErrorFallback' });
-  private templateRef: TemplateRef<ErrorContext> = inject(TemplateRef<ErrorContext>);
-  private viewContainer: ViewContainerRef = inject(ViewContainerRef);
+  /** The form field to monitor for errors. */
+  fieldInput = input.required<FieldTree<unknown>>({ alias: 'appError' });
+  
+  /** Fallback message when no specific error message is provided. */
+  fallbackInput = input('Ce champ contient une erreur', { alias: 'appErrorFallback' });
+  
+  private _templateReference: TemplateRef<ErrorContext> = inject(TemplateRef<ErrorContext>);
+  private _viewContainer: ViewContainerRef = inject(ViewContainerRef);
 
   constructor() {
-    const state = computed(() => this.field()());
+    const fieldStateSignal = computed(() => this.fieldInput()());
 
-    // 1. On détermine si on affiche
-    const shouldShow = computed(() => {
-      const s = state();
-      return s.invalid() && (s.touched() || s.dirty());
+    /** Determines if the error should be displayed (invalid + interacted with). */
+    const shouldShowSignal = computed(() => {
+      const state = fieldStateSignal();
+      return state.invalid() && (state.touched() || state.dirty());
     });
 
-    // 2. On calcule le message
-    const message = computed(() => {
-      const errors = state().errors();
+    /** Computes the error message to display. */
+    const errorMessageSignal = computed(() => {
+      const errors = fieldStateSignal().errors();
       const firstError = Array.isArray(errors) ? errors[0] : null;
 
-      // Sécurité : si errors n'est pas un tableau ou est vide
-      if (!firstError) return this.fallback();
+      if (!firstError) {
+        return this.fallbackInput();
+      }
 
-      return firstError.message ?? this.fallback();
+      return firstError.message ?? this.fallbackInput();
     });
 
-    // 3. L'effet qui met à jour le DOM
+    /** Effect handling the DOM manipulation based on validation state. */
     effect(() => {
-      const show = shouldShow();
-      const msg = message();
+      const isVisible = shouldShowSignal();
+      const message = errorMessageSignal();
 
-      if (!show) {
-        this.viewContainer.clear();
+      if (!isVisible) {
+        this._viewContainer.clear();
         return;
       }
 
-      // Si la vue n'existe pas encore, on la crée
-      if (this.viewContainer.length === 0) {
-        this.viewContainer.createEmbeddedView(this.templateRef, {
-          $implicit: msg
+      if (this._viewContainer.length === 0) {
+        this._viewContainer.createEmbeddedView(this._templateReference, {
+          $implicit: message
         });
       } else {
-        // Si la vue existe déjà, on met juste à jour le texte !
-        // On récupère la vue active (c'est une EmbeddedViewRef)
-        const view = this.viewContainer.get(0) as any;
-        // On met à jour son contexte
-        view.context.$implicit = msg;
-        // On force la détection de changement pour cette vue spécifique
+        const view = this._viewContainer.get(0) as any;
+        view.context.$implicit = message;
         view.detectChanges();
       }
     });
   }
-
 }

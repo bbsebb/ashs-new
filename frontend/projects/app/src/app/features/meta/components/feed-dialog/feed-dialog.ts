@@ -22,5 +22,5 @@ import {Carousel} from '../carousel/carousel';
 export class FeedDialog {
   public readonly data = inject(MAT_DIALOG_DATA);
   feed = this.data.feed;
-  attachment = this.feed.attachments[0];
+  attachment = this.feed.attachments.data[0];
 }

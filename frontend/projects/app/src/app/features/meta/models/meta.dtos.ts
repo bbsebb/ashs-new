@@ -1,4 +1,4 @@
-export type ISO8601String = string;
+import {ISO8601String} from '@shared-domain';
 
 export interface ImageDTO {
   height: number;

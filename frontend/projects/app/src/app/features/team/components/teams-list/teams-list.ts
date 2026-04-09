@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, inject, linkedSignal } from '@angular/core';
 import { SeasonsStore, TeamsStore } from '@shared-api';
 import { ErrorData, LoadingData, PageTitle, TeamCard } from '@shared-ui';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,7 +27,17 @@ export class TeamsList {
   private readonly seasonsStore = inject(SeasonsStore);
 
   seasonsSignal = this.seasonsStore.seasonsSignal;
-  selectedSeasonIdSignal = signal<string | null>(null);
+  
+  /**
+   * Automatically resets or initializes the selected season when the seasons list changes.
+   * Prefers the current season, otherwise the first one available.
+   */
+  selectedSeasonIdSignal = linkedSignal<string | null>(() => {
+    const seasons = this.seasonsSignal();
+    if (seasons.length === 0) return null;
+    const current = seasons.find(s => s.isCurrent) || seasons[0];
+    return current.id;
+  });
 
   isLoadingSignal = computed(() => this.teamsStore.isLoadingSignal() || this.seasonsStore.isLoadingSignal());
   errorSignal = computed(() => this.teamsStore.errorSignal() || this.seasonsStore.errorSignal());
@@ -40,13 +50,6 @@ export class TeamsList {
   });
 
   constructor() {
-    effect(() => {
-      const seasons = this.seasonsSignal();
-      if (seasons.length > 0 && !this.selectedSeasonIdSignal()) {
-        const current = seasons.find(s => s.isCurrent) || seasons[0];
-        this.selectedSeasonIdSignal.set(current.id);
-      }
-    });
     this.seasonsStore.reload();
   }
 

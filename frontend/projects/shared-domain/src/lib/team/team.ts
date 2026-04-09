@@ -1,17 +1,7 @@
 import {AgeGroup} from './age-group';
-
-export const GENDER = ['Female', 'Male', 'Mixte'] as const;
-
-export type Gender = typeof GENDER[number];
-
-export const STAFF_ROLE_VALUE = ['COACH', 'ASSISTANT', 'SUPPORT'] as const;
-
-export type StaffRoleValue = typeof STAFF_ROLE_VALUE[number];
-
-
-export const DAY_OF_WEEKS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const;
-
-export type DayOfWeek = typeof DAY_OF_WEEKS[number];
+import {Gender} from './gender';
+import {DayOfWeek} from './day-of-week';
+import {StaffRoleValue} from '../staff/staff-role';
 
 export interface Team {
   id: string;
@@ -41,5 +31,3 @@ export type TimeSlot = {
   startTime: Date,
   endTime: Date
 }
-
-

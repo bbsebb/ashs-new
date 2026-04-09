@@ -1,11 +1,10 @@
 export * from './lib/problem-detail';
-
-
+export * from './lib/uuid';
 export * from './lib/hall/models/hall';
-
 export * from './lib/season/season';
-
 export * from './lib/staff/staff';
+export * from './lib/staff/staff-role';
 export * from './lib/team/team';
 export * from './lib/team/age-group';
-
+export * from './lib/team/gender';
+export * from './lib/team/day-of-week';

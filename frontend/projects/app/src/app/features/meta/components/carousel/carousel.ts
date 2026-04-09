@@ -1,10 +1,8 @@
-import {Component, computed, effect, input, signal} from '@angular/core';
+import {Component, computed, input, signal} from '@angular/core';
 
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {Media} from '../media/media';
-import {SubAttachmentsDTO} from '../../models/subAttachementsDTO';
-import {AttachmentDTO} from '../../models/attachment-dto';
 import {SubAttachmentDTO} from '../../models/subAttachmentDTO';
 
 
@@ -29,7 +27,10 @@ export class Carousel {
     const items = this.subAttachmentsSignal();
     const len = items.length;
     if (len === 0) return null;
-    const safeIndex = ((this.currentIndexSignal() % len) + len) % len;
+    
+    // Ensure index is always within bounds even if items change
+    const index = this.currentIndexSignal();
+    const safeIndex = ((index % len) + len) % len;
     return items[safeIndex];
   });
 
@@ -37,14 +38,19 @@ export class Carousel {
 
 
   prevSlide() {
-    const len = this.lengthSignal();
-    if (len <= 1) return;
-    this.currentIndexSignal.update((index) => (index - 1 + len) % len);
+    this._moveSlide(-1);
   }
 
   nextSlide() {
+    this._moveSlide(1);
+  }
+
+  private _moveSlide(delta: number) {
     const len = this.lengthSignal();
     if (len <= 1) return;
-    this.currentIndexSignal.update((index) => (index + 1) % len);
+    
+    this.currentIndexSignal.update((index) => {
+      return (index + delta + len) % len;
+    });
   }
 }

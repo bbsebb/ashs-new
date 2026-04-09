@@ -1,87 +1,66 @@
 import {Injectable} from '@angular/core';
-import {FieldTree, ValidationError} from '@angular/forms/signals';
-import {ProblemDetail} from '@shared-domain';
 import {HttpErrorResponse} from '@angular/common/http';
+import {ProblemDetail} from '@shared-domain';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class FormErrorHandleService {
 
   /**
-   * Méthode principale à appeler dans le catch
+   * Maps an HTTP error response to form errors or returns a generic error message.
+   * @param errorResponse The HTTP error received from the API.
+   * @param formFieldTree The field tree of the signal form.
+   * @returns An array of errors for signal-based forms, or a string for global notifications.
    */
-  handleError<T>(error: unknown, form: FieldTree<T>): ValidationError.WithFieldTree[] | string {
-    console.error('Erreur attrapée par le service :', error);
-
-    // 1) Cas HTTP avec payload exploitable
-    if (error instanceof HttpErrorResponse) {
-      const problemDetail = this.tryParseProblemDetail(error);
-
-      if (problemDetail?.hasAnyValidationError()) {
-        return this.mapServerErrorsToForm(problemDetail, form);
-      }
-
-      // HTTP mais pas des erreurs de validation "form"
-      return this.getTechnicalErrorMessage(problemDetail);
+  handleError(errorResponse: unknown, formFieldTree: any): any[] | string {
+    if (!(errorResponse instanceof HttpErrorResponse)) {
+      return 'Une erreur inconnue est survenue.';
     }
 
-    // 2) Cas non-HTTP (TypeError, erreur RxJS, bug front, etc.)
-    return 'Une erreur inattendue est survenue. Veuillez réessayer.';
-  }
+    const errorData = errorResponse.error as ProblemDetail;
 
-  private tryParseProblemDetail(error: HttpErrorResponse): ProblemDetail | undefined {
-    // Selon les cas, error.error peut être un objet, une string, null, etc.
-    const raw = error.error;
+    // Handle field errors from ProblemDetail
+    if (errorData?.fieldErrors && Object.keys(errorData.fieldErrors).length > 0) {
+      return Object.entries(errorData.fieldErrors).map(([field, message]) => {
+        const fieldPath = field.split('.');
+        let targetFieldTree: any = formFieldTree;
 
-    if (!raw || typeof raw !== 'object') return undefined;
-
-    try {
-      return new ProblemDetail(raw as Partial<ProblemDetail>);
-    } catch {
-      return undefined;
-    }
-  }
-
-  private mapServerErrorsToForm<T>(problemDetail: ProblemDetail, form: FieldTree<T>): ValidationError.WithFieldTree[] {
-    const validationErrors: ValidationError.WithFieldTree[] = [];
-
-    const errorKind = problemDetail.type ?? 'server';
-
-    // A. Mapping des champs
-    if (problemDetail.hasAnyFieldError()) {
-      for (const [fieldName, message] of Object.entries(problemDetail.fieldErrors)) {
-        const fieldNode = this.getFieldByPath(form, fieldName);
-        if (fieldNode) {
-          validationErrors.push({
-            fieldTree: fieldNode,
-            kind: errorKind,
-            message: message ?? 'Erreur de validation'
-          });
+        // Navigate through the field tree to find the matching control
+        for (const pathPart of fieldPath) {
+          if (targetFieldTree && targetFieldTree[pathPart]) {
+            targetFieldTree = targetFieldTree[pathPart];
+          }
         }
-      }
-    }
 
-    // B. Erreurs globales du formulaire
-    if (problemDetail.hasAnyGlobalError()) {
-      validationErrors.push({
-        fieldTree: form,
-        kind: errorKind,
-        message: Object.values(problemDetail.globalErrors).join(" ")
+        return {
+          kind: 'error',
+          message: message,
+          fieldTree: targetFieldTree
+        };
       });
     }
 
-    return validationErrors;
-  }
+    // Handle global errors
+    if (errorData?.globalErrors && Object.keys(errorData.globalErrors).length > 0) {
+        // Here we could map them to the root form or return them as a combined string
+        return Object.values(errorData.globalErrors).join(' ');
+    }
 
-  private getTechnicalErrorMessage(problemDetail?: ProblemDetail): string {
-    return problemDetail?.detail
-      ?? problemDetail?.title
-      ?? 'Une erreur inattendue est survenue. Veuillez réessayer.';
-  }
-
-  // Utilitaire déplacé dans le service
-  private getFieldByPath<T>(root: FieldTree<T>, path: string): any {
-    return path.split('.').reduce((obj: any, key) => obj?.[key], root);
+    // Handle specific status codes with generic messages
+    switch (errorResponse.status) {
+      case 400:
+        return errorData?.detail ?? 'Les données saisies sont invalides.';
+      case 403:
+        return 'Vous n\'avez pas les permissions nécessaires pour effectuer cette action.';
+      case 404:
+        return 'La ressource demandée est introuvable.';
+      case 409:
+        return errorData?.detail ?? 'Un conflit est survenu avec une ressource existante.';
+      case 500:
+        return 'Une erreur interne du serveur est survenue. Veuillez réessayer plus tard.';
+      default:
+        return errorData?.detail ?? 'Une erreur réseau est survenue.';
+    }
   }
 }

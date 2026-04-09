@@ -1,15 +1,15 @@
-import {FieldTree} from '@angular/forms/signals';
-
 /**
  * Validates that the end time is strictly after the start time.
  * @param context The validation context.
+ * @param fields The fields to validate (should have startTime and endTime).
  * @returns An array of errors or null if valid.
  */
 export function validateTimeRange(
-  context: any
+  context: any,
+  fields: any
 ) {
-  const startTime = context.valueOf(context.fieldTree.startTime);
-  const endTime = context.valueOf(context.fieldTree.endTime);
+  const startTime = context.valueOf(fields.startTime);
+  const endTime = context.valueOf(fields.endTime);
 
   if (startTime && endTime) {
     const startMinutes = startTime.getHours() * 60 + startTime.getMinutes();
@@ -22,8 +22,8 @@ export function validateTimeRange(
       };
 
       return [
-        {...error, fieldTree: context.fieldTree.startTime},
-        {...error, fieldTree: context.fieldTree.endTime}
+        {...error, fieldTree: fields.startTime},
+        {...error, fieldTree: fields.endTime}
       ];
     }
   }

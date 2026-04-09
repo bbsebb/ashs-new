@@ -8,7 +8,7 @@ import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
 import {Team} from '@shared-domain';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
 describe('TeamView Component (Admin)', () => {
   const mockTeam: Team = {
@@ -41,7 +41,7 @@ describe('TeamView Component (Admin)', () => {
     mocks.teamsStore.isLoadingSignal.set(true);
 
     await render(TeamView, {
-      componentInputs: { id: 't1' },
+      inputs: { id: 't1' },
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -59,7 +59,7 @@ describe('TeamView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(TeamView, {
-      componentInputs: { id: 't1' },
+      inputs: { id: 't1' },
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -80,7 +80,7 @@ describe('TeamView Component (Admin)', () => {
     const mocks = setupMocks(mockTeam);
 
     await render(TeamView, {
-      componentInputs: { id: 't1' },
+      inputs: { id: 't1' },
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -97,19 +97,17 @@ describe('TeamView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(TeamView, {
-      componentInputs: { id: 't1' },
+      inputs: { id: 't1' },
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
-        { provide: Router, useValue: mocks.router }
+        { provide: Router, useValue: mocks.router },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
+        provideAnimationsAsync('noop')
       ]
     });
 
     // S'il n'y a pas de donnée et qu'on ne charge pas, on redirige vers 404
     expect(mocks.router.navigateByUrl).toHaveBeenCalledWith('/404');
   });
-
-  // Note: La suppression nécessite une interaction avec un dialogue (mat-dialog)
-  // Cela rend le test unitaire du clic complexe sans environnement complet, 
-  // mais la vue en elle-même est testée exhaustivement sur ses différents états.
 });

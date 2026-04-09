@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/angular';
+import {render, screen, aliasedInput} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
 import {SeasonCard} from './season-card';
 import {Season} from '@shared-domain';
@@ -16,8 +16,8 @@ describe('SeasonCard Component', () => {
 
   it('should render season name and dates correctly', async () => {
     await render(SeasonCard, {
-      componentInputs: {
-        season: mockSeason
+      inputs: {
+        seasonSignal: aliasedInput('season', mockSeason)
       },
       imports: [DatePipe]
     });
@@ -29,8 +29,8 @@ describe('SeasonCard Component', () => {
 
   it('should display "Active" and "En cours" chips when applicable', async () => {
     await render(SeasonCard, {
-      componentInputs: {
-        season: mockSeason
+      inputs: {
+        seasonSignal: aliasedInput('season', mockSeason)
       },
       imports: [DatePipe]
     });
@@ -41,8 +41,8 @@ describe('SeasonCard Component', () => {
 
   it('should display "Inactive" chip when not active', async () => {
     await render(SeasonCard, {
-      componentInputs: {
-        season: { ...mockSeason, isActive: false, isCurrent: false }
+      inputs: {
+        seasonSignal: aliasedInput('season', { ...mockSeason, isActive: false, isCurrent: false })
       },
       imports: [DatePipe]
     });

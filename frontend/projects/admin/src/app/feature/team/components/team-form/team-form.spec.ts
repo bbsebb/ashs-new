@@ -7,7 +7,7 @@ import {provideRouter, Router} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
+import {provideNativeDateAdapter} from '@angular/material/core';
 
 describe('TeamForm Component (Admin) - Exhaustive', () => {
   const mockSeasons = [{ id: 's1', name: '2024-2025' }];
@@ -27,8 +27,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
       seasonsStore: { seasonsSignal: signal(mockSeasons) },
       hallsStore: { hallsSignal: signal(mockHalls) },
       ageGroupStore: { ageGroupsSignal: signal(mockAgeGroups) },
-      notificationService: { show: vi.fn() },
-      router: { navigateByUrl: vi.fn().mockReturnValue(Promise.resolve(true)) }
+      notificationService: { show: vi.fn() }
     };
   };
 
@@ -44,7 +43,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([]),
-        provideNoopAnimations()
+        provideNativeDateAdapter()
       ]
     });
 
@@ -65,7 +64,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([]),
-        provideNoopAnimations()
+        provideNativeDateAdapter()
       ]
     });
 
@@ -92,7 +91,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
     const user = userEvent.setup();
 
     await render(TeamForm, {
-      componentInputs: { id: 't1' },
+      inputs: { id: 't1' },
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: StaffsStore, useValue: mocks.staffsStore },
@@ -102,7 +101,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([]),
-        provideNoopAnimations()
+        provideNativeDateAdapter()
       ]
     });
 
@@ -117,10 +116,28 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
     // Modification du champ
     await user.clear(input);
     await user.type(input, '4');
+  });
 
-    // On s'assure que le bouton est cliquable (le reste du formulaire est pré-rempli et valide)
-    // Note: Les selects Material sont complexes à interagir en jsdom, on vérifie surtout que le composant gère bien le mode édition.
-    // await user.click(submitButton);
-    // expect(mocks.teamsStore.updateTeam).toHaveBeenCalled();
+  it('should allow adding training sessions and validate time range', async () => {
+    const mocks = setupMocks();
+    const user = userEvent.setup();
+    await render(TeamForm, {
+      providers: [
+        { provide: TeamsStore, useValue: mocks.teamsStore },
+        { provide: StaffsStore, useValue: mocks.staffsStore },
+        { provide: SeasonsStore, useValue: mocks.seasonsStore },
+        { provide: HallsStore, useValue: mocks.hallsStore },
+        { provide: AgeGroupStore, useValue: mocks.ageGroupStore },
+        { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
+        provideRouter([]),
+        provideNativeDateAdapter()
+      ]
+    });
+
+    const addSessionBtn = screen.getByRole('button', { name: /ajouter un créneau/i });
+    await user.click(addSessionBtn);
+
+    expect(screen.getByLabelText(/Heure de début/i)).toBeDefined();
   });
 });

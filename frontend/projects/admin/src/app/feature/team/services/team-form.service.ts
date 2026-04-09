@@ -1,5 +1,5 @@
 import {computed, inject, Injectable, linkedSignal, signal, Signal} from '@angular/core';
-import {applyEach, FieldTree, form, max, min, required, SchemaPathTree, validateTree} from '@angular/forms/signals';
+import {applyEach, FieldTree, form, max, min, required, SchemaPathTree, validate, validateTree} from '@angular/forms/signals';
 import {
   AgeGroupStore,
   dateToLocalDateTime,
@@ -121,7 +121,7 @@ export class TeamFormService {
       required(session.timeSlot.endTime, {message: 'Le créneau horaire est requis'});
       required(session.timeSlot.startTime, {message: 'Le créneau horaire est requis'});
 
-      validateTree(session.timeSlot, (context) => validateTimeRange(context));
+      validateTree(session.timeSlot, (context) => validateTimeRange(context, session.timeSlot));
     });
   }
 

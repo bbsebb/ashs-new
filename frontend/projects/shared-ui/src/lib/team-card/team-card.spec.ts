@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/angular';
+import {render, screen, aliasedInput} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {TeamCard} from './team-card';
 import {Team} from '@shared-domain';
@@ -32,8 +32,8 @@ describe('TeamCard Component', () => {
 
   it('should render team details and enriched data from stores', async () => {
     await render(TeamCard, {
-      componentInputs: {
-        team: mockTeam
+      inputs: {
+        teamSignal: aliasedInput('team', mockTeam)
       },
       providers: [
         { provide: StaffsStore, useValue: mockStaffsStore },

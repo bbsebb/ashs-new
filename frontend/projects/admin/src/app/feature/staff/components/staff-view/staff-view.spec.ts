@@ -38,7 +38,7 @@ describe('StaffView Component (Admin)', () => {
     mocks.staffsStore.isLoadingSignal.set(true);
 
     await render(StaffView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -56,7 +56,7 @@ describe('StaffView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(StaffView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -77,7 +77,7 @@ describe('StaffView Component (Admin)', () => {
     const mocks = setupMocks(mockStaff);
 
     await render(StaffView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -94,7 +94,7 @@ describe('StaffView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(StaffView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },

@@ -7,7 +7,7 @@ import {Router, provideRouter} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {provideNativeDateAdapter} from '@angular/material/core';
 
 describe('SeasonForm Component (Admin) - Exhaustive', () => {
@@ -32,7 +32,6 @@ describe('SeasonForm Component (Admin) - Exhaustive', () => {
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations(),
         provideNativeDateAdapter()
       ]
     });
@@ -51,7 +50,6 @@ describe('SeasonForm Component (Admin) - Exhaustive', () => {
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations(),
         provideNativeDateAdapter()
       ]
     });

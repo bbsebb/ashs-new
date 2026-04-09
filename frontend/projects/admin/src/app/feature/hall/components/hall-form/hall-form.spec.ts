@@ -7,7 +7,7 @@ import {Router} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
 describe('HallForm Component (Admin) - Exhaustive', () => {
   const setupMocks = (existingHall?: any) => {
@@ -34,8 +34,7 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations()
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 
@@ -52,8 +51,7 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations()
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 
@@ -76,8 +74,7 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations()
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 
@@ -115,13 +112,12 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
     const user = userEvent.setup();
 
     await render(HallForm, {
-      componentInputs: { id: 'existing-id' },
+      inputs: { id: 'existing-id' },
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations()
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 

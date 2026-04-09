@@ -38,7 +38,7 @@ describe('HallView Component (Admin)', () => {
     mocks.hallsStore.isLoadingSignal.set(true);
 
     await render(HallView, {
-      componentInputs: { id: '1' },
+      inputs: { id: '1' },
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -55,7 +55,7 @@ describe('HallView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(HallView, {
-      componentInputs: { id: '1' },
+      inputs: { id: '1' },
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -75,7 +75,7 @@ describe('HallView Component (Admin)', () => {
     const mocks = setupMocks(mockHall);
 
     await render(HallView, {
-      componentInputs: { id: '1' },
+      inputs: { id: '1' },
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -91,7 +91,7 @@ describe('HallView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(HallView, {
-      componentInputs: { id: '1' },
+      inputs: { id: '1' },
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },

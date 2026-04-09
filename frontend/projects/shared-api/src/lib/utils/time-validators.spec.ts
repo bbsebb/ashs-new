@@ -9,16 +9,16 @@ describe('TimeValidators', () => {
       const endTime = new Date();
       endTime.setHours(11, 0);
 
+      const mockFields = { startTime: {}, endTime: {} };
       const mockContext = {
-        fieldTree: { startTime: {}, endTime: {} },
         valueOf: vi.fn().mockImplementation((field) => {
-          if (field === mockContext.fieldTree.startTime) return startTime;
-          if (field === mockContext.fieldTree.endTime) return endTime;
+          if (field === mockFields.startTime) return startTime;
+          if (field === mockFields.endTime) return endTime;
           return null;
         })
       };
 
-      expect(validateTimeRange(mockContext)).toBeNull();
+      expect(validateTimeRange(mockContext, mockFields)).toBeNull();
     });
 
     it('should return errors if startTime is after endTime', () => {
@@ -27,16 +27,16 @@ describe('TimeValidators', () => {
       const endTime = new Date();
       endTime.setHours(13, 0);
 
+      const mockFields = { startTime: { id: 'start' }, endTime: { id: 'end' } };
       const mockContext = {
-        fieldTree: { startTime: { id: 'start' }, endTime: { id: 'end' } },
         valueOf: vi.fn().mockImplementation((field) => {
-          if (field === mockContext.fieldTree.startTime) return startTime;
-          if (field === mockContext.fieldTree.endTime) return endTime;
+          if (field === mockFields.startTime) return startTime;
+          if (field === mockFields.endTime) return endTime;
           return null;
         })
       };
 
-      const result = validateTimeRange(mockContext);
+      const result = validateTimeRange(mockContext, mockFields);
       expect(result).toHaveLength(2);
       expect(result![0].message).toContain('supérieure à l\'heure de début');
     });
@@ -45,22 +45,22 @@ describe('TimeValidators', () => {
       const time = new Date();
       time.setHours(10, 0);
 
+      const mockFields = { startTime: {}, endTime: {} };
       const mockContext = {
-        fieldTree: { startTime: {}, endTime: {} },
         valueOf: vi.fn().mockReturnValue(time)
       };
 
-      const result = validateTimeRange(mockContext);
+      const result = validateTimeRange(mockContext, mockFields);
       expect(result).not.toBeNull();
     });
 
     it('should return null if one of the dates is missing', () => {
+      const mockFields = { startTime: {}, endTime: {} };
       const mockContext = {
-        fieldTree: { startTime: {}, endTime: {} },
         valueOf: vi.fn().mockReturnValue(null)
       };
 
-      expect(validateTimeRange(mockContext)).toBeNull();
+      expect(validateTimeRange(mockContext, mockFields)).toBeNull();
     });
   });
 });

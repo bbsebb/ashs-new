@@ -11,7 +11,7 @@ describe('FormSubmitButton Component', () => {
 
   it('should render custom content', async () => {
     await render(FormSubmitButton, {
-      componentInputs: {
+      inputs: {
         content: 'Sauvegarder'
       }
     });
@@ -20,7 +20,7 @@ describe('FormSubmitButton Component', () => {
 
   it('should disable button when disabled input is true', async () => {
     await render(FormSubmitButton, {
-      componentInputs: {
+      inputs: {
         disabled: true
       }
     });
@@ -29,7 +29,7 @@ describe('FormSubmitButton Component', () => {
 
   it('should show spinner and hide text when submitting', async () => {
     await render(FormSubmitButton, {
-      componentInputs: {
+      inputs: {
         submitting: true
       }
     });

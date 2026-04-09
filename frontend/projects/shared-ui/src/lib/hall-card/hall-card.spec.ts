@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/angular';
+import {render, screen, aliasedInput} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
 import {HallCard} from './hall-card';
 import {Hall} from '@shared-domain';
@@ -16,8 +16,8 @@ describe('HallCard Component', () => {
 
   it('should render hall name and address correctly', async () => {
     await render(HallCard, {
-      componentInputs: {
-        hall: mockHall
+      inputs: {
+        hallSignal: aliasedInput('hall', mockHall)
       },
       imports: [SafePipe] // Nécessaire car utilisé dans le template
     });
@@ -32,8 +32,8 @@ describe('HallCard Component', () => {
 
   it('should have a link to Google Maps with correct aria-label', async () => {
     await render(HallCard, {
-      componentInputs: {
-        hall: mockHall
+      inputs: {
+        hallSignal: aliasedInput('hall', mockHall)
       },
       imports: [SafePipe]
     });

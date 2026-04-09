@@ -5,7 +5,7 @@ import {LoadingData} from './loading-data';
 describe('LoadingData Component', () => {
   it('should render default label when loading', async () => {
     await render(LoadingData, {
-      componentInputs: {
+      inputs: {
         isLoading: true
       }
     });
@@ -17,7 +17,7 @@ describe('LoadingData Component', () => {
 
   it('should render custom label', async () => {
     await render(LoadingData, {
-      componentInputs: {
+      inputs: {
         isLoading: true,
         label: 'Chargement des salles...'
       }
@@ -28,7 +28,7 @@ describe('LoadingData Component', () => {
 
   it('should not render anything when isLoading is false', async () => {
     await render(LoadingData, {
-      componentInputs: {
+      inputs: {
         isLoading: false
       }
     });

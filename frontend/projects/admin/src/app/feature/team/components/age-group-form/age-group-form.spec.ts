@@ -7,7 +7,7 @@ import {Router, provideRouter} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
 describe('AgeGroupForm Component (Admin) - Exhaustive', () => {
   const setupMocks = () => {
@@ -27,8 +27,7 @@ describe('AgeGroupForm Component (Admin) - Exhaustive', () => {
         { provide: AgeGroupStore, useValue: mocks.ageGroupStore },
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations()
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 
@@ -46,8 +45,7 @@ describe('AgeGroupForm Component (Admin) - Exhaustive', () => {
         { provide: AgeGroupStore, useValue: mocks.ageGroupStore },
         { provide: NotificationService, useValue: mocks.notificationService },
         { provide: Router, useValue: mocks.router },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideNoopAnimations()
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 

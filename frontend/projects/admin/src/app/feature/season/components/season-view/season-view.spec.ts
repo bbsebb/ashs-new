@@ -38,7 +38,7 @@ describe('SeasonView Component (Admin)', () => {
     mocks.seasonsStore.isLoadingSignal.set(true);
 
     await render(SeasonView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -55,7 +55,7 @@ describe('SeasonView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(SeasonView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -75,7 +75,7 @@ describe('SeasonView Component (Admin)', () => {
     const mocks = setupMocks(mockSeason);
 
     await render(SeasonView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -90,7 +90,7 @@ describe('SeasonView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(SeasonView, {
-      componentInputs: { id: 's1' },
+      inputs: { id: 's1' },
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },

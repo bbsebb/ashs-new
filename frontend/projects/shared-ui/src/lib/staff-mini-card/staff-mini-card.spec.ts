@@ -7,7 +7,7 @@ import {APP_CONFIG} from '@shared-api';
 describe('StaffMiniCard Component', () => {
   it('should render staff name and role correctly', async () => {
     await render(StaffMiniCard, {
-      componentInputs: {
+      inputs: {
         staffId: 's1',
         fullName: 'Jean Dupont',
         role: 'Entraîneur',

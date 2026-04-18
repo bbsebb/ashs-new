@@ -1,6 +1,6 @@
 import {Component, computed, effect, inject, signal} from '@angular/core';
 import {SeasonsStore, StaffsStore, TeamsStore} from '@shared-api';
-import {ErrorData, LoadingData, PublicPageContainer, StaffCard} from '@shared-ui';
+import {ErrorData, LoadingData, PublicPageContainer, RoleStaffPipe, StaffCard, StaffMiniCard} from '@shared-ui';
 import {MatIconModule} from '@angular/material/icon';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
@@ -8,22 +8,26 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardActions} from '@angular/material/card';
 import {FormsModule} from '@angular/forms';
 import {RouterLink} from '@angular/router';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
 
 @Component({
   selector: 'app-staffs-list',
   standalone: true,
+  providers: [RoleStaffPipe],
   imports: [
     LoadingData,
     ErrorData,
     PublicPageContainer,
     StaffCard,
+    StaffMiniCard,
     MatIconModule,
     MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
     MatCardActions,
     FormsModule,
-    RouterLink
+    RouterLink,
+    MatButtonToggleModule
   ],
   templateUrl: './staffs-list.html',
   styleUrl: './staffs-list.scss'
@@ -32,35 +36,46 @@ export class StaffsList {
   private readonly staffsStore = inject(StaffsStore);
   private readonly seasonsStore = inject(SeasonsStore);
   private readonly teamsStore = inject(TeamsStore);
+  private readonly roleStaffPipe = inject(RoleStaffPipe);
 
+  viewModeSignal = signal<'cards' | 'mini'>('cards');
   seasonsSignal = this.seasonsStore.seasonsSignal;
   selectedSeasonIdSignal = signal<string | undefined>(undefined);
 
   isLoadingSignal = computed(() => this.staffsStore.isLoadingSignal() || this.seasonsStore.isLoadingSignal() || this.teamsStore.isLoadingSignal());
   errorSignal = computed(() => this.staffsStore.errorSignal() || this.seasonsStore.errorSignal() || this.teamsStore.errorSignal());
 
-  // Staffs filtrés : n'afficher que ceux qui ont au moins une équipe pour la saison sélectionnée
-  filteredStaffsSignal = computed(() => {
+  // Calcul des staffs filtrés avec leurs rôles consolidés et traduits pour la saison
+  staffsWithRolesSignal = computed(() => {
     const staffs = this.staffsStore.staffsSignal();
     const teams = this.teamsStore.teamsSignal();
     const selectedSeasonId = this.selectedSeasonIdSignal();
 
     if (!selectedSeasonId) return [];
 
-    // On filtre les équipes de la saison sélectionnée
     const teamsOfSeason = teams.filter(t => t.seasonId === selectedSeasonId);
 
-    // On récupère les IDs des staffs qui encadrent ces équipes
-    const staffIdsOfSeason = new Set(
-      teamsOfSeason.flatMap(t => t.staffs.map(s => s.staffId))
-    );
+    return staffs
+      .map(staff => {
+        const staffTeams = teamsOfSeason.filter(t => t.staffs.some(s => s.staffId === staff.id));
+        if (staffTeams.length === 0) return null;
 
-    // On retourne les staffs correspondants
-    return staffs.filter(s => staffIdsOfSeason.has(s.id));
+        // On récupère les rôles uniques, on les traduit, puis on les joint
+        const roles = [...new Set(staffTeams.flatMap(t =>
+          t.staffs.filter(s => s.staffId === staff.id).map(s => s.role)
+        ))];
+
+        const translatedRoles = roles.map(role => this.roleStaffPipe.transform(role));
+
+        return {
+          staff,
+          rolesSummary: translatedRoles.join(', ')
+        };
+      })
+      .filter((item): item is { staff: any, rolesSummary: string } => item !== null);
   });
 
   constructor() {
-    // Initialisation de la saison sélectionnée sur la saison courante dès qu'elle est disponible
     effect(() => {
       const currentSeason = this.seasonsStore.currentSeasonSignal();
       if (currentSeason && !this.selectedSeasonIdSignal()) {
@@ -71,6 +86,10 @@ export class StaffsList {
 
   protected onSeasonChange(seasonId: string) {
     this.selectedSeasonIdSignal.set(seasonId);
+  }
+
+  protected toggleView(mode: 'cards' | 'mini') {
+    this.viewModeSignal.set(mode);
   }
 
   protected retry() {

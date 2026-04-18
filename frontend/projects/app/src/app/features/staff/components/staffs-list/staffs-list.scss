@@ -22,9 +22,16 @@
     margin: 0;
   }
 
-  .season-selector {
-    width: 100%;
-    max-width: 300px;
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .season-selector {
+      width: 250px;
+    }
   }
 }
 
@@ -34,15 +41,39 @@
   gap: 32px;
   justify-content: center;
 
-  // On cible les cartes de staff directement
+  // Mode cartes larges
   & > * {
     flex: 1 1 350px;
-    max-width: 450px; // Aligné sur le max-width interne de lib-staff-card
-    min-width: 0; // Évite les débordements sur mobile
+    max-width: 450px;
+    min-width: 0;
   }
 
   mat-card-actions {
     padding: 8px 16px 16px;
+  }
+
+  // Mode mini-cartes
+  &.mini-mode {
+    gap: 16px;
+    justify-content: flex-start;
+
+    & > * {
+      flex: 0 1 calc(33.333% - 16px);
+      max-width: none;
+      min-width: 280px;
+    }
+
+    @media (max-width: 900px) {
+      & > * {
+        flex: 0 1 calc(50% - 16px);
+      }
+    }
+
+    @media (max-width: 600px) {
+      & > * {
+        flex: 1 1 100%;
+      }
+    }
   }
 }
 

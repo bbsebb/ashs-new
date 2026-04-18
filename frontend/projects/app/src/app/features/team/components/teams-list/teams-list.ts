@@ -62,8 +62,7 @@ export class TeamsList {
       result = result.filter(t => t.gender === gender);
     }
 
-    // Tri alphabétique par nom de catégorie pour un meilleur rendu en liste
-    return [...result].sort((a, b) => a.ageGroup.name.localeCompare(b.ageGroup.name));
+    return result;
   });
 
   constructor() {

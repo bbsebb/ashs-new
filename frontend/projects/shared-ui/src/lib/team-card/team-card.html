@@ -51,7 +51,7 @@
       </h3>
       @if (enrichedStaffs.length > 0) {
         <div class="staff-list">
-          @for (staff of enrichedStaffs; track staff.id) {
+          @for (staff of enrichedStaffs; track $index) {
             <lib-staff-mini-card
               [staffId]="staff.staffId"
               [fullName]="staff.fullName"
@@ -75,7 +75,7 @@
       </h3>
       @if (enrichedSessions.length > 0) {
         <div class="session-list">
-          @for (session of enrichedSessions; track session.id) {
+          @for (session of enrichedSessions; track $index) {
             <lib-training-session-item
               [dayOfWeek]="session.dayOfWeek"
               [startTime]="session.timeSlot.startTime"

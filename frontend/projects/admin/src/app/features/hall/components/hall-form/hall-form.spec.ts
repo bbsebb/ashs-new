@@ -1,13 +1,12 @@
-import {render, screen, waitFor} from '@testing-library/angular';
+import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {HallForm} from './hall-form';
-import {HallsStore, APP_CONFIG} from '@shared-api';
+import {APP_CONFIG, HallsStore} from '@shared-api';
 import {signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
-import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
 describe('HallForm Component (Admin) - Exhaustive', () => {
   const setupMocks = (existingHall?: any) => {
@@ -56,7 +55,7 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
     });
 
     const nameInput = screen.getByLabelText(/^Nom de la salle$/i);
-    
+
     // On clique dedans puis on clique ailleurs (touched)
     await user.click(nameInput);
     await user.click(document.body);
@@ -85,7 +84,7 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
     await user.type(screen.getByLabelText(/^Pays$/i), 'France');
 
     const submitButton = screen.getByRole('button', { name: /enregistrer/i });
-    
+
     // Le bouton doit être activé
     expect((submitButton as HTMLButtonElement).disabled).toBeFalsy();
 
@@ -107,7 +106,7 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
       addressPostalCode: '75000',
       addressCountry: 'France'
     };
-    
+
     const mocks = setupMocks(existingHall);
     const user = userEvent.setup();
 
@@ -125,7 +124,7 @@ describe('HallForm Component (Admin) - Exhaustive', () => {
     expect(nameInput.value).toBe('Ancienne Salle');
 
     const submitButton = screen.getByRole('button', { name: /modifier/i });
-    
+
     // On modifie une valeur
     await user.clear(nameInput);
     await user.type(nameInput, 'Salle Renommée');

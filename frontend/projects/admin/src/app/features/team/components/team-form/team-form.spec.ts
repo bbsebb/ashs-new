@@ -1,9 +1,9 @@
-import {render, screen, waitFor} from '@testing-library/angular';
+import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {TeamForm} from './team-form';
-import {AgeGroupStore, HallsStore, SeasonsStore, StaffsStore, TeamsStore, APP_CONFIG} from '@shared-api';
+import {AgeGroupStore, APP_CONFIG, HallsStore, SeasonsStore, StaffsStore, TeamsStore} from '@shared-api';
 import {signal} from '@angular/core';
-import {provideRouter, Router} from '@angular/router';
+import {provideRouter} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
@@ -86,7 +86,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
       trainingSessions: [],
       photoFileName: null
     };
-    
+
     const mocks = setupMocks(existingTeam);
     const user = userEvent.setup();
 
@@ -108,7 +108,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
     // En mode édition, le numéro d'équipe doit être pré-rempli à 3
     const input = screen.getByLabelText(/Numéro d'équipe/i) as HTMLInputElement;
     expect(input.value).toBe('3');
-    
+
     // Le bouton doit afficher "Modifier"
     const submitButton = screen.getByRole('button', { name: /modifier/i });
     expect(submitButton).toBeDefined();

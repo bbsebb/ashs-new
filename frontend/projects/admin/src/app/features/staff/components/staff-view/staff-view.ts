@@ -1,8 +1,7 @@
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {StaffsStore} from '@shared-api';
-import {ErrorData, LoadingData, NotificationService} from '@shared-ui';
-import {StaffCard} from '@shared-ui';
+import {ErrorData, LoadingData, NotificationService, StaffCard} from '@shared-ui';
 import {MatCardActions} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';

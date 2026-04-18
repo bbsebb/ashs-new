@@ -1,9 +1,9 @@
-import {computed, inject, Injectable, linkedSignal, signal} from '@angular/core';
+import {computed, inject, Injectable, linkedSignal} from '@angular/core';
 import {AgeGroupStore, CreateAgeGroupDTO, FormErrorHandleService} from '@shared-api';
 import {Router} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {FieldTree, form, schema, SchemaPathTree} from '@angular/forms/signals';
-import {catchError, firstValueFrom, map, of, tap} from 'rxjs';
+import {firstValueFrom} from 'rxjs';
 import {MatDialogRef} from '@angular/material/dialog';
 import {AgeGroupFormModel} from './age-group.dtos';
 
@@ -43,7 +43,7 @@ export class AgeGroupFormService {
     try {
       const result = await firstValueFrom(this._ageGroupStore.createAgeGroup(ageGroupDTO));
       this._notificationService.show("La catégorie a été enregistrée", 'success');
-      
+
       if (this._dialogReference) {
         this._dialogReference.close(result);
       } else {

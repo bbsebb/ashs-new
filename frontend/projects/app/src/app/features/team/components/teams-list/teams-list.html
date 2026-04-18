@@ -4,26 +4,56 @@
   } @else if (errorSignal()) {
     <app-error-data dataName="équipes" (onRetry)="retry()"/>
   } @else {
-    <div class="filter-section">
-      <mat-form-field appearance="outline">
-        <mat-label>Saison</mat-label>
-        <mat-select [value]="selectedSeasonIdSignal()" (selectionChange)="onSeasonChange($event.value)">
-          @for (season of seasonsSignal(); track season.id) {
-            <mat-option [value]="season.id">
-              {{ season.name }} @if (season.isCurrent) { (Actuelle) }
-            </mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
+    <header class="list-header">
+      <div class="header-actions">
+        <div class="filter-section">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Saison</mat-label>
+            <mat-select [value]="selectedSeasonIdSignal()" (selectionChange)="onSeasonChange($event.value)">
+              @for (season of seasonsSignal(); track season.id) {
+                <mat-option [value]="season.id">
+                  {{ season.name }} @if (season.isCurrent) {
+                  (Actuelle)
+                }
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
-    <section class="teams-grid">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Genre</mat-label>
+            <mat-select [value]="selectedGenderSignal()" (selectionChange)="onGenderChange($event.value)">
+              <mat-option value="All">Tous les genres</mat-option>
+              @for (gender of genders; track gender) {
+                <mat-option [value]="gender">{{ gender | gender: 'long' }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-button-toggle-group [value]="viewModeSignal()" (change)="toggleView($event.value)"
+                                 aria-label="Mode d'affichage">
+          <mat-button-toggle value="cards" title="Vue grandes cartes">
+            <mat-icon>grid_view</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="mini" title="Vue compacte">
+            <mat-icon>view_list</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </header>
+
+    <section class="teams-grid" [class.mini-mode]="viewModeSignal() === 'mini'">
       @for (team of filteredTeamsSignal(); track team.id) {
-        <lib-team-card [team]="team"></lib-team-card>
+        @if (viewModeSignal() === 'cards') {
+          <lib-team-card [team]="team"></lib-team-card>
+        } @else {
+          <lib-team-mini-card [team]="team"></lib-team-mini-card>
+        }
       } @empty {
         <div class="empty-state">
           <mat-icon>diversity_3</mat-icon>
-          <p>Aucune équipe n'est répertoriée pour cette saison.</p>
+          <p>Aucune équipe n'est répertoriée avec ces critères.</p>
         </div>
       }
     </section>

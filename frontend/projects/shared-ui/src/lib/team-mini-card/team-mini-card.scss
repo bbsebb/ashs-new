@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.team-mini-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background-color: var(--mat-sys-surface-container-low);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: var(--mat-sys-surface-container-high);
+    border-color: var(--mat-sys-outline-variant);
+    transform: translateX(4px);
+  }
+}
+
+.team-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.category-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}
+
+.gender-label {
+  font-size: 0.85rem;
+  color: var(--mat-sys-secondary);
+}
+
+.chevron {
+  color: var(--mat-sys-outline);
+  opacity: 0.5;
+}

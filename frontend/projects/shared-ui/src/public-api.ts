@@ -19,15 +19,15 @@ export * from './lib/services/breakpoint.service';
 export * from './lib/services/image.service';
 export * from './lib/hall-card/hall-card';
 export * from './lib/season-card/season-card';
+export * from './lib/team-card/team-card';
+export * from './lib/team-mini-card/team-mini-card';
 export * from './lib/staff-card/staff-card';
 export * from './lib/staff-mini-card/staff-mini-card';
+export * from './lib/staff-teams-list/staff-teams-list';
 export * from './lib/training-session-item/training-session-item';
 export * from './lib/admin-page-container/admin-page-container';
 export * from './lib/public-page-container/public-page-container';
-export * from './lib/team-card/team-card';
 export * from './lib/pipes/role-staff-pipe';
 export * from './lib/pipes/day-of-week-pipe';
 export * from './lib/pipes/gender-pipe';
 export * from './lib/pipes/category-pipe';
-
-

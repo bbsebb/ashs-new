@@ -1,8 +1,8 @@
 import {describe, expect, it} from 'vitest';
-import {AgeLimitPipe} from './age-limit-pipe';
+import {CategoryPipe} from '@shared-ui';
 
 describe('AgeLimitPipe', () => {
-  const pipe = new AgeLimitPipe();
+  const pipe = new CategoryPipe();
 
   it('should transform true to "-" in short format', () => {
     expect(pipe.transform(true)).toBe('-');

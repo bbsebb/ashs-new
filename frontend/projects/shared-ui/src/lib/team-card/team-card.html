@@ -23,7 +23,7 @@
                   [class.female]="team.gender === 'Female'"
                   [class.male]="team.gender === 'Male'"
                   [class.mixte]="team.gender === 'Mixte'">
-          {{ team.ageGroup.upperLimit | ageLimit }}{{ team.ageGroup.ageLimit }} {{ team.gender | gender }}
+          {{ team.ageGroup.ageLimit | category:team.ageGroup.upperLimit:'short' }} {{ team.gender | gender }}
         </mat-chip>
         @if (team.teamNumber > 1) {
           <mat-chip class="number-chip">Équipe {{ team.teamNumber }}</mat-chip>
@@ -34,8 +34,10 @@
 
   <mat-card-header>
     <mat-card-title>
-      {{ team.ageGroup.upperLimit | ageLimit: 'long' }} {{ team.ageGroup.ageLimit }} ans
-      @if (team.teamNumber > 1) { ({{ team.teamNumber }}) }
+      {{ team.ageGroup.ageLimit | category:team.ageGroup.upperLimit:'long' }}
+      @if (team.teamNumber > 1) {
+        {{ team.teamNumber }}
+      }
     </mat-card-title>
     <mat-card-subtitle>{{ team.gender | gender }}</mat-card-subtitle>
   </mat-card-header>

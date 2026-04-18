@@ -1,8 +1,6 @@
 import {Component, computed, inject, input} from '@angular/core';
 import {MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
-import {AgeLimitPipe} from '../pipes/age-limit-pipe';
-import {GenderPipe} from '../pipes/gender-pipe';
-import {RoleStaffPipe} from '../pipes/role-staff-pipe';
+import {CategoryPipe, GenderPipe, RoleStaffPipe} from '../pipes';
 import {HallsStore, StaffsStore} from '@shared-api';
 import {MatIcon} from '@angular/material/icon';
 import {MatDivider} from '@angular/material/divider';
@@ -25,7 +23,7 @@ import {ImageService} from '../services/image.service';
     MatChipsModule,
     GenderPipe,
     RoleStaffPipe,
-    AgeLimitPipe,
+    CategoryPipe,
     StaffMiniCard,
     TrainingSessionItem
   ],

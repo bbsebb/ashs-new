@@ -28,6 +28,6 @@ export * from './lib/team-card/team-card';
 export * from './lib/pipes/role-staff-pipe';
 export * from './lib/pipes/day-of-week-pipe';
 export * from './lib/pipes/gender-pipe';
-export * from './lib/pipes/age-limit-pipe';
+export * from './lib/pipes/category-pipe';
 
 

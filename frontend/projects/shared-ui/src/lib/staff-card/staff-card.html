@@ -1,23 +1,39 @@
 @let staff = staffSignal();
-<mat-card appearance="outlined" class="card">
-  <mat-card-header class="header">
-    <div mat-card-avatar
-         class="example-header-image">
+
+<mat-card appearance="outlined" class="staff-card">
+  <mat-card-header>
+    <div mat-card-avatar class="staff-avatar">
+      @if (!staff.avatarFileName) {
+        <mat-icon>person</mat-icon>
+      }
     </div>
-    <mat-card-title class="title">{{ staff.firstName }} {{ staff.lastName }}</mat-card-title>
+    <mat-card-title>{{ staff.firstName }} {{ staff.lastName }}</mat-card-title>
+    <mat-card-subtitle>Membre du staff</mat-card-subtitle>
   </mat-card-header>
 
-  <mat-card-content class="content">
-    <div class="info-container">
-      <div class="info-item">
-        <span class="info-label">Email</span>
-        <span class="info-value">{{ staff.email }}</span>
-      </div>
+  <mat-card-content>
+    <div class="contact-info">
+      @if (staff.email) {
+        <div class="info-row">
+          <mat-icon>email</mat-icon>
+          <span class="info-value">{{ staff.email }}</span>
+        </div>
+      }
 
-      <div class="info-item">
-        <span class="info-label">Téléphone</span>
-        <span class="info-value">{{ staff.phone }}</span>
-      </div>
+      @if (staff.phone) {
+        <div class="info-row">
+          <mat-icon>phone</mat-icon>
+          <span class="info-value">{{ staff.phone }}</span>
+        </div>
+      }
+
+      @if (!staff.email && !staff.phone) {
+        <div class="no-contact-info">
+          <p>Absence d'information de contact. Pour toute question concernant l'encadrement de l'équipe, vous pouvez
+            contacter directement le club.</p>
+          <a routerLink="/contact" class="contact-link">Nous contacter</a>
+        </div>
+      }
     </div>
   </mat-card-content>
 

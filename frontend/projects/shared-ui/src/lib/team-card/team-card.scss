@@ -4,6 +4,8 @@
 
 .team-card {
   height: 100%;
+  max-width: 600px;
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   border-radius: var(--mat-sys-corner-large);
@@ -17,7 +19,7 @@
 }
 
 .image-container {
-  height: 250px;
+  aspect-ratio: 450 / 250;
   position: relative;
   background-color: var(--mat-sys-surface-container-high);
   overflow: hidden;

@@ -1,1 +1,14 @@
-<p>hall-view works!</p>
+@let hall = hallSignal();
+@if (isLoadingSignal()) {
+  <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()"/>
+} @else if (errorSignal()) {
+  <app-error-data dataName="salles" (onRetry)="retry()"/>
+} @else if (!hall) {
+  <p>Aucune salle</p>
+} @else {
+  <lib-hall-card [hall]="hall">
+    <mat-card-actions actions align="end">
+      <button mat-button type="button" routerLink="/halls">Retour à la liste</button>
+    </mat-card-actions>
+  </lib-hall-card>
+}

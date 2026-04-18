@@ -1,16 +1,29 @@
 import {Component, computed, inject, input} from '@angular/core';
-import {MatCard, MatCardAvatar, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
+import {
+  MatCard,
+  MatCardAvatar,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle
+} from "@angular/material/card";
+import {MatIcon} from '@angular/material/icon';
+import {RouterLink} from '@angular/router';
 import {Staff} from '@shared-domain';
 import {ImageService} from '../services/image.service';
 
 @Component({
   selector: 'lib-staff-card',
+  standalone: true,
   imports: [
     MatCard,
     MatCardContent,
     MatCardHeader,
     MatCardTitle,
+    MatCardSubtitle,
     MatCardAvatar,
+    MatIcon,
+    RouterLink
   ],
   templateUrl: './staff-card.html',
   styleUrl: './staff-card.scss',
@@ -23,6 +36,7 @@ export class StaffCard {
   staffSignal = input.required<Staff>({alias: 'staff'});
 
   avatarUrlSignal = computed(() => {
-    return this._imageService.buildCssBackgroundImageUrl(this._imageService.createImageSourceUrl(this.staffSignal().avatarFileName));
+    const url = this._imageService.createImageSourceUrl(this.staffSignal().avatarFileName);
+    return url ? `url(${url})` : 'none';
   });
 }

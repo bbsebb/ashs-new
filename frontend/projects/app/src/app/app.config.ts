@@ -1,5 +1,5 @@
 import {ApplicationConfig, provideBrowserGlobalErrorListeners} from '@angular/core';
-import {provideRouter, TitleStrategy, withInMemoryScrolling} from '@angular/router';
+import {provideRouter, TitleStrategy, withComponentInputBinding, withInMemoryScrolling} from '@angular/router';
 
 import {routes} from './app.routes';
 import {MENU_CONFIG, provideSharedIcons} from '@shared-ui';
@@ -17,7 +17,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     // provideHttpClient(withInterceptors([delayInterceptor])),
-    provideRouter(routes, withInMemoryScrolling({scrollPositionRestoration: 'top', anchorScrolling: 'enabled'})),
+    provideRouter(routes, withInMemoryScrolling({
+      scrollPositionRestoration: 'top',
+      anchorScrolling: 'enabled'
+    }), withComponentInputBinding()),
     {provide: TitleStrategy, useClass: MyCustomPageTitleStrategy},
     provideSharedIcons(),
     {

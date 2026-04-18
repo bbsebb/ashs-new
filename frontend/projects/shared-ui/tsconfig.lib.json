@@ -6,11 +6,7 @@
     "outDir": "../../out-tsc/lib",
     "declaration": true,
     "declarationMap": true,
-    "types": [],
-    "paths": {
-      "@shared-domain": ["../../dist/shared-domain"],
-      "@shared-api": ["../../dist/shared-api"]
-    }
+    "types": []
   },
   "include": [
     "src/**/*.ts"

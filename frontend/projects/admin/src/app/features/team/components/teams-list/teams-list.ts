@@ -1,5 +1,5 @@
-import {Component, computed, effect, inject, viewChild} from '@angular/core';
-import {LayoutService, TeamsStore} from '@shared-api';
+import {Component, computed, effect, inject, signal, viewChild} from '@angular/core';
+import {LayoutService, SeasonsStore, TeamsStore} from '@shared-api';
 import {AdminPageContainer, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {
   MatCell,
@@ -22,6 +22,8 @@ import {RouterLink} from '@angular/router';
 import {MatIcon} from '@angular/material/icon';
 import {Team} from '@shared-domain';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatSelectModule} from '@angular/material/select';
 
 @Component({
   selector: 'app-teams-list',
@@ -47,19 +49,33 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
     MatIcon,
     MatNoDataRow,
     MatFabButton,
-    FormDeleteButton
+    FormDeleteButton,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   templateUrl: './teams-list.html',
   styleUrl: './teams-list.scss',
 })
 export class TeamsList {
   private readonly _teamsStore = inject(TeamsStore);
+  private readonly _seasonsStore = inject(SeasonsStore);
   private readonly _layoutService = inject(LayoutService);
   private readonly _notificationService = inject(NotificationService);
 
-  teamsSignal = this._teamsStore.teamsSignal;
-  isLoadingSignal = this._teamsStore.isLoadingSignal;
-  errorSignal = computed(() => !!this._teamsStore.errorSignal());
+  seasonsSignal = this._seasonsStore.seasonsSignal;
+  selectedSeasonIdSignal = signal<string | undefined>(undefined);
+
+  isLoadingSignal = computed(() => this._teamsStore.isLoadingSignal() || this._seasonsStore.isLoadingSignal());
+  errorSignal = computed(() => !!this._teamsStore.errorSignal() || !!this._seasonsStore.errorSignal());
+
+  // Données filtrées par saison pour la table
+  filteredTeamsSignal = computed(() => {
+    const teams = this._teamsStore.teamsSignal();
+    const selectedSeasonId = this.selectedSeasonIdSignal();
+
+    if (!selectedSeasonId) return teams;
+    return teams.filter(t => t.seasonId === selectedSeasonId);
+  });
 
   displayedColumns = computed(() => this._layoutService.isDesktopSignal() ? ['category', 'gender', 'teamNumber', 'actions'] : ['category', 'gender', 'actions']);
 
@@ -69,15 +85,29 @@ export class TeamsList {
   sort = viewChild(MatSort);
 
   constructor() {
+    // Initialisation saison courante
     effect(() => {
-      this.dataSource.data = this.teamsSignal();
+      const currentSeason = this._seasonsStore.currentSeasonSignal();
+      if (currentSeason && !this.selectedSeasonIdSignal()) {
+        this.selectedSeasonIdSignal.set(currentSeason.id);
+      }
+    });
+
+    // Mise à jour de la table
+    effect(() => {
+      this.dataSource.data = this.filteredTeamsSignal();
       this.dataSource.paginator = this.paginator() ?? null;
       this.dataSource.sort = this.sort() ?? null;
     });
   }
 
+  protected onSeasonChange(seasonId: string) {
+    this.selectedSeasonIdSignal.set(seasonId);
+  }
+
   protected retry(): void {
     this._teamsStore.reload();
+    this._seasonsStore.reload();
   }
 
   protected onDelete(id: string) {

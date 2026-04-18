@@ -1,0 +1,30 @@
+@let assignedTeams = enrichedTeamsSignal();
+@let currentSeasonId = seasonId();
+
+@if (assignedTeams.length > 0) {
+  <mat-divider></mat-divider>
+  <div class="teams-section">
+    <h3 class="section-title">
+      <mat-icon>groups</mat-icon>
+      {{ currentSeasonId ? 'Équipes encadrées' : 'Historique des équipes' }}
+    </h3>
+    <div class="teams-list">
+      @for (assignedTeam of assignedTeams; track $index) {
+        <a [routerLink]="['/teams', assignedTeam.id]" class="team-item">
+          <div class="team-info">
+            @if (!currentSeasonId) {
+              <span class="season-label">{{ assignedTeam.seasonName }}</span>
+            }
+            <span class="team-name">
+                {{ assignedTeam.ageGroup.ageLimit | category:assignedTeam.ageGroup.upperLimit:'short' }}
+              @if (assignedTeam.teamNumber > 1) {
+                {{ assignedTeam.teamNumber }}
+              }
+              </span>
+          </div>
+          <span class="team-role">{{ assignedTeam.role | roleStaff }}</span>
+        </a>
+      }
+    </div>
+  </div>
+}

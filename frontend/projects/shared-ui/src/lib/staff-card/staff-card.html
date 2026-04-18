@@ -12,6 +12,7 @@
   </mat-card-header>
 
   <mat-card-content>
+    <!-- Informations de contact -->
     <div class="contact-info">
       @if (staff.email) {
         <div class="info-row">
@@ -29,12 +30,14 @@
 
       @if (!staff.email && !staff.phone) {
         <div class="no-contact-info">
-          <p>Absence d'information de contact. Pour toute question concernant l'encadrement de l'équipe, vous pouvez
-            contacter directement le club.</p>
+          <p>Pour toute question concernant l'encadrement de l'équipe, vous pouvez contacter directement le club.</p>
           <a routerLink="/contact" class="contact-link">Nous contacter</a>
         </div>
       }
     </div>
+
+    <!-- Liste des équipes (Composant dédié) -->
+    <lib-staff-teams-list [staffId]="staff.id" [seasonId]="seasonIdSignal()"></lib-staff-teams-list>
   </mat-card-content>
 
   <ng-content select="[actions]"></ng-content>

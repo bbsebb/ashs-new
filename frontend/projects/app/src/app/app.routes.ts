@@ -20,7 +20,16 @@ export const routes: Routes = [
   {
     path: 'teams',
     title: 'Nos Équipes',
-    loadComponent: () => import('./features/team/components/teams-list/teams-list').then(m => m.TeamsList)
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/team/components/teams-list/teams-list').then(m => m.TeamsList)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/team/components/team-view/team-view').then(m => m.TeamView)
+      },
+    ]
   },
   {
     path: 'staffs',

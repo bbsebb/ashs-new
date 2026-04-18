@@ -1,6 +1,6 @@
 import {computed, inject, Injectable, Signal} from '@angular/core';
 import {Observable, tap} from 'rxjs';
-import {Team} from '@shared-domain';
+import {StaffRoleValue, Team} from '@shared-domain';
 import {TeamGateway} from './team.gateway';
 import {CreateTeamDTO, UpdateTeamDTO} from './team.dtos';
 
@@ -47,6 +47,20 @@ export class TeamsStore {
     return this._teamGateway.updateTeam(teamId, updateTeamDTO, blobPhoto).pipe(
       tap((updatedTeam) => this._teamsResource.update(teamsList => teamsList.map(team => team.id === updatedTeam.id ? updatedTeam : team)))
     );
+  }
+
+  teamsByStaffId(staffIdSignal: Signal<string | undefined>) {
+    return computed(() => {
+      const staffId = staffIdSignal();
+      if (!staffId) return [];
+
+      return this.teamsSignal()
+        .map(team => {
+          const assignment = team.staffs.find(s => s.staffId === staffId);
+          return assignment ? {...team, role: assignment.role as StaffRoleValue} : null;
+        })
+        .filter((team): team is (Team & { role: StaffRoleValue }) => team !== null);
+    });
   }
 
   onStaffDeleted(staffID: string) {

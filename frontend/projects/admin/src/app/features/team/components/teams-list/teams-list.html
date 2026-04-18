@@ -4,10 +4,26 @@
   <app-error-data dataName="équipes" (onRetry)="retry()"/>
 } @else {
   <app-admin-page-container title="Équipes" subtitle="Gestion des équipes">
-    <a mat-fab extended routerLink="/teams/create" aria-label="Ajouter une équipe" header-actions>
-      <mat-icon>add</mat-icon>
-      Ajouter
-    </a>
+    <div slot="header-actions" class="header-actions">
+      <mat-form-field appearance="outline" class="season-selector" subscriptSizing="dynamic">
+        <mat-label>Saison</mat-label>
+        <mat-select [value]="selectedSeasonIdSignal()" (selectionChange)="onSeasonChange($event.value)">
+          @for (season of seasonsSignal(); track season.id) {
+            <mat-option [value]="season.id">
+              Saison {{ season.name }}
+              @if (season.isCurrent) {
+                (Actuelle)
+              }
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <a mat-fab extended routerLink="/teams/create" aria-label="Ajouter une équipe">
+        <mat-icon>add</mat-icon>
+        Ajouter
+      </a>
+    </div>
 
     <div class="table-container">
       <table mat-table [dataSource]="dataSource" matSort>
@@ -15,7 +31,7 @@
         <ng-container matColumnDef="category">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Catégorie</th>
           <td mat-cell *matCellDef="let team" data-label="Catégorie">
-            {{ team.ageGroup.isUpperLimit ? 'U' : '' }}{{ team.ageGroup.ageLimit }}
+            {{ team.ageGroup.upperLimit ? 'U' : '' }}{{ team.ageGroup.ageLimit }}
           </td>
         </ng-container>
 
@@ -51,7 +67,7 @@
         <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell" [attr.colspan]="displayedColumns().length">
-            Aucune équipe à afficher.
+            Aucune équipe à afficher pour cette saison.
           </td>
         </tr>
       </table>

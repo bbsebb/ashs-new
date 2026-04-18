@@ -1,0 +1,77 @@
+:host {
+  display: block;
+}
+
+.teams-section {
+  padding-top: 20px;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font: var(--mat-sys-label-large);
+    font-weight: 600;
+    color: var(--mat-sys-primary);
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.teams-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.team-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: var(--mat-sys-surface-container-low);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    background-color: var(--mat-sys-surface-container-high);
+    border-color: var(--mat-sys-outline-variant);
+    transform: translateX(4px);
+  }
+
+  .team-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .season-label {
+    font: var(--mat-sys-label-small);
+    background-color: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .team-name {
+    font: var(--mat-sys-label-large);
+    font-weight: 600;
+  }
+
+  .team-role {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-secondary);
+    text-transform: capitalize;
+    text-align: right;
+  }
+}

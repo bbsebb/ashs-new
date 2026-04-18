@@ -36,9 +36,8 @@ export class TeamTrainingSessionFields {
 
   sessionsArray = input.required<FieldTree<TeamFormModel['trainingSessions']>>();
 
-  // On aide IntelliJ en extrayant le signal dans une propriété explicite
-  protected readonly sessionsSignal = computed(() => this.sessionsArray());
-
+  // L'opérateur [...] force la conversion en Array réel, ce qui satisfait IntelliJ
+  protected readonly sessionsSignal = computed(() => [...this.sessionsArray()]);
   hallsSignal = this.teamFormService.hallsSignal;
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   dayOfWeeks = Object.values(DAY_OF_WEEKS);

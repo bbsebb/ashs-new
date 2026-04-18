@@ -1,4 +1,4 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {FieldTree, FormField} from '@angular/forms/signals';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
@@ -31,6 +31,10 @@ export class TeamStaffFields {
   protected readonly teamFormService = inject(TeamFormService);
 
   staffsArray = input.required<FieldTree<TeamFormModel['staffs']>>();
+
+  // On aide IntelliJ en convertissant l'itérable complexe en tableau réel
+  protected readonly staffsFormSignal = computed(() => [...this.staffsArray()]);
+
   staffsSignal = this.teamFormService.staffsSignal;
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   staffRoles = Object.values(STAFF_ROLE_VALUE);

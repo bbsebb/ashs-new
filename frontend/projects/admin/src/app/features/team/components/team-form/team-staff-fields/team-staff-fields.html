@@ -6,25 +6,25 @@
   </button>
 </div>
 
-@for (staff of staffsArray(); track $index) {
+@for (staffField of staffsFormSignal(); track $index) {
   <div class="optional-form-fields">
     <div class="form-fields">
       <mat-form-field class="field" appearance="outline">
         <mat-label>Rôle</mat-label>
-        <mat-select [formField]="staffsArray()[$index].role">
+        <mat-select [formField]="staffField.role">
           @for (staffRole of staffRoles; track staffRole) {
             <mat-option [value]="staffRole">
               {{ staffRole | roleStaff }}
             </mat-option>
           }
         </mat-select>
-        <mat-error *appError="staffsArray()[$index].role; let errorMsg">
+        <mat-error *appError="staffField.role; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
       <mat-form-field class="field" appearance="outline">
         <mat-label>Encadrant</mat-label>
-        <mat-select [formField]="staffsArray()[$index].staffId">
+        <mat-select [formField]="staffField.staffId">
           @for (staff of staffsSignal(); track staff.id) {
             <mat-option [value]="staff.id">
               {{ staff.firstName }} {{ staff.lastName }}
@@ -32,7 +32,7 @@
           }
           <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addStaffMember($index)" [value]="null">Ajouter un encadrant</mat-option>
         </mat-select>
-        <mat-error *appError="staffsArray()[$index].staffId; let errorMsg">
+        <mat-error *appError="staffField.staffId; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>

@@ -26,7 +26,8 @@
 - **Composants :**
     - Utilise au maximum les composants d'Angular Material 21.
     - **Structure :** Tout composant Angular doit être impérativement structuré en 3 fichiers distincts (`.ts`, `.html`, `.scss`). L'utilisation de templates ou de styles inline est interdite.
-- **Stylisation :** Utilise exclusivement SCSS.
+- **Stylisation :** Utilise exclusivement SCSS. Interdiction formelle d'utiliser CSS Grid ; utilise exclusivement
+  Flexbox pour tous les layouts.
 - **Nommage CSS :**
     - Utilise des noms de classes simples, courts et sémantiques (ex: `.card`, `.title`, `.actions`).
     - **Interdiction :** Ne pas utiliser le style `composant__nom` ou `bloc__element` (BEM).

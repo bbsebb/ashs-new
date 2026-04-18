@@ -16,6 +16,10 @@ export class SeasonsStore {
     this._seasonsResource.hasValue() ? this._seasonsResource.value() : []
   );
 
+  readonly currentSeasonSignal = computed(() =>
+    this.seasonsSignal().find(season => season.isCurrent)
+  );
+
   isLoadingSignal = this._seasonsResource.isLoading;
   errorSignal = this._seasonsResource.error;
 

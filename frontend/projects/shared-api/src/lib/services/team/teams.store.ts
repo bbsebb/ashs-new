@@ -1,6 +1,6 @@
 import {computed, inject, Injectable, Signal} from '@angular/core';
 import {Observable, tap} from 'rxjs';
-import {Team} from '@shared-domain';
+import {StaffRoleValue, Team} from '@shared-domain';
 import {TeamGateway} from './team.gateway';
 import {CreateTeamDTO, UpdateTeamDTO} from './team.dtos';
 
@@ -10,7 +10,34 @@ import {CreateTeamDTO, UpdateTeamDTO} from './team.dtos';
 export class TeamsStore {
   private readonly _teamGateway = inject(TeamGateway);
   private readonly _teamsResource = this._teamGateway.getTeams();
-  readonly teamsSignal: Signal<Team[]> = computed(() => this._teamsResource.hasValue() ? this._teamsResource.value() : []);
+  readonly teamsSignal: Signal<Team[]> = computed(() => {
+    const teams = this._teamsResource.hasValue() ? this._teamsResource.value() : [];
+    return [...teams].sort(TeamsStore.sortTeams);
+  });
+
+  /**
+   * Logique de tri métier des équipes :
+   * 1. Genre (Féminin > Masculin > Mixte)
+   * 2. Sens de la limite (Sans limite "Moins de" d'abord)
+   * 3. Limite d'âge (Croissant)
+   * 4. Numéro d'équipe (Croissant)
+   */
+  public static sortTeams(a: Team, b: Team): number {
+    // 1. Tri par genre
+    if (a.gender !== b.gender) {
+      return a.gender.localeCompare(b.gender);
+    }
+    // 2. Tri par upperLimit (false d'abord)
+    if (a.ageGroup.upperLimit !== b.ageGroup.upperLimit) {
+      return a.ageGroup.upperLimit ? 1 : -1;
+    }
+    // 3. Tri par limite d'âge
+    if (a.ageGroup.ageLimit !== b.ageGroup.ageLimit) {
+      return a.ageGroup.ageLimit - b.ageGroup.ageLimit;
+    }
+    // 4. Tri par numéro d'équipe
+    return a.teamNumber - b.teamNumber;
+  }
 
 
   isLoadingSignal = this._teamsResource.isLoading;
@@ -47,6 +74,20 @@ export class TeamsStore {
     return this._teamGateway.updateTeam(teamId, updateTeamDTO, blobPhoto).pipe(
       tap((updatedTeam) => this._teamsResource.update(teamsList => teamsList.map(team => team.id === updatedTeam.id ? updatedTeam : team)))
     );
+  }
+
+  teamsByStaffId(staffIdSignal: Signal<string | undefined>) {
+    return computed(() => {
+      const staffId = staffIdSignal();
+      if (!staffId) return [];
+
+      return this.teamsSignal()
+        .map(team => {
+          const assignment = team.staffs.find(s => s.staffId === staffId);
+          return assignment ? {...team, role: assignment.role as StaffRoleValue} : null;
+        })
+        .filter((team): team is (Team & { role: StaffRoleValue }) => team !== null);
+    });
   }
 
   onStaffDeleted(staffID: string) {

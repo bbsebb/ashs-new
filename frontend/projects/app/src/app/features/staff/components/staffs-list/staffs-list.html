@@ -1,18 +1,67 @@
-<app-public-page-container title="Notre Staff" subtitle="Découvrez les visages qui font vivre l'association et encadrent nos équipes.">
+<app-public-page-container title="Encadrement">
   @if (isLoadingSignal()) {
-    <app-loading-data label="Chargement du staff" [isLoading]="isLoadingSignal()"/>
+    <app-loading-data label="Chargement de l'encadrement" [isLoading]="isLoadingSignal()"/>
   } @else if (errorSignal()) {
-    <app-error-data dataName="staff" (onRetry)="retry()"/>
+    <app-error-data dataName="encadrants" (onRetry)="retry()"/>
   } @else {
-    <section class="staff-grid">
-      @for (staff of staffsSignal(); track staff.id) {
-        <lib-staff-card [staff]="staff"></lib-staff-card>
-      } @empty {
-        <div class="empty-state">
-          <mat-icon>supervisor_account</mat-icon>
-          <p>Aucun membre du staff n'est répertorié pour le moment.</p>
+    <div class="list-container">
+      <header class="list-header">
+        <div class="header-text">
+          <p class="description">
+            Découvrez les membres qui encadrent nos équipes pour la saison sélectionnée.
+          </p>
         </div>
-      }
-    </section>
+
+        <div class="header-actions">
+          <mat-button-toggle-group [value]="viewModeSignal()" (change)="toggleView($event.value)"
+                                   aria-label="Mode d'affichage">
+            <mat-button-toggle value="cards" title="Vue grandes cartes">
+              <mat-icon>grid_view</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="mini" title="Vue compacte">
+              <mat-icon>view_list</mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <mat-form-field appearance="outline" class="season-selector" subscriptSizing="dynamic">
+            <mat-label>Saison</mat-label>
+            <mat-select [value]="selectedSeasonIdSignal()" (selectionChange)="onSeasonChange($event.value)">
+              @for (season of seasonsSignal(); track season.id) {
+                <mat-option [value]="season.id">
+                  Saison {{ season.name }}
+                  @if (season.isCurrent) {
+                    (Actuelle)
+                  }
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </header>
+
+      <div class="staffs-grid" [class.mini-mode]="viewModeSignal() === 'mini'">
+        @for (item of staffsWithRolesSignal(); track item.staff.id) {
+          @if (viewModeSignal() === 'cards') {
+            <lib-staff-card [staff]="item.staff" [seasonId]="selectedSeasonIdSignal()">
+              <mat-card-actions actions align="end">
+                <button mat-button [routerLink]="['/staffs', item.staff.id]">Voir la fiche</button>
+              </mat-card-actions>
+            </lib-staff-card>
+          } @else {
+            <lib-staff-mini-card
+              [staffId]="item.staff.id"
+              [fullName]="item.staff.firstName + ' ' + item.staff.lastName"
+              [role]="item.rolesSummary"
+              [avatar]="item.staff.avatarFileName">
+            </lib-staff-mini-card>
+          }
+        } @empty {
+          <div class="empty-state">
+            <mat-icon>person_off</mat-icon>
+            <p>Aucun membre de l'encadrement trouvé pour cette saison.</p>
+          </div>
+        }
+      </div>
+    </div>
   }
 </app-public-page-container>

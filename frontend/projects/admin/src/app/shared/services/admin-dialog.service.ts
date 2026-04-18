@@ -1,11 +1,11 @@
 import {inject, Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable, tap} from 'rxjs';
-import {Season, AgeGroup, Hall, Staff} from '@shared-domain';
-import {SeasonForm} from '../../feature/season/components/season-form/season-form';
-import {AgeGroupForm} from '../../feature/team/components/age-group-form/age-group-form';
-import {HallForm} from '../../feature/hall/components/hall-form/hall-form';
-import {StaffForm} from '../../feature/staff/components/staff-form/staff-form';
+import {AgeGroup, Hall, Season, Staff} from '@shared-domain';
+import {SeasonForm} from '../../features/season/components/season-form/season-form';
+import {AgeGroupForm} from '../../features/team/components/age-group-form/age-group-form';
+import {HallForm} from '../../features/hall/components/hall-form/hall-form';
+import {StaffForm} from '../../features/staff/components/staff-form/staff-form';
 
 @Injectable({
   providedIn: 'root'

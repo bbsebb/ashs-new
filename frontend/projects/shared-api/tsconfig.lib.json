@@ -8,7 +8,9 @@
     "declarationMap": true,
     "types": [],
     "paths": {
-      "@shared-domain": ["../../dist/shared-domain"]
+      "@shared-domain": [
+        "../../dist/shared-domain"
+      ]
     }
   },
   "include": [

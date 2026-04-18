@@ -1,9 +1,9 @@
-import { Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { MatIconModule } from '@angular/material/icon';
-import { DatePipe } from '@angular/common';
-import { DayOfWeekPipe } from '../pipes/day-of-week-pipe';
-import { DayOfWeek } from '@shared-domain';
+import {Component, input} from '@angular/core';
+import {RouterLink} from '@angular/router';
+import {MatIconModule} from '@angular/material/icon';
+import {DatePipe} from '@angular/common';
+import {DayOfWeekPipe} from '../pipes';
+import {DayOfWeek} from '@shared-domain';
 
 @Component({
   selector: 'lib-training-session-item',

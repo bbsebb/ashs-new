@@ -1,0 +1,46 @@
+<div class="table-toolbar">
+  <app-page-title title="Encadrants"/>
+  <button mat-fab type="button" extended aria-label="Ajouter un encadrant" (click)="teamFormService.addStaff()">
+    <mat-icon>add</mat-icon>
+    Ajouter
+  </button>
+</div>
+
+@for (staffField of staffsFormSignal(); track $index) {
+  <div class="optional-form-fields">
+    <div class="form-fields">
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Rôle</mat-label>
+        <mat-select [formField]="staffField.role">
+          @for (staffRole of staffRoles; track staffRole) {
+            <mat-option [value]="staffRole">
+              {{ staffRole | roleStaff }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-error *appError="staffField.role; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Encadrant</mat-label>
+        <mat-select [formField]="staffField.staffId">
+          @for (staff of staffsSignal(); track staff.id) {
+            <mat-option [value]="staff.id">
+              {{ staff.firstName }} {{ staff.lastName }}
+            </mat-option>
+          }
+          <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addStaffMember($index)" [value]="null">Ajouter un encadrant</mat-option>
+        </mat-select>
+        <mat-error *appError="staffField.staffId; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <app-form-delete-button
+      [confirmMessage]="null"
+      [iconOnly]="!isHandsetSignal()"
+      (deleteConfirmed)="teamFormService.removeStaff($index)">
+    </app-form-delete-button>
+  </div>
+}

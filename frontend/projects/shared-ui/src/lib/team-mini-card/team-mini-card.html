@@ -1,0 +1,14 @@
+@let t = team();
+
+<a [routerLink]="['/teams', t.id]" class="team-mini-card" title="Voir les détails de l'équipe">
+  <div class="team-details">
+    <span class="category-name">
+      {{ t.ageGroup.ageLimit | category:t.ageGroup.upperLimit:'long' }}
+      @if (t.teamNumber > 1) {
+        {{ t.teamNumber }}
+      }
+    </span>
+    <span class="gender-label">{{ t.gender | gender:'long' }}</span>
+  </div>
+  <mat-icon class="chevron">chevron_right</mat-icon>
+</a>

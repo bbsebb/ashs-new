@@ -6,7 +6,7 @@ import {authGuard} from './core/guards/auth-guard';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./feature/dashboard/dashboard').then(m => m.Dashboard),
+    loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard),
     pathMatch: 'full'
   },
   {
@@ -15,19 +15,19 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./feature/hall/components/halls-list/halls-list').then(m => m.HallsList)
+        loadComponent: () => import('./features/hall/components/halls-list/halls-list').then(m => m.HallsList)
       },
       {
         path: 'create',
-        loadComponent: () => import('./feature/hall/components/hall-form/hall-form').then(m => m.HallForm)
+        loadComponent: () => import('./features/hall/components/hall-form/hall-form').then(m => m.HallForm)
       },
       {
         path: ':id/update',
-        loadComponent: () => import('./feature/hall/components/hall-form/hall-form').then(m => m.HallForm)
+        loadComponent: () => import('./features/hall/components/hall-form/hall-form').then(m => m.HallForm)
       },
       {
         path: ':id',
-        loadComponent: () => import('./feature/hall/components/hall-view/hall-view').then(m => m.HallView)
+        loadComponent: () => import('./features/hall/components/hall-view/hall-view').then(m => m.HallView)
       },
     ]
   },
@@ -37,19 +37,19 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./feature/season/components/seasons-list/seasons-list').then(m => m.SeasonsList)
+        loadComponent: () => import('./features/season/components/seasons-list/seasons-list').then(m => m.SeasonsList)
       },
       {
         path: 'create',
-        loadComponent: () => import('./feature/season/components/season-form/season-form').then(m => m.SeasonForm)
+        loadComponent: () => import('./features/season/components/season-form/season-form').then(m => m.SeasonForm)
       },
       {
         path: ':id/update',
-        loadComponent: () => import('./feature/season/components/season-form/season-form').then(m => m.SeasonForm)
+        loadComponent: () => import('./features/season/components/season-form/season-form').then(m => m.SeasonForm)
       },
       {
         path: ':id',
-        loadComponent: () => import('./feature/season/components/season-view/season-view').then(m => m.SeasonView)
+        loadComponent: () => import('./features/season/components/season-view/season-view').then(m => m.SeasonView)
       },
     ]
   },
@@ -59,19 +59,19 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./feature/staff/components/staffs-list/staffs-list').then(m => m.StaffsList)
+        loadComponent: () => import('./features/staff/components/staffs-list/staffs-list').then(m => m.StaffsList)
       },
       {
         path: 'create',
-        loadComponent: () => import('./feature/staff/components/staff-form/staff-form').then(m => m.StaffForm)
+        loadComponent: () => import('./features/staff/components/staff-form/staff-form').then(m => m.StaffForm)
       },
       {
         path: ':id/update',
-        loadComponent: () => import('./feature/staff/components/staff-form/staff-form').then(m => m.StaffForm)
+        loadComponent: () => import('./features/staff/components/staff-form/staff-form').then(m => m.StaffForm)
       },
       {
         path: ':id',
-        loadComponent: () => import('./feature/staff/components/staff-view/staff-view').then(m => m.StaffView)
+        loadComponent: () => import('./features/staff/components/staff-view/staff-view').then(m => m.StaffView)
       },
     ]
   },
@@ -81,19 +81,19 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./feature/team/components/teams-list/teams-list').then(m => m.TeamsList)
+        loadComponent: () => import('./features/team/components/teams-list/teams-list').then(m => m.TeamsList)
       },
       {
         path: 'create',
-        loadComponent: () => import('./feature/team/components/team-form/team-form').then(m => m.TeamForm)
+        loadComponent: () => import('./features/team/components/team-form/team-form').then(m => m.TeamForm)
       },
       {
         path: ':id/update',
-        loadComponent: () => import('./feature/team/components/team-form/team-form').then(m => m.TeamForm)
+        loadComponent: () => import('./features/team/components/team-form/team-form').then(m => m.TeamForm)
       },
       {
         path: ':id',
-        loadComponent: () => import('./feature/team/components/team-view/team-view').then(m => m.TeamView)
+        loadComponent: () => import('./features/team/components/team-view/team-view').then(m => m.TeamView)
       },
     ]
   },
@@ -103,11 +103,11 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./feature/team/components/age-group-list/age-group-list').then(m => m.AgeGroupList)
+        loadComponent: () => import('./features/team/components/age-group-list/age-group-list').then(m => m.AgeGroupList)
       },
       {
         path: 'create',
-        loadComponent: () => import('./feature/team/components/age-group-form/age-group-form').then(m => m.AgeGroupForm)
+        loadComponent: () => import('./features/team/components/age-group-form/age-group-form').then(m => m.AgeGroupForm)
       },
     ]
   },

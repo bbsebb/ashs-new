@@ -6,17 +6,45 @@ export const routes: Routes = [
   {
     path: 'halls',
     title: 'Nos Salles',
-    loadComponent: () => import('./features/hall/components/halls-list/halls-list').then(m => m.HallsList)
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/hall/components/halls-list/halls-list').then(m => m.HallsList)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/hall/components/hall-view/hall-view').then(m => m.HallView)
+      },
+    ]
   },
   {
     path: 'teams',
     title: 'Nos Équipes',
-    loadComponent: () => import('./features/team/components/teams-list/teams-list').then(m => m.TeamsList)
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/team/components/teams-list/teams-list').then(m => m.TeamsList)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/team/components/team-view/team-view').then(m => m.TeamView)
+      },
+    ]
   },
   {
     path: 'staffs',
     title: 'Notre Staff',
-    loadComponent: () => import('./features/staff/components/staffs-list/staffs-list').then(m => m.StaffsList)
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/staff/components/staffs-list/staffs-list').then(m => m.StaffsList)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/staff/components/staff-view/staff-view').then(m => m.StaffView)
+      },
+    ]
+
   },
   {
     path: 'feeds',

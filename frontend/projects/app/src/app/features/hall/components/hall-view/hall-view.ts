@@ -1,11 +1,42 @@
-import { Component } from '@angular/core';
+import {Component, effect, inject, input} from '@angular/core';
+import {Router, RouterLink} from '@angular/router';
+import {HallsStore} from '@shared-api';
+import {ErrorData, HallCard, LoadingData} from '@shared-ui';
+import {MatCardActions} from '@angular/material/card';
+import {MatButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-hall-view',
-  imports: [],
+  imports: [
+    ErrorData,
+    LoadingData,
+    HallCard,
+    MatCardActions,
+    MatButton,
+    RouterLink,
+  ],
   templateUrl: './hall-view.html',
-  styleUrl: './hall-view.scss',
+  standalone: true
 })
 export class HallView {
+  private readonly hallsStore = inject(HallsStore);
+  private readonly router = inject(Router);
 
+  id = input.required<string>();
+  hallSignal = this.hallsStore.hallById(this.id);
+
+  isLoadingSignal = this.hallsStore.isLoadingSignal;
+  errorSignal = this.hallsStore.errorSignal;
+
+  constructor() {
+    effect(() => {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.hallSignal()) {
+        void this.router.navigateByUrl('/404');
+      }
+    });
+  }
+
+  protected retry() {
+    this.hallsStore.reload();
+  }
 }

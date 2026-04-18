@@ -8,8 +8,12 @@
     "declarationMap": true,
     "types": [],
     "paths": {
-      "@shared-domain": ["../../dist/shared-domain"],
-      "@shared-api": ["../../dist/shared-api"]
+      "@shared-domain": [
+        "../../dist/shared-domain"
+      ],
+      "@shared-api": [
+        "../../dist/shared-api"
+      ]
     }
   },
   "include": [

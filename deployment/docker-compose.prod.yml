@@ -39,6 +39,8 @@ services:
       - MAIL_USERNAME=${MAIL_USERNAME}
       - RESOURCE_SERVER_ISSUER_URI=${RESOURCE_SERVER_ISSUER_URI}
       - SPRING_FLYWAY_ENABLED=true
+    volumes:
+      - ./uploads:/app/uploads
     networks:
       - ashs-network
     depends_on:

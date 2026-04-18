@@ -38,6 +38,8 @@ services:
       - SPRING_FLYWAY_ENABLED=true
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://localhost:8079/realms/ashs
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/ashs/protocol/openid-connect/certs
+    volumes:
+      - ./uploads:/app/uploads
     networks:
       - staging-ashs-network
     depends_on:

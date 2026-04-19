@@ -2,20 +2,14 @@
 
 <!-- Loading State View -->
 @if(isLoadingSignal()) {
-  <app-loading-data label="Chargement de la salle" [isLoadingSignal]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()"/>
 }
-
-<!-- Error State View -->
 @else if (errorSignal()) {
   <app-error-data dataName="salles" (onRetry)="retry()" />
 }
-
-<!-- Empty State -->
 @else if (!hall) {
   <p>Aucune salle</p>
 }
-
-<!-- Hall Details View -->
 @else {
   <lib-hall-card [hall]="hall">
     <mat-card-actions actions align="end">

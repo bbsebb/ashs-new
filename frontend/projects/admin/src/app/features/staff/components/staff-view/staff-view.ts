@@ -25,38 +25,39 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   standalone: true
 })
 export class StaffView {
-  private readonly staffsStore = inject(StaffsStore);
-  private readonly router = inject(Router);
-  private readonly notificationService = inject(NotificationService);
+  private readonly _staffsStore = inject(StaffsStore);
+  private readonly _router = inject(Router);
+  private readonly _notificationService = inject(NotificationService);
 
-  idSignal = input.required<string>();
-  staffSignal = this.staffsStore.staffById(this.idSignal);
+  idInputSignal = input.required<string>({alias: 'id'});
 
-  isLoadingSignal = this.staffsStore.isLoadingSignal;
-  errorSignal = this.staffsStore.errorSignal;
+  staffSignal = this._staffsStore.staffById(this.idInputSignal);
 
+  isLoadingSignal = this._staffsStore.isLoadingSignal;
+  errorSignal = this._staffsStore.errorSignal;
 
   constructor() {
     effect(() => {
       if (!this.isLoadingSignal() && !this.errorSignal() && !this.staffSignal()) {
-        void this.router.navigateByUrl('/404');
+        void this._router.navigateByUrl('/404');
       }
     });
   }
 
+
   protected onDelete() {
     const staff = this.staffSignal();
     if (staff) {
-      this.staffsStore.deleteById(staff.id).subscribe({
+      this._staffsStore.deleteById(staff.id).subscribe({
         next: () => {
-          this.notificationService.show("Membre de l'encadrement supprimé avec succès", 'success');
-          void this.router.navigateByUrl('/staffs');
+          this._notificationService.show("Membre de l'encadrement supprimé avec succès", 'success');
+          void this._router.navigateByUrl('/staffs');
         }
       });
     }
   }
 
   protected retry() {
-    this.staffsStore.reload();
+    this._staffsStore.reload();
   }
 }

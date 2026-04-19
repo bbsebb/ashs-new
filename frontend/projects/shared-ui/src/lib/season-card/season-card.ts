@@ -26,5 +26,5 @@ export class SeasonCard {
   /**
    * The season object to display.
    */
-  seasonSignal = input.required<Season>({alias: 'season'});
+  seasonInputSignal = input.required<Season>({alias: 'season'});
 }

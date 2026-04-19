@@ -1,6 +1,6 @@
 <app-public-page-container title="Encadrement">
   @if (isLoadingSignal()) {
-    <app-loading-data label="Chargement de l'encadrement" [isLoadingSignal]="isLoadingSignal()"/>
+    <app-loading-data label="Chargement de l'encadrement" [isLoading]="isLoadingSignal()"/>
   } @else if (errorSignal()) {
     <app-error-data dataName="encadrants" (onRetry)="retry()"/>
   } @else {
@@ -49,10 +49,10 @@
             </lib-staff-card>
           } @else {
             <lib-staff-mini-card
-              [staffIdSignal]="item.staff.id"
-              [fullNameSignal]="item.staff.firstName + ' ' + item.staff.lastName"
-              [roleSignal]="item.rolesSummary"
-              [avatarSignal]="item.staff.avatarFileName">
+              [staffId]="item.staff.id"
+              [fullName]="item.staff.firstName + ' ' + item.staff.lastName"
+              [role]="item.rolesSummary"
+              [avatar]="item.staff.avatarFileName">
             </lib-staff-mini-card>
           }
         } @empty {
@@ -65,3 +65,4 @@
     </div>
   }
 </app-public-page-container>
+c-page-container>

@@ -1,5 +1,5 @@
 <!-- Extract data from signals into local variables for cleaner template logic -->
-@let team = teamSignal();
+@let team = teamInputSignal();
 @let enrichedStaffs = enrichedStaffsSignal();
 @let enrichedSessions = enrichedTrainingSessionsSignal();
 
@@ -59,10 +59,10 @@
         <div class="staff-list">
           @for (staff of enrichedStaffs; track $index) {
             <lib-staff-mini-card
-              [staffIdSignal]="staff.staffId"
-              [fullNameSignal]="staff.fullName"
-              [roleSignal]="staff.role | roleStaff"
-              [avatarSignal]="staff.avatar">
+              [staffId]="staff.staffId"
+              [fullName]="staff.fullName"
+              [role]="staff.role | roleStaff"
+              [avatar]="staff.avatar">
             </lib-staff-mini-card>
           }
         </div>
@@ -83,11 +83,11 @@
         <div class="session-list">
           @for (session of enrichedSessions; track $index) {
             <lib-training-session-item
-              [dayOfWeekSignal]="session.dayOfWeek"
-              [startTimeSignal]="session.timeSlot.startTime"
-              [endTimeSignal]="session.timeSlot.endTime"
-              [hallNameSignal]="session.hallName"
-              [hallIdSignal]="session.hallId">
+              [dayOfWeek]="session.dayOfWeek"
+              [startTime]="session.timeSlot.startTime"
+              [endTime]="session.timeSlot.endTime"
+              [hallName]="session.hallName"
+              [hallId]="session.hallId">
             </lib-training-session-item>
           }
         </div>

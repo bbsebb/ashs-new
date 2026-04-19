@@ -24,39 +24,38 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   styleUrl: './season-view.scss',
 })
 export class SeasonView {
-  private readonly seasonStore = inject(SeasonsStore);
-  private readonly router = inject(Router);
-  private readonly notificationService = inject(NotificationService);
+  private readonly _seasonsStore = inject(SeasonsStore)
+  private readonly _router = inject(Router)
+  private readonly _notificationService = inject(NotificationService)
 
-  readonly idSignal = input.required<string>()
+  readonly idInputSignal = input.required<string>({alias: 'id'})
 
-  seasonSignal = this.seasonStore.seasonById(this.idSignal);
+  seasonSignal = this._seasonsStore.seasonById(this.idInputSignal)
 
-  isLoadingSignal = this.seasonStore.isLoadingSignal;
-  errorSignal = this.seasonStore.errorSignal;
-
+  isLoadingSignal = this._seasonsStore.isLoadingSignal
+  errorSignal = this._seasonsStore.errorSignal
 
   constructor() {
     effect(() => {
       if (!this.isLoadingSignal() && !this.errorSignal() && !this.seasonSignal()) {
-        void this.router.navigateByUrl('/404');
+        void this._router.navigateByUrl('/404')
       }
-    });
+    })
   }
 
   protected onDelete() {
     const season = this.seasonSignal();
     if (season) {
-      this.seasonStore.deleteById(season.id).subscribe({
+      this._seasonsStore.deleteById(season.id).subscribe({
         next: () => {
-          this.notificationService.show("Saison supprimée avec succès", 'success');
-          void this.router.navigateByUrl('/seasons');
+          this._notificationService.show("Saison supprimée avec succès", 'success');
+          void this._router.navigateByUrl('/seasons');
         }
       });
     }
   }
 
   protected retry() {
-    this.seasonStore.reload();
+    this._seasonsStore.reload();
   }
 }

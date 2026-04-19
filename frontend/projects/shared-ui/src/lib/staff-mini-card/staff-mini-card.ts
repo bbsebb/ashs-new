@@ -23,13 +23,13 @@ export class StaffMiniCard {
   private readonly _imageService = inject(ImageService);
 
   /** Staff identifier for linking. */
-  staffIdSignal = input.required<string>();
+  staffIdInputSignal = input.required<string>({alias: 'staffId'});
   /** Full name of the staff member. */
-  fullNameSignal = input.required<string>();
+  fullNameInputSignal = input.required<string>({alias: 'fullName'});
   /** Role in the team (e.g., Coach). */
-  roleSignal = input.required<string>();
+  roleInputSignal = input.required<string>({alias: 'role'});
   /** Optional avatar filename. */
-  avatarSignal = input<string | null | undefined>(null);
+  avatarInputSignal = input<string | null | undefined>(null, {alias: 'avatar'});
 
   /** Utility to create the full image source URL. */
   protected readonly createImageSourceUrl = (source: string | null | undefined) => this._imageService.createImageSourceUrl(source);

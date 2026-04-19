@@ -1,6 +1,6 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
-import {LoadingData} from './loading-data';
+import {LoadingData} from '@shared-ui';
 
 /**
  * Unit tests for LoadingData component.
@@ -9,7 +9,7 @@ describe('LoadingData Component', () => {
   it('should render default label when loading', async () => {
     await render(LoadingData, {
       componentProperties: {
-        isLoading: true
+        isLoadingInputSignal: true
       } as any
     });
 
@@ -20,8 +20,8 @@ describe('LoadingData Component', () => {
   it('should render custom label', async () => {
     await render(LoadingData, {
       componentProperties: {
-        isLoading: true,
-        label: 'Chargement des salles...'
+        isLoadingInputSignal: true,
+        labelInputSignal: 'Chargement des salles...'
       } as any
     });
 
@@ -31,7 +31,7 @@ describe('LoadingData Component', () => {
   it('should not render anything when isLoading is false', async () => {
     await render(LoadingData, {
       componentProperties: {
-        isLoading: false
+        isLoadingInputSignal: false
       } as any
     });
 

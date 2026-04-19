@@ -1,6 +1,6 @@
 <app-public-page-container title="Nos Équipes" subtitle="Retrouvez toutes les équipes de l'association par saison.">
   @if (isLoadingSignal()) {
-    <app-loading-data label="Chargement des équipes" [isLoadingSignal]="isLoadingSignal()"/>
+    <app-loading-data label="Chargement des équipes" [isLoading]="isLoadingSignal()"/>
   } @else if (errorSignal()) {
     <app-error-data dataName="équipes" (onRetry)="retry()"/>
   } @else {

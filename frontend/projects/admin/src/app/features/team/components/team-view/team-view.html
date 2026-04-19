@@ -1,7 +1,7 @@
 @let team = teamSignal();
 @if(isLoadingSignal()) {
-  <app-loading-data label="Chargement de l'équipe" [isLoadingSignal]="isLoadingSignal()"/>
-} @else if(errorSignal()) {
+  <app-loading-data label="Chargement de l'équipe" [isLoading]="isLoadingSignal()"/>
+} @else if (errorSignal()) {
   <app-error-data dataName="équipes" (onRetry)="retry()" />
 } @else if (!team) {
   <p>Aucune équipe</p>

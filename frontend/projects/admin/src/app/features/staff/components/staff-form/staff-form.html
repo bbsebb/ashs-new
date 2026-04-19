@@ -1,9 +1,9 @@
 <section class="form">
   <!-- Page Header and Title -->
   <app-page-title
-    [eyebrowSignal]="'Gestion de l\'encadrement'"
-    [titleSignal]="'Informations du membre de l\'encadrement'"
-    [subtitleSignal]="'Renseignez le prénom, le nom, l\'email et le numéro de téléphone.'"
+    [eyebrow]="'Gestion de l\'encadrement'"
+    [title]="'Informations du membre de l\'encadrement'"
+    [subtitle]="'Renseignez le prénom, le nom, l\'email et le numéro de téléphone.'"
   />
 
   <!-- Staff Member Creation/Edition Form -->
@@ -82,11 +82,11 @@
           >
           </app-image-cropper>
           <app-image-cropper-preview
-            [isLoadingSignal]="staffFormService.blobIsLoadingSignal()"
-            [isErrorSignal]="!!staffFormService.blobErrorSignal()"
+            [isLoading]="staffFormService.blobIsLoadingSignal()"
+            [isError]="!!staffFormService.blobErrorSignal()"
             [previewBlob]="staffFormService.blobAvatarSignal()"
-            [previewHeightSignal]="100"
-            [previewWidthSignal]="100"
+            [previewHeight]="100"
+            [previewWidth]="100"
           >
           </app-image-cropper-preview>
         </div>
@@ -97,9 +97,9 @@
     <mat-dialog-actions align="end">
       <div class="actions">
         <app-form-submit-button
-          [disabledSignal]="staffFormService.isSubmitDisabledSignal()"
-          [contentSignal]="staffFormService.staffSignal() ? 'Modifier' : 'Enregistrer'"
-          [submittingSignal]="staffFormService.staffFormSignal().submitting()"/>
+          [disabled]="staffFormService.isSubmitDisabledSignal()"
+          [content]="staffFormService.staffSignal() ? 'Modifier' : 'Enregistrer'"
+          [submitting]="staffFormService.staffFormSignal().submitting()"/>
         <button mat-button type="button" (click)="cancel()">Retour</button>
       </div>
     </mat-dialog-actions>

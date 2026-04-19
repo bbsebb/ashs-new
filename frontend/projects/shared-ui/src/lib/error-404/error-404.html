@@ -7,16 +7,16 @@
       </div>
 
       <div class="code">404</div>
-      <h1 class="title">{{ title() }}</h1>
-      <p class="message">{{ message() }}</p>
+      <h1 class="title">{{ titleInputSignal() }}</h1>
+      <p class="message">{{ messageInputSignal() }}</p>
 
       <div class="actions">
         <button
           mat-flat-button
           type="button"
           back-home
-          [label]="homeLabel()"
-          [route]="homeRoute()"
+          [label]="homeLabelInputSignal()"
+          [route]="homeRouteInputSignal()"
         ></button>
       </div>
     </mat-card-content>

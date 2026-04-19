@@ -1,9 +1,8 @@
 /**
  * Component displaying an Instagram post (feed).
  */
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
-import {MatDialog} from '@angular/material/dialog';
 import {FeedDTO} from '../../models/meta.dtos';
 import {Carousel} from '../carousel/carousel';
 import {Media} from '../media/media';
@@ -28,11 +27,12 @@ import {MediaPlaceholder} from '../media-placeholder/media-placeholder';
 export class Feed {
 
 
-  feedSignal = input.required<FeedDTO>({
+  feedInputSignal = input.required<FeedDTO>({
     alias: 'feed'
   });
-  attachmentSignal = computed(() => this.feedSignal().attachments.data[0] ?? null)
-  private readonly dialog = inject(MatDialog);
+  attachmentSignal = computed(() => this.feedInputSignal().attachments.data[0] ?? null)
+
+  // private readonly dialog = inject(MatDialog);
 
   constructor() {
   }

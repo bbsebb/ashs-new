@@ -23,25 +23,25 @@ import {PercentPipe} from '@angular/common';
   styleUrl: './image-cropper-view.scss',
   host: {
     '[style.--container-scale]': 'containerScaleSignal()',
-    '[style.--target-width.px]': 'cropMaskWidthSignal()',
-    '[style.--target-height.px]': 'cropMaskHeightSignal()',
-    '[style.--aspect-ratio]': 'cropMaskWidthSignal() / cropMaskHeightSignal()',
+    '[style.--target-width.px]': 'cropMaskWidthInputSignal()',
+    '[style.--target-height.px]': 'cropMaskHeightInputSignal()',
+    '[style.--aspect-ratio]': 'cropMaskWidthInputSignal() / cropMaskHeightInputSignal()',
   }
 })
 export class ImageCropperView {
   /** The source URL of the image to be updateed. */
-  selectedImageSourceSignal = input.required<string | null>();
+  selectedImageSourceInputSignal = input.required<string | null>({alias: 'selectedImageSource'});
 
   /** The width of the cropping mask area. */
-  cropMaskWidthSignal = input.required<number>();
+  cropMaskWidthInputSignal = input.required<number>({alias: 'cropMaskWidth'});
 
   /** The height of the cropping mask area. */
-  cropMaskHeightSignal = input.required<number>();
+  cropMaskHeightInputSignal = input.required<number>({alias: 'cropMaskHeight'});
 
   /** Whether the crop mask should be displayed as a circle. */
-  isCircularSignal = input(false);
+  isCircularInputSignal = input(false, {alias: 'isCircular'});
 
-  containerScaleSignal: Signal<number> = computed(() => this.isCircularSignal() ? 1.1 : 1.5);
+  containerScaleSignal: Signal<number> = computed(() => this.isCircularInputSignal() ? 1.1 : 1.5);
 
   /** Emits the new crop geometry coordinates whenever the image is moved, zoomed, or loaded. */
   cropGeometryChange = output<CropGeometry>();
@@ -71,7 +71,7 @@ export class ImageCropperView {
       this.zoomLevelSignal();
       // Wait for the next macro-task to ensure CSS transform is applied before measuring.
       // We also check if we have an image selected and elements are available.
-      if (this.selectedImageSourceSignal()) {
+      if (this.selectedImageSourceInputSignal()) {
         setTimeout(() => this.recalculateCropGeometry());
       }
     });
@@ -108,7 +108,7 @@ export class ImageCropperView {
    */
   onWheel(event: WheelEvent): void {
     // Only zoom if an image is loaded
-    if (!this.selectedImageSourceSignal()) {
+    if (!this.selectedImageSourceInputSignal()) {
       return;
     }
 
@@ -147,8 +147,8 @@ export class ImageCropperView {
     const geometry = computeCropGeometry(
       imageElement,
       maskElement,
-      this.cropMaskWidthSignal(),
-      this.cropMaskHeightSignal()
+      this.cropMaskWidthInputSignal(),
+      this.cropMaskHeightInputSignal()
     );
     this.cropGeometryChange.emit(geometry);
   }

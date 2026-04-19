@@ -43,14 +43,14 @@ export class HallForm {
    * Optional hall ID provided via route parameters or input.
    * Bound from the 'id' route parameter.
    */
-  idSignal = input<string | undefined>(undefined, {alias: 'id'});
+  idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
 
   constructor() {
     /**
      * Effect to initialize the service when the ID input changes.
      */
     effect(() => {
-      this._hallFormService.init(this.idSignal());
+      this._hallFormService.init(this.idInputSignal());
     });
   }
 

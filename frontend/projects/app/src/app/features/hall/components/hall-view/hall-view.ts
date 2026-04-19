@@ -23,21 +23,22 @@ import {MatButton} from '@angular/material/button';
 })
 export class HallView {
   private readonly hallsStore = inject(HallsStore);
-  private readonly router = inject(Router);
+  private readonly _router = inject(Router);
 
-  idSignal = input.required<string>();
-  hallSignal = this.hallsStore.hallById(this.idSignal);
+  idInputSignal = input.required<string>({alias: 'id'});
 
+  hallSignal = this.hallsStore.hallById(this.idInputSignal);
   isLoadingSignal = this.hallsStore.isLoadingSignal;
   errorSignal = this.hallsStore.errorSignal;
 
   constructor() {
     effect(() => {
       if (!this.isLoadingSignal() && !this.errorSignal() && !this.hallSignal()) {
-        void this.router.navigateByUrl('/404');
+        void this._router.navigateByUrl('/404');
       }
     });
   }
+
 
   protected retry() {
     this.hallsStore.reload();

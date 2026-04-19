@@ -1,9 +1,9 @@
 <section class="form">
   <!-- Page Header and Title -->
   <app-page-title
-    [eyebrowSignal]="'Gestion des équipes'"
-    [titleSignal]="'Informations de l\'équipe'"
-    [subtitleSignal]="'Renseignez la catégorie, le genre et le numéro de l\'équipe.'"
+    [eyebrow]="'Gestion des équipes'"
+    [title]="'Informations de l\'équipe'"
+    [subtitle]="'Renseignez la catégorie, le genre et le numéro de l\'équipe.'"
   />
 
   <!-- Team Creation/Edition Form -->
@@ -78,7 +78,7 @@
 
     <!-- Team Photo Management -->
     <div class="table-toolbar">
-      <app-page-title [titleSignal]="'Photo d\'équipe'"/>
+      <app-page-title [title]="'Photo d\'équipe'"/>
     </div>
     @if (teamFormService.showExistingPhotoSignal()) {
       <div class="image-preview-container">
@@ -103,11 +103,11 @@
         >
         </app-image-cropper>
         <app-image-cropper-preview
-          [isLoadingSignal]="teamFormService.photoIsLoadingSignal()"
-          [isErrorSignal]="!!teamFormService.photoErrorSignal()"
+          [isLoading]="teamFormService.photoIsLoadingSignal()"
+          [isError]="!!teamFormService.photoErrorSignal()"
           [previewBlob]="teamFormService.photoBlobSignal()"
-          [previewHeightSignal]="PHOTO_HEIGHT"
-          [previewWidthSignal]="PHOTO_WIDTH"
+          [previewHeight]="PHOTO_HEIGHT"
+          [previewWidth]="PHOTO_WIDTH"
         >
         </app-image-cropper-preview>
       </div>
@@ -126,9 +126,9 @@
     <!-- Form Action Buttons -->
     <div class="actions">
       <app-form-submit-button
-        [disabledSignal]="teamFormService.isSubmitDisabledSignal()"
-        [contentSignal]="idSignal() ? 'Modifier' : 'Enregistrer'"
-        [submittingSignal]="teamFormService.teamFormSignal().submitting()"/>
+        [disabled]="teamFormService.isSubmitDisabledSignal()"
+        [content]="idInputSignal() ? 'Modifier' : 'Enregistrer'"
+        [submitting]="teamFormService.teamFormSignal().submitting()"/>
       <button mat-button type="button" routerLink="/teams">Retour</button>
     </div>
   </form>

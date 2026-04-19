@@ -1,7 +1,7 @@
-<a [routerLink]="['/staffs', staffIdSignal()]" class="staff-mini-card" title="Voir la fiche de l'encadrant">
+<a [routerLink]="['/staffs', staffIdInputSignal()]" class="staff-mini-card" title="Voir la fiche de l'encadrant">
   <div class="avatar-container">
-    @if (avatarSignal()) {
-      <img [ngSrc]="createImageSourceUrl(avatarSignal())" [alt]="fullNameSignal()" width="32" height="32"
+    @if (avatarInputSignal()) {
+      <img [ngSrc]="createImageSourceUrl(avatarInputSignal())" [alt]="fullNameInputSignal()" width="32" height="32"
            class="avatar">
     } @else {
       <div class="avatar-placeholder">
@@ -10,8 +10,8 @@
     }
   </div>
   <div class="staff-details">
-    <span class="full-name">{{ fullNameSignal() }}</span>
-    <span class="role">{{ roleSignal() }}</span>
+    <span class="full-name">{{ fullNameInputSignal() }}</span>
+    <span class="role">{{ roleInputSignal() }}</span>
   </div>
   <mat-icon class="chevron">chevron_right</mat-icon>
 </a>

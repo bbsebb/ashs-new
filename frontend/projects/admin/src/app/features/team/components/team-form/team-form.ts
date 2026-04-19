@@ -63,14 +63,14 @@ export class TeamForm {
   protected readonly teamFormService = inject(TeamFormService);
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
-  idSignal = input<string | undefined>(undefined);
-  
+  idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
+
   genders = Object.values(GENDER);
 
   constructor() {
     // Initialize service with ID
     effect(() => {
-      this.teamFormService.init(this.idSignal());
+      this.teamFormService.init(this.idInputSignal());
     });
 
     // Cleanup preview URL

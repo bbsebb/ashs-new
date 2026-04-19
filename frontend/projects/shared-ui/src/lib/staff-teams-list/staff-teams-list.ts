@@ -27,20 +27,20 @@ export class StaffTeamsList {
   private readonly _seasonsStore = inject(SeasonsStore);
 
   /** The unique identifier of the staff member. */
-  staffIdSignal = input.required<string>();
+  staffIdInputSignal = input.required<string>({alias: 'staffId'});
   /** Optional season identifier to filter the list. */
-  seasonIdSignal = input<string | undefined>(undefined);
+  seasonIdInputSignal = input<string | undefined>(undefined, {alias: 'seasonId'});
 
   /**
    * Computed signal that retrieves all teams for the staff member,
    * applies optional season filtering, and enriches them with season names.
    */
   protected readonly enrichedTeamsSignal = computed(() => {
-    const staffId = this.staffIdSignal();
+    const staffId = this.staffIdInputSignal();
     // Pass a signal wrapper around the raw ID to the store
     const allTeams = this._teamsStore.teamsByStaffId(computed(() => staffId))();
     const seasons = this._seasonsStore.seasonsSignal();
-    const targetSeasonId = this.seasonIdSignal();
+    const targetSeasonId = this.seasonIdInputSignal();
 
     const filteredTeams = targetSeasonId
       ? allTeams.filter(t => t.seasonId === targetSeasonId)

@@ -1,6 +1,6 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
-import {SeasonCard} from './season-card';
+import {SeasonCard} from '@shared-ui';
 import {Season} from '@shared-domain';
 import {DatePipe} from '@angular/common';
 
@@ -42,7 +42,7 @@ describe('SeasonCard Component', () => {
   it('should display "Inactive" chip when not active', async () => {
     await render(SeasonCard, {
       componentProperties: {
-        season: {...mockSeason, isActive: false, isCurrent: false}
+        seasonInputSignal: {...mockSeason, isActive: false, isCurrent: false}
       } as any,
       imports: [DatePipe]
     });

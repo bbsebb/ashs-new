@@ -37,12 +37,12 @@ export class HallView {
    * Required hall ID input from the route parameters.
    * Bound from the 'id' route parameter.
    */
-  idSignal = input.required<string>({alias: 'id'});
+  idInputSignal = input.required<string>({alias: 'id'});
 
   /**
    * Signal fetching the specific hall from the store.
    */
-  hallSignal = this._hallsStore.hallById(this.idSignal);
+  hallSignal = this._hallsStore.hallById(this.idInputSignal);
 
   /**
    * Signal indicating if the hall data is currently being loaded.

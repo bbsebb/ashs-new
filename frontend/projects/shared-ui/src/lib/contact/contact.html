@@ -49,9 +49,9 @@
 
     <div class="actions">
       <app-form-submit-button
-        [disabledSignal]="contactFormSignal().submitting() || contactFormSignal().invalid()"
-        [contentSignal]="'Envoyer'"
-        [submittingSignal]="contactFormSignal().submitting()"
+        [disabled]="contactFormSignal().submitting() || contactFormSignal().invalid()"
+        [content]="'Envoyer'"
+        [submitting]="contactFormSignal().submitting()"
       />
     </div>
   </form>

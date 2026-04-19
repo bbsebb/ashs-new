@@ -12,9 +12,9 @@ import {Component, input} from '@angular/core';
 })
 export class PageTitle {
   /** Small introductory text displayed above the title. */
-  eyebrowSignal = input<string | null>(null);
+  eyebrowInputSignal = input<string | null>(null, {alias: 'eyebrow'});
   /** The main heading of the page. */
-  titleSignal = input<string | null>(null);
+  titleInputSignal = input<string | null>(null, {alias: 'title'});
   /** Descriptive text displayed below the title. */
-  subtitleSignal = input<string | null>(null);
+  subtitleInputSignal = input<string | null>(null, {alias: 'subtitle'});
 }

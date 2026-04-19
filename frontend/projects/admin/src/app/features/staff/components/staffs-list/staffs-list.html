@@ -1,5 +1,5 @@
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement de l'encadrement" [isLoadingSignal]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement de l'encadrement" [isLoading]="isLoadingSignal()"/>
 } @else if (errorSignalSignal()) {
   <app-error-data dataName="personnel" (onRetry)="retry()"/>
 } @else {

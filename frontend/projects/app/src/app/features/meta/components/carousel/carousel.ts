@@ -21,13 +21,13 @@ import {SubAttachmentDTO} from '../../models/meta.dtos';
 })
 export class Carousel {
 
-  subAttachmentsSignal = input.required<SubAttachmentDTO[]>({alias: 'subAttachments'});
+  subAttachmentsInputSignal = input.required<SubAttachmentDTO[]>({alias: 'subAttachments'});
   currentIndexSignal = signal(0);
 
-  readonly lengthSignal = computed(() => this.subAttachmentsSignal().length);
+  readonly lengthSignal = computed(() => this.subAttachmentsInputSignal().length);
 
   readonly currentSubAttachmentSignal = computed(() => {
-    const items = this.subAttachmentsSignal();
+    const items = this.subAttachmentsInputSignal();
     const len = items.length;
     if (len === 0) return null;
     

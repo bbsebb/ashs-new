@@ -1,9 +1,9 @@
 import {render, screen} from '@testing-library/angular';
-import {describe, expect, it, vi} from 'vitest';
-import {TeamCard} from './team-card';
+import {describe, expect, it} from 'vitest';
+import {TeamCard} from '@shared-ui';
 import {Team} from '@shared-domain';
 import {signal} from '@angular/core';
-import {HallsStore, StaffsStore, APP_CONFIG} from '@shared-api';
+import {APP_CONFIG, HallsStore, StaffsStore} from '@shared-api';
 import {provideRouter} from '@angular/router';
 
 /**
@@ -44,7 +44,7 @@ describe('TeamCard Component', () => {
 
   it('should render team details and enriched data from stores', async () => {
     await render(TeamCard, {
-      componentProperties: {team: mockTeam} as any,
+      componentProperties: {teamInputSignal: mockTeam} as any,
       providers: [
         { provide: StaffsStore, useValue: mockStaffsStore },
         { provide: HallsStore, useValue: mockHallsStore },

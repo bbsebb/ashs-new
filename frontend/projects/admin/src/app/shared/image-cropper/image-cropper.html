@@ -20,22 +20,22 @@
     <div class="crop-section">
       <h3>Éditeur</h3>
       <app-image-cropper-view
-        [selectedImageSourceSignal]="selectedImageUrlSignal()"
-        [cropMaskWidthSignal]="cropMaskWidthSignal()"
-        [cropMaskHeightSignal]="effectiveHeightSignal()"
-        [isCircularSignal]="isCircularSignal()"
+        [selectedImageSource]="selectedImageUrlSignal()"
+        [cropMaskWidth]="cropMaskWidthInputSignal()"
+        [cropMaskHeight]="effectiveHeightSignal()"
+        [isCircular]="isCircularInputSignal()"
         (cropGeometryChange)="updateCropGeometry($event)">
       </app-image-cropper-view>
     </div>
-    @if (withPreviewSignal()) {
+    @if (withPreviewInputSignal()) {
       <!-- Live preview section showing the cropped result -->
       <app-image-cropper-preview
         [previewBlob]="croppedBlobResource.value()"
-        [isErrorSignal]="!!croppedBlobResource.error()"
-        [isLoadingSignal]="croppedBlobResource.isLoading()"
-        [previewWidthSignal]="cropMaskWidthSignal()"
-        [previewHeightSignal]="effectiveHeightSignal()"
-        [isCircularSignal]="isCircularSignal()">
+        [isError]="!!croppedBlobResource.error()"
+        [isLoading]="croppedBlobResource.isLoading()"
+        [previewWidth]="cropMaskWidthInputSignal()"
+        [previewHeight]="effectiveHeightSignal()"
+        [isCircular]="isCircularInputSignal()">
       </app-image-cropper-preview>
     }
   </div>

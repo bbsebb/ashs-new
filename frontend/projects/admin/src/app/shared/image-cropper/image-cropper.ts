@@ -27,26 +27,26 @@ const DEFAULT_CROP_MASK_HEIGHT = 400;
 export class ImageCropper {
 
 
-  withPreviewSignal = input(false, {alias: 'withPreview'});
+  withPreviewInputSignal = input(false, {alias: 'withPreview'});
 
   /** Whether the cropping mask and result should be circular (forces 1:1 ratio). */
-  isCircularSignal = input(false, {alias: 'isCircular'});
+  isCircularInputSignal = input(false, {alias: 'isCircular'});
 
-  /** The width of the cropping mask area. Defaults to 800. */
-  cropMaskWidthSignal = input(DEFAULT_CROP_MASK_WIDTH, {
+  /** The width of the cropping mask area. Defaults to 400. */
+  cropMaskWidthInputSignal = input(DEFAULT_CROP_MASK_WIDTH, {
     alias: 'cropMaskWidth',
     transform: (value: number) => value || DEFAULT_CROP_MASK_WIDTH,
   });
 
-  /** The height of the cropping mask area. Defaults to 300. Forced to match width if circular. */
-  cropMaskHeightSignal = input(DEFAULT_CROP_MASK_HEIGHT, {
+  /** The height of the cropping mask area. Defaults to 400. Forced to match width if circular. */
+  cropMaskHeightInputSignal = input(DEFAULT_CROP_MASK_HEIGHT, {
     alias: 'cropMaskHeight',
     transform: (value: number) => value || DEFAULT_CROP_MASK_HEIGHT,
   });
 
   /** Computed height that respects the circular constraint. */
   effectiveHeightSignal = computed(() => {
-    return this.isCircularSignal() ? this.cropMaskWidthSignal() : this.cropMaskHeightSignal();
+    return this.isCircularInputSignal() ? this.cropMaskWidthInputSignal() : this.cropMaskHeightInputSignal();
   });
 
   /** Emits the resulting Blob whenever the crop is updated. */
@@ -118,7 +118,7 @@ export class ImageCropper {
       params: () => ({
         source: this._selectedImageUrlSignal(),
         geometry: this._currentCropGeometrySignal(),
-        isCircular: this.isCircularSignal()
+        isCircular: this.isCircularInputSignal()
       }),
       loader: async ({params}) => {
         if (!params.source || !params.geometry) {

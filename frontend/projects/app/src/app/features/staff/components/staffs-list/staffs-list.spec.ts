@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {StaffsList} from './staffs-list';
-import {StaffsStore, APP_CONFIG, SeasonsStore, TeamsStore} from '@shared-api';
+import {APP_CONFIG, SeasonsStore, StaffsStore, TeamsStore} from '@shared-api';
 import {signal} from '@angular/core';
 import {provideRouter} from '@angular/router';
 
@@ -45,6 +45,6 @@ describe('StaffsList Component (Public)', () => {
     });
 
     // The title in template is "Encadrement"
-    expect(screen.getByText(/Encadrement/i)).toBeDefined();
+    expect(screen.getAllByText(/Encadrement/i).length).toBeGreaterThan(0);
   });
 });

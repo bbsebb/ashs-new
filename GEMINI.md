@@ -19,9 +19,14 @@
 
 - **Réactivité (Signals & RxJS) :**
     - **Logique :** Privilégie les **Signals Angular** pour la gestion d'état et la réactivité.
-    - **Nommage Signals :** Les signals doivent inclure le suffixe `Signal` (ex: `isLoadingSignal`,
-      `productsListSignal`).
-    - **Nommage Observables :** Les observables doivent avoir le suffixe `$` (ex: `routeParams$`, `userActions$`).
+  - **Nommage Signals :** Les signals d'état interne doivent inclure le suffixe `Signal` (ex: `isLoadingSignal`).
+  - **Signal Inputs (Parent-Enfant & Route) :** Tout input utilisant les Signals doit impérativement porter le suffixe
+    `InputSignal` en interne et utiliser un alias sans ce suffixe pour l'API publique (ex:
+    `userNameInputSignal = input.required<string>({ alias: 'userName' })`).
+      - Cette distinction permet de différencier immédiatement un état local (`Signal`) d'une donnée d'entrée (
+        `InputSignal`).
+      - Le composant parent (ou le routeur) utilise toujours le nom simple : `[userName]="value"`.
+  - **Nommage Observables :** Les observables doivent avoir le suffixe `$` (ex: `routeParams$`).
     - **Variables Privées :** Doivent impérativement porter le prefix `_` (ex: `_userService`, `_itemsList`).
 - **Composants :**
     - Utilise au maximum les composants d'Angular Material 21.

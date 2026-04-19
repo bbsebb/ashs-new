@@ -19,5 +19,5 @@ export class TeamMiniCard {
   /**
    * The team to display.
    */
-  teamSignal = input.required<Team>({alias: 'team'});
+  teamInputSignal = input.required<Team>({alias: 'team'});
 }

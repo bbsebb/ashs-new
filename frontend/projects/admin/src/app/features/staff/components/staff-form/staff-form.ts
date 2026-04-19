@@ -54,11 +54,11 @@ export class StaffForm {
   private readonly _router = inject(Router);
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
-  idSignal = input<string | undefined>(undefined);
+  idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
 
   constructor() {
     effect(() => {
-      this.staffFormService.init(this.idSignal());
+      this.staffFormService.init(this.idInputSignal());
     });
   }
 

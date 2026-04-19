@@ -5,7 +5,7 @@
   aria-roledescription="carousel"
   aria-label="Galerie"
 >
-  @for (subAttachment of subAttachmentsSignal(); let i = $index; track subAttachment.url) {
+  @for (subAttachment of subAttachmentsInputSignal(); let i = $index; track subAttachment.url) {
     @if (i === 0) {
       <app-media
         [class.active]="!!currentSubAttachmentSignal() && subAttachment.url === currentSubAttachmentSignal()!.url"

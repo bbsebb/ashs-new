@@ -26,9 +26,9 @@ export class StaffView {
   private readonly staffsStore = inject(StaffsStore);
   private readonly router = inject(Router);
 
-  idSignal = input.required<string>();
-  // On passe directement le signal 'this.idSignal' (sans les parenthèses) au store
-  staffSignal = this.staffsStore.staffById(this.idSignal);
+  idInputSignal = input.required<string>({alias: 'id'});
+  // On passe directement le signal 'this.idInputSignal' (sans les parenthèses) au store
+  staffSignal = this.staffsStore.staffById(this.idInputSignal);
 
   isLoadingSignal = this.staffsStore.isLoadingSignal;
   errorSignal = this.staffsStore.errorSignal;

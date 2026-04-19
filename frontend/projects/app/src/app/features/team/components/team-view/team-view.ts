@@ -26,9 +26,9 @@ export class TeamView {
   private readonly _teamsStore = inject(TeamsStore);
   private readonly _router = inject(Router);
 
-  idSignal = input.required<string>();
-  teamSignal = this._teamsStore.teamById(this.idSignal);
+  idInputSignal = input.required<string>({alias: 'id'});
 
+  teamSignal = this._teamsStore.teamById(this.idInputSignal);
   isLoadingSignal = this._teamsStore.isLoadingSignal;
   errorSignal = this._teamsStore.errorSignal;
 
@@ -39,6 +39,7 @@ export class TeamView {
       }
     });
   }
+
 
   protected retry() {
     this._teamsStore.reload();

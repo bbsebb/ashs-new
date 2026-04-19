@@ -1,6 +1,6 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
-import {ErrorData} from './error-data';
+import {ErrorData} from '@shared-ui';
 import userEvent from '@testing-library/user-event';
 import {provideRouter} from '@angular/router';
 
@@ -21,7 +21,7 @@ describe('ErrorData Component', () => {
   it('should render custom data name in the error message', async () => {
     await render(ErrorData, {
       componentProperties: {
-        dataName: 'la liste des salles'
+        dataNameInputSignal: 'la liste des salles'
       } as any,
       providers: [provideRouter([])]
     });
@@ -32,7 +32,7 @@ describe('ErrorData Component', () => {
 
   it('should emit onRetry when retry button is clicked', async () => {
     const onRetrySpy = vi.fn();
-    
+
     await render(ErrorData, {
       componentOutputs: {
         onRetry: { emit: onRetrySpy } as any
@@ -42,9 +42,9 @@ describe('ErrorData Component', () => {
 
     const user = userEvent.setup();
     const retryButton = screen.getByRole('button', { name: /réessayer/i });
-    
+
     await user.click(retryButton);
-    
+
     expect(onRetrySpy).toHaveBeenCalled();
   });
 });

@@ -6,18 +6,18 @@
   <h3>Résultat</h3>
 
   <!-- Loading State: Shown while the blob is being generated from canvas -->
-  @if (isLoadingSignal()) {
+  @if (isLoadingInputSignal()) {
     <div class="result-box loading">
       <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
       <span class="mat-label-small">Traitement...</span>
     </div>
-  } @else if (isErrorSignal()) {
+  } @else if (isErrorInputSignal()) {
     <div class="result-box error">
       <mat-icon>error</mat-icon>
       <span class="mat-label-large">Erreur</span>
     </div>
   } @else if (previewImageSourceSignal()) {
-    <div class="result-box success mat-elevation-z2" [class.circular]="isCircularSignal()">
+    <div class="result-box success mat-elevation-z2" [class.circular]="isCircularInputSignal()">
       <img [src]="previewImageSourceSignal()" alt="Cropped Image Preview"/>
     </div>
   } @else {

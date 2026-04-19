@@ -12,6 +12,6 @@ export class LoadingComponent {
   /**
    * Message to display under the spinner.
    */
-  message = input<string>('Chargement...');
+  messageInputSignal = input<string>('Chargement...', {alias: 'message'});
 
 }

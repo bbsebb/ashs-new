@@ -3,9 +3,9 @@
   <!-- Header section containing the title and actions -->
   <div class="page-header">
     <app-page-title
-      [titleSignal]="title()"
-      [subtitleSignal]="subtitle()"
-      [eyebrowSignal]="eyebrow()"
+      [title]="titleInputSignal()"
+      [subtitle]="subtitleInputSignal()"
+      [eyebrow]="eyebrowInputSignal()"
     />
     <!-- Slot for additional actions (e.g., buttons) in the header -->
     <div class="header-actions">

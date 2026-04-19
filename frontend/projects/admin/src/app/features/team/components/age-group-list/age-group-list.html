@@ -1,5 +1,5 @@
 @if (isLoadingSignal()) {
-  <app-loading-data [isLoadingSignal]="isLoadingSignal()" label="Chargement des catégories"></app-loading-data>
+  <app-loading-data [isLoading]="isLoadingSignal()" label="Chargement des catégories"></app-loading-data>
 } @else if (errorSignal()) {
   <app-error-data (onRetry)="reload()" dataName="Catégorie"></app-error-data>
 } @else {

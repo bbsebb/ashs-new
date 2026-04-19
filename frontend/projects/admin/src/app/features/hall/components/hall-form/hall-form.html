@@ -1,9 +1,9 @@
 <section class="form">
   <!-- Page Header and Title -->
   <app-page-title
-    [eyebrowSignal]="'Gestion des salles'"
-    [titleSignal]="'Informations de la salle'"
-    [subtitleSignal]="'Renseignez le nom et l\'adresse complète pour l\'enregistrement.'"
+    [eyebrow]="'Gestion des salles'"
+    [title]="'Informations de la salle'"
+    [subtitle]="'Renseignez le nom et l\'adresse complète pour l\'enregistrement.'"
   />
 
   <!-- Hall Creation/Edition Form -->
@@ -72,9 +72,9 @@
     <mat-dialog-actions align="end">
       <div class="actions">
         <app-form-submit-button
-          [disabledSignal]="_hallFormService.isSubmitDisabledSignal()"
-          [contentSignal]="_hallFormService.hallSignal() ? 'Modifier' : 'Enregistrer'"
-          [submittingSignal]="_hallFormService.hallForm().submitting()"/>
+          [disabled]="_hallFormService.isSubmitDisabledSignal()"
+          [content]="_hallFormService.hallSignal() ? 'Modifier' : 'Enregistrer'"
+          [submitting]="_hallFormService.hallForm().submitting()"/>
         <button mat-button type="button" (click)="cancel()">Retour</button>
       </div>
     </mat-dialog-actions>

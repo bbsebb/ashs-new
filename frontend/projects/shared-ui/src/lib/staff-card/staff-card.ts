@@ -41,15 +41,15 @@ export class StaffCard {
   private readonly _imageService = inject(ImageService);
 
   /** The staff member to display. */
-  staffSignal = input.required<Staff>({alias: 'staff'});
+  staffInputSignal = input.required<Staff>({alias: 'staff'});
   /** Optional season ID to filter the displayed teams. */
-  seasonIdSignal = input<string | undefined>(undefined, {alias: 'seasonId'});
+  seasonIdInputSignal = input<string | undefined>(undefined, {alias: 'seasonId'});
 
   /**
    * Computed signal formatting the avatar URL as a CSS value for the host's background.
    */
   avatarUrlSignal = computed(() => {
-    const url = this._imageService.createImageSourceUrl(this.staffSignal().avatarFileName);
+    const url = this._imageService.createImageSourceUrl(this.staffInputSignal().avatarFileName);
     return url ? `url(${url})` : 'none';
   });
 

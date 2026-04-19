@@ -42,7 +42,7 @@ export class TeamCard {
   /**
    * The team object to display.
    */
-  teamSignal = input.required<Team>({alias: 'team'});
+  teamInputSignal = input.required<Team>({alias: 'team'});
 
   /**
    * Signal for available staff members from the store.
@@ -58,7 +58,7 @@ export class TeamCard {
    * Computed signal that maps basic staff IDs to full staff profiles (names and avatars).
    */
   enrichedStaffsSignal = computed(() => {
-    const team = this.teamSignal();
+    const team = this.teamInputSignal();
     const staffs = this.staffsSignal();
     return (team.staffs ?? []).map(staffView => {
       const staff = staffs.find(s => s.id === staffView.staffId);
@@ -74,7 +74,7 @@ export class TeamCard {
    * Computed signal that maps hall IDs to hall names for training sessions.
    */
   enrichedTrainingSessionsSignal = computed(() => {
-    const team = this.teamSignal();
+    const team = this.teamInputSignal();
     const halls = this.hallsSignal();
     return (team.trainingSessions ?? []).map(session => {
       const hall = halls.find(h => h.id === session.hallId);

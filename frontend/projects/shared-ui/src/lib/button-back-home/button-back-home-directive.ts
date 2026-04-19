@@ -1,5 +1,5 @@
 import {Directive, inject, input} from '@angular/core';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 
 /**
  * Directive applicable to buttons to provide a standard "Back" navigation behavior.
@@ -10,20 +10,20 @@ import {Router, RouterLink} from '@angular/router';
   standalone: true,
   host: {
     '(click)': 'onClick()',
-    '[textContent]': 'label()',
+    '[textContent]': 'labelInputSignal()',
   }
 })
 export class ButtonBackHomeDirective {
   private router = inject(Router);
 
   /** The target route to navigate to. Defaults to root ('/'). */
-  route = input<string | any[]>('/');
+  routeInputSignal = input<string | any[]>('/', {alias: 'route'});
   /** The text label to display on the button. Defaults to 'Retour'. */
-  label = input<string>('Retour');
+  labelInputSignal = input<string>('Retour', {alias: 'label'});
 
   /** Triggered on button click. Performs the actual navigation. */
   onClick(): void {
-    const r = this.route();
+    const r = this.routeInputSignal();
     if (Array.isArray(r)) {
       void this.router.navigate(r);
     } else {

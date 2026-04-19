@@ -3,9 +3,9 @@
   [disabled]="isDisabled()"
   mat-flat-button
 >
-  @if (submittingSignal()) {
+  @if (submittingInputSignal()) {
     <mat-spinner diameter="16"></mat-spinner>
   } @else {
-    {{ contentSignal() }}
+    {{ contentInputSignal() }}
   }
 </button>

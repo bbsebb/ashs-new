@@ -1,6 +1,6 @@
-import { Component, input } from '@angular/core';
+import {Component, input} from '@angular/core';
 
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 /**
  * Global loading overlay for data fetching operations.
@@ -15,7 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class LoadingData {
   /** Visibility state. */
-  isLoadingSignal = input<boolean>(true);
+  isLoadingInputSignal = input<boolean>(true, {alias: 'isLoading'});
   /** Text message to display below the spinner. */
-  labelSignal = input<string>('Téléchargement des données…');
+  labelInputSignal = input<string>('Téléchargement des données…', {alias: 'label'});
 }

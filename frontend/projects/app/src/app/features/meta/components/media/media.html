@@ -1,6 +1,6 @@
-@let type = typeSignal();
-@let media = mediaSignal();
-@let priority = prioritySignal();
+@let type = typeInputSignal();
+@let media = mediaInputSignal();
+@let priority = priorityInputSignal();
 @if (type === 'photo') {
   <img
     [ngSrc]="media.image.src"

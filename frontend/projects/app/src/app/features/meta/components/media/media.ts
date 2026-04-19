@@ -16,8 +16,8 @@ import {MediaDTO} from '../../models/meta.dtos';
   styleUrl: './media.scss'
 })
 export class Media {
-  mediaSignal = input.required<MediaDTO>({alias: 'media'});
-  typeSignal = input.required<string>({alias: 'type'});
-  prioritySignal = input<boolean>(false, {alias: 'priority'});
+  mediaInputSignal = input.required<MediaDTO>({alias: 'media'});
+  typeInputSignal = input.required<string>({alias: 'type'});
+  priorityInputSignal = input<boolean>(false, {alias: 'priority'});
 
 }

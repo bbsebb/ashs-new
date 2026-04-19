@@ -34,10 +34,10 @@ export class TeamTrainingSessionFields {
   private readonly _breakpointService = inject(BreakpointService);
   protected readonly teamFormService = inject(TeamFormService);
 
-  sessionsArray = input.required<FieldTree<TeamFormModel['trainingSessions']>>();
+  sessionsArrayInputSignal = input.required<FieldTree<TeamFormModel['trainingSessions']>>({alias: 'sessionsArray'});
 
   // L'opérateur [...] force la conversion en Array réel, ce qui satisfait IntelliJ
-  protected readonly sessionsSignal = computed(() => [...this.sessionsArray()]);
+  protected readonly sessionsSignal = computed(() => [...this.sessionsArrayInputSignal()]);
   hallsSignal = this.teamFormService.hallsSignal;
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   dayOfWeeks = Object.values(DAY_OF_WEEKS);

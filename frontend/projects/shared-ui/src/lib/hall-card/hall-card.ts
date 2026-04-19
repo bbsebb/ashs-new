@@ -1,13 +1,11 @@
 import {Component, computed, input} from '@angular/core';
-import {
-  MatCardModule
-} from "@angular/material/card";
+import {MatCardModule} from "@angular/material/card";
 import {Hall} from '@shared-domain';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatDividerModule} from "@angular/material/divider";
-import {SafePipe} from "../pipes/safe.pipe";
+import {SafePipe} from "../pipes";
 
 /**
  * Component for displaying a card with information about a sports hall.
@@ -30,13 +28,13 @@ export class HallCard {
   /**
    * The hall object to display.
    */
-  hallSignal = input.required<Hall>({alias: 'hall'})
+  hallInputSignal = input.required<Hall>({alias: 'hall'})
 
   /**
    * Computed signal: formatted address string for display and maps integration.
    */
   fullAddressSignal = computed(() => {
-    const h = this.hallSignal();
+    const h = this.hallInputSignal();
     return `${h.addressStreet}, ${h.addressPostalCode} ${h.addressCity}, ${h.addressCountry}`;
   });
 

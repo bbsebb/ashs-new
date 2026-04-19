@@ -4,12 +4,12 @@
 -->
 <div class="crop-container mat-elevation-z2"
      (wheel)="onWheel($event)">
-  @let selectedImageSource = selectedImageSourceSignal();
+  @let selectedImageSource = selectedImageSourceInputSignal();
   @if (selectedImageSource) {
 
     <!-- Mask Overlay: Represents the final crop area -->
     <div class="crop-overlay"
-         [class.circular]="isCircularSignal()"
+         [class.circular]="isCircularInputSignal()"
          #maskElement>
     </div>
 

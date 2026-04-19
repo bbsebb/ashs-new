@@ -14,9 +14,9 @@ import {PageTitle} from '../page-title/page-title';
 })
 export class AdminPageContainer {
   /** The main title of the page. */
-  title = input.required<string>();
+  titleInputSignal = input.required<string>({alias: 'title'});
   /** Optional subtitle displayed below the title. */
-  subtitle = input<string>('');
+  subtitleInputSignal = input<string>('', {alias: 'subtitle'});
   /** Optional eyebrow text displayed above the title. */
-  eyebrow = input<string>('');
+  eyebrowInputSignal = input<string>('', {alias: 'eyebrow'});
 }

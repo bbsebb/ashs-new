@@ -1,8 +1,8 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
-import {HallCard} from './hall-card';
+import {HallCard} from '@shared-ui';
 import {Hall} from '@shared-domain';
-import {SafePipe} from '../pipes/safe.pipe';
+import {SafePipe} from '../pipes';
 
 /**
  * Unit tests for HallCard component.
@@ -31,7 +31,7 @@ describe('HallCard Component', () => {
 
   it('should have a link to Google Maps with correct aria-label', async () => {
     await render(HallCard, {
-      componentProperties: {hall: mockHall} as any,
+      componentProperties: {hallInputSignal: mockHall} as any,
       imports: [SafePipe]
     });
 

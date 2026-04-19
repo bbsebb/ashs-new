@@ -17,34 +17,34 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
   templateUrl: './image-cropper-preview.html',
   styleUrl: './image-cropper-preview.scss',
   host: {
-    '[style.--target-width.px]': 'previewWidthSignal()',
-    '[style.--target-height.px]': 'previewHeightSignal()',
+    '[style.--target-width.px]': 'previewWidthInputSignal()',
+    '[style.--target-height.px]': 'previewHeightInputSignal()',
   }
 })
 export class ImageCropperPreview {
   /** The required height for the preview display. */
-  previewHeightSignal = input.required<number>();
+  previewHeightInputSignal = input.required<number>({alias: 'previewHeight'});
 
   /** The required width for the preview display. */
-  previewWidthSignal = input.required<number>();
+  previewWidthInputSignal = input.required<number>({alias: 'previewWidth'});
 
   /** Indicates if the cropping process is currently active. */
-  isLoadingSignal = input(false);
+  isLoadingInputSignal = input(false, {alias: 'isLoading'});
 
   /** Indicates if an error occurred during image processing. */
-  isErrorSignal = input(false);
+  isErrorInputSignal = input(false, {alias: 'isError'});
 
   /** The blob of the cropped image to preview. */
-  previewBlobSignal = input.required<Blob | undefined>({alias: 'previewBlob'});
+  previewBlobInputSignal = input.required<Blob | undefined>({alias: 'previewBlob'});
 
   /** The generated source URL for the preview image. */
   previewImageSourceSignal = computed(() => {
-    const blob = this.previewBlobSignal();
+    const blob = this.previewBlobInputSignal();
     return blob ? URL.createObjectURL(blob) : null;
   });
 
   /** Whether the preview should be displayed as a circle. */
-  isCircularSignal = input(false);
+  isCircularInputSignal = input(false, {alias: 'isCircular'});
 
   constructor() {
     effect((onCleanup) => {

@@ -30,10 +30,10 @@ export class TeamStaffFields {
   private readonly _breakpointService = inject(BreakpointService);
   protected readonly teamFormService = inject(TeamFormService);
 
-  staffsArray = input.required<FieldTree<TeamFormModel['staffs']>>();
+  staffsArrayInputSignal = input.required<FieldTree<TeamFormModel['staffs']>>({alias: 'staffsArray'});
 
   // On aide IntelliJ en convertissant l'itérable complexe en tableau réel
-  protected readonly staffsFormSignal = computed(() => [...this.staffsArray()]);
+  protected readonly staffsFormSignal = computed(() => [...this.staffsArrayInputSignal()]);
 
   staffsSignal = this.teamFormService.staffsSignal;
   isHandsetSignal = this._breakpointService.isHandsetSignal;

@@ -16,9 +16,9 @@ import {DayOfWeek} from '@shared-domain';
   styleUrl: './training-session-item.scss'
 })
 export class TrainingSessionItem {
-  dayOfWeekSignal = input.required<DayOfWeek>();
-  startTimeSignal = input.required<Date>();
-  endTimeSignal = input.required<Date>();
-  hallNameSignal = input.required<string>();
-  hallIdSignal = input.required<string>();
+  dayOfWeekInputSignal = input.required<DayOfWeek>({alias: 'dayOfWeek'});
+  startTimeInputSignal = input.required<Date>({alias: 'startTime'});
+  endTimeInputSignal = input.required<Date>({alias: 'endTime'});
+  hallNameInputSignal = input.required<string>({alias: 'hallName'});
+  hallIdInputSignal = input.required<string>({alias: 'hallId'});
 }

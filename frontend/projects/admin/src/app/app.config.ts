@@ -30,10 +30,9 @@ registerLocaleData(localFr);
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideRouter(routes, withComponentInputBinding()),
     {provide: ErrorHandler, useClass: GlobalErrorHandler},
     provideBrowserGlobalErrorListeners(),
-    // provideHttpClient(withInterceptors([delayInterceptor])),
-    provideRouter(routes, withComponentInputBinding()),
     provideSharedIcons(),
     provideNativeDateAdapter(),
     provideHttpClient(

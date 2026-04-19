@@ -17,19 +17,19 @@ import {MatButton} from '@angular/material/button';
 })
 export class FormSubmitButton {
   /** True when the form is being submitted (shows spinner). */
-  submittingSignal = input<boolean>(false);
+  submittingInputSignal = input<boolean>(false, {alias: 'submitting'});
 
   /** Business-level disabling (e.g., form invalid, missing permissions). */
-  disabledSignal = input<boolean>(false);
+  disabledInputSignal = input<boolean>(false, {alias: 'disabled'});
 
   /** The text content to display on the button. */
-  contentSignal = input<string>('Envoyer');
+  contentInputSignal = input<string>('Envoyer', {alias: 'content'});
 
   /**
    * Internal logic to determine if the button should be disabled.
    * @returns True if either disabled or submitting input is true.
    */
   protected isDisabled(): boolean {
-    return this.disabledSignal() || this.submittingSignal();
+    return this.disabledInputSignal() || this.submittingInputSignal();
   }
 }

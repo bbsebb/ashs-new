@@ -1,9 +1,9 @@
 <section class="form">
   <!-- Page Header and Title -->
   <app-page-title
-    [eyebrowSignal]="'Gestion des saisons'"
-    [titleSignal]="'Informations d\'une saison'"
-    [subtitleSignal]="'Renseignez les dates de début et de fin pour l\'enregistrement.'"
+    [eyebrow]="'Gestion des saisons'"
+    [title]="'Informations d\'une saison'"
+    [subtitle]="'Renseignez les dates de début et de fin pour l\'enregistrement.'"
   />
 
   <!-- Season Creation/Edition Form -->
@@ -41,9 +41,9 @@
     <mat-dialog-actions align="end">
       <div class="actions">
         <app-form-submit-button
-          [disabledSignal]="seasonFormService.isSubmitDisabledSignal()"
-          [contentSignal]="seasonFormService.seasonSignal() ? 'Modifier' : 'Enregistrer'"
-          [submittingSignal]="seasonFormService.seasonFormSignal().submitting()"/>
+          [disabled]="seasonFormService.isSubmitDisabledSignal()"
+          [content]="seasonFormService.seasonSignal() ? 'Modifier' : 'Enregistrer'"
+          [submitting]="seasonFormService.seasonFormSignal().submitting()"/>
         <button mat-button type="button" (click)="cancel()">Retour</button>
       </div>
     </mat-dialog-actions>

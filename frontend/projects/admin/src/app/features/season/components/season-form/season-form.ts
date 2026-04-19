@@ -49,11 +49,11 @@ export class SeasonForm {
   private readonly _dialogReference = inject(MatDialogRef, {optional: true});
   private readonly _router = inject(Router);
 
-  idSignal = input<string | undefined>(undefined);
+  idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
 
   constructor() {
     effect(() => {
-      this.seasonFormService.init(this.idSignal());
+      this.seasonFormService.init(this.idInputSignal());
     });
   }
 

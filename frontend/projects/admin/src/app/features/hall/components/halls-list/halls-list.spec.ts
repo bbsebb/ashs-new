@@ -6,7 +6,11 @@ import {signal} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
+/**
+ * Unit tests for HallsList component (Admin).
+ */
 describe('HallsList Component (Admin)', () => {
   const mockHalls = [
     { id: '1', name: 'Gymnase A', addressCity: 'Hoenheim' },
@@ -38,7 +42,8 @@ describe('HallsList Component (Admin)', () => {
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: LayoutService, useValue: mocks.layoutService },
         { provide: NotificationService, useValue: mocks.notificationService },
-        provideRouter([])
+        provideRouter([]),
+        provideAnimationsAsync('noop')
       ]
     });
 

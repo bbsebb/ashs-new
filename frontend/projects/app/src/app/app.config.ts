@@ -1,10 +1,10 @@
-import {ApplicationConfig, provideBrowserGlobalErrorListeners} from '@angular/core';
+import {ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners} from '@angular/core';
 import {provideRouter, TitleStrategy, withComponentInputBinding, withInMemoryScrolling} from '@angular/router';
 
 import {routes} from './app.routes';
 import {MENU_CONFIG, provideSharedIcons} from '@shared-ui';
 import {menuItems} from './core/layout/menu-items';
-import {APP_CONFIG} from '@shared-api';
+import {APP_CONFIG, GlobalErrorHandler} from '@shared-api';
 import {environment} from '@environment';
 import {MyCustomPageTitleStrategy} from './shared/services/title-strategy';
 
@@ -15,6 +15,7 @@ import {MyCustomPageTitleStrategy} from './shared/services/title-strategy';
 };*/
 export const appConfig: ApplicationConfig = {
   providers: [
+    {provide: ErrorHandler, useClass: GlobalErrorHandler},
     provideBrowserGlobalErrorListeners(),
     // provideHttpClient(withInterceptors([delayInterceptor])),
     provideRouter(routes, withInMemoryScrolling({

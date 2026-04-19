@@ -1,10 +1,13 @@
+<!-- Main container for public pages -->
 <div class="public-page-container">
+  <!-- Standardized page title -->
   <app-page-title
-    [title]="title()"
-    [subtitle]="subtitle()"
-    [eyebrow]="eyebrow()"
+    [titleSignal]="title()"
+    [subtitleSignal]="subtitle()"
+    [eyebrowSignal]="eyebrow()"
   />
 
+  <!-- Page content slot -->
   <main class="page-content">
     <ng-content></ng-content>
   </main>

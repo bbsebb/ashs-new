@@ -38,7 +38,7 @@ describe('HallView Component (Admin)', () => {
     mocks.hallsStore.isLoadingSignal.set(true);
 
     await render(HallView, {
-      inputs: { id: '1' },
+      inputs: {idSignal: '1'},
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -55,7 +55,7 @@ describe('HallView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(HallView, {
-      inputs: { id: '1' },
+      inputs: {idSignal: '1'},
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -64,7 +64,7 @@ describe('HallView Component (Admin)', () => {
     });
 
     expect(screen.getByText(/Impossible de charger salles/i)).toBeDefined();
-    
+
     const retryBtn = screen.getByRole('button', { name: /réessayer/i });
     await user.click(retryBtn);
 
@@ -75,7 +75,7 @@ describe('HallView Component (Admin)', () => {
     const mocks = setupMocks(mockHall);
 
     await render(HallView, {
-      inputs: { id: '1' },
+      inputs: {idSignal: '1'},
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -91,7 +91,7 @@ describe('HallView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(HallView, {
-      inputs: { id: '1' },
+      inputs: {idSignal: '1'},
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },

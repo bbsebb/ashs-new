@@ -1,3 +1,6 @@
+/**
+ * Complex form component for creating or editing a team and its assignments.
+ */
 import {Component, computed, effect, inject, input} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
@@ -60,14 +63,14 @@ export class TeamForm {
   protected readonly teamFormService = inject(TeamFormService);
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
-  id = input<string | undefined>(undefined);
+  idSignal = input<string | undefined>(undefined);
   
   genders = Object.values(GENDER);
 
   constructor() {
     // Initialize service with ID
     effect(() => {
-      this.teamFormService.init(this.id());
+      this.teamFormService.init(this.idSignal());
     });
 
     // Cleanup preview URL
@@ -94,7 +97,7 @@ export class TeamForm {
   });
 
   teamPreview = computed(() => {
-    const preview = this.teamFormService.teamPreview();
+    const preview = this.teamFormService.teamPreviewSignal();
     const previewUrl = this.previewPhotoUrlSignal();
     const existingPhoto = this.teamFormService.showExistingPhotoSignal() ? this.teamFormService.teamSignal()?.photoFileName : null;
 

@@ -1,3 +1,7 @@
+/**
+ * Layout for the admin page container.
+ * Uses Flexbox for vertical stacking and responsive header management.
+ */
 .admin-page-container {
   display: flex;
   flex-direction: column;
@@ -7,6 +11,7 @@
   margin: 0 auto;
 }
 
+/** Header layout with space-between for title and actions. */
 .page-header {
   display: flex;
   align-items: center;
@@ -21,6 +26,7 @@
   gap: 12px;
 }
 
+/** Responsive adjustments for mobile. */
 @media (max-width: 600px) {
   .admin-page-container {
     padding: 16px;

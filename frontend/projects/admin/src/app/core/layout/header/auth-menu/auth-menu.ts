@@ -7,6 +7,10 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {LayoutService} from '@shared-api';
 
+/**
+ * Component responsible for displaying the user authentication menu in the header.
+ * It provides buttons for logging in and logging out, and displays the user's profile if authenticated.
+ */
 @Component({
   selector: 'app-auth-menu',
   standalone: true,
@@ -21,13 +25,21 @@ import {LayoutService} from '@shared-api';
   styleUrl: './auth-menu.scss',
 })
 export class AuthMenu {
+  /** Injected authentication service to handle login/logout and access user profile. */
   protected readonly authService = inject(AuthService);
+  /** Injected layout service to handle responsive design states. */
   protected readonly layoutService = inject(LayoutService);
 
+  /**
+   * Triggers the Keycloak login process via AuthService.
+   */
   protected login() {
     this.authService.login();
   }
 
+  /**
+   * Triggers the Keycloak logout process via AuthService.
+   */
   protected logout() {
     this.authService.logout();
   }

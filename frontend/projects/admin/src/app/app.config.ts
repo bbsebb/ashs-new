@@ -1,5 +1,6 @@
 import {
   ApplicationConfig,
+  ErrorHandler,
   inject,
   LOCALE_ID,
   provideAppInitializer,
@@ -12,7 +13,7 @@ import {MENU_CONFIG, provideSharedIcons} from '@shared-ui';
 import {menuItems} from './core/layout/menu-items';
 
 import {environment} from '@environment';
-import {APP_CONFIG} from '@shared-api';
+import {APP_CONFIG, GlobalErrorHandler} from '@shared-api';
 import {MAT_DATE_LOCALE, provideNativeDateAdapter} from '@angular/material/core';
 import {registerLocaleData} from '@angular/common';
 import {AuthService} from './core/services/auth-service';
@@ -29,6 +30,7 @@ registerLocaleData(localFr);
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    {provide: ErrorHandler, useClass: GlobalErrorHandler},
     provideBrowserGlobalErrorListeners(),
     // provideHttpClient(withInterceptors([delayInterceptor])),
     provideRouter(routes, withComponentInputBinding()),

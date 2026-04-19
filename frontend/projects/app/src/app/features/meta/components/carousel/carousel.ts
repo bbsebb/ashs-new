@@ -1,3 +1,6 @@
+/**
+ * Interactive carousel for viewing post photo albums.
+ */
 import {Component, computed, input, signal} from '@angular/core';
 
 import {MatIconButton} from '@angular/material/button';

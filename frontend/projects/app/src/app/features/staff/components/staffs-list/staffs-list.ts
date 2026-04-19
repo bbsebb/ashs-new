@@ -1,3 +1,6 @@
+/**
+ * Component for listing all staff members in the public app.
+ */
 import {Component, computed, effect, inject, signal} from '@angular/core';
 import {SeasonsStore, StaffsStore, TeamsStore} from '@shared-api';
 import {ErrorData, LoadingData, PublicPageContainer, RoleStaffPipe, StaffCard, StaffMiniCard} from '@shared-ui';

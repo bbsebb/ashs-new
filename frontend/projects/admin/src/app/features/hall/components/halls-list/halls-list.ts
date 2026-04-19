@@ -53,43 +53,53 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   styleUrl: './halls-list.scss',
 })
 export class HallsList {
-  private readonly hallsStore = inject(HallsStore);
-  private readonly layoutService = inject(LayoutService);
-  private readonly notificationService = inject(NotificationService);
-  hallsSignal = this.hallsStore.hallsSignal;
-  isLoadingSignal = this.hallsStore.isLoadingSignal;
-  errorSignal = computed(() => !!this.hallsStore.errorSignal());
+  /** Store for hall data management. */
+  private readonly _hallsStore = inject(HallsStore);
+  /** Service for layout information. */
+  private readonly _layoutService = inject(LayoutService);
+  /** Service for user notifications. */
+  private readonly _notificationService = inject(NotificationService);
 
+  /** Signal providing the list of halls. */
+  hallsSignal = this._hallsStore.hallsSignal;
+  /** Signal indicating if halls are loading. */
+  isLoadingSignal = this._hallsStore.isLoadingSignal;
+  /** Computed signal determining if an error occurred. */
+  errorSignal = computed(() => !!this._hallsStore.errorSignal());
 
+  /** Computed signal for table columns to display based on screen size. */
+  displayedColumnsSignal = computed(() => this._layoutService.isDesktopSignal() ? ['name', 'addressStreet', 'addressCity', 'addressPostalCode', 'addressCountry', 'actions'] : ['name', 'actions']);
 
-  displayedColumns = computed(() => this.layoutService.isDesktopSignal() ? ['name', 'addressStreet','addressCity','addressPostalCode','addressCountry','actions'] : ['name','actions']);
-
-
-  // 2. Initialisation de la DataSource
+  /** The table data source. */
   dataSource = new MatTableDataSource([] as Hall[]);
 
-  // 3. Récupération du Paginator et du Sort (syntaxe viewChild de Signal - Angular 17.3+)
-  paginator = viewChild(MatPaginator);
-  sort = viewChild(MatSort);
+  /** Signal for the table paginator component. */
+  paginatorSignal = viewChild(MatPaginator);
+  /** Signal for the table sort component. */
+  sortSignal = viewChild(MatSort);
 
   constructor() {
-    // 4. L'effet magique : il s'exécute dès que 'users' change
+    /** Effect to synchronize the data source with the halls list and table features. */
     effect(() => {
       this.dataSource.data = this.hallsSignal();
-      // On réassigne le paginator et le sort au cas où
-      this.dataSource.paginator = this.paginator() ?? null;
-      this.dataSource.sort = this.sort() ?? null;
+      this.dataSource.paginator = this.paginatorSignal() ?? null;
+      this.dataSource.sort = this.sortSignal() ?? null;
     });
 
   }
 
+  /** Retries fetching the halls list. */
   protected retry(): void {
-  this.hallsStore.reload();
+    this._hallsStore.reload();
 }
 
+  /**
+   * Deletes a hall by its ID.
+   * @param id The ID of the hall to delete.
+   */
   protected onDelete(id: string) {
-    this.hallsStore.deleteById(id).subscribe({
-      next: () => this.notificationService.show("Salle supprimée avec succès", 'success')
+    this._hallsStore.deleteById(id).subscribe({
+      next: () => this._notificationService.show("Salle supprimée avec succès", 'success')
     });
   }
 }

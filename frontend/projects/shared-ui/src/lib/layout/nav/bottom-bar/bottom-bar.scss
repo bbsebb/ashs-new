@@ -1,21 +1,19 @@
 @use '../nav-shared' as shared;
 
-// --- MOBILE : BOTTOM BAR ---
+/**
+ * Mobile navigation bottom bar styles.
+ * Uses glassmorphism and centers the floating bar on the screen.
+ */
+.bar-container {
+  @include shared.nav-glass-container;
+  height: 72px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
 
-  .bar-container {
-    @include shared.nav-glass-container;
-    height: 72px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-
-
-// --- ITEM STYLING ---
 .nav-item {
   @include shared.nav-item-base;
 }
-
-

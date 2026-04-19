@@ -1,3 +1,4 @@
+<!-- Application Header with slots for left and right menus -->
 <app-header class="header">
   <ng-container ngProjectAs="[left-menu]">
     <ng-content select="[left-menu]"></ng-content>
@@ -8,16 +9,18 @@
 </app-header>
 
 <div class="app-body">
+  <!-- Desktop Navigation: Display a sidebar (NavRail) if not on a handset -->
   @if (!isHandsetSignal()) {
     <nav app-nav-rail></nav>
   }
 
-
+  <!-- Main scrollable content area -->
   <main #content class="content" [class.mobile-mode]="isHandsetSignal()">
     <router-outlet></router-outlet>
     <app-footer class="footer"></app-footer>
   </main>
 
+  <!-- Mobile Navigation: Display a bottom bar if on a handset -->
   @if (isHandsetSignal()) {
     <nav app-bottom-bar></nav>
   }

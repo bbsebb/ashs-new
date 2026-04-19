@@ -1,4 +1,6 @@
 @let user = authService.userProfile.value();
+
+<!-- Section for authenticated users: Display user profile and logout menu -->
 @if (authService.isAuthenticatedSignal()) {
   <button
     mat-button
@@ -11,7 +13,7 @@
     } @else {
       <mat-icon>account_circle</mat-icon>
     }
-    
+
     @if (layoutService.isDesktopSignal()) {
       <ng-container>
         <span class="user-name">{{ user?.fullName }}</span>
@@ -44,7 +46,9 @@
       <span>Déconnexion</span>
     </button>
   </mat-menu>
-} @else {
+}
+<!-- Section for unauthenticated users: Display login button -->
+@else {
   @if (layoutService.isDesktopSignal()) {
     <button
       mat-stroked-button

@@ -3,6 +3,10 @@ import {MAT_SNACK_BAR_DATA, MatSnackBarAction, MatSnackBarLabel, MatSnackBarRef}
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 
+/**
+ * Custom snackbar component for displaying application notifications.
+ * Uses Angular Material SnackBar internals for data injection and actions.
+ */
 @Component({
   selector: 'app-notification',
   imports: [
@@ -21,7 +25,9 @@ import {MatIcon} from '@angular/material/icon';
 
 })
 export class Notification {
+  /** The notification message string injected via MAT_SNACK_BAR_DATA. */
   data:string = inject(MAT_SNACK_BAR_DATA);
+  /** Reference to the current snackbar for dismissal. */
   snackBarRef = inject(MatSnackBarRef);
   constructor() { }
 }

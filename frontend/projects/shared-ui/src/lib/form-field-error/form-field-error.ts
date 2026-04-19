@@ -5,30 +5,38 @@ interface ErrorContext {
   $implicit: string; // Used by "let errorMsg" in template
 }
 
+/**
+ * Structural directive used to display validation errors for signal-based forms.
+ * Monitors the field state and automatically renders/updates error messages.
+ */
 @Directive({
   selector: '[appError]',
   standalone: true
 })
 export class FormFieldErrorDirective {
-  /** The form field to monitor for errors. */
+  /** The form field (FieldTree) to monitor for errors. */
   fieldInput = input.required<FieldTree<unknown>>({ alias: 'appError' });
-  
-  /** Fallback message when no specific error message is provided. */
+
+  /** Fallback message when the field is invalid but has no specific error message. */
   fallbackInput = input('Ce champ contient une erreur', { alias: 'appErrorFallback' });
-  
+
   private _templateReference: TemplateRef<ErrorContext> = inject(TemplateRef<ErrorContext>);
   private _viewContainer: ViewContainerRef = inject(ViewContainerRef);
 
   constructor() {
+    /** Signal representing the internal state of the form field. */
     const fieldStateSignal = computed(() => this.fieldInput()());
 
-    /** Determines if the error should be displayed (invalid + interacted with). */
+    /**
+     * Determines if the error should be visible based on validity and interaction.
+     * Displays only if invalid AND the user has interacted with the field (touched or dirty).
+     */
     const shouldShowSignal = computed(() => {
       const state = fieldStateSignal();
       return state.invalid() && (state.touched() || state.dirty());
     });
 
-    /** Computes the error message to display. */
+    /** Computes the specific error message to display from the field's errors array. */
     const errorMessageSignal = computed(() => {
       const errors = fieldStateSignal().errors();
       const firstError = Array.isArray(errors) ? errors[0] : null;
@@ -40,7 +48,10 @@ export class FormFieldErrorDirective {
       return firstError.message ?? this.fallbackInput();
     });
 
-    /** Effect handling the DOM manipulation based on validation state. */
+    /**
+     * Side effect that performs manual DOM manipulation.
+     * Creates or clears the embedded view based on the calculated visibility.
+     */
     effect(() => {
       const isVisible = shouldShowSignal();
       const message = errorMessageSignal();

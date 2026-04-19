@@ -5,6 +5,10 @@ import {MatIconButton} from "@angular/material/button";
 import {NgOptimizedImage} from "@angular/common";
 import {RouterLink} from "@angular/router";
 
+/**
+ * Application footer component.
+ * Displays sponsors, social media links, and legal information.
+ */
 @Component({
   selector: 'app-footer',
   imports: [
@@ -19,5 +23,4 @@ import {RouterLink} from "@angular/router";
   standalone: true
 })
 export class Footer {
-
 }

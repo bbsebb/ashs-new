@@ -1,4 +1,4 @@
-import {render, screen, aliasedInput} from '@testing-library/angular';
+import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {TeamCard} from './team-card';
 import {Team} from '@shared-domain';
@@ -6,6 +6,10 @@ import {signal} from '@angular/core';
 import {HallsStore, StaffsStore, APP_CONFIG} from '@shared-api';
 import {provideRouter} from '@angular/router';
 
+/**
+ * Unit tests for TeamCard component.
+ * Verifies data enrichment from stores and signal-based display.
+ */
 describe('TeamCard Component', () => {
   const mockTeam: Team = {
     id: 't1',
@@ -18,7 +22,15 @@ describe('TeamCard Component', () => {
       { id: 'ts1', role: 'COACH', staffId: 's1' }
     ],
     trainingSessions: [
-      { id: 'tr1', hallId: 'h1', dayOfWeek: 'MONDAY', timeSlot: { startTime: new Date(2024, 1, 1, 18, 0), endTime: new Date(2024, 1, 1, 20, 0) } }
+      {
+        id: 'tr1',
+        hallId: 'h1',
+        dayOfWeek: 'MONDAY',
+        timeSlot: {
+          startTime: new Date(2024, 1, 1, 18, 0),
+          endTime: new Date(2024, 1, 1, 20, 0)
+        }
+      }
     ]
   };
 
@@ -32,26 +44,24 @@ describe('TeamCard Component', () => {
 
   it('should render team details and enriched data from stores', async () => {
     await render(TeamCard, {
-      inputs: {
-        teamSignal: aliasedInput('team', mockTeam)
-      },
+      componentProperties: {team: mockTeam} as any,
       providers: [
         { provide: StaffsStore, useValue: mockStaffsStore },
         { provide: HallsStore, useValue: mockHallsStore },
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
-        provideRouter([]) // For the routerLink in StaffMiniCard
+        provideRouter([])
       ]
     });
 
-    // Titre et catégorie
+    // Category and Gender (via pipes)
     expect(screen.getByText(/Moins de 18 ans/)).toBeDefined();
-    expect(screen.getByText('Masc.')).toBeDefined(); // Grâce au GenderPipe
+    expect(screen.getByText('Masc.')).toBeDefined();
 
-    // Données enrichies : Staff
+    // Enriched Staff
     expect(screen.getByText('Jean Dupont')).toBeDefined();
-    expect(screen.getByText('Entraineur')).toBeDefined(); // Grâce au RoleStaffPipe
+    expect(screen.getByText('Entraineur')).toBeDefined();
 
-    // Données enrichies : Salle d'entraînement
+    // Enriched Hall
     expect(screen.getByText(/Palais des Sports/)).toBeDefined();
   });
 });

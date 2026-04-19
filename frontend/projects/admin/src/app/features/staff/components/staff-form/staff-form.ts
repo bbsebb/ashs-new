@@ -1,3 +1,6 @@
+/**
+ * Component for creating or editing a staff member profile.
+ */
 import {Component, effect, inject, input} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
@@ -51,11 +54,11 @@ export class StaffForm {
   private readonly _router = inject(Router);
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
-  id = input<string | undefined>(undefined);
+  idSignal = input<string | undefined>(undefined);
 
   constructor() {
     effect(() => {
-      this.staffFormService.init(this.id());
+      this.staffFormService.init(this.idSignal());
     });
   }
 

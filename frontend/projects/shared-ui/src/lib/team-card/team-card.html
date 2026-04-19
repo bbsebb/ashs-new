@@ -1,9 +1,11 @@
+<!-- Extract data from signals into local variables for cleaner template logic -->
 @let team = teamSignal();
 @let enrichedStaffs = enrichedStaffsSignal();
 @let enrichedSessions = enrichedTrainingSessionsSignal();
 
+<!-- Team Card Main Container -->
 <mat-card appearance="outlined" class="team-card">
-  <!-- Image de l'équipe -->
+  <!-- Team Photo or Placeholder Section -->
   <div class="image-container">
     @if (team.photoFileName) {
       <img [src]="createImageSourceUrl(team.photoFileName)"
@@ -16,7 +18,7 @@
       </div>
     }
 
-    <!-- Badges superposés sur l'image -->
+    <!-- Badges for Category and Team Number over the image -->
     <div class="badge-overlay">
       <mat-chip-set>
         <mat-chip class="category-chip"
@@ -32,6 +34,7 @@
     </div>
   </div>
 
+  <!-- Header Section with Team Category and Gender -->
   <mat-card-header>
     <mat-card-title>
       {{ team.ageGroup.ageLimit | category:team.ageGroup.upperLimit:'long' }}
@@ -42,56 +45,58 @@
     <mat-card-subtitle>{{ team.gender | gender }}</mat-card-subtitle>
   </mat-card-header>
 
+  <!-- Detailed Team Info Section -->
   <mat-card-content>
     <mat-divider></mat-divider>
 
-    <!-- Section Encadrants -->
+    <!-- Staff (Coaches/Managers) Section -->
     <section class="info-section">
       <h3 class="section-title">
         <mat-icon>person</mat-icon>
-        Encadrement
+        Staff
       </h3>
       @if (enrichedStaffs.length > 0) {
         <div class="staff-list">
           @for (staff of enrichedStaffs; track $index) {
             <lib-staff-mini-card
-              [staffId]="staff.staffId"
-              [fullName]="staff.fullName"
-              [role]="staff.role | roleStaff"
-              [avatar]="staff.avatar">
+              [staffIdSignal]="staff.staffId"
+              [fullNameSignal]="staff.fullName"
+              [roleSignal]="staff.role | roleStaff"
+              [avatarSignal]="staff.avatar">
             </lib-staff-mini-card>
           }
         </div>
       } @else {
-        <p class="empty-state">Aucun encadrant renseigné</p>
+        <p class="empty-state">No staff assigned</p>
       }
     </section>
 
     <mat-divider></mat-divider>
 
-    <!-- Section Entraînements -->
+    <!-- Training Sessions Schedule Section -->
     <section class="info-section">
       <h3 class="section-title">
         <mat-icon>event</mat-icon>
-        Entraînements
+        Training Sessions
       </h3>
       @if (enrichedSessions.length > 0) {
         <div class="session-list">
           @for (session of enrichedSessions; track $index) {
             <lib-training-session-item
-              [dayOfWeek]="session.dayOfWeek"
-              [startTime]="session.timeSlot.startTime"
-              [endTime]="session.timeSlot.endTime"
-              [hallName]="session.hallName"
-              [hallId]="session.hallId">
+              [dayOfWeekSignal]="session.dayOfWeek"
+              [startTimeSignal]="session.timeSlot.startTime"
+              [endTimeSignal]="session.timeSlot.endTime"
+              [hallNameSignal]="session.hallName"
+              [hallIdSignal]="session.hallId">
             </lib-training-session-item>
           }
         </div>
       } @else {
-        <p class="empty-state">Aucun créneau d'entraînement</p>
+        <p class="empty-state">No sessions scheduled</p>
       }
     </section>
   </mat-card-content>
 
+  <!-- Extension Slot for External Actions -->
   <ng-content select="[actions]"></ng-content>
 </mat-card>

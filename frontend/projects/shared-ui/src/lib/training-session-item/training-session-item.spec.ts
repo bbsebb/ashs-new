@@ -1,9 +1,11 @@
 import { render, screen } from '@testing-library/angular';
 import { TrainingSessionItem } from './training-session-item';
 import { provideRouter } from '@angular/router';
-import { DayOfWeek } from '@shared-domain';
 import { describe, expect, it } from 'vitest';
 
+/**
+ * Unit tests for TrainingSessionItem component.
+ */
 describe('TrainingSessionItem Component', () => {
   it('should render session details', async () => {
     const startTime = new Date();
@@ -13,13 +15,13 @@ describe('TrainingSessionItem Component', () => {
 
     await render(TrainingSessionItem, {
       providers: [provideRouter([])],
-      inputs: {
+      componentProperties: {
         dayOfWeek: 'MONDAY',
         startTime: startTime,
         endTime: endTime,
         hallName: 'Gymnase A',
         hallId: '123'
-      }
+      } as any
     });
 
     expect(screen.getByText(/gymnase a/i)).toBeTruthy();

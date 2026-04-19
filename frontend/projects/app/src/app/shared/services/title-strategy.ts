@@ -2,6 +2,11 @@ import {Injectable} from '@angular/core';
 import {Meta, Title} from '@angular/platform-browser';
 import {RouterStateSnapshot, TitleStrategy} from '@angular/router';
 
+/**
+ * Custom strategy for managing document titles and meta descriptions for SEO.
+ * This strategy updates the `<title>` tag and the `<meta name="description">` tag
+ * dynamically based on the current route's title configuration.
+ */
 @Injectable({providedIn: 'root'})
 export class MyCustomPageTitleStrategy extends TitleStrategy {
   constructor(
@@ -11,7 +16,13 @@ export class MyCustomPageTitleStrategy extends TitleStrategy {
     super();
   }
 
-  // Cette méthode est appelée à chaque changement de route
+  /**
+   * Called on every route change to update the document title and meta description.
+   * If a title is defined in the route configuration, it is prefixed with "ASHS | ".
+   * Otherwise, a default title and description are used.
+   *
+   * @param routerState The current state of the router.
+   */
   override updateTitle(routerState: RouterStateSnapshot) {
     const title = this.buildTitle(routerState);
     if (title !== undefined) {
@@ -23,6 +34,13 @@ export class MyCustomPageTitleStrategy extends TitleStrategy {
     }
   }
 
+  /**
+   * Updates the meta description tag based on the page title.
+   * Provides contextual descriptions for main sections like halls, teams, staff, and feeds.
+   *
+   * @param pageTitle The current page title to determine the appropriate description.
+   * @private
+   */
   private _updateMetaDescription(pageTitle: string) {
     let description = '';
     switch (pageTitle.toLowerCase()) {

@@ -11,23 +11,28 @@
     font-size: 32px;
     font-weight: 600;
     margin: 0 0 8px 0;
+    /* Use Material 3 on-surface token */
     color: var(--mat-sys-on-surface);
   }
 
   .subtitle {
     font-size: 16px;
+    /* Use Material 3 on-surface-variant token */
     color: var(--mat-sys-on-surface-variant);
     margin: 0;
   }
 }
 
+/* Feature grid layout using Flexbox as per project rules */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
 }
 
 .feature-card {
+  /* Flexbox item configuration: allows growth and shrinking with a base width */
+  flex: 1 1 280px;
   height: 100%;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   
@@ -37,6 +42,7 @@
   }
 
   .feature-icon {
+    /* Centering icon using Flexbox */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -50,12 +56,14 @@
 
   p {
     margin: 16px 0;
+    /* Use Material 3 on-surface-variant token */
     color: var(--mat-sys-on-surface-variant);
     line-height: 1.5;
   }
 }
 
 .protected-content {
+  /* Centering card in protected content area using Flexbox */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -67,6 +75,7 @@
   padding: 16px;
 
   .lock-icon {
+    /* Use Material 3 error token for status indicator */
     color: var(--mat-sys-error);
     display: flex;
     align-items: center;
@@ -81,12 +90,13 @@
 
   .help-text {
     font-size: 14px;
+    /* Use Material 3 on-surface-variant token */
     color: var(--mat-sys-on-surface-variant);
     margin-top: 16px;
   }
 }
 
-// Responsive adjustments
+// Responsive adjustments using Flexbox
 @media (max-width: 600px) {
   .dashboard-container {
     padding: 16px;
@@ -97,6 +107,7 @@
   }
 
   .grid {
-    grid-template-columns: 1fr;
+    /* Stack cards vertically on mobile */
+    flex-direction: column;
   }
 }

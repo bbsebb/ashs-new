@@ -1,19 +1,19 @@
 @use '../nav-shared' as shared;
-// Nav
-// --- DESKTOP : NAVIGATION RAIL ---
-  .rail-container {
-    @include shared.nav-glass-container;
-    min-height: 500px; // Flotte verticalement
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    padding: 20px 0;
-  }
 
-// --- ITEM STYLING ---
+/**
+ * Styling for the desktop navigation rail.
+ * Uses a glassmorphism effect for a modern aesthetic.
+ */
+.rail-container {
+  @include shared.nav-glass-container;
+  min-height: 500px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 20px 0;
+}
+
 .nav-item {
   @include shared.nav-item-base;
 }
-
-

@@ -10,6 +10,10 @@ import { MatInputModule } from '@angular/material/input';
 import {ButtonBackHomeDirective} from '../button-back-home/button-back-home-directive';
 
 
+/**
+ * Component for displaying an error message when data fetching fails.
+ * Provides a retry action and a button to return home.
+ */
 @Component({
   selector: 'app-error-data',
   standalone: true,
@@ -27,15 +31,9 @@ import {ButtonBackHomeDirective} from '../button-back-home/button-back-home-dire
   styleUrl: './error-data.scss',
 })
 export class ErrorData {
-  //TODO design à revoir
-  /**
-   * Nom de la donnée (ex: "Profil utilisateur").
-   * Utilise une "signal input" (Angular moderne).
-   */
-  dataName = input<string>('');
+  /** The name of the data that failed to load (e.g., "teams"). */
+  dataNameSignal = input<string>('', {alias: 'dataName'});
 
-
+  /** Emitted when the user clicks the retry button. */
   onRetry = output<void>();
-
-
 }

@@ -1,3 +1,6 @@
+/**
+ * Component for listing all staff members.
+ */
 import {Component, computed, effect, inject, viewChild} from '@angular/core';
 import {LayoutService, StaffsStore} from '@shared-api';
 import {AdminPageContainer, ErrorData, LoadingData, NotificationService} from '@shared-ui';
@@ -53,42 +56,46 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   styleUrl: './staffs-list.scss',
 })
 export class StaffsList {
-  private readonly staffsStore = inject(StaffsStore);
-  private readonly layoutService = inject(LayoutService);
-  private readonly notificationService = inject(NotificationService);
-  staffsSignal = this.staffsStore.staffsSignal;
-  isLoadingSignal = this.staffsStore.isLoadingSignal;
-  errorSignal = computed(() => !!this.staffsStore.errorSignal());
+  private readonly _staffsStore = inject(StaffsStore);
+  private readonly _layoutService = inject(LayoutService);
+  private readonly _notificationService = inject(NotificationService);
 
+  readonly staffsSignal = this._staffsStore.staffsSignal;
+  readonly isLoadingSignal = this._staffsStore.isLoadingSignal;
+  readonly errorSignalSignal = computed(() => !!this._staffsStore.errorSignal());
 
-  displayedColumns = computed(() => this.layoutService.isDesktopSignal() ? ['firstName', 'lastName', 'email', 'phone', 'actions'] : ['firstName', 'lastName', 'actions']);
+  readonly displayedColumnsSignal = computed(() => this._layoutService.isDesktopSignal() ? ['firstName', 'lastName', 'email', 'phone', 'actions'] : ['firstName', 'lastName', 'actions']);
 
-
-  // 2. Initialisation de la DataSource
+  /** The data source used by the material table. */
   dataSource = new MatTableDataSource([] as Staff[]);
 
-  // 3. Récupération du Paginator et du Sort (syntaxe viewChild de Signal - Angular 17.3+)
-  paginator = viewChild(MatPaginator);
-  sort = viewChild(MatSort);
+  /** Signal-based references to paginator and sort components. */
+  paginatorSignal = viewChild(MatPaginator);
+  sortSignal = viewChild(MatSort);
 
   constructor() {
-    // 4. L'effet magique : il s'exécute dès que 'staffs' change
+    /**
+     * Automatically update table data and connectors when store or view childs change.
+     */
     effect(() => {
       this.dataSource.data = this.staffsSignal();
-      // On réassigne le paginator et le sort au cas où
-      this.dataSource.paginator = this.paginator() ?? null;
-      this.dataSource.sort = this.sort() ?? null;
+      this.dataSource.paginator = this.paginatorSignal() ?? null;
+      this.dataSource.sort = this.sortSignal() ?? null;
     });
-
   }
 
+  /** Reloads the staff list from the backend. */
   protected retry(): void {
-    this.staffsStore.reload();
+    this._staffsStore.reload();
   }
 
+  /**
+   * Triggers the deletion of a staff member.
+   * @param id The UUID of the staff to delete.
+   */
   protected onDelete(id: string) {
-    this.staffsStore.deleteById(id).subscribe({
-      next: () => this.notificationService.show("Membre de l'encadrement supprimé avec succès", 'success')
+    this._staffsStore.deleteById(id).subscribe({
+      next: () => this._notificationService.show("Membre de l'encadrement supprimé avec succès", 'success')
     });
   }
 }

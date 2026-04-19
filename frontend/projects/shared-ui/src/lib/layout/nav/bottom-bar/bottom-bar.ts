@@ -4,6 +4,10 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
 import {MatRipple} from '@angular/material/core';
 import {MatIcon} from '@angular/material/icon';
 
+/**
+ * Bottom navigation bar component for mobile devices.
+ * Centered and floating bar rendering menu items.
+ */
 @Component({
   selector: '[app-bottom-bar]',
   imports: [
@@ -17,5 +21,6 @@ import {MatIcon} from '@angular/material/icon';
   standalone: true
 })
 export class BottomBar {
+  /** Menu configuration items. */
   menuItems = inject(MENU_CONFIG);
 }

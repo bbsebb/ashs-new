@@ -1,6 +1,6 @@
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement des équipes" [isLoading]="isLoadingSignal()"/>
-} @else if (errorSignal()) {
+  <app-loading-data label="Chargement des équipes" [isLoadingSignal]="isLoadingSignal()"/>
+} @else if (errorSignalSignal()) {
   <app-error-data dataName="équipes" (onRetry)="retry()"/>
 } @else {
   <app-admin-page-container title="Équipes" subtitle="Gestion des équipes">
@@ -63,10 +63,10 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
-        <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsSignal()"></tr>
+        <tr mat-row *matRowDef="let _; columns: displayedColumnsSignal();"></tr>
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" [attr.colspan]="displayedColumns().length">
+          <td class="mat-cell" [attr.colspan]="displayedColumnsSignal().length">
             Aucune équipe à afficher pour cette saison.
           </td>
         </tr>

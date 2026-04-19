@@ -1,6 +1,6 @@
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement des salles" [isLoading]="isLoadingSignal()"/>
-} @else if (errorSignal()) {
+  <app-loading-data label="Chargement des salles" [isLoadingSignal]="isLoadingSignal()"/>
+} @else if (errorSignalSignal()) {
   <app-error-data dataName="salles" (onRetry)="retry()"/>
 } @else {
   <app-admin-page-container title="Saisons" subtitle="Gestion des saisons">
@@ -56,11 +56,11 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
-        <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsSignal()"></tr>
+        <tr mat-row *matRowDef="let _; columns: displayedColumnsSignal();"></tr>
         <!-- ✅ Message quand il n'y a aucune donnée -->
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" [attr.colspan]="displayedColumns().length">
+          <td class="mat-cell" [attr.colspan]="displayedColumnsSignal().length">
             Aucune saison à afficher.
           </td>
         </tr>

@@ -1,3 +1,6 @@
+/**
+ * List component for social media feeds with deferred loading for performance.
+ */
 import {Component, inject, Signal} from '@angular/core';
 import {FeedDTO} from '../../models/meta.dtos';
 import {Feed} from '../feed/feed';

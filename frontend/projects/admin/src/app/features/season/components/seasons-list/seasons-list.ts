@@ -1,3 +1,6 @@
+/**
+ * Component for listing all sport seasons with sorting and pagination.
+ */
 import {Component, computed, effect, inject, viewChild} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -35,43 +38,41 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   styleUrl: './seasons-list.scss',
 })
 export class SeasonsList {
-  private readonly seasonsStore = inject(SeasonsStore);
-  private readonly layoutService = inject(LayoutService);
-  private readonly notificationService = inject(NotificationService);
-  seasonsSignal = this.seasonsStore.seasonsSignal;
-  isLoadingSignal = this.seasonsStore.isLoadingSignal;
-  errorSignal = computed(() => !!this.seasonsStore.errorSignal());
+  private readonly _seasonsStore = inject(SeasonsStore);
+  private readonly _layoutService = inject(LayoutService);
+  private readonly _notificationService = inject(NotificationService);
 
+  readonly seasonsSignal = this._seasonsStore.seasonsSignal;
+  readonly isLoadingSignal = this._seasonsStore.isLoadingSignal;
+  readonly errorSignalSignal = computed(() => !!this._seasonsStore.errorSignal());
 
+  readonly displayedColumnsSignal = computed(() => this._layoutService.isDesktopSignal() ? ['name', 'startDate', 'endDate', 'isCurrent', 'isActive', 'actions'] : ['name', 'actions']);
 
-  displayedColumns = computed(() => this.layoutService.isDesktopSignal() ? ['name', 'startDate','endDate','isCurrent','isActive','actions'] : ['name','actions']);
-
-
-  // 2. Initialisation de la DataSource
+  /** The data source for the Material table. */
   dataSource = new MatTableDataSource([] as Season[]);
 
-  // 3. Récupération du Paginator et du Sort (syntaxe viewChild de Signal - Angular 17.3+)
-  paginator = viewChild(MatPaginator);
-  sort = viewChild(MatSort);
+  /** Signal-based references to Material components. */
+  paginatorSignal = viewChild(MatPaginator);
+  sortSignal = viewChild(MatSort);
 
   constructor() {
-    // 4. L'effet magique : il s'exécute dès que 'users' change
+    /** Sync signal data with table source. */
     effect(() => {
       this.dataSource.data = this.seasonsSignal();
-      // On réassigne le paginator et le sort au cas où
-      this.dataSource.paginator = this.paginator() ?? null;
-      this.dataSource.sort = this.sort() ?? null;
+      this.dataSource.paginator = this.paginatorSignal() ?? null;
+      this.dataSource.sort = this.sortSignal() ?? null;
     });
-
   }
 
+  /** Reloads seasons from the API. */
   protected retry(): void {
-    this.seasonsStore.reload();
+    this._seasonsStore.reload();
   }
 
+  /** Deletes a season by ID. */
   protected onDelete(id: string) {
-    this.seasonsStore.deleteById(id).subscribe({
-      next: () => this.notificationService.show("Saison supprimée avec succès", 'success')
+    this._seasonsStore.deleteById(id).subscribe({
+      next: () => this._notificationService.show("Saison supprimée avec succès", 'success')
     });
   }
 }

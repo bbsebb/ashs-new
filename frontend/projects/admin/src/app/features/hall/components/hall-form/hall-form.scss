@@ -1,0 +1,42 @@
+/* Styles for the Hall form component */
+/* Layout follows Flexbox principles as per project rules */
+/* Uses Material 3 design tokens for consistent theming */
+
+.form {
+  // Container styles could go here
+}
+
+.content {
+  // Flexbox layouts for form fields should be defined here
+}
+
+.form-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.field {
+  flex: 1 1 200px;
+
+  &-full {
+    flex: 1 1 100%;
+  }
+
+  &-compact {
+    flex: 0 1 150px;
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.debug {
+  margin-top: 32px;
+  padding: 16px;
+  border-top: 1px dashed var(--mat-sys-outline-variant);
+}

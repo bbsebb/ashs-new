@@ -1,6 +1,10 @@
 import {Directive, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 
+/**
+ * Directive applicable to buttons to provide a standard "Back" navigation behavior.
+ * Programmatically navigates to a specified route using the Angular Router.
+ */
 @Directive({
   selector: 'button[back-home]',
   standalone: true,
@@ -11,9 +15,13 @@ import {Router, RouterLink} from '@angular/router';
 })
 export class ButtonBackHomeDirective {
   private router = inject(Router);
+
+  /** The target route to navigate to. Defaults to root ('/'). */
   route = input<string | any[]>('/');
+  /** The text label to display on the button. Defaults to 'Retour'. */
   label = input<string>('Retour');
 
+  /** Triggered on button click. Performs the actual navigation. */
   onClick(): void {
     const r = this.route();
     if (Array.isArray(r)) {

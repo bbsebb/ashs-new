@@ -6,6 +6,18 @@ import {catchError, throwError} from 'rxjs';
 import {NotificationService} from '@shared-ui';
 import {Router} from '@angular/router';
 
+/**
+ * Functional HTTP interceptor that manages authentication headers and handles authorization errors.
+ *
+ * This interceptor:
+ * 1. Appends a Bearer token to outgoing requests directed to the API URL if the user is authenticated.
+ * 2. Catches 401 (Unauthorized) errors to trigger a logout and notify the user.
+ * 3. Catches 403 (Forbidden) errors to notify the user of insufficient permissions and redirect to home.
+ *
+ * @param req The outgoing HTTP request.
+ * @param next The next interceptor or backend in the chain.
+ * @returns An observable of the HTTP event stream.
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const notificationService = inject(NotificationService);

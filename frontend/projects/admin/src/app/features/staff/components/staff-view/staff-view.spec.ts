@@ -38,7 +38,7 @@ describe('StaffView Component (Admin)', () => {
     mocks.staffsStore.isLoadingSignal.set(true);
 
     await render(StaffView, {
-      inputs: { id: 's1' },
+      componentProperties: {idSignal: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -56,7 +56,7 @@ describe('StaffView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(StaffView, {
-      inputs: { id: 's1' },
+      componentProperties: {idSignal: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -77,7 +77,7 @@ describe('StaffView Component (Admin)', () => {
     const mocks = setupMocks(mockStaff);
 
     await render(StaffView, {
-      inputs: { id: 's1' },
+      componentProperties: {idSignal: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -94,11 +94,12 @@ describe('StaffView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(StaffView, {
-      inputs: { id: 's1' },
+      componentProperties: {idSignal: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
-        { provide: Router, useValue: mocks.router }
+        {provide: Router, useValue: mocks.router},
+        {provide: APP_CONFIG, useValue: {apiUrl: 'http://test.api'}}
       ]
     });
 

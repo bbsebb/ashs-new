@@ -1,3 +1,6 @@
+/**
+ * Component for displaying a staff member detail page in the public app.
+ */
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {StaffsStore} from '@shared-api';
@@ -23,9 +26,9 @@ export class StaffView {
   private readonly staffsStore = inject(StaffsStore);
   private readonly router = inject(Router);
 
-  id = input.required<string>();
-  // On passe directement le signal 'this.id' (sans les parenthèses) au store
-  staffSignal = this.staffsStore.staffById(this.id);
+  idSignal = input.required<string>();
+  // On passe directement le signal 'this.idSignal' (sans les parenthèses) au store
+  staffSignal = this.staffsStore.staffById(this.idSignal);
 
   isLoadingSignal = this.staffsStore.isLoadingSignal;
   errorSignal = this.staffsStore.errorSignal;

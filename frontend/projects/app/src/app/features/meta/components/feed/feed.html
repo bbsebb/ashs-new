@@ -1,9 +1,11 @@
 @let feed = feedSignal();
 @let attachment = attachmentSignal();
+<!-- Main Feed Card Container -->
 <mat-card #trigger class="feed-card">
   @switch (attachment.type) {
     @case ('album') {
       @if (attachment.subAttachments) {
+        <!-- Defer media loading until card is in viewport or interacted with -->
         @defer (on viewport(trigger); on interaction; prefetch on idle) {
           <app-carousel [subAttachments]="attachment.subAttachments.data">
           </app-carousel>
@@ -14,6 +16,7 @@
     }
     @default {
       @if (attachment.media) {
+        <!-- Lazy loading for single media items -->
         @defer (on viewport(trigger); on interaction; prefetch on idle) {
           <app-media [type]="attachment.type" [media]="attachment.media">
           </app-media>
@@ -31,6 +34,5 @@
   </mat-card-content>
   <mat-card-actions class="feed-actions">
     <span class="feed-meta">Posté le {{ feed.createdTime | date: 'dd/MM/yyyy HH:mm' }}</span>
-    <!--    <button type="button" mat-button (click)="openDialog()">VOIR</button>-->
   </mat-card-actions>
 </mat-card>

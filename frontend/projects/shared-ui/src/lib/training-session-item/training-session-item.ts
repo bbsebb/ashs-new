@@ -1,3 +1,6 @@
+/**
+ * Linkable item displaying training session details (day, time, hall).
+ */
 import {Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
@@ -13,9 +16,9 @@ import {DayOfWeek} from '@shared-domain';
   styleUrl: './training-session-item.scss'
 })
 export class TrainingSessionItem {
-  dayOfWeek = input.required<DayOfWeek>();
-  startTime = input.required<Date>();
-  endTime = input.required<Date>();
-  hallName = input.required<string>();
-  hallId = input.required<string>();
+  dayOfWeekSignal = input.required<DayOfWeek>();
+  startTimeSignal = input.required<Date>();
+  endTimeSignal = input.required<Date>();
+  hallNameSignal = input.required<string>();
+  hallIdSignal = input.required<string>();
 }

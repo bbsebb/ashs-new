@@ -1,11 +1,11 @@
 <header class="page-title">
-  @if (eyebrow()) {
-    <p class="eyebrow">{{ eyebrow() }}</p>
+  @if (eyebrowSignal()) {
+    <p class="eyebrow">{{ eyebrowSignal() }}</p>
   }
-  @if (title()) {
-    <h2 class="title">{{ title() }}</h2>
+  @if (titleSignal()) {
+    <h2 class="title">{{ titleSignal() }}</h2>
   }
-  @if (subtitle()) {
-    <p class="subtitle">{{ subtitle() }}</p>
+  @if (subtitleSignal()) {
+    <p class="subtitle">{{ subtitleSignal() }}</p>
   }
 </header>

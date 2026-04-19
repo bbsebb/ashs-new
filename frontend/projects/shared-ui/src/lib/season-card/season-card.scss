@@ -1,10 +1,11 @@
 .card {
-  /* Tokens Material 3 (Angular Material) */
+  /* Theme tokens: container background and text color */
   background: var(--mat-sys-surface-container-low);
   color: var(--mat-sys-on-surface);
 }
 
 .header {
+  /* Flexbox: horizontal layout with items aligned and spaced */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12,6 +13,7 @@
 }
 
 .title {
+  /* Theme tokens: typography */
   font: var(--mat-sys-title-medium);
   margin: 0;
 }
@@ -25,10 +27,12 @@
 }
 
 .row {
+  /* Flexbox: space label and value apart */
   display: flex;
   justify-content: space-between;
   gap: 12px;
   padding: 8px 0;
+  /* Theme tokens: separator color */
   border-top: 1px solid var(--mat-sys-outline-variant);
 }
 
@@ -37,24 +41,27 @@
 }
 
 dt {
+  /* Theme tokens: typography and variant color */
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-body-medium);
 }
 
 dd {
   margin: 0;
+  /* Theme tokens: typography and surface color */
   font: var(--mat-sys-body-medium);
   color: var(--mat-sys-on-surface);
 }
 
-/* Chip “status” en mode M3 via tokens */
+/* Chips status using M3 tokens */
 .status {
+  /* Theme tokens: container background highest and variant text color */
   background: var(--mat-sys-surface-container-highest);
   color: var(--mat-sys-on-surface-variant);
 }
 
 .status-active {
+  /* Theme tokens: primary container background and on-primary container color */
   background: var(--mat-sys-primary-container);
   color: var(--mat-sys-on-primary-container);
 }
-

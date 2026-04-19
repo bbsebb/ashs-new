@@ -4,6 +4,10 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/mat
 import {MatChip, MatChipSet} from '@angular/material/chips';
 import {DatePipe} from '@angular/common';
 
+/**
+ * Component for displaying a summarized view of a season.
+ * Shows the season name, its duration (start and end dates), and its status badges.
+ */
 @Component({
   selector: 'lib-season-card',
   imports: [
@@ -19,5 +23,8 @@ import {DatePipe} from '@angular/common';
   styleUrl: './season-card.scss',
 })
 export class SeasonCard {
+  /**
+   * The season object to display.
+   */
   seasonSignal = input.required<Season>({alias: 'season'});
 }

@@ -1,13 +1,25 @@
 @let hall = hallSignal();
+
+<!-- Loading State View -->
 @if(isLoadingSignal()) {
-  <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()" />
-} @else if(errorSignal()) {
+  <app-loading-data label="Chargement de la salle" [isLoadingSignal]="isLoadingSignal()"/>
+}
+
+<!-- Error State View -->
+@else if (errorSignal()) {
   <app-error-data dataName="salles" (onRetry)="retry()" />
-} @else if (!hall) {
+}
+
+<!-- Empty State -->
+@else if (!hall) {
   <p>Aucune salle</p>
-} @else {
+}
+
+<!-- Hall Details View -->
+@else {
   <lib-hall-card [hall]="hall">
     <mat-card-actions actions align="end">
+      <!-- Navigation and Management Actions -->
       <button mat-button type="button" routerLink="/halls">Retour</button>
       <button mat-flat-button type="button" routerLink="/halls/{{hall.id}}/update">Modifier</button>
       <app-form-delete-button

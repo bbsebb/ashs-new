@@ -1,4 +1,5 @@
 export * from './lib/form-error-handle-service';
+export * from './lib/services/global-error-handler';
 export * from './lib/configs/app-config';
 export * from './lib/utils/date-mapper';
 export * from './lib/utils/time-validators';

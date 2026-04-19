@@ -1,22 +1,25 @@
 @let hall = hallSignal();
+<!-- Hall Card Container -->
 <mat-card appearance="outlined" class="card">
+  <!-- Map Section -->
   <div class="map-container">
     <iframe
       mat-card-image
       class="map-iframe"
-      [src]="googleMapsEmbedUrl() | safe"
+      [src]="googleMapsEmbedUrlSignal() | safe"
       loading="lazy"
       referrerpolicy="no-referrer-when-downgrade"
       title="Localisation Google Maps">
     </iframe>
   </div>
 
+  <!-- Header Section with Title and Action -->
   <mat-card-header class="header">
     <mat-card-title class="title">{{ hall.name }}</mat-card-title>
     <span class="spacer"></span>
     <a
       mat-icon-button
-      [href]="googleMapsUrl()"
+      [href]="googleMapsUrlSignal()"
       target="_blank"
       rel="noopener noreferrer"
       [matTooltip]="'Ouvrir dans Google Maps'"
@@ -26,6 +29,7 @@
     </a>
   </mat-card-header>
 
+  <!-- Content Section with Address Info -->
   <mat-card-content class="content">
     <div class="info-container">
       <div class="info-item">
@@ -44,6 +48,7 @@
 
   <mat-divider></mat-divider>
 
+  <!-- Actions Slot -->
   <mat-card-actions align="end" class="actions">
     <ng-content select="[actions]"></ng-content>
   </mat-card-actions>

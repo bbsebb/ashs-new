@@ -4,10 +4,13 @@ import {ErrorData} from './error-data';
 import userEvent from '@testing-library/user-event';
 import {provideRouter} from '@angular/router';
 
+/**
+ * Unit tests for ErrorData component.
+ */
 describe('ErrorData Component', () => {
   it('should render default error message', async () => {
     await render(ErrorData, {
-      providers: [provideRouter([])] // For the back-home directive if it uses router
+      providers: [provideRouter([])]
     });
 
     expect(screen.getByText('Impossible de charger la donnée')).toBeDefined();
@@ -17,9 +20,9 @@ describe('ErrorData Component', () => {
 
   it('should render custom data name in the error message', async () => {
     await render(ErrorData, {
-      inputs: {
+      componentProperties: {
         dataName: 'la liste des salles'
-      },
+      } as any,
       providers: [provideRouter([])]
     });
 

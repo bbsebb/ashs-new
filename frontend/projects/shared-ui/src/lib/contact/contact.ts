@@ -13,6 +13,10 @@ import {PageTitle} from '../page-title/page-title';
 import {NotificationService} from '../notification/notification-service';
 import {FormFieldErrorDirective} from '../form-field-error/form-field-error';
 
+/**
+ * Contact form component using Signal-based forms and validation.
+ * Handles the club contact logic via the ContactGateway.
+ */
 @Component({
   selector: 'app-contact',
   imports: [
@@ -32,12 +36,18 @@ export class Contact {
   private readonly formErrorHandler = inject(FormErrorHandleService);
   private readonly notificationService = inject(NotificationService);
 
-  contactModel = this.buildModel();
-  contactForm = this.buildForm();
+  /** Writable Signal representing the raw form data. */
+  contactModelSignal = this.buildModel();
 
-  // Optionnel, utile si tu veux afficher un aperçu/debug
-  contactPreview = computed(() => this.contactModel());
+  /** The signal-based form tree derived from the model. */
+  contactFormSignal = this.buildForm();
 
+  /** Optional preview of the current model state. */
+  contactPreviewSignal = computed(() => this.contactModelSignal());
+
+  /**
+   * Initializes the form model with empty values.
+   */
   private buildModel(): WritableSignal<ContactFormModel> {
     return signal<ContactFormModel>({
       from: '',
@@ -46,8 +56,11 @@ export class Contact {
     });
   }
 
+  /**
+   * Defines the validation rules for each form field.
+   */
   private buildForm(): FieldTree<ContactFormModel> {
-    return form(this.contactModel, (path) => {
+    return form(this.contactModelSignal, (path) => {
       required(path.from, {message: "L'email est requis."});
       email(path.from, {message: "L'email n'est pas valide."});
       maxLength(path.from, 254, {message: "L'email ne doit pas dépasser 254 caractères."});
@@ -62,12 +75,18 @@ export class Contact {
     });
   }
 
+  /**
+   * Triggers the form submission process.
+   * Resets the form upon success and handles errors via the FormErrorHandleService.
+   *
+   * @param event The submit event from the template.
+   */
   protected submitForm(event: Event) {
     event.preventDefault();
 
-    void submit(this.contactForm, async (formState) => {
+    void submit(this.contactFormSignal, async (formState) => {
       try {
-        const {from, subject, content} = this.contactModel();
+        const {from, subject, content} = this.contactModelSignal();
 
         await firstValueFrom(
           this.contactGateway.contactSubmission(from, subject, content).pipe(
@@ -75,8 +94,8 @@ export class Contact {
           ),
         );
 
-        // Reset simple (optionnel)
-        this.contactModel.set({from: '', subject: '', content: ''});
+        // Reset the form model
+        this.contactModelSignal.set({from: '', subject: '', content: ''});
 
         return undefined;
       } catch (error) {
@@ -91,8 +110,12 @@ export class Contact {
   }
 }
 
+/** Internal DTO for the contact form state. */
 type ContactFormModel = {
+  /** The sender's email address. */
   from: string;
+  /** The subject of the message. */
   subject: string;
+  /** The main message content. */
   content: string;
 };

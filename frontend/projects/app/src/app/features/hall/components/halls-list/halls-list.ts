@@ -1,3 +1,6 @@
+/**
+ * Component for listing all halls in the public app.
+ */
 import {Component, inject} from '@angular/core';
 import {HallsStore} from '@shared-api';
 import {ErrorData, HallCard, LoadingData, PublicPageContainer} from '@shared-ui';

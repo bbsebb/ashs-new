@@ -5,6 +5,9 @@ import {SeasonsStore, TeamsStore, APP_CONFIG} from '@shared-api';
 import {signal} from '@angular/core';
 import {provideRouter} from '@angular/router';
 
+/**
+ * Unit tests for TeamsList component (Public).
+ */
 describe('TeamsList Public Component', () => {
   const mockTeams = [
     { id: 't1', seasonId: 's1', gender: 'Male', teamNumber: 1, ageGroup: { name: 'U18', ageLimit: 18, upperLimit: true } },
@@ -26,6 +29,7 @@ describe('TeamsList Public Component', () => {
       },
       seasonsStore: {
         seasonsSignal: signal(mockSeasons),
+        currentSeasonSignal: signal(mockSeasons[1]),
         isLoadingSignal: signal(false),
         errorSignal: signal(undefined),
         reload: vi.fn()
@@ -45,10 +49,8 @@ describe('TeamsList Public Component', () => {
       ]
     });
 
-    // Seulement l'équipe de la saison 2 devrait être visible (Fém. U15)
+    // Only U15 from season s2 should be visible
     expect(screen.getByText(/Moins de 15 ans/)).toBeDefined();
-    
-    // L'équipe U18 ne devrait pas être là
     expect(screen.queryByText(/Moins de 18 ans/)).toBeNull();
   });
 });

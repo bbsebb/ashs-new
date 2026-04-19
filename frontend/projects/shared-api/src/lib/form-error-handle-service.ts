@@ -2,6 +2,10 @@ import {Injectable} from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProblemDetail} from '@shared-domain';
 
+/**
+ * Service responsible for handling and mapping API errors to form-specific structures.
+ * It parses ProblemDetail responses to associate field errors with their corresponding form controls.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -9,9 +13,10 @@ export class FormErrorHandleService {
 
   /**
    * Maps an HTTP error response to form errors or returns a generic error message.
-   * @param errorResponse The HTTP error received from the API.
-   * @param formFieldTree The field tree of the signal form.
-   * @returns An array of errors for signal-based forms, or a string for global notifications.
+   * Supports both field-specific errors and global errors.
+   * @param errorResponse The error received from the HttpClient.
+   * @param formFieldTree The structured representation of the form fields for mapping.
+   * @returns An array of mapped field errors or a combined global error string.
    */
   handleError(errorResponse: unknown, formFieldTree: any): any[] | string {
     if (!(errorResponse instanceof HttpErrorResponse)) {

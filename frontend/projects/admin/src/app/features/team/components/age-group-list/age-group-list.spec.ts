@@ -6,7 +6,11 @@ import {signal} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
+/**
+ * Unit tests for AgeGroupList component (Admin).
+ */
 describe('AgeGroupList Component (Admin)', () => {
   const mockAgeGroups = [
     { id: '1', name: 'U18', ageLimit: 18, upperLimit: true },
@@ -34,7 +38,8 @@ describe('AgeGroupList Component (Admin)', () => {
       providers: [
         { provide: AgeGroupStore, useValue: mocks.ageGroupStore },
         { provide: NotificationService, useValue: mocks.notificationService },
-        provideRouter([])
+        provideRouter([]),
+        provideAnimationsAsync('noop')
       ]
     });
 

@@ -1,3 +1,6 @@
+/**
+ * Component for displaying a team detail page in the public app.
+ */
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {TeamsStore} from '@shared-api';
@@ -23,8 +26,8 @@ export class TeamView {
   private readonly _teamsStore = inject(TeamsStore);
   private readonly _router = inject(Router);
 
-  id = input.required<string>();
-  teamSignal = this._teamsStore.teamById(this.id);
+  idSignal = input.required<string>();
+  teamSignal = this._teamsStore.teamById(this.idSignal);
 
   isLoadingSignal = this._teamsStore.isLoadingSignal;
   errorSignal = this._teamsStore.errorSignal;

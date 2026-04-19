@@ -17,6 +17,11 @@ import {firstValueFrom} from 'rxjs';
 import {AdminDialogService} from '../../../shared/services/admin-dialog.service';
 import {TeamFormModel} from './team.dtos';
 
+/**
+ * Service managing the state and logic for the team form.
+ * Handles complex relationships (staff assignments, training sessions),
+ * photo upload, and nested array validation.
+ */
 @Injectable()
 export class TeamFormService {
   private readonly _formErrorHandler = inject(FormErrorHandleService);
@@ -29,14 +34,24 @@ export class TeamFormService {
   private readonly _notificationService = inject(NotificationService);
   private readonly _adminDialogs = inject(AdminDialogService);
 
-  private _teamId = signal<string | undefined>(undefined);
+  /** Internal signal tracking the ID of the team being edited. */
+  private _teamIdSignal = signal<string | undefined>(undefined);
 
-  readonly teamSignal: Signal<Team | undefined> = this._teamsStore.teamById(this._teamId);
+  /** Signal providing team data from the store based on the current ID. */
+  readonly teamSignal: Signal<Team | undefined> = this._teamsStore.teamById(this._teamIdSignal);
+  /** Signal for available staff members. */
   readonly staffsSignal = this._staffsStore.staffsSignal;
+  /** Signal for available seasons. */
   readonly seasonsSignal = this._seasonsStore.seasonsSignal;
+  /** Signal for available halls. */
   readonly hallsSignal = this._hallsStore.hallsSignal;
+  /** Signal for available age categories. */
   readonly ageGroupsSignal = this._ageGroupStore.ageGroupsSignal;
 
+  /**
+   * Linked signal synchronizing the form model with the loaded team data.
+   * Maps nested entities to their IDs for the form controls.
+   */
   readonly teamFormModelSignal = linkedSignal<TeamFormModel>(() => {
     const team = this.teamSignal();
     return {
@@ -57,13 +72,17 @@ export class TeamFormService {
     };
   });
 
-  // Photo management
-  photoBlobSignal = signal<Blob | undefined>(undefined);
-  photoIsLoadingSignal = signal<boolean>(false);
-  photoErrorSignal = signal<Error | undefined>(undefined);
-  showExistingPhotoSignal = linkedSignal(() => !!this.teamSignal()?.photoFileName);
+  /** Signal for the team photo blob. */
+  readonly photoBlobSignal = signal<Blob | undefined>(undefined);
+  /** Signal for photo processing state. */
+  readonly photoIsLoadingSignal = signal<boolean>(false);
+  /** Signal for photo processing error. */
+  readonly photoErrorSignal = signal<Error | undefined>(undefined);
+  /** Linked signal determining if existing photo should be shown. */
+  readonly showExistingPhotoSignal = linkedSignal(() => !!this.teamSignal()?.photoFileName);
 
-  readonly teamPreview = computed(() => {
+  /** Computed signal for a live preview of the team card. */
+  readonly teamPreviewSignal = computed(() => {
     const model = this.teamFormModelSignal();
     const ageGroup = this.ageGroupsSignal().find(ageGroup => ageGroup.id === model.ageGroupId) ?? {
       id: '',
@@ -73,7 +92,7 @@ export class TeamFormService {
     };
 
     return {
-      id: this._teamId() ?? '',
+      id: this._teamIdSignal() ?? '',
       seasonId: model.seasonId,
       gender: model.gender,
       teamNumber: model.teamNumber,
@@ -83,18 +102,26 @@ export class TeamFormService {
     } as Team;
   });
 
-  // On initialise le formulaire APRES les méthodes pour éviter le problème d'ordre d'initialisation
-  readonly isSubmitDisabledSignal = computed(() => this.teamForm().submitting() || this.teamForm().invalid());
-  readonly teamForm: FieldTree<TeamFormModel>;
+  /** The Signal-based form tree derived from the model. */
+  readonly teamFormSignal: FieldTree<TeamFormModel>;
+  /** Computed signal determining if the submit button should be disabled. */
+  readonly isSubmitDisabledSignal = computed(() => this.teamFormSignal().submitting() || this.teamFormSignal().invalid());
 
   constructor() {
-    this.teamForm = this._buildForm();
+    this.teamFormSignal = this._buildForm();
   }
 
+  /**
+   * Initializes the service with a team ID.
+   * @param id The UUID of the team to edit, or undefined for creation.
+   */
   init(id: string | undefined) {
-    this._teamId.set(id);
+    this._teamIdSignal.set(id);
   }
 
+  /**
+   * Defines validation rules for the team form, including nested arrays.
+   */
   private _applyValidationSchema(path: SchemaPathTree<TeamFormModel>) {
     required(path.seasonId, {message: 'La saison est requise.'});
     required(path.ageGroupId, {message: 'La catégorie est requise.'});
@@ -107,6 +134,9 @@ export class TeamFormService {
     this._validateTrainingSessions(path.trainingSessions);
   }
 
+  /**
+   * Custom validation logic for the staff assignment array.
+   */
   private _validateStaffs(staffsPath: SchemaPathTree<TeamFormModel>['staffs']) {
     applyEach(staffsPath, (staff) => {
       required(staff.role, {message: 'Le rôle est requis.'});
@@ -114,6 +144,9 @@ export class TeamFormService {
     });
   }
 
+  /**
+   * Custom validation logic for training sessions, including time range checks.
+   */
   private _validateTrainingSessions(trainingSessionsPath: SchemaPathTree<TeamFormModel>['trainingSessions']) {
     applyEach(trainingSessionsPath, (session) => {
       required(session.hallId, {message: 'La salle est requise'});
@@ -125,7 +158,9 @@ export class TeamFormService {
     });
   }
 
-
+  /**
+   * Handles form submission with multipart data.
+   */
   private _handleTeamSubmission = async (form: FieldTree<TeamFormModel>) => {
     const oldTeam = this.teamSignal();
     const model = this.teamFormModelSignal();
@@ -206,7 +241,6 @@ export class TeamFormService {
     return errorResult;
   }
 
-
   private _buildForm(): FieldTree<TeamFormModel> {
     return form(this.teamFormModelSignal, (path) => this._applyValidationSchema(path), {
       submission: {
@@ -215,7 +249,9 @@ export class TeamFormService {
     });
   }
 
-  // Dialog methods
+  /**
+   * Opens the dialog to add a new season and updates the model if successful.
+   */
   addSeason() {
     this._adminDialogs.openSeasonForm().subscribe((result) => {
       if (result) {
@@ -229,6 +265,9 @@ export class TeamFormService {
     });
   }
 
+  /**
+   * Opens the dialog to add a new age category.
+   */
   addAgeGroup() {
     this._adminDialogs.openAgeGroupForm().subscribe((result) => {
       if (result) {
@@ -242,6 +281,9 @@ export class TeamFormService {
     });
   }
 
+  /**
+   * Opens the dialog to add a new hall for a specific training session.
+   */
   addHall(trainingSessionIndex?: number) {
     this._adminDialogs.openHallForm().subscribe((result) => {
       if (result && trainingSessionIndex !== undefined) {
@@ -262,6 +304,9 @@ export class TeamFormService {
     });
   }
 
+  /**
+   * Opens the dialog to add a new staff member for an assignment.
+   */
   addStaffMember(staffIndex: number) {
     this._adminDialogs.openStaffForm().subscribe((result) => {
       if (result) {
@@ -282,7 +327,9 @@ export class TeamFormService {
     });
   }
 
-  // Array management
+  /**
+   * Adds an empty staff assignment slot to the model.
+   */
   addStaff() {
     this.teamFormModelSignal.update(teamFormModel => ({
       ...teamFormModel,
@@ -290,6 +337,9 @@ export class TeamFormService {
     }))
   }
 
+  /**
+   * Removes a staff assignment slot by index.
+   */
   removeStaff(index: number) {
     this.teamFormModelSignal.update(teamFormModel => ({
       ...teamFormModel,
@@ -297,6 +347,9 @@ export class TeamFormService {
     }));
   }
 
+  /**
+   * Adds an empty training session slot to the model.
+   */
   addTrainingSession() {
     this.teamFormModelSignal.update(teamFormModel => ({
       ...teamFormModel,
@@ -309,6 +362,9 @@ export class TeamFormService {
     }))
   }
 
+  /**
+   * Removes a training session slot by index.
+   */
   removeTrainingSession(index: number) {
     this.teamFormModelSignal.update(teamFormModel => ({
       ...teamFormModel,

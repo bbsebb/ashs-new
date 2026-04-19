@@ -1,3 +1,6 @@
+/**
+ * Component displaying an Instagram post (feed).
+ */
 import {Component, computed, inject, input} from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
 import {MatDialog} from '@angular/material/dialog';

@@ -1,12 +1,12 @@
-<a [routerLink]="['/halls', hallId()]" class="session-item" title="Voir les détails de la salle">
-  <div class="session-day">{{ dayOfWeek() | dayOfWeek }}</div>
+<a [routerLink]="['/halls', hallIdSignal()]" class="session-item" title="Voir les détails de la salle">
+  <div class="session-day">{{ dayOfWeekSignal() | dayOfWeek }}</div>
   <div class="session-details">
     <span class="session-time">
-      {{ startTime() | date: 'HH:mm' }} - {{ endTime() | date: 'HH:mm' }}
+      {{ startTimeSignal() | date: 'HH:mm' }} - {{ endTimeSignal() | date: 'HH:mm' }}
     </span>
     <span class="session-hall">
       <mat-icon>location_on</mat-icon>
-      {{ hallName() }}
+      {{ hallNameSignal() }}
     </span>
   </div>
   <mat-icon class="chevron">chevron_right</mat-icon>

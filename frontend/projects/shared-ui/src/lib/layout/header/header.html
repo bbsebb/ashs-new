@@ -1,10 +1,14 @@
+<!-- Main toolbar using Angular Material -->
 <mat-toolbar class="toolbar">
 
+  <!-- Slot for navigation items on the left side -->
   <menu class="left-menu">
     <ng-content select="[left-menu]"></ng-content>
   </menu>
+
   <span class="example-spacer"></span>
 
+  <!-- Central logo linked to the home page -->
   <a routerLink="/" class="logo-container">
     <img [ngSrc]="'/shared-ui/logo.svg'"
          width="631"
@@ -15,6 +19,8 @@
   </a>
 
   <span class="example-spacer"></span>
+
+  <!-- Slot for navigation items on the right side -->
   <menu class="right-menu">
     <ng-content select="[right-menu]"></ng-content>
   </menu>

@@ -63,28 +63,24 @@ jobs:
       - name: Create Dockerfiles & Nginx configs for Angular apps
         working-directory: frontend
         run: |
-          cat <<'EOF' > nginx.app.conf
+          cat <<'EOF' > nginx.conf
           server {
             listen 80;
             server_name _;
             root /usr/share/nginx/html;
             index index.html;
           
+            # Disable cache for HTML to ensure users always get the latest version
             location / {
               try_files $uri $uri/ /index.html;
+              add_header Cache-Control "no-store, no-cache, must-revalidate";
             }
-          }
-          EOF
-          
-          cat <<'EOF' > nginx.admin.conf
-          server {
-            listen 80;
-            server_name _;
-            root /usr/share/nginx/html;
-            index index.html;
-          
-            location / {
-              try_files $uri $uri/ /index.html;
+
+            # Enable long-term cache for hashed assets (JS, CSS) and images
+            location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|eot|ttf|svg)$ {
+              expires 1y;
+              add_header Cache-Control "public, immutable";
+              access_log off;
             }
           }
           EOF
@@ -92,14 +88,14 @@ jobs:
           cat <<'EOF' > Dockerfile.app
           FROM nginx:alpine
           COPY dist/app/browser /usr/share/nginx/html
-          COPY nginx.app.conf /etc/nginx/conf.d/default.conf
+          COPY nginx.conf /etc/nginx/conf.d/default.conf
           EXPOSE 80
           EOF
           
           cat <<EOF > Dockerfile.admin
           FROM nginx:alpine
           COPY dist/admin/browser /usr/share/nginx/html
-          COPY nginx.admin.conf /etc/nginx/conf.d/default.conf
+          COPY nginx.conf /etc/nginx/conf.d/default.conf
           EXPOSE 80
           EOF
 

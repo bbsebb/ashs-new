@@ -1,3 +1,6 @@
+/**
+ * Component for listing and filtering teams by season.
+ */
 import {Component, computed, effect, inject, signal, viewChild} from '@angular/core';
 import {LayoutService, SeasonsStore, TeamsStore} from '@shared-api';
 import {AdminPageContainer, ErrorData, LoadingData, NotificationService} from '@shared-ui';
@@ -62,14 +65,14 @@ export class TeamsList {
   private readonly _layoutService = inject(LayoutService);
   private readonly _notificationService = inject(NotificationService);
 
-  seasonsSignal = this._seasonsStore.seasonsSignal;
-  selectedSeasonIdSignal = signal<string | undefined>(undefined);
+  readonly seasonsSignal = this._seasonsStore.seasonsSignal;
+  readonly selectedSeasonIdSignal = signal<string | undefined>(undefined);
 
-  isLoadingSignal = computed(() => this._teamsStore.isLoadingSignal() || this._seasonsStore.isLoadingSignal());
-  errorSignal = computed(() => !!this._teamsStore.errorSignal() || !!this._seasonsStore.errorSignal());
+  readonly isLoadingSignal = computed(() => this._teamsStore.isLoadingSignal() || this._seasonsStore.isLoadingSignal());
+  readonly errorSignalSignal = computed(() => !!this._teamsStore.errorSignal() || !!this._seasonsStore.errorSignal());
 
-  // Données filtrées par saison pour la table
-  filteredTeamsSignal = computed(() => {
+  /** Teams filtered by the selected season. */
+  readonly filteredTeamsSignal = computed(() => {
     const teams = this._teamsStore.teamsSignal();
     const selectedSeasonId = this.selectedSeasonIdSignal();
 
@@ -77,15 +80,17 @@ export class TeamsList {
     return teams.filter(t => t.seasonId === selectedSeasonId);
   });
 
-  displayedColumns = computed(() => this._layoutService.isDesktopSignal() ? ['category', 'gender', 'teamNumber', 'actions'] : ['category', 'gender', 'actions']);
+  readonly displayedColumnsSignal = computed(() => this._layoutService.isDesktopSignal() ? ['category', 'gender', 'teamNumber', 'actions'] : ['category', 'gender', 'actions']);
 
+  /** The data source used by the material table. */
   dataSource = new MatTableDataSource([] as Team[]);
 
-  paginator = viewChild(MatPaginator);
-  sort = viewChild(MatSort);
+  /** Signal-based references to paginator and sort components. */
+  paginatorSignal = viewChild(MatPaginator);
+  sortSignal = viewChild(MatSort);
 
   constructor() {
-    // Initialisation saison courante
+    /** Initialize default season to current one if available. */
     effect(() => {
       const currentSeason = this._seasonsStore.currentSeasonSignal();
       if (currentSeason && !this.selectedSeasonIdSignal()) {
@@ -93,23 +98,26 @@ export class TeamsList {
       }
     });
 
-    // Mise à jour de la table
+    /** Sync table data and controls with signals. */
     effect(() => {
       this.dataSource.data = this.filteredTeamsSignal();
-      this.dataSource.paginator = this.paginator() ?? null;
-      this.dataSource.sort = this.sort() ?? null;
+      this.dataSource.paginator = this.paginatorSignal() ?? null;
+      this.dataSource.sort = this.sortSignal() ?? null;
     });
   }
 
+  /** Changes the filtered season. */
   protected onSeasonChange(seasonId: string) {
     this.selectedSeasonIdSignal.set(seasonId);
   }
 
+  /** Retries loading both teams and seasons. */
   protected retry(): void {
     this._teamsStore.reload();
     this._seasonsStore.reload();
   }
 
+  /** Deletes a team by ID. */
   protected onDelete(id: string) {
     this._teamsStore.deleteById(id).subscribe({
       next: () => this._notificationService.show("Équipe supprimée avec succès", 'success')

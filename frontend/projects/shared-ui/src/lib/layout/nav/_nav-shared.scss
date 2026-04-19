@@ -1,10 +1,18 @@
 @use '@angular/material' as mat;
 
+/**
+ * Shared navigation variables and mixins.
+ * Leverages Material 3 tokens for colors.
+ */
 $nav-bg: var(--mat-sys-surface-container-highest);
 $nav-color: var(--mat-sys-on-surface-container-highest);
 $active-color: var(--mat-sys-primary);
 $blur: 15px;
 
+/**
+ * Mixin for a modern "Glassmorphism" container.
+ * Combines translucent background, backdrop blur, and subtle borders.
+ */
 @mixin nav-glass-container {
   background: rgba($nav-bg, 0.1);
   color: $nav-color;
@@ -14,6 +22,10 @@ $blur: 15px;
   border-radius: 24px;
 }
 
+/**
+ * Base styles for navigation items (links).
+ * Includes smooth transitions and an animated background for the active state.
+ */
 @mixin nav-item-base {
   display: flex;
   flex-direction: column;
@@ -38,6 +50,7 @@ $blur: 15px;
   &.active {
     color: $active-color;
 
+    /* Animated background capsule for the active item */
     &::before {
       content: '';
       position: absolute;
@@ -50,6 +63,8 @@ $blur: 15px;
     }
   }
 }
+
+/** Animation for the active navigation item background. */
 @keyframes expand {
   from { width: 0; opacity: 0; }
   to { width: 48px; opacity: 1; }

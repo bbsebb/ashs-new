@@ -1,3 +1,6 @@
+/**
+ * Component for creating or editing a sport season via a form.
+ */
 import {Component, effect, inject, input} from '@angular/core';
 import {FormFieldErrorDirective, FormSubmitButton, PageTitle, SeasonCard} from "@shared-ui";
 import {MatButton} from "@angular/material/button";
@@ -46,11 +49,11 @@ export class SeasonForm {
   private readonly _dialogReference = inject(MatDialogRef, {optional: true});
   private readonly _router = inject(Router);
 
-  id = input<string | undefined>(undefined);
+  idSignal = input<string | undefined>(undefined);
 
   constructor() {
     effect(() => {
-      this.seasonFormService.init(this.id());
+      this.seasonFormService.init(this.idSignal());
     });
   }
 

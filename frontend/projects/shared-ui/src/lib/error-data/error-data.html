@@ -4,7 +4,7 @@
       <mat-icon aria-hidden="true" class="error-icon">error_outline</mat-icon>
 
       <div class="texts">
-        <h2 class="title">Impossible de charger {{ dataName() || 'la donnée' }}</h2>
+        <h2 class="title">Impossible de charger {{ dataNameSignal() || 'la donnée' }}</h2>
         <p class="subtitle">
           Une erreur est survenue pendant le chargement. Vérifiez votre connexion et réessayez.
         </p>
@@ -12,7 +12,7 @@
     </div>
 
     <div class="message" role="alert" aria-live="polite">
-      <strong>{{ dataName() || 'La donnée' }}</strong>
+      <strong>{{ dataNameSignal() || 'La donnée' }}</strong>
       n’a pas pu être chargée.
       <span class="message-muted">Si le problème persiste, réessayez dans quelques minutes.</span>
     </div>

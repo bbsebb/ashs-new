@@ -1,14 +1,20 @@
-// On garde cette fonction privée pour ce fichier
+/**
+ * Pads a number with a leading zero if it is less than 10.
+ * @param n The number to pad.
+ * @returns A string representation of the padded number.
+ */
 function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
 /**
- * Format "YYYY-MM-DD" (Ex: pour un LocalDate en backend)
- * Amélioration : Tolère null/undefined en entrée.
+ * Formats a Date object as a "YYYY-MM-DD" string.
+ * This format is compatible with backend LocalDate.
+ * @param date The date to format.
+ * @returns A string in "YYYY-MM-DD" format, or null if input is null/undefined.
  */
 export function dateToYyyyMmDd(date: Date | null | undefined): string | null {
-  if (!date) return null; // Sécurité vitale pour les formulaires Angular
+  if (!date) return null;
 
   const y = date.getFullYear();
   const m = pad(date.getMonth() + 1);
@@ -18,7 +24,9 @@ export function dateToYyyyMmDd(date: Date | null | undefined): string | null {
 }
 
 /**
- * Format "DD-MM-YYYY" (Ex: pour un affichage personnalisé)
+ * Formats a Date object as a "DD-MM-YYYY" string for display purposes.
+ * @param date The date to format.
+ * @returns A string in "DD-MM-YYYY" format, or null if input is null/undefined.
  */
 export function dateToDdMmYyyy(date: Date | null | undefined): string | null {
   if (!date) return null;
@@ -31,12 +39,12 @@ export function dateToDdMmYyyy(date: Date | null | undefined): string | null {
 }
 
 /**
- * NOUVEAU : Format "YYYY-MM-DDTHH:mm:ss"
- * Idéal pour envoyer tes données formées par le mat-timepicker vers un LocalDateTime
+ * Formats a Date object's time as an "HH:mm:ss" string.
+ * Useful for sending time data to backend LocalDateTime.
+ * @param date The date containing the time to format.
+ * @returns A string in "HH:mm:ss" format.
  */
 export function dateToLocalDateTime(date: Date): string {
-
-
   const hours = pad(date.getHours());
   const minutes = pad(date.getMinutes());
   const seconds = pad(date.getSeconds());
@@ -45,11 +53,12 @@ export function dateToLocalDateTime(date: Date): string {
 }
 
 /**
- * NOUVEAU : Parsing inverse (Backend vers Frontend)
- * Transforme le string reçu du backend en véritable objet Date pour tes composants Angular
+ * Parses a time string ("HH:mm:ss") from the backend into a Javascript Date object.
+ * The resulting Date object uses the current day with the specified time.
+ * @param timeString The time string to parse.
+ * @returns A Date object set to the specified time.
  */
 export function parseLocalDateTime(timeString: string): Date {
-  // On découpe la chaîne "HH:mm:ss"
   const parts = timeString.split(':');
   if (parts.length < 2) {
     throw new Error('Invalid time format');
@@ -57,10 +66,8 @@ export function parseLocalDateTime(timeString: string): Date {
 
   const hours = parseInt(parts[0], 10);
   const minutes = parseInt(parts[1], 10);
-  // Si le backend n'envoie pas les secondes, on met 0 par défaut
   const seconds = parts.length === 3 ? parseInt(parts[2], 10) : 0;
 
-  // On crée une date du jour, et on écrase l'heure avec celle du backend
   const date = new Date();
   date.setHours(hours, minutes, seconds, 0);
   return date;

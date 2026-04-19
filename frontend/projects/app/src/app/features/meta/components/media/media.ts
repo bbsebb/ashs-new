@@ -1,3 +1,6 @@
+/**
+ * Optimized media handler for images and videos with priority loading support.
+ */
 import {Component, input} from '@angular/core';
 
 import {NgOptimizedImage} from '@angular/common';

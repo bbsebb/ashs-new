@@ -1,3 +1,6 @@
+/**
+ * Component for displaying a hall detail page in the public app.
+ */
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {HallsStore} from '@shared-api';
@@ -22,8 +25,8 @@ export class HallView {
   private readonly hallsStore = inject(HallsStore);
   private readonly router = inject(Router);
 
-  id = input.required<string>();
-  hallSignal = this.hallsStore.hallById(this.id);
+  idSignal = input.required<string>();
+  hallSignal = this.hallsStore.hallById(this.idSignal);
 
   isLoadingSignal = this.hallsStore.isLoadingSignal;
   errorSignal = this.hallsStore.errorSignal;

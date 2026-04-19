@@ -91,7 +91,7 @@ describe('TeamForm Component (Admin) - Exhaustive', () => {
     const user = userEvent.setup();
 
     await render(TeamForm, {
-      inputs: { id: 't1' },
+      inputs: {idSignal: 't1'},
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: StaffsStore, useValue: mocks.staffsStore },

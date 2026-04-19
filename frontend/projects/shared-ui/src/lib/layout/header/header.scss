@@ -3,9 +3,9 @@
 }
 
 .toolbar {
-  position: relative; // Important pour le positionnement du logo
+  position: relative;
   z-index: 10;
-  overflow: visible !important; // Permet au logo de dépasser
+  overflow: visible !important; // Allow the logo to overlap the toolbar boundaries
 
 
   .left-menu, .right-menu {
@@ -13,24 +13,28 @@
     align-content: center;
   }
 
+  /**
+   * Central logo styling.
+   * Positioned absolutely to overlap the toolbar and creating a distinctive visual identity.
+   */
   .logo-container {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -30%); // Centre le logo et le descend légèrement
+    transform: translate(-50%, -30%);
     z-index: 1001;
     transition: transform 0.3s ease;
     display: flex;
     align-items: center;
 
     &:hover {
-      transform: translate(-50%, -35%) scale(1.1); // Effet de survol : zoom et léger mouvement
+      transform: translate(-50%, -35%) scale(1.1);
     }
 
     .logo-img {
-      height: 80px; // Ajustez la taille selon vos besoins
+      height: 80px;
       width: auto;
-      filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.1)); // Petit relief
+      filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.1));
     }
   }
 }

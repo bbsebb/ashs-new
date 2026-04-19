@@ -1,5 +1,5 @@
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement des salles" [isLoading]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement des salles" [isLoadingSignal]="isLoadingSignal()"/>
 } @else if (errorSignal()) {
   <app-error-data dataName="salles" (onRetry)="retry()"/>
 } @else {
@@ -56,16 +56,19 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
-        <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
-        <!-- ✅ Message quand il n'y a aucune donnée -->
+        <!-- Table Row Definitions -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsSignal()"></tr>
+        <tr mat-row *matRowDef="let _; columns: displayedColumnsSignal();"></tr>
+
+        <!-- No Data Row -->
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" [attr.colspan]="displayedColumns().length">
+          <td class="mat-cell" [attr.colspan]="displayedColumnsSignal().length">
             Aucune salle à afficher.
           </td>
         </tr>
       </table>
 
+      <!-- Paginator -->
       <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
   </app-admin-page-container>

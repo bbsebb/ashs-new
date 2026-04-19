@@ -1,6 +1,6 @@
 @let staff = staffSignal();
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement du membre de l'encadrement" [isLoading]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement du membre de l'encadrement" [isLoadingSignal]="isLoadingSignal()"/>
 } @else if (errorSignal()) {
   <app-error-data dataName="encadrant" (onRetry)="retry()"/>
 } @else if (!staff) {

@@ -37,7 +37,7 @@
     </div>
 
     <!-- Liste des équipes (Composant dédié) -->
-    <lib-staff-teams-list [staffId]="staff.id" [seasonId]="seasonIdSignal()"></lib-staff-teams-list>
+    <lib-staff-teams-list [staffIdSignal]="staff.id" [seasonIdSignal]="seasonIdSignal()"></lib-staff-teams-list>
   </mat-card-content>
 
   <ng-content select="[actions]"></ng-content>

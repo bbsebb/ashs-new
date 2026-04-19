@@ -1,8 +1,13 @@
 @use '@angular/material' as mat;
 
+/**
+ * Mixin defining the global theme for the shared-ui library.
+ * Configures Material 3 palettes, typography, and density.
+ */
 @mixin shared-ui-theme() {
   html {
     height: 100%;
+    /* Apply Material 3 theme configuration */
     @include mat.theme((
       color: (
         primary: mat.$azure-palette,
@@ -15,6 +20,7 @@
 
   body {
     color-scheme: light;
+    /* Use Material 3 system tokens for global styles */
     background-color: var(--mat-sys-surface);
     color: var(--mat-sys-on-surface);
     font: var(--mat-sys-body-medium);

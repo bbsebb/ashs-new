@@ -1,30 +1,36 @@
 <section class="form">
+  <!-- Page Header and Title -->
   <app-page-title
-    eyebrow="Gestion des équipes"
-    title="Informations de l'équipe"
-    subtitle="Renseignez la catégorie, le genre et le numéro de l'équipe."
+    [eyebrowSignal]="'Gestion des équipes'"
+    [titleSignal]="'Informations de l\'équipe'"
+    [subtitleSignal]="'Renseignez la catégorie, le genre et le numéro de l\'équipe.'"
   />
 
-  <form class="content" autocomplete="off" [formRoot]="teamFormService.teamForm">
+  <!-- Team Creation/Edition Form -->
+  <form class="content" autocomplete="off" [formRoot]="teamFormService.teamFormSignal">
     <div class="form-fields">
+      <!-- Season Selection -->
       <mat-form-field class="field" appearance="outline">
         <mat-label>Saison</mat-label>
-        <mat-select [formField]="teamFormService.teamForm.seasonId">
+        <mat-select [formField]="teamFormService.teamFormSignal.seasonId">
           @for (season of teamFormService.seasonsSignal(); track season.id) {
             <mat-option [value]="season.id">
-              {{ season.name }} ans
+              {{ season.name }}
             </mat-option>
           }
-          <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addSeason()" [value]="null">Ajouter une season</mat-option>
+          <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addSeason()"
+                      [value]="null">Ajouter une saison
+          </mat-option>
         </mat-select>
-        <mat-error *appError="teamFormService.teamForm.seasonId; let errorMsg">
+        <mat-error *appError="teamFormService.teamFormSignal.seasonId; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
 
+      <!-- Age Category Selection -->
       <mat-form-field class="field" appearance="outline">
         <mat-label>Catégorie</mat-label>
-        <mat-select [formField]="teamFormService.teamForm.ageGroupId">
+        <mat-select [formField]="teamFormService.teamFormSignal.ageGroupId">
           @for (ageGroup of teamFormService.ageGroupsSignal(); track ageGroup.id) {
             <mat-option [value]="ageGroup.id">
               {{ ageGroup.upperLimit ? 'Moins de' : 'Plus de' }} {{ ageGroup.ageLimit }} ans
@@ -32,53 +38,56 @@
           }
           <mat-option (onSelectionChange)="$event.isUserInput && $event.source.selected && teamFormService.addAgeGroup()" [value]="null">Ajouter une catégorie</mat-option>
         </mat-select>
-        <mat-error *appError="teamFormService.teamForm.ageGroupId; let errorMsg">
+        <mat-error *appError="teamFormService.teamFormSignal.ageGroupId; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
 
+      <!-- Gender Selection -->
       <mat-form-field class="field" appearance="outline">
         <mat-label>Genre</mat-label>
-        <mat-select [formField]="teamFormService.teamForm.gender">
+        <mat-select [formField]="teamFormService.teamFormSignal.gender">
           @for (gender of genders; track gender) {
             <mat-option [value]="gender">{{ gender | gender }}</mat-option>
           }
         </mat-select>
-        <mat-error *appError="teamFormService.teamForm.gender; let errorMsg">
+        <mat-error *appError="teamFormService.teamFormSignal.gender; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
 
+      <!-- Team Number Input -->
       <mat-form-field class="field" appearance="outline">
         <mat-label>Numéro d'équipe</mat-label>
-        <input matInput type="number" [formField]="teamFormService.teamForm.teamNumber"/>
-        <mat-error *appError="teamFormService.teamForm.teamNumber; let errorMsg">
+        <input matInput type="number" [formField]="teamFormService.teamFormSignal.teamNumber"/>
+        <mat-error *appError="teamFormService.teamFormSignal.teamNumber; let errorMsg">
           {{ errorMsg }}
         </mat-error>
       </mat-form-field>
-
     </div>
-    
-    <mat-divider/>
-    <app-team-staff-fields [staffsArray]="teamFormService.teamForm.staffs" />
 
     <mat-divider/>
-    <app-team-training-session-fields [sessionsArray]="teamFormService.teamForm.trainingSessions" />
-    
+    <!-- Nested Form for Staff Assignments -->
+    <app-team-staff-fields [staffsArray]="teamFormService.teamFormSignal.staffs"/>
+
+    <mat-divider/>
+    <!-- Nested Form for Training Sessions -->
+    <app-team-training-session-fields [sessionsArray]="teamFormService.teamFormSignal.trainingSessions"/>
+
     <mat-divider/>
 
+    <!-- Team Photo Management -->
     <div class="table-toolbar">
-      <app-page-title title="Photo d'équipe"/>
+      <app-page-title [titleSignal]="'Photo d\'équipe'"/>
     </div>
     @if (teamFormService.showExistingPhotoSignal()) {
       <div class="image-preview-container">
-
         <img class="image-preview" [ngSrc]="createImageSourceUrl(teamFormService.teamSignal()?.photoFileName)"
              [height]="PHOTO_HEIGHT"
              [width]="PHOTO_WIDTH"
              alt="avatar" priority/>
         <app-form-delete-button
-          confirmMessage="Êtes-vous sûr de vouloir supprimer la photo d'équipe ?"
+          [confirmMessage]="'Êtes-vous sûr de vouloir supprimer la photo d\'équipe ?'"
           [iconOnly]="!isHandsetSignal()"
           (deleteConfirmed)="deletePhoto()">
         </app-form-delete-button>
@@ -104,7 +113,8 @@
       </div>
     }
 
-    @let globalErrors = teamFormService.teamForm().errors();
+    <!-- Global Form Errors -->
+    @let globalErrors = teamFormService.teamFormSignal().errors();
     @if (globalErrors.length > 0) {
       @for (globalError of globalErrors; track globalError.kind) {
         <mat-error class="alert alert-danger">
@@ -113,16 +123,18 @@
       }
     }
 
+    <!-- Form Action Buttons -->
     <div class="actions">
       <app-form-submit-button
-        [disabled]="teamFormService.isSubmitDisabledSignal()"
-        [content]="(id() ? 'Modifier' : 'Enregistrer')"
-        [submitting]="teamFormService.teamForm().submitting()"/>
+        [disabledSignal]="teamFormService.isSubmitDisabledSignal()"
+        [contentSignal]="idSignal() ? 'Modifier' : 'Enregistrer'"
+        [submittingSignal]="teamFormService.teamFormSignal().submitting()"/>
       <button mat-button type="button" routerLink="/teams">Retour</button>
     </div>
   </form>
 </section>
 
+<!-- Live Data Preview -->
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
   <lib-team-card [team]="teamPreview()"/>

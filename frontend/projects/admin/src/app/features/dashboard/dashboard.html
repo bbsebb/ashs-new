@@ -1,10 +1,12 @@
 <div class="dashboard-container">
   @if (authService.isAuthenticatedSignal()) {
+    <!-- Main Dashboard Header -->
     <header class="header">
       <h1>Bienvenue, {{ authService.userProfile.value()?.firstName }} !</h1>
       <p class="subtitle">Tableau de bord de l'administration</p>
     </header>
 
+    <!-- Features Navigation Grid -->
     <div class="grid">
       @for (feature of features; track feature.path) {
         <mat-card appearance="outlined" class="feature-card">
@@ -18,6 +20,7 @@
             <p>{{ feature.description }}</p>
           </mat-card-content>
           <mat-card-actions align="end">
+            <!-- Action Link to Feature -->
             <a mat-button [routerLink]="feature.path" [color]="feature.color">
               Gérer
               <mat-icon iconPositionEnd>arrow_forward</mat-icon>
@@ -27,8 +30,10 @@
       }
     </div>
   } @else {
+    <!-- Protected Content Section (Unauthenticated access) -->
     <div class="protected-content">
       <mat-card appearance="outlined" class="access-card">
+        ...
         <mat-card-header>
           <div mat-card-avatar class="lock-icon">
             <mat-icon>lock</mat-icon>
@@ -36,10 +41,10 @@
           <mat-card-title>Accès Protégé</mat-card-title>
           <mat-card-subtitle>Administration réservée</mat-card-subtitle>
         </mat-card-header>
-        
+
         <mat-card-content>
           <p>
-            Cette plateforme est réservée aux administrateurs de l'association. 
+            Cette plateforme est réservée aux administrateurs de l'association.
             Vous devez être connecté pour accéder à ces fonctionnalités.
           </p>
           <p class="help-text">

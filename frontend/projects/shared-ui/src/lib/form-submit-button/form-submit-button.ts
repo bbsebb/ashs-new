@@ -2,6 +2,10 @@ import {Component, input} from '@angular/core';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatButton} from '@angular/material/button';
 
+/**
+ * Standardized submit button for forms.
+ * Automatically handles loading state with a spinner and disabling logic.
+ */
 @Component({
   selector: 'app-form-submit-button',
   imports: [
@@ -12,20 +16,20 @@ import {MatButton} from '@angular/material/button';
   styleUrl: './form-submit-button.css',
 })
 export class FormSubmitButton {
-  /**
-   * True quand le formulaire est en cours d'envoi.
-   */
-  submitting = input<boolean>(false);
+  /** True when the form is being submitted (shows spinner). */
+  submittingSignal = input<boolean>(false);
+
+  /** Business-level disabling (e.g., form invalid, missing permissions). */
+  disabledSignal = input<boolean>(false);
+
+  /** The text content to display on the button. */
+  contentSignal = input<string>('Envoyer');
 
   /**
-   * Désactivation “métier” (ex: form invalid, droits, etc.)
+   * Internal logic to determine if the button should be disabled.
+   * @returns True if either disabled or submitting input is true.
    */
-  disabled = input<boolean>(false);
-
-  content = input<string>('Envoyer');
-
-
   protected isDisabled(): boolean {
-    return this.disabled() || this.submitting();
+    return this.disabledSignal() || this.submittingSignal();
   }
 }

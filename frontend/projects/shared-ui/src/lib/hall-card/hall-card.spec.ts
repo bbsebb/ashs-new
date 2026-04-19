@@ -1,9 +1,13 @@
-import {render, screen, aliasedInput} from '@testing-library/angular';
+import {render, screen} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
 import {HallCard} from './hall-card';
 import {Hall} from '@shared-domain';
 import {SafePipe} from '../pipes/safe.pipe';
 
+/**
+ * Unit tests for HallCard component.
+ * Uses componentProperties to bypass Signal input type issues in Testing Library.
+ */
 describe('HallCard Component', () => {
   const mockHall: Hall = {
     id: '1',
@@ -16,25 +20,18 @@ describe('HallCard Component', () => {
 
   it('should render hall name and address correctly', async () => {
     await render(HallCard, {
-      inputs: {
-        hallSignal: aliasedInput('hall', mockHall)
-      },
-      imports: [SafePipe] // Nécessaire car utilisé dans le template
+      componentProperties: {hall: mockHall} as any,
+      imports: [SafePipe]
     });
 
-    // Vérifie le titre (Nom de la salle)
     expect(screen.getByText('Palais des Sports')).toBeDefined();
-
-    // Vérifie l'adresse
     expect(screen.getByText(/123 Rue du Handball/)).toBeDefined();
     expect(screen.getByText(/67800 Hoenheim/)).toBeDefined();
   });
 
   it('should have a link to Google Maps with correct aria-label', async () => {
     await render(HallCard, {
-      inputs: {
-        hallSignal: aliasedInput('hall', mockHall)
-      },
+      componentProperties: {hall: mockHall} as any,
       imports: [SafePipe]
     });
 

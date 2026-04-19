@@ -5,6 +5,10 @@ import {Season} from '@shared-domain';
 import {APP_CONFIG} from '../../configs/app-config';
 import {CreateSeasonDTO, UpdateSeasonDTO} from './season.dtos';
 
+/**
+ * Gateway for Season-related API calls.
+ * Handles fetching, creating, updating, and deleting seasons.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -12,6 +16,11 @@ export class SeasonGateway {
   private readonly http = inject(HttpClient);
   private readonly appConfig = inject(APP_CONFIG);
 
+  /**
+   * Retrieves all seasons from the API using httpResource.
+   * Maps the response to the domain Season model.
+   * @returns An HttpResourceRef containing the list of seasons.
+   */
   getSeasons(): HttpResourceRef<Season[]> {
     return httpResource<Season[]>(() => `${this.appConfig.apiUrl}/api/v1/seasons`, {
       parse: (response: unknown) => {
@@ -21,22 +30,43 @@ export class SeasonGateway {
     });
   }
 
+  /**
+   * Adds a new season.
+   * @param createSeasonDTO The data for the new season.
+   * @returns An Observable of the created Season.
+   */
   addSeason(createSeasonDTO: CreateSeasonDTO): Observable<Season> {
     return this.http.post<SeasonResponseDTO>(`${this.appConfig.apiUrl}/api/v1/seasons`, createSeasonDTO).pipe(
       map(response => this.toSeason(response))
     );
   }
 
+  /**
+   * Deletes a season by its ID.
+   * @param id The unique identifier of the season to delete.
+   * @returns An Observable that completes when the deletion is done.
+   */
   deleteById(id: string): Observable<void> {
     return this.http.delete<void>(`${this.appConfig.apiUrl}/api/v1/seasons/${id}`);
   }
 
+  /**
+   * Updates an existing season.
+   * @param id The unique identifier of the season to update.
+   * @param updateSeasonDTO The updated data.
+   * @returns An Observable of the updated Season.
+   */
   updateSeason(id: string, updateSeasonDTO: UpdateSeasonDTO): Observable<Season> {
     return this.http.put<SeasonResponseDTO>(`${this.appConfig.apiUrl}/api/v1/seasons/${id}`, updateSeasonDTO).pipe(
       map(response => this.toSeason(response)),
     );
   }
 
+  /**
+   * Maps a SeasonResponseDTO from the API to a domain Season object.
+   * @param seasonResponseDTO The API response object.
+   * @returns A Season domain object.
+   */
   toSeason(seasonResponseDTO: SeasonResponseDTO): Season {
     return {
       id: seasonResponseDTO.id,

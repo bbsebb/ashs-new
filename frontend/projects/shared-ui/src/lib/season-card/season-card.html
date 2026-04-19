@@ -1,20 +1,25 @@
 @let season = seasonSignal();
+<!-- Season Card Container -->
 <mat-card class="card" appearance="outlined">
+  <!-- Header Section with Season Name and Status Chips -->
   <mat-card-header class="header">
     <mat-card-title class="title">{{ season.name }}</mat-card-title>
 
     <mat-chip-set aria-label="Statut de la saison">
+      <!-- Active Status Badge -->
       @if (season.isActive) {
         <mat-chip class="status status-active">Active</mat-chip>
       } @else {
         <mat-chip class="status">Inactive</mat-chip>
       }
+      <!-- Current Season Badge -->
       @if (season.isCurrent) {
         <mat-chip class="status status-active">En cours</mat-chip>
       }
     </mat-chip-set>
   </mat-card-header>
 
+  <!-- Content Section with Start and End Dates -->
   <mat-card-content class="content">
     <dl class="meta">
       <div class="row">
@@ -28,5 +33,7 @@
       </div>
     </dl>
   </mat-card-content>
+
+  <!-- Actions Slot -->
   <ng-content select="[actions]"></ng-content>
 </mat-card>

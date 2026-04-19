@@ -1,3 +1,6 @@
+/**
+ * Component for listing all teams in the public app.
+ */
 import {Component, computed, inject, linkedSignal, signal} from '@angular/core';
 import {SeasonsStore, TeamsStore} from '@shared-api';
 import {ErrorData, GenderPipe, LoadingData, PublicPageContainer, TeamCard, TeamMiniCard} from '@shared-ui';

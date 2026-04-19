@@ -1,3 +1,6 @@
+/**
+ * Component for viewing a staff member detail profile.
+ */
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {StaffsStore} from '@shared-api';
@@ -26,8 +29,8 @@ export class StaffView {
   private readonly router = inject(Router);
   private readonly notificationService = inject(NotificationService);
 
-  id = input.required<string>();
-  staffSignal = this.staffsStore.staffById(this.id);
+  idSignal = input.required<string>();
+  staffSignal = this.staffsStore.staffById(this.idSignal);
 
   isLoadingSignal = this.staffsStore.isLoadingSignal;
   errorSignal = this.staffsStore.errorSignal;

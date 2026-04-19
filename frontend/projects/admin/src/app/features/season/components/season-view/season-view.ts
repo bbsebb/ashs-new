@@ -1,3 +1,6 @@
+/**
+ * Component for viewing a single sport season detail.
+ */
 import {Component, effect, inject, input} from '@angular/core';
 import {ErrorData, LoadingData, NotificationService, SeasonCard} from '@shared-ui';
 import {SeasonsStore} from '@shared-api';
@@ -25,9 +28,9 @@ export class SeasonView {
   private readonly router = inject(Router);
   private readonly notificationService = inject(NotificationService);
 
-  readonly id = input.required<string>()
+  readonly idSignal = input.required<string>()
 
-  seasonSignal = this.seasonStore.seasonById(this.id);
+  seasonSignal = this.seasonStore.seasonById(this.idSignal);
 
   isLoadingSignal = this.seasonStore.isLoadingSignal;
   errorSignal = this.seasonStore.errorSignal;

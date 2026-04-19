@@ -8,6 +8,11 @@ import {Router} from '@angular/router';
 import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {HallFormService} from '../../services/hall-form.service';
 
+/**
+ * Component for creating or editing a Hall.
+ * It uses HallFormService to manage the form state and logic.
+ * Can be displayed as a standalone page or within a dialog.
+ */
 @Component({
   selector: 'app-hall-form',
   providers: [HallFormService],
@@ -27,18 +32,31 @@ import {HallFormService} from '../../services/hall-form.service';
   styleUrl: './hall-form.scss',
 })
 export class HallForm {
-  protected readonly hallFormService = inject(HallFormService);
+  /** Service for hall form management. */
+  protected readonly _hallFormService = inject(HallFormService);
+  /** Reference to the dialog if opened in a modal. */
   private readonly _dialogReference = inject(MatDialogRef, {optional: true});
+  /** Router for navigation. */
   private readonly _router = inject(Router);
 
-  id = input<string | undefined>(undefined);
+  /**
+   * Optional hall ID provided via route parameters or input.
+   * Bound from the 'id' route parameter.
+   */
+  idSignal = input<string | undefined>(undefined, {alias: 'id'});
 
   constructor() {
+    /**
+     * Effect to initialize the service when the ID input changes.
+     */
     effect(() => {
-      this.hallFormService.init(this.id());
+      this._hallFormService.init(this.idSignal());
     });
   }
 
+  /**
+   * Cancels the form operation and navigates back or closes the dialog.
+   */
   protected cancel(): void {
     if (this._dialogReference) {
       this._dialogReference.close();

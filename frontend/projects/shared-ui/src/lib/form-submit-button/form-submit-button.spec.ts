@@ -2,6 +2,9 @@ import {render, screen} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
 import {FormSubmitButton} from './form-submit-button';
 
+/**
+ * Unit tests for FormSubmitButton component.
+ */
 describe('FormSubmitButton Component', () => {
   it('should render default content', async () => {
     await render(FormSubmitButton);
@@ -11,34 +14,30 @@ describe('FormSubmitButton Component', () => {
 
   it('should render custom content', async () => {
     await render(FormSubmitButton, {
-      inputs: {
+      componentProperties: {
         content: 'Sauvegarder'
-      }
+      } as any
     });
     expect(screen.getByText('Sauvegarder')).toBeDefined();
   });
 
   it('should disable button when disabled input is true', async () => {
     await render(FormSubmitButton, {
-      inputs: {
+      componentProperties: {
         disabled: true
-      }
+      } as any
     });
     expect((screen.getByRole('button') as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('should show spinner and hide text when submitting', async () => {
     await render(FormSubmitButton, {
-      inputs: {
+      componentProperties: {
         submitting: true
-      }
+      } as any
     });
     
-    // Le texte ne devrait plus être visible
     expect(screen.queryByText('Envoyer')).toBeNull();
-    
-    // Le spinner (role=progressbar interne à Angular Material) devrait être présent, 
-    // ou au moins le bouton devrait être désactivé
     expect((screen.getByRole('button') as HTMLButtonElement).disabled).toBe(true);
   });
 });

@@ -1,6 +1,6 @@
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement de l'encadrement" [isLoading]="isLoadingSignal()"/>
-} @else if (errorSignal()) {
+  <app-loading-data label="Chargement de l'encadrement" [isLoadingSignal]="isLoadingSignal()"/>
+} @else if (errorSignalSignal()) {
   <app-error-data dataName="personnel" (onRetry)="retry()"/>
 } @else {
   <app-admin-page-container title="Personnel" subtitle="Gestion de l'encadrement">
@@ -50,10 +50,10 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
-        <tr mat-row *matRowDef="let _; columns: displayedColumns();"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsSignal()"></tr>
+        <tr mat-row *matRowDef="let _; columns: displayedColumnsSignal();"></tr>
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" [attr.colspan]="displayedColumns().length">
+          <td class="mat-cell" [attr.colspan]="displayedColumnsSignal().length">
             Aucun membre de l'encadrement à afficher.
           </td>
         </tr>

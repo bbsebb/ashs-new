@@ -2,24 +2,46 @@ import {Injectable, resource, signal} from '@angular/core';
 import Keycloak from 'keycloak-js';
 import {environment} from '@environment';
 
+/**
+ * Interface representing the user profile information retrieved from Keycloak.
+ */
 export interface UserProfile {
+  /** The unique username of the user. */
   username?: string;
+  /** The email address of the user. */
   email?: string;
+  /** The first name of the user. */
   firstName?: string;
+  /** The last name of the user. */
   lastName?: string;
+  /** The full name of the user, computed from first and last names. */
   fullName: string;
+  /** URL to the user's profile picture. */
   profilePicture?: string;
 }
 
+/**
+ * Service responsible for managing authentication using Keycloak.
+ * It handles initialization, login, logout, and provides reactive access to the user's authentication state and profile.
+ */
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  /** Keycloak instance initialized with configuration from environment. */
   private readonly keycloak = new Keycloak(environment.keycloakConfig);
-  // Signal simple pour l'état d'authentification
+
+  /**
+   * Signal tracking whether the user is currently authenticated.
+   * Updated during initialization.
+   */
   public isAuthenticatedSignal = signal(false);
 
-  // 🚀 Utilisation de la nouvelle API resource !
+  /**
+   * Resource managing the user's profile data.
+   * It automatically reloads when `isAuthenticatedSignal` changes.
+   * Uses Keycloak's `loadUserProfile` to fetch data.
+   */
   public userProfile = resource({
     params: () => this.isAuthenticatedSignal(),
 
@@ -48,10 +70,18 @@ export class AuthService {
   });
 
 
+  /**
+   * Entry point to initialize the authentication service.
+   * @returns A promise that resolves when Keycloak is initialized.
+   */
   public initialize(): Promise<void> {
     return this.init();
   }
 
+  /**
+   * Private initialization logic for Keycloak.
+   * Configures silent SSO check and updates `isAuthenticatedSignal`.
+   */
   private async init(): Promise<void> {
     try {
       const authenticated = await this.keycloak.init({
@@ -66,18 +96,31 @@ export class AuthService {
     }
   }
 
+  /**
+   * Redirects the user to the Keycloak login page.
+   */
   public login(): void {
     void this.keycloak.login();
   }
 
+  /**
+   * Redirects the user to the Keycloak registration page.
+   */
   public register(): void {
     void this.keycloak.register();
   }
 
+  /**
+   * Logs the user out from Keycloak and redirects back to the application origin.
+   */
   public logout(): void {
     void this.keycloak.logout({redirectUri: window.location.origin});
   }
 
+  /**
+   * Retrieves the current access token from Keycloak.
+   * @returns The access token string or undefined if not authenticated.
+   */
   public getToken(): string | undefined {
     return this.keycloak.token;
   }

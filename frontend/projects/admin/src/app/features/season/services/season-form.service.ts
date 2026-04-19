@@ -8,6 +8,10 @@ import {MatDialogRef} from '@angular/material/dialog';
 import {firstValueFrom} from 'rxjs';
 import {SeasonFormModel} from './season.dtos';
 
+/**
+ * Service managing the state and logic for the season form.
+ * Handles creation, updates, and validation of sport seasons.
+ */
 @Injectable()
 export class SeasonFormService {
   private readonly _formErrorHandler = inject(FormErrorHandleService);
@@ -16,11 +20,18 @@ export class SeasonFormService {
   private readonly _notificationService = inject(NotificationService);
   private readonly _dialogReference = inject(MatDialogRef, {optional: true});
 
-  private _seasonId = signal<string | undefined>(undefined);
-  
-  readonly seasonSignal: Signal<Season | undefined> = this._seasonsStore.seasonById(this._seasonId);
+  /** Internal signal tracking the ID of the season being edited. */
+  private _seasonIdSignal = signal<string | undefined>(undefined);
+
+  /** Signal providing the season data from the store based on the current ID. */
+  readonly seasonSignal: Signal<Season | undefined> = this._seasonsStore.seasonById(this._seasonIdSignal);
+  /** Signal indicating if data is currently being fetched from the store. */
   readonly isLoadingSignal = this._seasonsStore.isLoadingSignal;
 
+  /**
+   * Linked signal that synchronizes the form model with the loaded season data.
+   * Resets to current date for new seasons.
+   */
   readonly seasonModelSignal = linkedSignal<SeasonFormModel>(() => {
     const season = this.seasonSignal();
     if (season) {
@@ -36,27 +47,41 @@ export class SeasonFormService {
     };
   });
 
-  readonly seasonForm: FieldTree<SeasonFormModel>;
-  readonly isSubmitDisabledSignal = computed(() => this.seasonForm().submitting() || this.seasonForm().invalid());
-  readonly seasonPreview = computed(() => this._mapToSeason(this.seasonModelSignal()));
+  /** The Signal-based form tree derived from the model. */
+  readonly seasonFormSignal: FieldTree<SeasonFormModel>;
+  /** Computed signal determining if the submit button should be disabled. */
+  readonly isSubmitDisabledSignal = computed(() => this.seasonFormSignal().submitting() || this.seasonFormSignal().invalid());
+  /** Computed signal for a live preview of the season being edited. */
+  readonly seasonPreviewSignal = computed(() => this._mapToSeason(this.seasonModelSignal()));
 
   constructor() {
-    this.seasonForm = this._buildForm();
+    this.seasonFormSignal = this._buildForm();
   }
 
+  /**
+   * Initializes the service with a season ID.
+   * @param id The UUID of the season to edit, or undefined for creation.
+   */
   init(id: string | undefined) {
-    this._seasonId.set(id);
+    this._seasonIdSignal.set(id);
   }
 
+  /**
+   * Defines validation rules for the season form fields.
+   */
   private _applyValidationSchema(path: SchemaPathTree<SeasonFormModel>) {
     // Schema logic if needed
   }
 
+  /**
+   * Handles the submission logic for the season form.
+   * Performs either a create or update request based on the presence of an ID.
+   */
   private _handleSeasonSubmission = async (form: FieldTree<SeasonFormModel>) => {
-    const currentIdentifier = this._seasonId();
+    const currentIdentifier = this._seasonIdSignal();
     const model = this.seasonModelSignal();
     const seasonData = this._mapToCreateSeasonDTO(model);
-    
+
     const request$ = !currentIdentifier
       ? this._seasonsStore.createSeason(seasonData)
       : this._seasonsStore.updateSeason(currentIdentifier, seasonData);
@@ -64,7 +89,7 @@ export class SeasonFormService {
     try {
       const result = await firstValueFrom(request$);
       this._notificationService.show(`La saison a été ${!currentIdentifier ? 'enregistrée' : 'mise à jour'}`, 'success');
-      
+
       if (this._dialogReference) {
         this._dialogReference.close(result);
       } else {
@@ -76,6 +101,9 @@ export class SeasonFormService {
     }
   };
 
+  /**
+   * Maps backend/network errors to the form tree using the central error handler.
+   */
   private _handleSubmissionError(error: unknown, form: FieldTree<SeasonFormModel>) {
     const errorResult = this._formErrorHandler.handleError(error, form);
     if (typeof errorResult === 'string') {
@@ -85,6 +113,9 @@ export class SeasonFormService {
     return errorResult;
   }
 
+  /**
+   * Builds the Signal-based form configuration.
+   */
   private _buildForm(): FieldTree<SeasonFormModel> {
     return form(this.seasonModelSignal, schema((path) => this._applyValidationSchema(path)), {
       submission: {
@@ -93,6 +124,9 @@ export class SeasonFormService {
     });
   }
 
+  /**
+   * Internal mapper to create a Season domain object from the form model for previewing.
+   */
   private _mapToSeason(seasonFormModel: SeasonFormModel): Season {
     const StartDate = new Date(seasonFormModel.startDate);
     const EndDate = new Date(seasonFormModel.endDate);
@@ -107,6 +141,9 @@ export class SeasonFormService {
     }
   }
 
+  /**
+   * Maps the UI form model to the backend DTO format (dates as strings).
+   */
   private _mapToCreateSeasonDTO<T extends CreateSeasonDTO | UpdateSeasonDTO>(seasonForm: SeasonFormModel): T {
     return {
       endDate: dateToYyyyMmDd(seasonForm.endDate),

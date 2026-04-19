@@ -5,6 +5,9 @@ import {HallsStore} from '@shared-api';
 import {signal} from '@angular/core';
 import {SafePipe} from '../../../../../../../shared-ui/src/lib/pipes/safe.pipe';
 
+/**
+ * Unit tests for HallsList component (Public).
+ */
 describe('HallsList Component (Public)', () => {
   it('should render public halls grid', async () => {
     const mockHalls = [{ id: '1', name: 'Grande Salle', addressCity: 'Hoenheim' }];
@@ -19,10 +22,10 @@ describe('HallsList Component (Public)', () => {
       providers: [
         { provide: HallsStore, useValue: mockHallsStore }
       ],
-      imports: [SafePipe] // For HallCard inside
+      imports: [SafePipe]
     });
 
-    expect(screen.getByText('Nos Salles')).toBeDefined();
+    expect(screen.getByText(/Nos Salles/i)).toBeDefined();
     expect(screen.getByText('Grande Salle')).toBeDefined();
   });
 });

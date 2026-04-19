@@ -18,6 +18,10 @@ import {parseLocalDateTime} from '../../utils/date-mapper';
 const API_VERSION = '/api/v1';
 const API_NAME = "teams"
 
+/**
+ * Gateway for Team-related API calls.
+ * Handles complex team data including photos and training sessions.
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -25,6 +29,11 @@ export class TeamGateway {
   private readonly _http = inject(HttpClient);
   private readonly _appConfig = inject(APP_CONFIG);
 
+  /**
+   * Retrieves all teams from the API using httpResource.
+   * Performs manual parsing and mapping to domain Team objects.
+   * @returns An HttpResourceRef containing the list of teams.
+   */
   getTeams(): HttpResourceRef<Team[]> {
     return httpResource<Team[]>(() => `${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}`, {
       parse: (response: unknown) => {
@@ -34,7 +43,13 @@ export class TeamGateway {
     });
   }
 
-
+  /**
+   * Creates a new team with an optional photo.
+   * Uses FormData to handle file upload and JSON data.
+   * @param createTeamDTO The data for the new team.
+   * @param blobPhoto Optional photo file as a Blob.
+   * @returns An Observable of the created Team.
+   */
   createTeam(createTeamDTO: CreateTeamDTO, blobPhoto: Blob | undefined): Observable<Team> {
     const formData = new FormData();
     if (blobPhoto) {
@@ -47,7 +62,13 @@ export class TeamGateway {
     );
   }
 
-
+  /**
+   * Updates an existing team.
+   * @param teamId The unique identifier of the team to update.
+   * @param updateTeamDTO The updated data.
+   * @param blobPhoto Optional new photo file.
+   * @returns An Observable of the updated Team.
+   */
   updateTeam(teamId: string, updateTeamDTO: UpdateTeamDTO, blobPhoto: Blob | undefined): Observable<Team> {
     const formData = new FormData();
     if (blobPhoto) {
@@ -60,11 +81,21 @@ export class TeamGateway {
     );
   }
 
+  /**
+   * Deletes a team by its ID.
+   * @param teamId The unique identifier of the team to delete.
+   * @returns An Observable that completes when the deletion is done.
+   */
   deleteById(teamId: string): Observable<void> {
     return this._http.delete<void>(`${this._appConfig.apiUrl}${API_VERSION}/${API_NAME}/${teamId}`);
   }
 
-
+  /**
+   * Maps a TeamResponseDTO from the API to a domain Team object.
+   * Handles date parsing for training sessions.
+   * @param teamResponseDTO The API response object.
+   * @returns A Team domain object.
+   */
   private toTeam(teamResponseDTO: TeamResponseDTO): Team {
     return {
       id: teamResponseDTO.id,

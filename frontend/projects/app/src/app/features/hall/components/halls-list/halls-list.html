@@ -1,6 +1,6 @@
 <app-public-page-container title="Nos Salles" subtitle="Découvrez les lieux où nos équipes s'entraînent et jouent leurs matchs.">
   @if (isLoadingSignal()) {
-    <app-loading-data label="Chargement des salles" [isLoading]="isLoadingSignal()"/>
+    <app-loading-data label="Chargement des salles" [isLoadingSignal]="isLoadingSignal()"/>
   } @else if (errorSignal()) {
     <app-error-data dataName="salles" (onRetry)="retry()"/>
   } @else {

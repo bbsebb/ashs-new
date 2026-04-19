@@ -1,33 +1,38 @@
 <section class="form">
+  <!-- Page Header and Title -->
   <app-page-title
-    eyebrow="Gestion des salles"
-    title="Informations de la salle"
-    subtitle="Renseignez le nom et l'adresse complète pour l'enregistrement."
+    [eyebrowSignal]="'Gestion des salles'"
+    [titleSignal]="'Informations de la salle'"
+    [subtitleSignal]="'Renseignez le nom et l\'adresse complète pour l\'enregistrement.'"
   />
 
-  <form class="content" autocomplete="off" [formRoot]="hallFormService.hallForm">
+  <!-- Hall Creation/Edition Form -->
+  <form class="content" autocomplete="off" [formRoot]="_hallFormService.hallForm">
     <mat-dialog-content class="mat-typography">
+      <!-- Input Fields for Hall Details -->
       <div class="form-fields">
         <mat-form-field class="field field-full" appearance="outline">
           <mat-label>Nom de la salle</mat-label>
-          <input matInput type="text" [formField]="hallFormService.hallForm.name" autocomplete="organization"/>
-          <mat-error *appError="hallFormService.hallForm.name; let errorMsg">
+          <input matInput type="text" [formField]="_hallFormService.hallForm.name" autocomplete="organization"/>
+          <mat-error *appError="_hallFormService.hallForm.name; let errorMsg">
             {{ errorMsg }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field class="field field-full" appearance="outline">
           <mat-label>Rue et num&eacute;ro</mat-label>
-          <input matInput type="text" [formField]="hallFormService.hallForm.addressStreet" autocomplete="street-address"/>
-          <mat-error *appError="hallFormService.hallForm.addressStreet; let errorMsg">
+          <input matInput type="text" [formField]="_hallFormService.hallForm.addressStreet"
+                 autocomplete="street-address"/>
+          <mat-error *appError="_hallFormService.hallForm.addressStreet; let errorMsg">
             {{ errorMsg }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field class="field field-compact" appearance="outline">
           <mat-label>Code postal</mat-label>
-          <input matInput type="text" [formField]="hallFormService.hallForm.addressPostalCode" autocomplete="postal-code"/>
-          <mat-error *appError="hallFormService.hallForm.addressPostalCode; let errorMsg">
+          <input matInput type="text" [formField]="_hallFormService.hallForm.addressPostalCode"
+                 autocomplete="postal-code"/>
+          <mat-error *appError="_hallFormService.hallForm.addressPostalCode; let errorMsg">
             {{ errorMsg }}
           </mat-error>
 
@@ -35,21 +40,25 @@
 
         <mat-form-field class="field" appearance="outline">
           <mat-label>Ville</mat-label>
-          <input matInput type="text" [formField]="hallFormService.hallForm.addressCity" autocomplete="address-level2"/>
-          <mat-error *appError="hallFormService.hallForm.addressCity; let errorMsg">
+          <input matInput type="text" [formField]="_hallFormService.hallForm.addressCity"
+                 autocomplete="address-level2"/>
+          <mat-error *appError="_hallFormService.hallForm.addressCity; let errorMsg">
             {{ errorMsg }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field class="field" appearance="outline">
           <mat-label>Pays</mat-label>
-          <input matInput type="text" [formField]="hallFormService.hallForm.addressCountry" autocomplete="country-name"/>
-          <mat-error *appError="hallFormService.hallForm.addressCountry; let errorMsg">
+          <input matInput type="text" [formField]="_hallFormService.hallForm.addressCountry"
+                 autocomplete="country-name"/>
+          <mat-error *appError="_hallFormService.hallForm.addressCountry; let errorMsg">
             {{ errorMsg }}
           </mat-error>
         </mat-form-field>
       </div>
-      @let globalErrors = hallFormService.hallForm().errors();
+
+      <!-- Global Form Errors -->
+      @let globalErrors = _hallFormService.hallForm().errors();
       @if (globalErrors.length > 0) {
         @for (globalError of globalErrors; track globalError.kind) {
           <mat-error class="alert alert-danger">
@@ -59,19 +68,21 @@
       }
     </mat-dialog-content>
 
+    <!-- Form Action Buttons -->
     <mat-dialog-actions align="end">
       <div class="actions">
         <app-form-submit-button
-          [disabled]="hallFormService.isSubmitDisabledSignal()"
-          [content]="hallFormService.hallSignal() ? 'Modifier' : 'Enregistrer'"
-          [submitting]="hallFormService.hallForm().submitting()"/>
+          [disabledSignal]="_hallFormService.isSubmitDisabledSignal()"
+          [contentSignal]="_hallFormService.hallSignal() ? 'Modifier' : 'Enregistrer'"
+          [submittingSignal]="_hallFormService.hallForm().submitting()"/>
         <button mat-button type="button" (click)="cancel()">Retour</button>
       </div>
     </mat-dialog-actions>
   </form>
 </section>
 
+<!-- Live Data Preview -->
 <details class="debug">
   <summary>Pr&eacute;visualiser les donn&eacute;es</summary>
-  <lib-hall-card [hall]="hallFormService.hallPreview()" />
+  <lib-hall-card [hall]="_hallFormService.hallPreviewSignal()"/>
 </details>

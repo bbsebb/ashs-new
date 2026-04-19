@@ -2,12 +2,18 @@
   display: block;
 }
 
+/**
+ * Team card styles using Material 3 design tokens.
+ * Features smooth elevation and hover transitions.
+ */
 .team-card {
   height: 100%;
   max-width: 600px;
   margin-inline: auto;
+  /* Flexbox: vertical stack for card structure */
   display: flex;
   flex-direction: column;
+  /* Theme tokens: large corner radius */
   border-radius: var(--mat-sys-corner-large);
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -21,6 +27,7 @@
 .image-container {
   aspect-ratio: 450 / 250;
   position: relative;
+  /* Theme tokens: high surface container color */
   background-color: var(--mat-sys-surface-container-high);
   overflow: hidden;
 
@@ -33,10 +40,12 @@
   .photo-placeholder {
     width: 100%;
     height: 100%;
+    /* Flexbox: center icon and text */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* Theme tokens: primary container colors */
     background-color: var(--mat-sys-primary-container);
     color: var(--mat-sys-on-primary-container);
     gap: 8px;
@@ -59,10 +68,12 @@
   bottom: 12px;
   left: 12px;
   right: 12px;
+  /* Flexbox: align badges to the start */
   display: flex;
   justify-content: flex-start;
 }
 
+/** Color-coded chips for team gender using M3 tokens. */
 .category-chip {
   &.female { --mdc-chip-label-text-color: var(--mat-sys-on-secondary-container); background-color: var(--mat-sys-secondary-container); }
   &.male { --mdc-chip-label-text-color: var(--mat-sys-on-tertiary-container); background-color: var(--mat-sys-tertiary-container); }
@@ -73,12 +84,14 @@ mat-card-header {
   padding: 20px 24px 12px;
 
   mat-card-title {
+    /* Theme tokens: title typography and surface color */
     font: var(--mat-sys-title-large);
     font-weight: 700;
     color: var(--mat-sys-on-surface);
   }
 
   mat-card-subtitle {
+    /* Theme tokens: small title typography and variant color */
     font: var(--mat-sys-title-small);
     color: var(--mat-sys-on-surface-variant);
     margin-top: 4px;
@@ -89,9 +102,11 @@ mat-card-header {
   padding: 16px 0;
 
   .section-title {
+    /* Flexbox: align icon and text horizontally */
     display: flex;
     align-items: center;
     gap: 12px;
+    /* Theme tokens: label typography and primary color */
     font: var(--mat-sys-label-large);
     font-weight: 600;
     color: var(--mat-sys-primary);
@@ -108,12 +123,14 @@ mat-card-header {
 }
 
 .staff-list, .session-list {
+  /* Flexbox: vertical stack for list items */
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .empty-state {
+  /* Theme tokens: small body typography and variant color */
   font: var(--mat-sys-body-small);
   color: var(--mat-sys-on-surface-variant);
   font-style: italic;

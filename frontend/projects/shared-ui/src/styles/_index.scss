@@ -1,3 +1,7 @@
+/**
+ * Main entry point for shared UI styles.
+ * Forwards theme and form styles and includes the shared-ui theme.
+ */
 @forward './theme';
 @forward './forms';
 

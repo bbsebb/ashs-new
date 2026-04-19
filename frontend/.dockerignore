@@ -2,7 +2,7 @@
 *
 
 # Autoriser les configurations Nginx
-!nginx.*.conf
+!nginx*.conf
 
 # Autoriser les Dockerfiles
 !Dockerfile.*

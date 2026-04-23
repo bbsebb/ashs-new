@@ -16,4 +16,18 @@ describe('AdminPageContainer Component', () => {
     expect(screen.getByText('Sous-titre')).toBeDefined();
     expect(screen.getByText('Admin')).toBeDefined();
   });
+
+  it('should project content and header actions', async () => {
+    await render(`
+      <app-admin-page-container title="Test">
+        <button header-actions>Action</button>
+        <div class="main-content">Content</div>
+      </app-admin-page-container>
+    `, {
+      imports: [AdminPageContainer]
+    });
+
+    expect(screen.getByText('Action')).toBeDefined();
+    expect(screen.getByText('Content')).toBeDefined();
+  });
 });

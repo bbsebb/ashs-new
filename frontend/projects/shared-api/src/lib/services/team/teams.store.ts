@@ -3,6 +3,8 @@ import {Observable, tap} from 'rxjs';
 import {StaffRoleValue, Team} from '@shared-domain';
 import {TeamGateway} from './team.gateway';
 import {CreateTeamDTO, UpdateTeamDTO} from './team.dtos';
+import {StaffEventsService} from '../staff/staff-events.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 /**
  * Centralized state management for Teams using Angular Signals and Resources.
@@ -13,7 +15,14 @@ import {CreateTeamDTO, UpdateTeamDTO} from './team.dtos';
 })
 export class TeamsStore {
   private readonly _teamGateway = inject(TeamGateway);
+  private readonly _staffEventsService = inject(StaffEventsService);
   private readonly _teamsResource = this._teamGateway.getTeams();
+
+  constructor() {
+    this._staffEventsService.staffDeleted$
+      .pipe(takeUntilDestroyed())
+      .subscribe(staffId => this.onStaffDeleted(staffId));
+  }
 
   /**
    * Signal containing the current list of teams, automatically sorted by business rules.

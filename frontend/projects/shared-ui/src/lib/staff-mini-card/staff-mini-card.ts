@@ -1,36 +1,23 @@
-/**
- * Compact card for displaying staff member info in lists.
- */
-import {Component, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {MatCardModule} from '@angular/material/card';
 import {MatIconModule} from '@angular/material/icon';
 import {NgOptimizedImage} from '@angular/common';
 import {RouterLink} from '@angular/router';
-import {ImageService} from '../services/image.service';
+import {StaffMiniCardViewModel} from '@shared-api';
 
 /**
  * A compact staff card used in lists (e.g., inside TeamCard).
- * Displays name, role, and a small avatar.
+ * Purely presentational component using a ViewModel.
  */
 @Component({
   selector: 'lib-staff-mini-card',
   standalone: true,
   imports: [MatCardModule, MatIconModule, NgOptimizedImage, RouterLink],
   templateUrl: './staff-mini-card.html',
-  styleUrl: './staff-mini-card.scss'
+  styleUrl: './staff-mini-card.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StaffMiniCard {
-  private readonly _imageService = inject(ImageService);
-
-  /** Staff identifier for linking. */
-  staffIdInputSignal = input.required<string>({alias: 'staffId'});
-  /** Full name of the staff member. */
-  fullNameInputSignal = input.required<string>({alias: 'fullName'});
-  /** Role in the team (e.g., Coach). */
-  roleInputSignal = input.required<string>({alias: 'role'});
-  /** Optional avatar filename. */
-  avatarInputSignal = input<string | null | undefined>(null, {alias: 'avatar'});
-
-  /** Utility to create the full image source URL. */
-  protected readonly createImageSourceUrl = (source: string | null | undefined) => this._imageService.createImageSourceUrl(source);
+  /** The ViewModel containing all data for the card. */
+  staffMiniCardViewModelInputSignal = input.required<StaffMiniCardViewModel>({alias: 'staffMiniCardViewModel'});
 }

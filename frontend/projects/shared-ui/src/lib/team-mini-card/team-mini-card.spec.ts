@@ -1,22 +1,22 @@
 import {render, screen} from '@testing-library/angular';
-import {TeamMiniCard} from './team-mini-card';
+import {TeamMiniCard} from '@shared-ui';
 import {provideRouter} from '@angular/router';
-import {describe, it, expect} from 'vitest';
+import {describe, expect, it} from 'vitest';
+import {TeamMiniCardViewModel} from '@shared-api';
 
 /**
  * Unit tests for TeamMiniCard component.
  */
 describe('TeamMiniCard', () => {
-  const mockTeam = {
+  const mockViewModel: TeamMiniCardViewModel = {
     id: 't1',
-    gender: 'Male',
-    teamNumber: 2,
-    ageGroup: {ageLimit: 18, upperLimit: true}
+    categoryAndNumberLabel: 'Moins de 18 ans 2',
+    genderLabel: 'Masculin'
   };
 
   it('should render team category and gender', async () => {
     await render(TeamMiniCard, {
-      inputs: {team: mockTeam as any},
+      componentInputs: {teamMiniCardViewModel: mockViewModel},
       providers: [provideRouter([])]
     });
 
@@ -27,7 +27,7 @@ describe('TeamMiniCard', () => {
 
   it('should have a link to the team details page', async () => {
     await render(TeamMiniCard, {
-      inputs: {team: mockTeam as any},
+      componentInputs: {teamMiniCardViewModel: mockViewModel},
       providers: [provideRouter([])]
     });
 

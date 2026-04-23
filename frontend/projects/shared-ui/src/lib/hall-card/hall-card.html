@@ -1,4 +1,4 @@
-@let hall = hallInputSignal();
+@let viewModel = hallCardViewModelInputSignal();
 <!-- Hall Card Container -->
 <mat-card appearance="outlined" class="card">
   <!-- Map Section -->
@@ -6,7 +6,7 @@
     <iframe
       mat-card-image
       class="map-iframe"
-      [src]="googleMapsEmbedUrlSignal() | safe"
+      [src]="viewModel.googleMapsEmbedUrl | safe"
       loading="lazy"
       referrerpolicy="no-referrer-when-downgrade"
       title="Localisation Google Maps">
@@ -15,11 +15,11 @@
 
   <!-- Header Section with Title and Action -->
   <mat-card-header class="header">
-    <mat-card-title class="title">{{ hall.name }}</mat-card-title>
+    <mat-card-title class="title">{{ viewModel.name }}</mat-card-title>
     <span class="spacer"></span>
     <a
       mat-icon-button
-      [href]="googleMapsUrlSignal()"
+      [href]="viewModel.googleMapsUrl"
       target="_blank"
       rel="noopener noreferrer"
       [matTooltip]="'Ouvrir dans Google Maps'"
@@ -37,9 +37,9 @@
           <mat-icon class="icon" aria-hidden="true">location_on</mat-icon>
           <div class="text">
             <span class="info-label">Adresse</span>
-            <span class="info-value">{{ hall.addressStreet }}</span>
-            <span class="info-value">{{ hall.addressPostalCode }} {{ hall.addressCity }}</span>
-            <span class="info-value">{{ hall.addressCountry }}</span>
+            <span class="info-value">{{ viewModel.addressStreet }}</span>
+            <span class="info-value">{{ viewModel.addressCityInfo }}</span>
+            <span class="info-value">{{ viewModel.addressCountry }}</span>
           </div>
         </div>
       </div>

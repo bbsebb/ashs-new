@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {APP_CONFIG} from '@shared-api';
+import {APP_CONFIG} from '../configs/app-config';
 
 /**
  * Service for handling image URL generation and CSS background formatting.
@@ -17,7 +17,10 @@ export class ImageService {
    * @param source The image identifier, absolute URL, blob, or data URL.
    * @returns A string containing the full URL or a default placeholder path.
    */
-  createImageSourceUrl(source: string | null | undefined): string {
+  createImageSourceUrl(source: string | null | undefined): string | null {
+    if (source === null) {
+      return null;
+    }
     const DEFAULT_AVATAR_IMAGE_PATH = '/shared-ui/avatar.png';
     if (!source) {
       return DEFAULT_AVATAR_IMAGE_PATH;

@@ -3,7 +3,7 @@
  */
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {TeamsStore} from '@shared-api';
+import {TeamsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, LoadingData, NotificationService, TeamCard} from '@shared-ui';
 import {MatCardActions} from '@angular/material/card';
 import {MatButton, MatIconButton} from '@angular/material/button';
@@ -29,11 +29,12 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
 })
 export class TeamView {
   private readonly _teamsStore = inject(TeamsStore);
+  private readonly _viewModelMapper = inject(ViewModelMapperService);
   private readonly _router = inject(Router);
   private readonly _notificationService = inject(NotificationService);
 
   idInputSignal = input.required<string>({alias: 'id'});
-  teamSignal = this._teamsStore.teamById(this.idInputSignal);
+  teamCardViewModelSignal = this._viewModelMapper.teamCardViewModelById(this.idInputSignal);
 
   isLoadingSignal = this._teamsStore.isLoadingSignal;
   errorSignal = this._teamsStore.errorSignal;
@@ -41,16 +42,16 @@ export class TeamView {
 
   constructor() {
     effect(() => {
-      if (!this.isLoadingSignal() && !this.errorSignal() && !this.teamSignal()) {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.teamCardViewModelSignal()) {
         void this._router.navigateByUrl('/404');
       }
     });
   }
 
   protected onDelete() {
-    const team = this.teamSignal();
-    if (team) {
-      this._teamsStore.deleteById(team.id).subscribe({
+    const viewModel = this.teamCardViewModelSignal();
+    if (viewModel) {
+      this._teamsStore.deleteById(viewModel.id).subscribe({
         next: () => {
           this._notificationService.show("Équipe supprimée avec succès", 'success');
           void this._router.navigateByUrl('/teams');

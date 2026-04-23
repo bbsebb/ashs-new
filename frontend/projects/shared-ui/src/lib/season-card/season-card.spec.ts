@@ -1,15 +1,14 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
 import {SeasonCard} from '@shared-ui';
-import {Season} from '@shared-domain';
 import {DatePipe} from '@angular/common';
+import {SeasonCardViewModel} from '@shared-api';
 
 /**
  * Unit tests for SeasonCard component.
- * Verifies status chips and date formatting.
  */
 describe('SeasonCard Component', () => {
-  const mockSeason: Season = {
+  const mockViewModel: SeasonCardViewModel = {
     id: '1',
     name: '2024-2025',
     startDate: new Date(2024, 8, 1),
@@ -20,7 +19,7 @@ describe('SeasonCard Component', () => {
 
   it('should render season name and dates correctly', async () => {
     await render(SeasonCard, {
-      componentProperties: {season: mockSeason} as any,
+      componentInputs: {seasonCardViewModel: mockViewModel},
       imports: [DatePipe]
     });
 
@@ -31,7 +30,7 @@ describe('SeasonCard Component', () => {
 
   it('should display "Active" and "En cours" chips when applicable', async () => {
     await render(SeasonCard, {
-      componentProperties: {season: mockSeason} as any,
+      componentInputs: {seasonCardViewModel: mockViewModel},
       imports: [DatePipe]
     });
 
@@ -41,9 +40,9 @@ describe('SeasonCard Component', () => {
 
   it('should display "Inactive" chip when not active', async () => {
     await render(SeasonCard, {
-      componentProperties: {
-        seasonInputSignal: {...mockSeason, isActive: false, isCurrent: false}
-      } as any,
+      componentInputs: {
+        seasonCardViewModel: {...mockViewModel, isActive: false, isCurrent: false}
+      },
       imports: [DatePipe]
     });
 

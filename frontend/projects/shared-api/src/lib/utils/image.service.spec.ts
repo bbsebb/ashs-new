@@ -1,17 +1,17 @@
-import { TestBed } from '@angular/core/testing';
-import { ImageService } from './image.service';
-import { APP_CONFIG } from '@shared-api';
-import { describe, expect, it, beforeEach } from 'vitest';
+import {TestBed} from '@angular/core/testing';
+import {ImageService} from './image.service';
+import {APP_CONFIG} from '@shared-api';
+import {beforeEach, describe, expect, it} from 'vitest';
 
 describe('ImageService', () => {
   let service: ImageService;
-  const config = { apiUrl: 'http://api', uploadsPath: '/up' };
+  const config = {apiUrl: 'http://api', uploadsPath: '/up'};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         ImageService,
-        { provide: APP_CONFIG, useValue: config }
+        {provide: APP_CONFIG, useValue: config}
       ]
     });
     service = TestBed.inject(ImageService);

@@ -44,11 +44,11 @@
     </header>
 
     <section class="teams-grid" [class.mini-mode]="viewModeSignal() === 'mini'">
-      @for (team of filteredTeamsSignal(); track team.id) {
+      @for (item of filteredViewModelsSignal(); track item.cardVM!.id) {
         @if (viewModeSignal() === 'cards') {
-          <lib-team-card [team]="team"></lib-team-card>
+          <lib-team-card [teamCardViewModel]="item.cardVM!"></lib-team-card>
         } @else {
-          <lib-team-mini-card [team]="team"></lib-team-mini-card>
+          <lib-team-mini-card [teamMiniCardViewModel]="item.miniVM!"></lib-team-mini-card>
         }
       } @empty {
         <div class="empty-state">

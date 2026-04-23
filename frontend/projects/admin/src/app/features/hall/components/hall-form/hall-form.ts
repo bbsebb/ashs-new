@@ -1,4 +1,4 @@
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -44,6 +44,22 @@ export class HallForm {
    * Bound from the 'id' route parameter.
    */
   idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
+
+  hallCardViewModelSignal = computed(() => {
+    const hall = this._hallFormService.hallPreviewSignal();
+    const fullAddress = `${hall.addressStreet}, ${hall.addressPostalCode} ${hall.addressCity}, ${hall.addressCountry}`;
+    const query = encodeURIComponent(fullAddress);
+
+    return {
+      id: hall.id,
+      name: hall.name,
+      addressStreet: hall.addressStreet,
+      addressCityInfo: `${hall.addressPostalCode} ${hall.addressCity}`,
+      addressCountry: hall.addressCountry,
+      googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${query}`,
+      googleMapsEmbedUrl: `https://www.google.com/maps?q=${query}&output=embed`
+    };
+  });
 
   constructor() {
     /**

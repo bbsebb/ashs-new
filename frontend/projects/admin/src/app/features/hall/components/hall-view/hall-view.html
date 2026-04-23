@@ -1,4 +1,4 @@
-@let hall = hallSignal();
+@let viewModel = hallCardViewModelSignal();
 
 <!-- Loading State View -->
 @if(isLoadingSignal()) {
@@ -6,16 +6,15 @@
 }
 @else if (errorSignal()) {
   <app-error-data dataName="salles" (onRetry)="retry()" />
-}
-@else if (!hall) {
+} @else if (!viewModel) {
   <p>Aucune salle</p>
 }
 @else {
-  <lib-hall-card [hall]="hall">
+  <lib-hall-card [hallCardViewModel]="viewModel">
     <mat-card-actions actions align="end">
       <!-- Navigation and Management Actions -->
       <button mat-button type="button" routerLink="/halls">Retour</button>
-      <button mat-flat-button type="button" routerLink="/halls/{{hall.id}}/update">Modifier</button>
+      <button mat-flat-button type="button" routerLink="/halls/{{viewModel.id}}/update">Modifier</button>
       <app-form-delete-button
         confirmMessage="Êtes-vous sûr de vouloir supprimer cette salle ?"
         (deleteConfirmed)="onDelete()">

@@ -1,4 +1,4 @@
-import {Component, computed, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, input} from '@angular/core';
 import {
   MatCard,
   MatCardAvatar,
@@ -8,14 +8,13 @@ import {
   MatCardTitle
 } from "@angular/material/card";
 import {MatIcon} from '@angular/material/icon';
-import {Staff} from '@shared-domain';
-import {ImageService} from '../services/image.service';
+import {StaffCardViewModel} from '@shared-api';
 import {StaffTeamsList} from '../staff-teams-list/staff-teams-list';
 import {RouterLink} from '@angular/router';
 
 /**
  * Component for displaying a detailed staff member card.
- * Features a themed background using the staff's avatar and a list of their assigned teams.
+ * Purely presentational component using a ViewModel.
  */
 @Component({
   selector: 'lib-staff-card',
@@ -35,24 +34,20 @@ import {RouterLink} from '@angular/router';
   styleUrl: './staff-card.scss',
   host: {
     '[style.--avatar-url]': 'avatarUrlSignal()'
-  }
+  },
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StaffCard {
-  private readonly _imageService = inject(ImageService);
-
-  /** The staff member to display. */
-  staffInputSignal = input.required<Staff>({alias: 'staff'});
-  /** Optional season ID to filter the displayed teams. */
+  /** The ViewModel containing all data for the card. */
+  staffCardViewModelInputSignal = input.required<StaffCardViewModel>({alias: 'staffCardViewModel'});
+  /** Optional season ID filter passed down to subcomponents if needed (mainly for context). */
   seasonIdInputSignal = input<string | undefined>(undefined, {alias: 'seasonId'});
 
   /**
    * Computed signal formatting the avatar URL as a CSS value for the host's background.
    */
   avatarUrlSignal = computed(() => {
-    const url = this._imageService.createImageSourceUrl(this.staffInputSignal().avatarFileName);
+    const url = this.staffCardViewModelInputSignal().avatarUrl;
     return url ? `url(${url})` : 'none';
   });
-
-  /** Utility to create the full image source URL. */
-  protected readonly createImageSourceUrl = (source: string | null | undefined) => this._imageService.createImageSourceUrl(source);
 }

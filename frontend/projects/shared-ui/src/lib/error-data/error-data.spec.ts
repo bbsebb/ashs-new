@@ -20,9 +20,9 @@ describe('ErrorData Component', () => {
 
   it('should render custom data name in the error message', async () => {
     await render(ErrorData, {
-      componentProperties: {
-        dataNameInputSignal: 'la liste des salles'
-      } as any,
+      componentInputs: {
+        dataName: 'la liste des salles'
+      },
       providers: [provideRouter([])]
     });
 

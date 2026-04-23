@@ -1,23 +1,23 @@
-import {Component, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
-import {Team} from '@shared-domain';
-import {CategoryPipe, GenderPipe} from '../pipes';
+import {TeamMiniCardViewModel} from '@shared-api';
 
 /**
  * A compact team card used for quick navigation or in lists.
- * Displays gender and category badges.
+ * Purely presentational component using a ViewModel.
  */
 @Component({
   selector: 'lib-team-mini-card',
   standalone: true,
-  imports: [RouterLink, MatIconModule, CategoryPipe, GenderPipe],
+  imports: [RouterLink, MatIconModule],
   templateUrl: './team-mini-card.html',
-  styleUrl: './team-mini-card.scss'
+  styleUrl: './team-mini-card.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TeamMiniCard {
   /**
-   * The team to display.
+   * The ViewModel containing all data for the card.
    */
-  teamInputSignal = input.required<Team>({alias: 'team'});
+  teamMiniCardViewModelInputSignal = input.required<TeamMiniCardViewModel>({alias: 'teamMiniCardViewModel'});
 }

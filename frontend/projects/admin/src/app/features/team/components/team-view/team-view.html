@@ -1,16 +1,16 @@
-@let team = teamSignal();
+@let viewModel = teamCardViewModelSignal();
 @if(isLoadingSignal()) {
   <app-loading-data label="Chargement de l'équipe" [isLoading]="isLoadingSignal()"/>
 } @else if (errorSignal()) {
   <app-error-data dataName="équipes" (onRetry)="retry()" />
-} @else if (!team) {
+} @else if (!viewModel) {
   <p>Aucune équipe</p>
 } @else {
-  <lib-team-card [team]="team">
+  <lib-team-card [teamCardViewModel]="viewModel">
     <mat-card-actions actions align="end">
       <button mat-button routerLink="/teams">Retour</button>
       <div class="spacer"></div>
-      <button mat-icon-button color="primary" routerLink="/teams/{{team.id}}/update" aria-label="Modifier">
+      <button mat-icon-button color="primary" routerLink="/teams/{{viewModel.id}}/update" aria-label="Modifier">
         <mat-icon>edit</mat-icon>
       </button>
       <app-form-delete-button

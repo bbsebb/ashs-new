@@ -1,15 +1,15 @@
-@let season = seasonSignal();
+@let viewModel = seasonCardViewModelSignal();
 @if(isLoadingSignal()) {
   <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()"/>
 } @else if (errorSignal()) {
   <app-error-data dataName="saisons" (onRetry)="retry()" />
-} @else if (!season) {
+} @else if (!viewModel) {
   <p>Aucune salle</p>
 } @else {
-  <lib-season-card [season]="season">
+  <lib-season-card [seasonCardViewModel]="viewModel">
     <mat-card-actions actions align="end">
       <button mat-button type="button" routerLink="/seasons">Retour</button>
-      <button mat-flat-button type="button" routerLink="/seasons/{{season.id}}/update">Modifier</button>
+      <button mat-flat-button type="button" routerLink="/seasons/{{viewModel.id}}/update">Modifier</button>
       <app-form-delete-button
         confirmMessage="Êtes-vous sûr de vouloir supprimer cette saison ?"
         (deleteConfirmed)="onDelete()">

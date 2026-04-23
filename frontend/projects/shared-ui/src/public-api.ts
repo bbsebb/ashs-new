@@ -16,7 +16,6 @@ export * from './lib/page-title/page-title'
 export * from './lib/form-field-error/form-field-error'
 export * from './lib/contact/contact'
 export * from './lib/services/breakpoint.service';
-export * from './lib/services/image.service';
 export * from './lib/hall-card/hall-card';
 export * from './lib/season-card/season-card';
 export * from './lib/team-card/team-card';

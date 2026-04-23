@@ -1,12 +1,12 @@
-
+@let viewModel = contactViewModelInputSignal();
 <section class="form">
   <app-page-title
-    eyebrow="Contact"
-    title="Nous contacter"
-    subtitle="Renseignez votre email, un sujet et votre message."
+    [eyebrow]="viewModel.eyebrow"
+    [title]="viewModel.title"
+    [subtitle]="viewModel.subtitle"
   />
 
-  <form class="content" autocomplete="off" (submit)="submitForm($event); $event.preventDefault()">
+  <form class="content" autocomplete="off" (submit)="onSubmitForm($event); $event.preventDefault()">
     <div class="form-fields">
       <mat-form-field class="field field-full" appearance="outline">
         <mat-label>Votre email</mat-label>
@@ -49,9 +49,9 @@
 
     <div class="actions">
       <app-form-submit-button
-        [disabled]="contactFormSignal().submitting() || contactFormSignal().invalid()"
+        [disabled]="isSubmittingInputSignal() || contactFormSignal().invalid()"
         [content]="'Envoyer'"
-        [submitting]="contactFormSignal().submitting()"
+        [submitting]="isSubmittingInputSignal()"
       />
     </div>
   </form>

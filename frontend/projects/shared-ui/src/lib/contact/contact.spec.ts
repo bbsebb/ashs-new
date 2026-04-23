@@ -1,28 +1,24 @@
-import { render, screen, fireEvent } from '@testing-library/angular';
-import { Contact } from './contact';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { APP_CONFIG, ContactGateway, FormErrorHandleService } from '@shared-api';
-import { NotificationService } from '../notification/notification-service';
-import { of, throwError } from 'rxjs';
-import { vi, describe, it, expect } from 'vitest';
+import {fireEvent, render, screen} from '@testing-library/angular';
+import {Contact} from './contact';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {ContactSubmitEvent, ContactViewModel} from '@shared-api';
+import {describe, expect, it, vi} from 'vitest';
 
 describe('Contact Component', () => {
-  const mockContactGateway = {
-    contactSubmission: vi.fn()
-  };
-  const mockNotificationService = {
-    show: vi.fn()
+  const mockViewModel: ContactViewModel = {
+    eyebrow: 'Contact',
+    title: 'Nous contacter',
+    subtitle: 'Renseignez votre email'
   };
 
   const setup = async () => {
     return await render(Contact, {
       providers: [
-        provideAnimationsAsync('noop'),
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api', uploadsPath: '/uploads' } },
-        { provide: ContactGateway, useValue: mockContactGateway },
-        { provide: NotificationService, useValue: mockNotificationService },
-        FormErrorHandleService
-      ]
+        provideAnimationsAsync('noop')
+      ],
+      componentInputs: {
+        contactViewModel: mockViewModel
+      }
     });
   };
 
@@ -34,9 +30,13 @@ describe('Contact Component', () => {
     expect(screen.getByRole('button', { name: /envoyer/i })).toBeTruthy();
   });
 
-  it('should call contactGateway on valid submit', async () => {
-    mockContactGateway.contactSubmission.mockReturnValue(of(void 0));
-    await setup();
+  it('should emit submitted event on valid submit', async () => {
+    const submittedSpy = vi.fn();
+    await render(Contact, {
+      providers: [provideAnimationsAsync('noop')],
+      componentInputs: {contactViewModel: mockViewModel},
+      componentOutputs: {submitted: {emit: submittedSpy} as any}
+    });
 
     fireEvent.input(screen.getByLabelText(/votre email/i), { target: { value: 'test@example.com' } });
     fireEvent.input(screen.getByLabelText(/sujet/i), { target: { value: 'Hello World' } });
@@ -45,10 +45,10 @@ describe('Contact Component', () => {
     const submitBtn = screen.getByRole('button', { name: /envoyer/i });
     fireEvent.click(submitBtn);
 
-    expect(mockContactGateway.contactSubmission).toHaveBeenCalledWith(
-      'test@example.com',
-      'Hello World',
-      'This is a test message'
-    );
+    expect(submittedSpy).toHaveBeenCalledWith({
+      from: 'test@example.com',
+      subject: 'Hello World',
+      content: 'This is a test message'
+    } as ContactSubmitEvent);
   });
 });

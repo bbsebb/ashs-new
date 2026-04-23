@@ -1,6 +1,6 @@
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {HallsStore} from '@shared-api';
+import {HallsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, HallCard, LoadingData, NotificationService} from '@shared-ui';
 import {MatCardActions} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
@@ -28,6 +28,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
 export class HallView {
   /** Store for hall data management. */
   private readonly _hallsStore = inject(HallsStore);
+  private readonly _viewModelMapper = inject(ViewModelMapperService);
   /** Router for navigation. */
   private readonly _router = inject(Router);
   /** Service for user notifications. */
@@ -40,9 +41,9 @@ export class HallView {
   idInputSignal = input.required<string>({alias: 'id'});
 
   /**
-   * Signal fetching the specific hall from the store.
+   * Signal fetching the specific hall ViewModel from the mapper.
    */
-  hallSignal = this._hallsStore.hallById(this.idInputSignal);
+  hallCardViewModelSignal = this._viewModelMapper.hallCardViewModelById(this.idInputSignal);
 
   /**
    * Signal indicating if the hall data is currently being loaded.
@@ -60,7 +61,7 @@ export class HallView {
      * Effect to redirect to 404 if the hall is not found after loading.
      */
     effect(() => {
-      if (!this.isLoadingSignal() && !this.errorSignal() && !this.hallSignal()) {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.hallCardViewModelSignal()) {
         void this._router.navigateByUrl('/404');
       }
     });
@@ -71,9 +72,9 @@ export class HallView {
    * Shows a notification and navigates back to the list on success.
    */
   protected onDelete() {
-    const hall = this.hallSignal();
-    if (hall) {
-      this._hallsStore.deleteById(hall.id).subscribe({
+    const viewModel = this.hallCardViewModelSignal();
+    if (viewModel) {
+      this._hallsStore.deleteById(viewModel.id).subscribe({
         next: () => {
           this._notificationService.show("Salle supprimée avec succès", 'success');
           void this._router.navigateByUrl('/halls');

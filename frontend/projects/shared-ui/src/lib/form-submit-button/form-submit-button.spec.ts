@@ -14,27 +14,27 @@ describe('FormSubmitButton Component', () => {
 
   it('should render custom content', async () => {
     await render(FormSubmitButton, {
-      componentProperties: {
-        contentInputSignal: 'Sauvegarder'
-      } as any
+      componentInputs: {
+        content: 'Sauvegarder'
+      }
     });
     expect(screen.getByText('Sauvegarder')).toBeDefined();
   });
 
   it('should disable button when disabled input is true', async () => {
     await render(FormSubmitButton, {
-      componentProperties: {
-        disabledInputSignal: true
-      } as any
+      componentInputs: {
+        disabled: true
+      }
     });
     expect((screen.getByRole('button') as HTMLButtonElement).disabled).toBe(true);
   });
 
   it('should show spinner and hide text when submitting', async () => {
     await render(FormSubmitButton, {
-      componentProperties: {
-        submittingInputSignal: true
-      } as any
+      componentInputs: {
+        submitting: true
+      }
     });
 
     expect(screen.queryByText('Envoyer')).toBeNull();

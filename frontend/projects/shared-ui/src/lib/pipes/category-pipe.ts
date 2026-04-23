@@ -1,4 +1,5 @@
 import {Pipe, PipeTransform} from '@angular/core';
+import {formatCategory} from '@shared-api';
 
 /**
  * Formats age group limits into team category labels (e.g., "-18 ans" or "Sénior").
@@ -16,10 +17,6 @@ export class CategoryPipe implements PipeTransform {
    * @returns Formatted category string.
    */
   transform(ageLimit: number, upperLimit: boolean, format: 'short' | 'long' = 'short'): string {
-    if (format === 'long') {
-      return upperLimit ? `Moins de ${ageLimit} ans` : 'Sénior';
-    }
-
-    return upperLimit ? `-${ageLimit} ans` : `+${ageLimit} ans`;
+    return formatCategory(ageLimit, upperLimit, format);
   }
 }

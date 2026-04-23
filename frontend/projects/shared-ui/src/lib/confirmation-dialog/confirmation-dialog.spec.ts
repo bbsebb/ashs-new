@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from '@testing-library/angular';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { describe, it, expect, vi } from 'vitest';
-import { ConfirmationDialog } from './confirmation-dialog';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import {fireEvent, render, screen} from '@testing-library/angular';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {describe, expect, it, vi} from 'vitest';
+import {ConfirmationDialog} from './confirmation-dialog';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
 describe('ConfirmationDialog', () => {
   const mockDialogRef = {
@@ -43,8 +43,6 @@ describe('ConfirmationDialog', () => {
   });
 
   it('should have a Confirm button that closes the dialog with true value', async () => {
-    // Note: mat-dialog-close is an Angular Material directive, 
-    // we just verify the button exists and has the correct text.
     await render(ConfirmationDialog, {
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
@@ -55,7 +53,5 @@ describe('ConfirmationDialog', () => {
 
     const confirmButton = screen.getByText('Confirmer');
     expect(confirmButton).toBeTruthy();
-    // Verification of mat-dialog-close behavior is usually covered by Material's own tests,
-    // but we can check if it has the directive attribute if needed.
   });
 });

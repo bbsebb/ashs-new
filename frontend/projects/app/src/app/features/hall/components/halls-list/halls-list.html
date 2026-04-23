@@ -5,8 +5,8 @@
     <app-error-data dataName="salles" (onRetry)="retry()"/>
   } @else {
     <section class="halls-grid">
-      @for (hall of hallsSignal(); track hall.id) {
-        <lib-hall-card [hall]="hall"></lib-hall-card>
+      @for (viewModel of hallCardViewModelsSignal(); track viewModel.id) {
+        <lib-hall-card [hallCardViewModel]="viewModel"></lib-hall-card>
       } @empty {
         <div class="empty-state">
           <mat-icon>stadium</mat-icon>

@@ -1,17 +1,13 @@
-@let t = teamInputSignal();
+@let viewModel = teamMiniCardViewModelInputSignal();
 
 <!-- Mini Card Link Container -->
-<a [routerLink]="['/teams', t.id]" class="team-mini-card" title="Voir les détails de l'équipe">
+<a [routerLink]="['/teams', viewModel.id]" class="team-mini-card" title="Voir les détails de l'équipe">
   <!-- Team Name and Category Details -->
   <div class="team-details">
     <span class="category-name">
-      {{ t.ageGroup.ageLimit | category:t.ageGroup.upperLimit:'long' }}
-      <!-- Team Number Badge (for multiple teams in same category) -->
-      @if (t.teamNumber > 1) {
-        {{ t.teamNumber }}
-      }
+      {{ viewModel.categoryAndNumberLabel }}
     </span>
-    <span class="gender-label">{{ t.gender | gender:'long' }}</span>
+    <span class="gender-label">{{ viewModel.genderLabel }}</span>
   </div>
 
   <!-- Navigation Indicator -->

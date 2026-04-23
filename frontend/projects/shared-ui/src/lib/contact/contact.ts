@@ -1,21 +1,19 @@
-import {Component, computed, inject, signal, WritableSignal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, input, output, signal, WritableSignal} from '@angular/core';
 import {email, FieldTree, form, FormField, maxLength, minLength, required, submit} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import {firstValueFrom, tap} from 'rxjs';
 
-import {ContactGateway, FormErrorHandleService} from '@shared-api';
+import {ContactSubmitEvent, ContactViewModel} from '@shared-api';
 
 import {FormSubmitButton} from '../form-submit-button/form-submit-button';
 
 import {PageTitle} from '../page-title/page-title';
-import {NotificationService} from '../notification/notification-service';
 import {FormFieldErrorDirective} from '../form-field-error/form-field-error';
 
 /**
  * Contact form component using Signal-based forms and validation.
- * Handles the club contact logic via the ContactGateway.
+ * Purely presentational component that emits an event on submission.
  */
 @Component({
   selector: 'app-contact',
@@ -30,11 +28,17 @@ import {FormFieldErrorDirective} from '../form-field-error/form-field-error';
   ],
   templateUrl: './contact.html',
   styleUrl: './contact.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Contact {
-  private readonly contactGateway = inject(ContactGateway);
-  private readonly formErrorHandler = inject(FormErrorHandleService);
-  private readonly notificationService = inject(NotificationService);
+  /** The ViewModel containing all data for the card. */
+  contactViewModelInputSignal = input.required<ContactViewModel>({alias: 'contactViewModel'});
+
+  /** True when the form is being submitted by the parent. */
+  isSubmittingInputSignal = input<boolean>(false, {alias: 'isSubmitting'});
+
+  /** Emitted when the user submits the form. */
+  submitted = output<ContactSubmitEvent>();
 
   /** Writable Signal representing the raw form data. */
   contactModelSignal = this.buildModel();
@@ -42,8 +46,14 @@ export class Contact {
   /** The signal-based form tree derived from the model. */
   contactFormSignal = this.buildForm();
 
-  /** Optional preview of the current model state. */
-  contactPreviewSignal = computed(() => this.contactModelSignal());
+  constructor() {
+    // Reset form when submission is complete and was successful
+    effect(() => {
+      if (!this.isSubmittingInputSignal()) {
+        // We could reset here if needed, but usually the parent handles success state
+      }
+    });
+  }
 
   /**
    * Initializes the form model with empty values.
@@ -76,46 +86,22 @@ export class Contact {
   }
 
   /**
-   * Triggers the form submission process.
-   * Resets the form upon success and handles errors via the FormErrorHandleService.
-   *
+   * Triggers the form submission event.
    * @param event The submit event from the template.
    */
-  protected submitForm(event: Event) {
+  protected onSubmitForm(event: Event) {
     event.preventDefault();
-
-    void submit(this.contactFormSignal, async (formState) => {
-      try {
-        const {from, subject, content} = this.contactModelSignal();
-
-        await firstValueFrom(
-          this.contactGateway.contactSubmission(from, subject, content).pipe(
-            tap(() => this.notificationService.show('Message envoyé.', 'success')),
-          ),
-        );
-
-        // Reset the form model
-        this.contactModelSignal.set({from: '', subject: '', content: ''});
-
-        return undefined;
-      } catch (error) {
-        const result = this.formErrorHandler.handleError(error, formState);
-        if (typeof result === 'string') {
-          this.notificationService.show(result, 'error');
-          return undefined;
-        }
-        return result;
-      }
+    void submit(this.contactFormSignal, async () => {
+      this.submitted.emit(this.contactModelSignal());
+      return undefined;
     });
+  }
+
+  /** Public method to reset the form, intended to be called by parent via template ref if needed. */
+  resetForm() {
+    this.contactModelSignal.set({from: '', subject: '', content: ''});
   }
 }
 
 /** Internal DTO for the contact form state. */
-type ContactFormModel = {
-  /** The sender's email address. */
-  from: string;
-  /** The subject of the message. */
-  subject: string;
-  /** The main message content. */
-  content: string;
-};
+type ContactFormModel = ContactSubmitEvent;

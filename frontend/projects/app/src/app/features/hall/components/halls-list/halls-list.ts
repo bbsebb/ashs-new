@@ -2,7 +2,7 @@
  * Component for listing all halls in the public app.
  */
 import {Component, inject} from '@angular/core';
-import {HallsStore} from '@shared-api';
+import {HallsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, HallCard, LoadingData, PublicPageContainer} from '@shared-ui';
 import {MatIconModule} from "@angular/material/icon";
 
@@ -20,7 +20,8 @@ import {MatIconModule} from "@angular/material/icon";
 })
 export class HallsList {
   private readonly hallsStore = inject(HallsStore);
-  hallsSignal = this.hallsStore.hallsSignal;
+  private readonly _viewModelMapper = inject(ViewModelMapperService);
+  hallCardViewModelsSignal = this._viewModelMapper.hallCardViewModelsSignal;
   isLoadingSignal = this.hallsStore.isLoadingSignal;
   errorSignal = this.hallsStore.errorSignal;
 

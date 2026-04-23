@@ -3,18 +3,18 @@ import {Observable, tap} from 'rxjs';
 import {Staff} from '@shared-domain';
 import {StaffGateway} from './staff.gateway';
 import {CreateStaffDTO, UpdateStaffDTO} from './staff.dtos';
-import {TeamsStore} from '../team/teams.store';
+import {StaffEventsService} from './staff-events.service';
 
 
 /**
  * Centralized state management for Staff members using Angular Signals and Resources.
- * This store coordinates with TeamsStore when a staff member is deleted (Zero Reload Policy).
+ * This store follow the Zero Reload Policy.
  */
 @Injectable({
   providedIn: 'root',
 })
 export class StaffsStore {
-  private readonly _teamsStore = inject(TeamsStore);
+  private readonly _staffEventsService = inject(StaffEventsService);
   private readonly _staffGateway = inject(StaffGateway);
   private readonly _staffsResource = this._staffGateway.getStaffs();
 
@@ -67,7 +67,7 @@ export class StaffsStore {
   deleteById(staffId: string): Observable<void> {
     return this._staffGateway.deleteById(staffId).pipe(
       tap(() => this._staffsResource.update(staffsList => staffsList ? staffsList.filter(staff => staff.id !== staffId) : [])),
-      tap(() => this._teamsStore.onStaffDeleted(staffId))
+      tap(() => this._staffEventsService.emitStaffDeleted(staffId))
     );
   }
 

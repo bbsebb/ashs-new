@@ -1,7 +1,8 @@
-<a [routerLink]="['/staffs', staffIdInputSignal()]" class="staff-mini-card" title="Voir la fiche de l'encadrant">
+@let viewModel = staffMiniCardViewModelInputSignal();
+<a [routerLink]="['/staffs', viewModel.id]" class="staff-mini-card" title="Voir la fiche de l'encadrant">
   <div class="avatar-container">
-    @if (avatarInputSignal()) {
-      <img [ngSrc]="createImageSourceUrl(avatarInputSignal())" [alt]="fullNameInputSignal()" width="32" height="32"
+    @if (viewModel.avatarUrl) {
+      <img [ngSrc]="viewModel.avatarUrl" [alt]="viewModel.fullName" width="32" height="32"
            class="avatar">
     } @else {
       <div class="avatar-placeholder">
@@ -10,8 +11,8 @@
     }
   </div>
   <div class="staff-details">
-    <span class="full-name">{{ fullNameInputSignal() }}</span>
-    <span class="role">{{ roleInputSignal() }}</span>
+    <span class="full-name">{{ viewModel.fullName }}</span>
+    <span class="role">{{ viewModel.roleLabel }}</span>
   </div>
   <mat-icon class="chevron">chevron_right</mat-icon>
 </a>

@@ -9,7 +9,12 @@
     "build:all:staging": "ng build app --configuration staging && ng build admin --configuration staging",
     "build:all:development": "ng build app --configuration development && ng build admin --configuration development",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test:admin": "ng test admin",
+    "test:app": "ng test app",
+    "test:ui": "ng test shared-ui",
+    "test:domain": "ng test domain",
+    "test:api": "ng test api",
+    "test:all": "ng test admin && ng test app && ng test shared-ui && ng test domain && ng test api"
   },
   "prettier": {
     "printWidth": 100,

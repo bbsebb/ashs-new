@@ -1,12 +1,12 @@
-import {Component, input} from '@angular/core';
-import {Season} from '@shared-domain';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {MatChip, MatChipSet} from '@angular/material/chips';
 import {DatePipe} from '@angular/common';
+import {SeasonCardViewModel} from '@shared-api';
 
 /**
  * Component for displaying a summarized view of a season.
- * Shows the season name, its duration (start and end dates), and its status badges.
+ * Purely presentational component using a ViewModel.
  */
 @Component({
   selector: 'lib-season-card',
@@ -21,10 +21,11 @@ import {DatePipe} from '@angular/common';
   ],
   templateUrl: './season-card.html',
   styleUrl: './season-card.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SeasonCard {
   /**
-   * The season object to display.
+   * The ViewModel containing all data for the card.
    */
-  seasonInputSignal = input.required<Season>({alias: 'season'});
+  seasonCardViewModelInputSignal = input.required<SeasonCardViewModel>({alias: 'seasonCardViewModel'});
 }

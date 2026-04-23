@@ -8,9 +8,9 @@ import {LoadingData} from '@shared-ui';
 describe('LoadingData Component', () => {
   it('should render default label when loading', async () => {
     await render(LoadingData, {
-      componentProperties: {
-        isLoadingInputSignal: true
-      } as any
+      componentInputs: {
+        isLoading: true
+      }
     });
 
     expect(screen.getByText('Téléchargement des données…')).toBeDefined();
@@ -19,10 +19,10 @@ describe('LoadingData Component', () => {
 
   it('should render custom label', async () => {
     await render(LoadingData, {
-      componentProperties: {
-        isLoadingInputSignal: true,
-        labelInputSignal: 'Chargement des salles...'
-      } as any
+      componentInputs: {
+        isLoading: true,
+        label: 'Chargement des salles...'
+      }
     });
 
     expect(screen.getByText('Chargement des salles...')).toBeDefined();
@@ -30,9 +30,9 @@ describe('LoadingData Component', () => {
 
   it('should not render anything when isLoading is false', async () => {
     await render(LoadingData, {
-      componentProperties: {
-        isLoadingInputSignal: false
-      } as any
+      componentInputs: {
+        isLoading: false
+      }
     });
 
     expect(screen.queryByRole('status')).toBeNull();

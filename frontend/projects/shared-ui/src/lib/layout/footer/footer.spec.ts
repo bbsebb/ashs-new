@@ -1,12 +1,10 @@
-import { render, screen } from '@testing-library/angular';
-import { provideRouter } from '@angular/router';
-import { describe, it, expect } from 'vitest';
-import { Footer } from './footer';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { MatIconRegistry } from '@angular/material/icon';
-import { of } from 'rxjs';
+import {render, screen} from '@testing-library/angular';
+import {provideRouter} from '@angular/router';
+import {describe, expect, it} from 'vitest';
+import {Footer} from './footer';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
-import { MatIconTestingModule } from '@angular/material/icon/testing';
+import {MatIconTestingModule} from '@angular/material/icon/testing';
 
 describe('Footer', () => {
   it('should render the footer content', async () => {
@@ -31,6 +29,6 @@ describe('Footer', () => {
       imports: [MatIconTestingModule]
     });
 
-    expect(screen.getByText('Mentions légales')).toBeTruthy();
+    expect(screen.getByText(/mentions légales/i)).toBeTruthy();
   });
 });

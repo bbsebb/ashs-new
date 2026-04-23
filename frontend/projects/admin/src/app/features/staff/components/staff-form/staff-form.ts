@@ -1,19 +1,13 @@
 /**
  * Component for creating or editing a staff member profile.
  */
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import {
-  BreakpointService,
-  FormFieldErrorDirective,
-  FormSubmitButton,
-  ImageService,
-  PageTitle,
-  StaffCard
-} from '@shared-ui';
+import {BreakpointService, FormFieldErrorDirective, FormSubmitButton, PageTitle, StaffCard} from '@shared-ui';
+import {ImageService} from '@shared-api';
 import {Router} from '@angular/router';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
@@ -55,6 +49,23 @@ export class StaffForm {
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
+
+  staffCardViewModelSignal = computed(() => {
+    const staff = this.staffFormService.staffPreviewSignal();
+    // We map manually here as the preview might not be in the store yet
+    return {
+      id: staff.id,
+      firstName: staff.firstName,
+      lastName: staff.lastName,
+      fullName: `${staff.firstName} ${staff.lastName}`,
+      email: staff.email,
+      phone: staff.phone,
+      avatarUrl: this.staffFormService.showExistingAvatarSignal()
+        ? this._imageService.createImageSourceUrl(staff.avatarFileName)
+        : (this.staffFormService.blobAvatarSignal() ? URL.createObjectURL(this.staffFormService.blobAvatarSignal()!) : null),
+      assignedTeams: [] // Preview doesn't need teams
+    };
+  });
 
   constructor() {
     effect(() => {

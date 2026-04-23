@@ -1,15 +1,12 @@
-<!-- Extract data from signals into local variables for cleaner template logic -->
-@let team = teamInputSignal();
-@let enrichedStaffs = enrichedStaffsSignal();
-@let enrichedSessions = enrichedTrainingSessionsSignal();
+@let viewModel = teamCardViewModelInputSignal();
 
 <!-- Team Card Main Container -->
 <mat-card appearance="outlined" class="team-card">
   <!-- Team Photo or Placeholder Section -->
   <div class="image-container">
-    @if (team.photoFileName) {
-      <img [src]="createImageSourceUrl(team.photoFileName)"
-           alt="Photo de l'équipe {{ team.ageGroup.name }}"
+    @if (viewModel.photoUrl) {
+      <img [src]="viewModel.photoUrl"
+           alt="Photo de l'équipe {{ viewModel.categoryLabelLong }}"
            class="team-photo">
     } @else {
       <div class="photo-placeholder">
@@ -22,13 +19,13 @@
     <div class="badge-overlay">
       <mat-chip-set>
         <mat-chip class="category-chip"
-                  [class.female]="team.gender === 'Female'"
-                  [class.male]="team.gender === 'Male'"
-                  [class.mixte]="team.gender === 'Mixte'">
-          {{ team.ageGroup.ageLimit | category:team.ageGroup.upperLimit:'short' }} {{ team.gender | gender }}
+                  [class.female]="viewModel.gender === 'Female'"
+                  [class.male]="viewModel.gender === 'Male'"
+                  [class.mixte]="viewModel.gender === 'Mixte'">
+          {{ viewModel.categoryLabelShort }} {{ viewModel.gender | gender }}
         </mat-chip>
-        @if (team.teamNumber > 1) {
-          <mat-chip class="number-chip">Équipe {{ team.teamNumber }}</mat-chip>
+        @if (viewModel.teamNumber > 1) {
+          <mat-chip class="number-chip">Équipe {{ viewModel.teamNumber }}</mat-chip>
         }
       </mat-chip-set>
     </div>
@@ -37,12 +34,12 @@
   <!-- Header Section with Team Category and Gender -->
   <mat-card-header>
     <mat-card-title>
-      {{ team.ageGroup.ageLimit | category:team.ageGroup.upperLimit:'long' }}
-      @if (team.teamNumber > 1) {
-        {{ team.teamNumber }}
+      {{ viewModel.categoryLabelLong }}
+      @if (viewModel.teamNumber > 1) {
+        {{ viewModel.teamNumber }}
       }
     </mat-card-title>
-    <mat-card-subtitle>{{ team.gender | gender }}</mat-card-subtitle>
+    <mat-card-subtitle>{{ viewModel.gender | gender }}</mat-card-subtitle>
   </mat-card-header>
 
   <!-- Detailed Team Info Section -->
@@ -55,14 +52,11 @@
         <mat-icon>person</mat-icon>
         Staff
       </h3>
-      @if (enrichedStaffs.length > 0) {
+      @if (viewModel.staffs.length > 0) {
         <div class="staff-list">
-          @for (staff of enrichedStaffs; track $index) {
+          @for (staff of viewModel.staffs; track $index) {
             <lib-staff-mini-card
-              [staffId]="staff.staffId"
-              [fullName]="staff.fullName"
-              [role]="staff.role | roleStaff"
-              [avatar]="staff.avatar">
+              [staffMiniCardViewModel]="staff">
             </lib-staff-mini-card>
           }
         </div>
@@ -79,15 +73,11 @@
         <mat-icon>event</mat-icon>
         Training Sessions
       </h3>
-      @if (enrichedSessions.length > 0) {
+      @if (viewModel.trainingSessions.length > 0) {
         <div class="session-list">
-          @for (session of enrichedSessions; track $index) {
+          @for (session of viewModel.trainingSessions; track $index) {
             <lib-training-session-item
-              [dayOfWeek]="session.dayOfWeek"
-              [startTime]="session.timeSlot.startTime"
-              [endTime]="session.timeSlot.endTime"
-              [hallName]="session.hallName"
-              [hallId]="session.hallId">
+              [trainingSessionViewModel]="session">
             </lib-training-session-item>
           }
         </div>

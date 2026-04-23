@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ProblemDetail} from './problem-detail';
+import {ProblemDetail} from '@shared-domain';
 
 describe('ProblemDetail Domain Model', () => {
   it('should initialize with provided data', () => {

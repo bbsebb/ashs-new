@@ -28,6 +28,24 @@
       - Le composant parent (ou le routeur) utilise toujours le nom simple : `[userName]="value"`.
   - **Nommage Observables :** Les observables doivent avoir le suffixe `$` (ex: `routeParams$`).
     - **Variables Privées :** Doivent impérativement porter le prefix `_` (ex: `_userService`, `_itemsList`).
+- **Composants : Smart vs Dumb :**
+    - **Smart Components (Containers) :**
+        - Orchestrent la logique métier en injectant les **Stores** et **Gateways**.
+        - S'abonnent aux données et gèrent les interactions avec les services.
+        - Ne contiennent quasiment aucun style CSS complexe (uniquement du layout).
+        - Passent les données aux composants Dumb via des **ViewModels**.
+    - **Dumb Components (Presentation) :**
+        - Focalisés exclusivement sur le rendu visuel et l'interaction utilisateur immédiate.
+        - **Interdiction :** Ne doivent jamais injecter de services métier (Stores/Gateways). Seuls les services
+          utilitaires (ex: `MatDialog`, `BreakpointObserver`) sont tolérés.
+        - Reçoivent leurs données via un seul input `viewModel` (pattern `InputSignal`).
+        - Communiquent avec le parent exclusivement via des `output()`.
+- **ViewModel (MVVM) & Communication :**
+    - **Définition :** Un `ViewModel` est un objet (Interface ou Type) regroupant l'intégralité des données nécessaires
+      à l'affichage d'un composant Dumb.
+    - **Génération :** Le `ViewModel` est impérativement généré dans le **Store** via un `computed()` signal pour
+      garantir une réactivité fine et une logique centralisée.
+    - **Nommage :** Doit porter le suffixe `ViewModel` (ex: `HallDetailsViewModel`).
 - **Composants :**
     - Utilise au maximum les composants d'Angular Material 21.
     - **Structure :** Tout composant Angular doit être impérativement structuré en 3 fichiers distincts (`.ts`, `.html`, `.scss`). L'utilisation de templates ou de styles inline est interdite.
@@ -58,11 +76,14 @@
         - `[domaine].gateway.ts` : Appels HTTP purs, mapping technique et validation des réponses.
         - `[domaine]s.store.ts` : Gestion d'état centralisée via Signals.
         - `[domaine].dtos.ts` : Centralisation de tous les types DTO (Data Transfer Objects) du domaine.
+      - `[domaine].view-models.ts` : Centralisation des interfaces de ViewModel du domaine.
     - **Implémentation Gateway :**
         - Utilise `httpResource` pour les requêtes de lecture (GET).
         - Utilise `Observable<T>` pour les mutations (POST, PUT, DELETE).
     - **Implémentation Store :**
         - Injecte la Gateway et expose les données via des Signals publics (suffixe `Signal`).
+      - **ViewModel Exposer :** Doit exposer un signal `computed` nommé `[nom]ViewModelSignal` qui agrège les états
+        nécessaires pour les composants Dumb.
         - **Zéro Reload Policy :** Les mutations ne doivent jamais appeler `reload()`. Elles doivent intercepter l'objet de retour via `tap()` et mettre à jour le cache local du signal via `this.resource.update()`.
         - **Nommage Explicite :** Les variables dans les opérateurs RxJS et les callbacks de signaux doivent être longues et descriptives (ex: `hallsList.map(hall => ...)` et non `items.map(i => ...)`).
 

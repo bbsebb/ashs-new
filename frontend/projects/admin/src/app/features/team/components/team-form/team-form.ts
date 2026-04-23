@@ -12,10 +12,10 @@ import {
   FormFieldErrorDirective,
   FormSubmitButton,
   GenderPipe,
-  ImageService,
   PageTitle,
   TeamCard
 } from '@shared-ui';
+import {ImageService} from '@shared-api';
 import {GENDER} from '@shared-domain';
 import {RouterLink} from '@angular/router';
 import {MatDivider} from '@angular/material/list';
@@ -64,6 +64,25 @@ export class TeamForm {
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
+
+  teamCardViewModelSignal = computed(() => {
+    const preview = this.teamFormService.teamPreviewSignal();
+    const team = this.teamFormService.teamSignal();
+
+    // We map manually to support preview without store persistence
+    return {
+      id: preview.id,
+      photoUrl: this.teamFormService.showExistingPhotoSignal()
+        ? this._imageService.createImageSourceUrl(team?.photoFileName)
+        : (this.teamFormService.photoBlobSignal() ? URL.createObjectURL(this.teamFormService.photoBlobSignal()!) : null),
+      categoryLabelShort: '?', // Simplified for preview
+      categoryLabelLong: 'Prévisualisation',
+      gender: preview.gender,
+      teamNumber: preview.teamNumber,
+      staffs: [], // Simplified for preview
+      trainingSessions: [] // Simplified for preview
+    };
+  });
 
   genders = Object.values(GENDER);
 

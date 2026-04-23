@@ -3,7 +3,7 @@
  */
 import {Component, effect, inject, input} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
-import {TeamsStore} from '@shared-api';
+import {TeamsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, LoadingData, TeamCard} from '@shared-ui';
 import {MatCardActions} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
@@ -24,17 +24,18 @@ import {MatButton} from '@angular/material/button';
 })
 export class TeamView {
   private readonly _teamsStore = inject(TeamsStore);
+  private readonly _viewModelMapper = inject(ViewModelMapperService);
   private readonly _router = inject(Router);
 
   idInputSignal = input.required<string>({alias: 'id'});
 
-  teamSignal = this._teamsStore.teamById(this.idInputSignal);
+  teamCardViewModelSignal = this._viewModelMapper.teamCardViewModelById(this.idInputSignal);
   isLoadingSignal = this._teamsStore.isLoadingSignal;
   errorSignal = this._teamsStore.errorSignal;
 
   constructor() {
     effect(() => {
-      if (!this.isLoadingSignal() && !this.errorSignal() && !this.teamSignal()) {
+      if (!this.isLoadingSignal() && !this.errorSignal() && !this.teamCardViewModelSignal()) {
         void this._router.navigateByUrl('/404');
       }
     });

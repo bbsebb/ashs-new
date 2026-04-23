@@ -2,7 +2,7 @@
  * Component for listing all teams in the public app.
  */
 import {Component, computed, inject, linkedSignal, signal} from '@angular/core';
-import {SeasonsStore, TeamsStore} from '@shared-api';
+import {SeasonsStore, TeamsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, GenderPipe, LoadingData, PublicPageContainer, TeamCard, TeamMiniCard} from '@shared-ui';
 import {MatIconModule} from '@angular/material/icon';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -33,6 +33,7 @@ import {GENDER, Gender} from '@shared-domain';
 export class TeamsList {
   private readonly teamsStore = inject(TeamsStore);
   private readonly seasonsStore = inject(SeasonsStore);
+  private readonly _viewModelMapper = inject(ViewModelMapperService);
 
   viewModeSignal = signal<'cards' | 'mini'>('cards');
   seasonsSignal = this.seasonsStore.seasonsSignal;
@@ -50,22 +51,21 @@ export class TeamsList {
   isLoadingSignal = computed(() => this.teamsStore.isLoadingSignal() || this.seasonsStore.isLoadingSignal());
   errorSignal = computed(() => this.teamsStore.errorSignal() || this.seasonsStore.errorSignal());
 
-  filteredTeamsSignal = computed(() => {
-    const teams = this.teamsStore.teamsSignal();
+  // Calcul des ViewModels filtrés
+  filteredViewModelsSignal = computed(() => {
     const seasonId = this.selectedSeasonIdSignal();
     const gender = this.selectedGenderSignal();
 
-    let result = teams;
+    const teams = this.teamsStore.teamsSignal().filter(t => {
+      const matchSeason = !seasonId || t.seasonId === seasonId;
+      const matchGender = gender === 'All' || t.gender === gender;
+      return matchSeason && matchGender;
+    });
 
-    if (seasonId) {
-      result = result.filter(t => t.seasonId === seasonId);
-    }
-
-    if (gender !== 'All') {
-      result = result.filter(t => t.gender === gender);
-    }
-
-    return result;
+    return teams.map(team => ({
+      cardVM: this._viewModelMapper.teamCardViewModelById(computed(() => team.id))(),
+      miniVM: this._viewModelMapper.teamMiniCardViewModelsSignal().find(vm => vm.id === team.id)
+    })).filter(item => item.cardVM && item.miniVM);
   });
 
   constructor() {

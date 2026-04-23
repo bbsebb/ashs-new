@@ -39,30 +39,33 @@
         </div>
       </header>
 
-      <div class="staffs-grid" [class.mini-mode]="viewModeSignal() === 'mini'">
-        @for (item of staffsWithRolesSignal(); track item.staff.id) {
-          @if (viewModeSignal() === 'cards') {
-            <lib-staff-card [staff]="item.staff" [seasonId]="selectedSeasonIdSignal()">
-              <mat-card-actions actions align="end">
-                <button mat-button [routerLink]="['/staffs', item.staff.id]">Voir la fiche</button>
-              </mat-card-actions>
-            </lib-staff-card>
-          } @else {
-            <lib-staff-mini-card
-              [staffId]="item.staff.id"
-              [fullName]="item.staff.firstName + ' ' + item.staff.lastName"
-              [role]="item.rolesSummary"
-              [avatar]="item.staff.avatarFileName">
-            </lib-staff-mini-card>
-          }
+      <section class="staffs-grid" [class.mini-view]="viewModeSignal() === 'mini'">
+        @for (item of staffViewModelsSignal(); track item.viewModel.id) {
+          <div class="staff-item">
+            @if (viewModeSignal() === 'cards') {
+              <lib-staff-card [staffCardViewModel]="item.viewModel" [seasonId]="selectedSeasonIdSignal()">
+                <mat-card-actions actions align="end">
+                  <button mat-button type="button" [routerLink]="['/staffs', item.viewModel.id]">Détails</button>
+                </mat-card-actions>
+              </lib-staff-card>
+            } @else {
+              <lib-staff-mini-card
+                [staffMiniCardViewModel]="{
+                  id: item.viewModel.id,
+                  fullName: item.viewModel.fullName,
+                  roleLabel: item.rolesSummary,
+                  avatarUrl: item.viewModel.avatarUrl
+                }">
+              </lib-staff-mini-card>
+            }
+          </div>
         } @empty {
           <div class="empty-state">
             <mat-icon>person_off</mat-icon>
             <p>Aucun membre de l'encadrement trouvé pour cette saison.</p>
           </div>
         }
-      </div>
+      </section>
     </div>
   }
 </app-public-page-container>
-

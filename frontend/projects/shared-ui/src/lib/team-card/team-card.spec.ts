@@ -1,59 +1,49 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it} from 'vitest';
 import {TeamCard} from '@shared-ui';
-import {Team} from '@shared-domain';
-import {signal} from '@angular/core';
-import {APP_CONFIG, HallsStore, StaffsStore} from '@shared-api';
 import {provideRouter} from '@angular/router';
+import {TeamCardViewModel} from '@shared-api';
 
 /**
  * Unit tests for TeamCard component.
- * Verifies data enrichment from stores and signal-based display.
  */
 describe('TeamCard Component', () => {
-  const mockTeam: Team = {
+  const mockViewModel: TeamCardViewModel = {
     id: 't1',
-    seasonId: 's1',
+    photoUrl: null,
+    categoryLabelShort: '-18 ans',
+    categoryLabelLong: 'Moins de 18 ans',
     gender: 'Male',
     teamNumber: 1,
-    photoFileName: null,
-    ageGroup: { id: 'ag1', name: 'U18', ageLimit: 18, upperLimit: true },
     staffs: [
-      { id: 'ts1', role: 'COACH', staffId: 's1' }
+      {
+        id: 's1',
+        fullName: 'Jean Dupont',
+        roleLabel: 'Entraineur',
+        role: 'COACH',
+        avatarUrl: null
+      }
     ],
     trainingSessions: [
       {
-        id: 'tr1',
-        hallId: 'h1',
         dayOfWeek: 'MONDAY',
-        timeSlot: {
-          startTime: new Date(2024, 1, 1, 18, 0),
-          endTime: new Date(2024, 1, 1, 20, 0)
-        }
+        startTime: new Date(2024, 1, 1, 18, 0),
+        endTime: new Date(2024, 1, 1, 20, 0),
+        hallName: 'Palais des Sports',
+        hallId: 'h1'
       }
     ]
   };
 
-  const mockStaffsStore = {
-    staffsSignal: signal([{ id: 's1', firstName: 'Jean', lastName: 'Dupont', avatarFileName: null }])
-  };
-
-  const mockHallsStore = {
-    hallsSignal: signal([{ id: 'h1', name: 'Palais des Sports' }])
-  };
-
-  it('should render team details and enriched data from stores', async () => {
+  it('should render team details and enriched data from ViewModel', async () => {
     await render(TeamCard, {
-      componentProperties: {teamInputSignal: mockTeam} as any,
+      componentInputs: {teamCardViewModel: mockViewModel},
       providers: [
-        { provide: StaffsStore, useValue: mockStaffsStore },
-        { provide: HallsStore, useValue: mockHallsStore },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
       ]
     });
 
-    // Category and Gender (via pipes)
+    // Category and Gender
     expect(screen.getByText(/Moins de 18 ans/)).toBeDefined();
     expect(screen.getByText('Masc.')).toBeDefined();
 
@@ -63,5 +53,22 @@ describe('TeamCard Component', () => {
 
     // Enriched Hall
     expect(screen.getByText(/Palais des Sports/)).toBeDefined();
+    expect(screen.getByText(/18:00 - 20:00/)).toBeDefined();
+  });
+
+  it('should render empty states when no staff or sessions', async () => {
+    const emptyViewModel: TeamCardViewModel = {
+      ...mockViewModel,
+      staffs: [],
+      trainingSessions: []
+    };
+
+    await render(TeamCard, {
+      componentInputs: {teamCardViewModel: emptyViewModel},
+      providers: [provideRouter([])]
+    });
+
+    expect(screen.getByText(/no staff assigned/i)).toBeDefined();
+    expect(screen.getByText(/no sessions scheduled/i)).toBeDefined();
   });
 });

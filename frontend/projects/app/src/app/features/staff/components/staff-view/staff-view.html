@@ -1,14 +1,15 @@
-@let staff = staffSignal();
+@let viewModel = staffCardViewModelSignal();
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement du membre de l'encadrement" [isLoading]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement de l'encadrant" [isLoading]="isLoadingSignal()"/>
 } @else if (errorSignal()) {
-  <app-error-data dataName="encadrant" (onRetry)="retry()"/>
-} @else if (!staff) {
-  <p>Aucun membre de l'encadrement trouvé</p>
+  <app-error-data dataName="encadrants" (onRetry)="retry()"/>
+} @else if (!viewModel) {
+  <p>Aucun encadrant trouvé</p>
 } @else {
-  <lib-staff-card [staff]="staff">
+  <lib-staff-card [staffCardViewModel]="viewModel">
     <mat-card-actions actions align="end">
       <button mat-button type="button" routerLink="/staffs">Retour à la liste</button>
     </mat-card-actions>
   </lib-staff-card>
 }
+

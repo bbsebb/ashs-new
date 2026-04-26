@@ -19,7 +19,7 @@
 
 - **Réactivité (Signals & RxJS) :**
     - **Logique :** Privilégie les **Signals Angular** pour la gestion d'état et la réactivité.
-  - **Nommage Signals :** Les signals d'état interne doivent inclure le suffixe `Signal` (ex: `isLoadingSignal`).
+  - **Nommage Signals :** Les signals d'état interne doivent include le suffixe `Signal` (ex: `isLoadingSignal`).
   - **Signal Inputs (Parent-Enfant & Route) :** Tout input utilisant les Signals doit impérativement porter le suffixe
     `InputSignal` en interne et utiliser un alias sans ce suffixe pour l'API publique (ex:
     `userNameInputSignal = input.required<string>({ alias: 'userName' })`).
@@ -92,13 +92,25 @@
 - **Java 25 :** Utilise les dernières fonctionnalités (Pattern Matching avancé, String Templates stabilisés, Records,
   Scoped Values).
 - **Gestion du Null :** Politique "Zero Null".
+    - Utilise `@NullMarked` (JSpecify) au niveau du package.
     - Utilise `Optional<T>` pour les retours de méthodes pouvant être vides.
-    - Utilise les annotations `@NonNullApi` au niveau du package et `@Nullable` uniquement par exception.
-    - Préfère les `Objects.requireNonNull()` pour la validation d'entrée.
+    - Utilise les annotations `@Nullable` uniquement par exception.
 - **Architecture :** Utilise **Spring Modulith**.
     - Respecte strictement l'encapsulation des modules (seuls les packages exposés peuvent être utilisés par d'autres
       modules).
     - Favorise les événements d'application (`ApplicationEventPublisher`) pour la communication entre modules.
+- **Tests (Standard Spring Boot 4.0) :**
+    - **Exigences :** Les tests doivent être **exhaustifs** (couvrant tous les endpoints, services et cas limites via
+      Boundary Value Analysis).
+    - **Assertions :** Utilise exclusivement **AssertJ** pour sa fluidité et sa puissance.
+    - **Logiciel (Services & Entités) :** Privilégie les tests unitaires purs avec JUnit 6 et Mockito (sans chargement
+      de contexte).
+    - **Contrôleurs (Slice Tests) :**
+        - Utilise
+          `@WebMvcTest(value = MyController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class})`.
+        - Utilise **`RestTestClient`** (`org.springframework.test.web.servlet.client.RestTestClient`) initialisé
+          manuellement dans un `@BeforeEach` via `RestTestClient.bindTo(mockMvc).build()` pour les tests d'API fluides.
+    - **Mocking :** Utilise systématiquement **`@MockitoBean`** pour l'injection de mocks dans le contexte Spring.
 - **Persistance & Migration :**
     - **Flyway :** Un schéma de base de données par module Spring Modulith pour garantir l'isolation des données.
     - **Développement :** Utilisation du support **Docker Compose** de Spring Boot pour l'instanciation automatique de la base de données en local.

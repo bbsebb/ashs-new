@@ -1,4 +1,26 @@
-MAIL_USERNAME: dummy@gmail.com
-MAIL_PASSWORD: dummypassword
-PAGE_ACCESS_TOKEN: dummytoken
-APP_CORS_ALLOWED_ORIGINS: http://localhost:4200
+spring:
+  flyway:
+    enabled: false # On désactive Flyway pour les tests de repository pour éviter les soucis de schémas multiples
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # Hibernate crée les tables
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        # On s'assure qu'Hibernate peut trouver les schémas
+        hibernate.default_schema: public
+
+  mail:
+    username: test@test.com
+    password: password
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8079/realms/ashs
+
+meta:
+  page-access-token: dummy-token

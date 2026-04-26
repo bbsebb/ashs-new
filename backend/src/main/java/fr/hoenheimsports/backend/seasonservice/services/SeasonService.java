@@ -19,6 +19,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service managing season lifecycle and activities.
+ * Provides functionality for creating, updating, listing, and deleting seasons
+ * with integrated safety checks for associations.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,6 +32,11 @@ public class SeasonService {
     private final SeasonMapper seasonMapper;
     private final TeamAPI teamAPI;
 
+    /**
+     * Retrieves all seasons.
+     *
+     * @return a list of all seasons as response DTOs
+     */
     public List<SeasonResponse> getAllSeasons() {
         log.debug("Appel de getAllSeasons");
         var seasons = seasonRepository.findAll().stream()
@@ -36,9 +46,16 @@ public class SeasonService {
         return seasons;
     }
 
+    /**
+     * Deletes a season by ID if it has no associated teams.
+     *
+     * @param uuid the unique identifier of the season to delete
+     * @throws EntityNotFoundException if the season does not exist
+     * @throws SeasonInUseException    if the season is associated with existing teams
+     */
     public void deleteById(UUID uuid) {
         log.debug("Tentative de suppression de la saison avec l'ID : {}", uuid);
-        var season = seasonRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La salle n'a pas été trouvé ou n'existe plus."));
+        var season = seasonRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La saison n'a pas été trouvée ou n'existe plus."));
         assertSeasonHasNoAssociations(season);
         seasonRepository.delete(season);
         log.info("Saison supprimée : {}", uuid);
@@ -51,15 +68,20 @@ public class SeasonService {
         }
     }
 
+    /**
+     * Creates and persists a new season.
+     *
+     * @param seasonCreateRequest the details of the new season
+     * @return the created season's DTO
+     * @throws RangeDateException if the start date is after the end date
+     */
     public SeasonResponse createSeason(SeasonCreateRequest seasonCreateRequest) {
         log.debug(
                 "Tentative de création d'une saison du : {} au : {}",
                 seasonCreateRequest.startDate().format(DateTimeFormatter.BASIC_ISO_DATE),
                 seasonCreateRequest.endDate().format(DateTimeFormatter.BASIC_ISO_DATE)
         );
-        if (seasonCreateRequest.startDate().isAfter(seasonCreateRequest.endDate())) {
-            throw new RangeDateException("La date de début doit être antérieure à la date de fin");
-        }
+        assertValidDateRange(seasonCreateRequest.startDate(), seasonCreateRequest.endDate());
         var season = seasonMapper.toEntity(seasonCreateRequest);
         season.setName(createSeasonName(season.getStartDate(), season.getEndDate()));
         var response = seasonMapper.toDto(seasonRepository.save(season));
@@ -67,19 +89,35 @@ public class SeasonService {
         return response;
     }
 
+    /**
+     * Updates an existing season's timeframe and name.
+     *
+     * @param id the unique identifier of the season to update
+     * @param seasonUpdateRequest the updated season details
+     * @return the updated season's DTO
+     * @throws EntityNotFoundException if the season does not exist
+     * @throws RangeDateException if the start date is after the end date
+     */
     public SeasonResponse updateSeason(UUID id, SeasonUpdateRequest seasonUpdateRequest) {
         log.debug(
                 "Tentative de mise à jour d'une saison du : {} au : {}",
                 seasonUpdateRequest.startDate().format(DateTimeFormatter.BASIC_ISO_DATE),
                 seasonUpdateRequest.endDate().format(DateTimeFormatter.BASIC_ISO_DATE)
         );
+        assertValidDateRange(seasonUpdateRequest.startDate(), seasonUpdateRequest.endDate());
         var errorMessage = "La saison du %s au %s n'existe pas ou n'a pas été trouvée".formatted(seasonUpdateRequest.startDate(), seasonUpdateRequest.endDate());
         var season = seasonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(errorMessage));
         season.setStartDate(seasonUpdateRequest.startDate());
         season.setEndDate(seasonUpdateRequest.endDate());
         season.setName(createSeasonName(season.getStartDate(), season.getEndDate()));
-        log.info("Mise à jour de la salle : {}", id);
+        log.info("Mise à jour de la saison : {}", id);
         return seasonMapper.toDto(seasonRepository.save(season));
+    }
+
+    private void assertValidDateRange(LocalDate startDate, LocalDate endDate) {
+        if (!startDate.isBefore(endDate)) {
+            throw new RangeDateException("La date de début doit être antérieure à la date de fin");
+        }
     }
 
     private String createSeasonName(LocalDate startDate, LocalDate endDate) {

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for retrieving Meta (Facebook/Instagram) feed data.
+ */
 @RestController
 @RequestMapping("/api/v1/meta")
 @RequiredArgsConstructor
@@ -15,6 +18,11 @@ public class MetaController {
 
     private final MetaService metaService;
 
+    /**
+     * Retrieves the social media feed from the Meta API.
+     *
+     * @return a ResponseEntity containing the Graph API response with feed data
+     */
     @GetMapping("feeds")
     public ResponseEntity<GraphApiResponse> getFeeds(){
         return ResponseEntity.ok(metaService.getFeeds());

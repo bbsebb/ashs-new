@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Service managing staff members.
+ * Handles CRUD operations, image storage associations, and event publication.
+ */
 @Service
 @RequiredArgsConstructor
 public class StaffService {
@@ -30,10 +34,22 @@ public class StaffService {
     private final ImageStorageService imageStorageService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * Retrieves all staff members.
+     *
+     * @return a list of staff response DTOs
+     */
     public List<StaffResponseDto> getAllStaff() {
         return this.staffRepository.findAll().stream().map(staffMapper::toDto).collect(Collectors.toList());
     }
 
+    /**
+     * Creates a new staff member and optionally saves their avatar.
+     *
+     * @param file               the optional avatar image file
+     * @param staffCreateRequest the data to create the staff member
+     * @return the created staff member's DTO
+     */
     public StaffResponseDto createStaff(@Nullable MultipartFile file, StaffCreateRequest staffCreateRequest) {
 
         var staff = this.staffMapper.toEntity(staffCreateRequest);
@@ -43,13 +59,22 @@ public class StaffService {
         return this.staffMapper.toDto(this.staffRepository.save(staff));
     }
 
+    /**
+     * Updates an existing staff member's details and avatar.
+     *
+     * @param id the unique identifier of the staff member
+     * @param file the optional new avatar image file
+     * @param staffUpdateRequest the updated data
+     * @return the updated staff member's DTO
+     * @throws EntityNotFoundException if the staff member does not exist
+     */
     public StaffResponseDto updateStaff(UUID id, @Nullable MultipartFile file, StaffUpdateRequest staffUpdateRequest) {
         var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));
         staff.setEmail(new Email(staffUpdateRequest.email()));
         staff.setPhone(new Phone(staffUpdateRequest.phone()));
         staff.setFirstName(staffUpdateRequest.firstName());
         staff.setLastName(staffUpdateRequest.lastName());
-        // if there is a new filename, file is not null. If the avatar is deleted, avatarFileName is null
+        
         updateAvatarFileName(staff, staffUpdateRequest.avatarFileName(), file);
 
         return this.staffMapper.toDto(this.staffRepository.save(staff));
@@ -60,7 +85,6 @@ public class StaffService {
             @Nullable String requestedAvatarFileName,
             @Nullable MultipartFile file
     ) {
-        // If there is a new filename, file is not null. If the avatar is deleted, avatarFileName is null
         if (staff.getAvatarFileName() != null && !staff.getAvatarFileName().equals(requestedAvatarFileName)) {
             imageStorageService.deleteImage(staff.getAvatarFileName());
             staff.setAvatarFileName(requestedAvatarFileName);
@@ -71,6 +95,12 @@ public class StaffService {
         }
     }
 
+    /**
+     * Deletes a staff member by ID, removes their avatar, and publishes a deletion event.
+     *
+     * @param id the unique identifier of the staff member to delete
+     * @throws EntityNotFoundException if the staff member does not exist
+     */
     @Transactional
     public void deleteStaff(UUID id) {
         var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));

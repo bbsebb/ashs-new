@@ -8,6 +8,9 @@ import org.hibernate.proxy.HibernateProxy;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * JPA entity representing an age group category (e.g., U11, U18, Seniors).
+ */
 @Entity
 @Table(name = "age_group", schema = "team_schema")
 @Setter
@@ -15,15 +18,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Getter
 public class AgeGroup {
+    /**
+     * Unique identifier for the age group.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
     private UUID id;
 
+    /**
+     * The numeric age limit for this group.
+     */
     @Min(value = 1, message = "L'âge limite doit être supérieur à 0")
     @Column(name = "age_limit", nullable = false, check = @CheckConstraint(constraint = "age_limit > 0"))
-    private int ageLimit; // ex: 11, 18
+    private int ageLimit;
 
+    /**
+     * Indicates if the age limit is an upper limit (e.g., U18) or lower limit (e.g., Seniors).
+     */
     @Column(name = "is_upper_limit")
     private boolean upperLimit;
 

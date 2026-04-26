@@ -22,32 +22,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Main security configuration for the application.
+ * Sets up CORS, CSRF protection, session management, and OAuth2 JWT resource server integration.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @EnableConfigurationProperties(CorsProperties.class)
 public class SecurityConfig {
 
+    /**
+     * Configures the security filter chain.
+     *
+     * @param http the HttpSecurity builder
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Activer le CORS (indispensable pour qu'Angular puisse appeler l'API)
                 .cors(Customizer.withDefaults())
-
-                // 2. Désactiver le CSRF (inutile avec les tokens JWT)
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // 3. Rendre l'API Stateless (pas de session HTTP)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // 4. Règles de protection des routes
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/**").permitAll()// Route publique
-                        .anyRequest().authenticated()                 // Tout le reste nécessite un token valide
+                        .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-
-                // 5. Dire à Spring d'utiliser JWT et notre convertisseur de rôles
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter()))
                 );
@@ -55,6 +57,11 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Configures the JWT authentication converter to map Keycloak roles to Spring Security authorities.
+     *
+     * @return the configured JwtAuthenticationConverter
+     */
     @Bean
     public JwtAuthenticationConverter jwtAuthConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
@@ -67,7 +74,6 @@ public class SecurityConfig {
             @SuppressWarnings("unchecked")
             List<String> roles = (List<String>) realmAccess.get("roles");
 
-            // Transforme "admin" en "ROLE_ADMIN" pour Spring Security
             return roles.stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
                     .collect(Collectors.toList());
@@ -75,6 +81,12 @@ public class SecurityConfig {
         return converter;
     }
 
+    /**
+     * Configures global CORS mapping based on application properties.
+     *
+     * @param corsProperties the CORS properties injected from configuration
+     * @return a WebMvcConfigurer with CORS mappings
+     */
     @Bean
     WebMvcConfigurer corsConfigurer(CorsProperties corsProperties) {
         return new WebMvcConfigurer() {
@@ -89,6 +101,13 @@ public class SecurityConfig {
     }
 }
 
+/**
+ * Configuration properties for CORS settings.
+ *
+ * @param allowedOrigins list of allowed origins
+ * @param allowedMethods list of allowed HTTP methods
+ * @param allowedHeaders list of allowed HTTP headers
+ */
 @ConfigurationProperties(prefix = "app.cors")
 record CorsProperties(
         String[] allowedOrigins,

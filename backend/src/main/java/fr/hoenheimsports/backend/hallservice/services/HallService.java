@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service managing sports hall operations.
+ * Provides functionality for listing, creating, updating, and deleting halls.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -21,12 +25,10 @@ public class HallService {
     private final HallRepository hallRepository;
     private final HallMapper hallMapper;
 
-/*    public HallResponse getHallById(String id) {
-        return hallMapper.toDto(hallRepository.findById(UUID.fromString(id)).orElseThrow(() -> new EntityNotFoundException("Hall not found")));
-    }*/
-
     /**
-     * Retrieves all halls and maps to DTO list
+     * Retrieves all sports halls.
+     *
+     * @return a list of all halls as response DTOs
      */
     public List<HallResponse> getAllHalls() {
         log.debug("Appel de getAllHalls");
@@ -36,7 +38,10 @@ public class HallService {
     }
 
     /**
-     * Creates and persists hall; returns mapped response
+     * Creates and persists a new sports hall.
+     *
+     * @param hallCreateRequest the data to create the hall
+     * @return the created hall's DTO
      */
     public HallResponse createHall(HallCreateRequest hallCreateRequest) {
         log.debug("Tentative de création d'une salle avec le nom: {}", hallCreateRequest.name());
@@ -45,9 +50,17 @@ public class HallService {
         return response;
     }
 
+    /**
+     * Updates an existing sports hall's details.
+     *
+     * @param id                the unique identifier of the hall to update
+     * @param hallUpdateRequest the updated data
+     * @return the updated hall's DTO
+     * @throws EntityNotFoundException if the hall does not exist
+     */
     public HallResponse updateHall(UUID id, HallUpdateRequest hallUpdateRequest) {
         log.debug("Tentative de mise à jour de la salle avec le nom: {}", hallUpdateRequest.name());
-        Hall hall = hallRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(STR."La salle avec le nom -\{hallUpdateRequest.name()}- n'a pas été trouvé ou n'existe plus."));
+        Hall hall = hallRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("La salle avec le nom -" + hallUpdateRequest.name() + "- n'a pas été trouvé ou n'existe plus."));
         hall.setName(hallUpdateRequest.name());
         hall.getAddress().setStreet(hallUpdateRequest.addressStreet());
         hall.getAddress().setCity(hallUpdateRequest.addressCity());
@@ -57,6 +70,12 @@ public class HallService {
         return hallMapper.toDto(hallRepository.save(hall));
     }
 
+    /**
+     * Deletes a sports hall by its ID.
+     *
+     * @param uuid the unique identifier of the hall to delete
+     * @throws EntityNotFoundException if the hall does not exist
+     */
     public void deleteHallById(UUID uuid) {
         log.debug("Tentative de suppression de la salle avec l'ID : {}", uuid);
         var hall = hallRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La salle n'a pas été trouvé ou n'existe plus."));

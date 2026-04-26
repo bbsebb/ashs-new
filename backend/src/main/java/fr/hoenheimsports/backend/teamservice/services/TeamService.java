@@ -22,6 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service managing team operations.
+ * Handles team creation, updates, and synchronization of staff and training sessions.
+ * Also listens for staff deletion events to maintain data integrity.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,10 +38,22 @@ public class TeamService {
     private final ImageStorageService imageStorageService;
 
 
+    /**
+     * Retrieves all teams currently stored in the system.
+     *
+     * @return a list of team response DTOs
+     */
     public List<TeamReponseDTO> getAllTeams() {
         return this.teamRepository.findAll().stream().map(teamMapper::toDto).collect(Collectors.toList());
     }
 
+    /**
+     * Creates a new team with an optional photo.
+     *
+     * @param file           the optional team photo file
+     * @param teamRequestDTO the details for creating the team
+     * @return the created team's DTO
+     */
     public TeamReponseDTO createTeam(@Nullable MultipartFile file, TeamCreateRequest teamRequestDTO) {
 
         log.debug("Mapping {}", this.teamMapper.toEntity(teamRequestDTO));
@@ -51,22 +68,27 @@ public class TeamService {
         return this.teamMapper.toDto(this.teamRepository.save(team));
     }
 
+    /**
+     * Updates an existing team, synchronizing its staff and training sessions.
+     *
+     * @param teamId the unique identifier of the team to update
+     * @param file the optional new team photo file
+     * @param teamRequestDTO the updated team data
+     * @return the updated team's DTO
+     * @throws EntityNotFoundException if the team or required age group is not found
+     */
     @Transactional
     public TeamReponseDTO updateTeam(UUID teamId, @Nullable MultipartFile file, TeamUpdateRequest teamRequestDTO) {
         Team team = this.teamRepository.findById(teamId)
                 .orElseThrow(() -> new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId));
 
-        // 1. Champs simples
         team.setGender(teamRequestDTO.gender());
 
         AgeGroup ageGroup = findById(teamRequestDTO.ageGroupId());
         team.setName(new TeamName(teamRequestDTO.teamNumber(), ageGroup));
         updatePhotoFileName(team, teamRequestDTO.photoFileName(), file);
 
-        // 2. Synchronisation des Staffs
         syncStaffs(team, teamRequestDTO.staffs());
-
-        // 3. Synchronisation des Sessions d'entraînement
         syncTrainingSessions(team, teamRequestDTO.trainingSessions());
 
         return this.teamMapper.toDto(this.teamRepository.save(team));
@@ -77,7 +99,6 @@ public class TeamService {
             @Nullable String requestedAvatarFileName,
             @Nullable MultipartFile file
     ) {
-        // If there is a new filename, file is not null. If the avatar is deleted, avatarFileName is null
         if (team.getPhotoFileName() != null && !team.getPhotoFileName().equals(requestedAvatarFileName)) {
             imageStorageService.deleteImage(team.getPhotoFileName());
             team.setPhotoFileName(requestedAvatarFileName);
@@ -89,6 +110,12 @@ public class TeamService {
     }
 
 
+    /**
+     * Deletes a team by its ID.
+     *
+     * @param teamId the unique identifier of the team to delete
+     * @throws EntityNotFoundException if the team does not exist
+     */
     public void deleteTeam(UUID teamId) {
         Team team = this.teamRepository.findById(teamId)
                 .orElseThrow(() -> new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId));
@@ -191,6 +218,12 @@ public class TeamService {
     }
 
 
+    /**
+     * Listener for staff deletion events.
+     * Ensures that any associations between the deleted staff member and teams are removed.
+     *
+     * @param event the staff deletion event containing the ID of the deleted staff member
+     */
     @ApplicationModuleListener
     public void onStaffDeleted(StaffDeletedEvent event) {
         var teams = this.teamRepository.findDistinctByStaffs_StaffId(event.id());

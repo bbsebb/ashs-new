@@ -9,11 +9,19 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service that orchestrates communication with the Meta API.
+ * Handles configuration, caching, and retry logic for social media feeds.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MetaService {
+    /**
+     * Default fields to retrieve from the Meta API if not specified.
+     */
     String DEFAULT_FEED_FIELDS = "id,created_time,message,attachments.limit(100){media_type,media,subattachments,type}";
+
     @Value("${meta.page-access-token}")
     private String accessToken;
 
@@ -22,6 +30,12 @@ public class MetaService {
 
     private final MetaClient metaClient;
 
+    /**
+     * Fetches social media feeds using the configured page ID and access token.
+     * The results are cached to minimize API usage and improve performance.
+     *
+     * @return the Graph API response containing the latest feed items
+     */
     @Cacheable(value = "metaFeeds")
     @Retryable(
             maxRetries = 2,

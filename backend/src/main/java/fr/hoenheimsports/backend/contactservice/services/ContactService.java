@@ -6,6 +6,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service responsible for managing contact emails.
+ */
 @Service
 @Slf4j
 public class ContactService {
@@ -13,11 +16,23 @@ public class ContactService {
     private final static String ADMINISTRATOR_EMAIL_ADDRESS ="sebastien.burckhardt@hoenheimsports.fr";
 
 
-    // Constructor injection (recommended in 2026)
+    /**
+     * Constructs a new ContactService with the required JavaMailSender.
+     *
+     * @param javaMailSender the Spring mail sender used to dispatch emails
+     */
     public ContactService(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 
+    /**
+     * Formats and sends a contact email to the administrator.
+     *
+     * @param senderEmailAddress    the email address of the person initiating the contact
+     * @param contactMessageSubject the subject line for the email
+     * @param contactMessageContent the main body content of the message
+     * @throws MailServiceException if the email fails to be sent
+     */
     public void sendContactEmail(String senderEmailAddress, String contactMessageSubject, String contactMessageContent) {
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
@@ -25,13 +40,9 @@ public class ContactService {
             simpleMailMessage.setTo(ADMINISTRATOR_EMAIL_ADDRESS);
             simpleMailMessage.setSubject("Email reçu depuis contact : " + contactMessageSubject);
 
-            String formattedEmailContent = STR."""
-                Expéditeur : \{senderEmailAddress}
-                Sujet : \{contactMessageSubject}
-
-                Message :
-                \{contactMessageContent}
-                """;
+            String formattedEmailContent = "Expéditeur : " + senderEmailAddress + "\n" +
+                    "Sujet : " + contactMessageSubject + "\n\n" +
+                    "Message :\n" + contactMessageContent;
             simpleMailMessage.setText(formattedEmailContent);
 
             this.javaMailSender.send(simpleMailMessage);

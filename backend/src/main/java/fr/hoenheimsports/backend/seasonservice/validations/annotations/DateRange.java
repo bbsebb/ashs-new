@@ -6,17 +6,31 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
-@Target({ ElementType.TYPE }) // C'est ici que la magie opère pour viser le DTO entier
+/**
+ * Constraint annotation for validating that a start date is before an end date within a class.
+ */
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = DateRangeValidator.class) // On lie l'annotation au validateur
+@Constraint(validatedBy = DateRangeValidator.class)
 @Documented
 public @interface DateRange {
     String message() default "La date de début doit être avant la date de fin";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
-    String startDate(); // Nom du premier champ
-    String endDate(); // Nom du second champ
+    /**
+     * The name of the field representing the start date.
+     *
+     * @return start date field name
+     */
+    String startDate();
+
+    /**
+     * The name of the field representing the end date.
+     *
+     * @return end date field name
+     */
+    String endDate();
 
     @Target({ ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)

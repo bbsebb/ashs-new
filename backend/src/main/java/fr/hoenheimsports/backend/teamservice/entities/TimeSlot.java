@@ -14,7 +14,7 @@ public record TimeSlot(
         LocalTime endTime
 ) {
     public TimeSlot {
-        if (startTime.isAfter(endTime)) {
+        if (!startTime.isBefore(endTime)) {
             throw new InvalidTimeSlotException("L'heure de début doit être avant l'heure de fin");
         }
     }

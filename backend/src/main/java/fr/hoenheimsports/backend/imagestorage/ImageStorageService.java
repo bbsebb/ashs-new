@@ -19,6 +19,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Service providing functionality to store and delete image files on the local filesystem.
+ * Handles validation of image types and file name sanitization.
+ */
 @Slf4j
 @Service
 public class ImageStorageService {
@@ -27,6 +31,13 @@ public class ImageStorageService {
 
     private static final String FILE_NAME_SEPARATOR = "_";
 
+    /**
+     * Validates and saves an image file to the storage directory.
+     *
+     * @param file the MultipartFile received from the request
+     * @return the unique file name assigned to the stored image
+     * @throws ImageUploadException if the file is invalid or if saving fails
+     */
     public String saveImage(MultipartFile file) {
         try {
             validateImage(file);
@@ -36,7 +47,7 @@ public class ImageStorageService {
                 Files.createDirectories(uploadPath);
             }
 
-            String originalFilename = Objects.requireNonNull(file.getOriginalFilename(), "originalFilename doit être non-null après validateImage()");
+            String originalFilename = Objects.requireNonNull(file.getOriginalFilename(), "originalFilename must be non-null after validateImage()");
             String fileName = buildStoredFileName(originalFilename);
 
             Path filePath = uploadPath.resolve(fileName);
@@ -44,18 +55,23 @@ public class ImageStorageService {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             return fileName;
         } catch (IOException e) {
-            log.error("Erreur lors de l'envoi du fichier : {}", e.getMessage());
-            throw new ImageUploadException("Erreur inconnue lors de l'envoi du fichier");
+            log.error("Error during file upload: {}", e.getMessage());
+            throw new ImageUploadException("Unknown error occurred during file upload");
         }
     }
 
+    /**
+     * Deletes an image file from the storage directory.
+     *
+     * @param fileName the name of the file to delete
+     */
     public void deleteImage(String fileName) {
         try {
             Path uploadPath = Paths.get(uploadDir);
             Path filePath = uploadPath.resolve(fileName);
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
-            log.error("Erreur lors de la suppression du fichier : {}", e.getMessage());
+            log.error("Error during file deletion: {}", e.getMessage());
         }
     }
 
@@ -64,7 +80,6 @@ public class ImageStorageService {
         return UUID.randomUUID() + FILE_NAME_SEPARATOR + cleanedOriginalFilename;
     }
 
-    // Helpers privés
     private boolean isImageContentType(@Nullable String contentType) {
         if (contentType == null) {
             return false;
@@ -77,22 +92,22 @@ public class ImageStorageService {
 
     private void validateImage(MultipartFile file) throws IOException {
         if (file.isEmpty() || file.getOriginalFilename() == null) {
-            throw new ImageUploadException("Le fichier envoyé est vide.");
+            throw new ImageUploadException("The uploaded file is empty.");
         }
 
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
         if (originalFilename.contains("..")) {
-            throw new ImageUploadException(STR."Nom de fichier invalide : \"\{originalFilename}\". Le nom ne doit pas contenir de séquences de chemin (ex: \"..\", \"/\", \"\\\").");
+            throw new ImageUploadException("Invalid file name: \"" + originalFilename + "\". Name must not contain path sequences (e.g., \"..\", \"/\", \"\\\").");
         }
 
         String contentType = file.getContentType();
         if (!isImageContentType(contentType)) {
-            throw new ImageUploadException(STR."Type de fichier \{contentType} sont non supporté. Formats acceptés : JPG, PNG, WEBP.");
+            throw new ImageUploadException("File type " + contentType + " is not supported. Supported formats: JPG, PNG, WEBP.");
         }
 
         BufferedImage bi = ImageIO.read(file.getInputStream());
         if (bi == null) {
-            throw new ImageUploadException("Le fichier reçu n'est pas une image valide ou est corrompu.");
+            throw new ImageUploadException("The received file is not a valid image or is corrupted.");
         }
 
     }

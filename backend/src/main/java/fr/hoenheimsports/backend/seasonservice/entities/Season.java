@@ -11,29 +11,44 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * JPA entity representing a sports season with a defined start and end date.
+ */
 @Entity
 @Table(
         name = "season",
         schema = "season_schema",
         check = @CheckConstraint(
         name = "check_timeslot_range",
-        constraint = "start_time < end_time"
+                constraint = "start_date < end_date"
 ))
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
 public class Season {
+    /**
+     * Unique identifier for the season.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    /**
+     * The start date of the season.
+     */
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
+    /**
+     * The end date of the season.
+     */
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    /**
+     * The display name of the season (e.g., "Season 2025 - 2026").
+     */
     @Column(name = "name", nullable = false)
     private String name;
 

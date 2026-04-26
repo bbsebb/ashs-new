@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * REST controller for testing image upload capabilities.
+ */
 @RestController
 @RequestMapping("/images")
 @Slf4j
@@ -17,10 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageController {
     private final ImageStorageService imageService;
 
+    /**
+     * Endpoint to test image uploading.
+     *
+     * @param image the image file to upload
+     * @return a ResponseEntity containing the generated filename
+     */
     @PostMapping(value = "/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createWithMedia(// Spring convertit le JSON en DTO automatiquement si bien configuré
-                                                  @RequestPart("image") MultipartFile image) {
-
+    public ResponseEntity<String> createWithMedia(@RequestPart("image") MultipartFile image) {
         return ResponseEntity.ok(imageService.saveImage(image));
     }
 }

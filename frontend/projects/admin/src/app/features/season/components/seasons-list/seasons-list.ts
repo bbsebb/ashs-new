@@ -73,6 +73,7 @@ export class SeasonsList {
   protected onDelete(id: string) {
     this._seasonsStore.deleteById(id).subscribe({
       next: () => this._notificationService.show("Saison supprimée avec succès", 'success'),
+      //TODO : Handle error notification
       error: (_) => this._notificationService.show("Erreur lors de la suppression de la saison", 'error'),
     });
   }

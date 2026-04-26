@@ -1,12 +1,15 @@
 package fr.hoenheimsports.backend.seasonservice.services;
 
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonCreateRequest;
-import fr.hoenheimsports.backend.seasonservice.dtos.SeasonUpdateRequest;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonResponse;
+import fr.hoenheimsports.backend.seasonservice.dtos.SeasonUpdateRequest;
+import fr.hoenheimsports.backend.seasonservice.entities.Season;
+import fr.hoenheimsports.backend.seasonservice.exceptions.SeasonInUseException;
 import fr.hoenheimsports.backend.seasonservice.mappers.SeasonMapper;
 import fr.hoenheimsports.backend.seasonservice.repositories.SeasonRepository;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import fr.hoenheimsports.backend.shared.exceptions.RangeDateException;
+import fr.hoenheimsports.backend.teamservice.TeamAPI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.UUID;
 public class SeasonService {
     private final SeasonRepository seasonRepository;
     private final SeasonMapper seasonMapper;
+    private final TeamAPI teamAPI;
 
     public List<SeasonResponse> getAllSeasons() {
         log.debug("Appel de getAllSeasons");
@@ -34,9 +38,17 @@ public class SeasonService {
 
     public void deleteById(UUID uuid) {
         log.debug("Tentative de suppression de la saison avec l'ID : {}", uuid);
-        var hall = seasonRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La salle n'a pas été trouvé ou n'existe plus."));
-        seasonRepository.delete(hall);
+        var season = seasonRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La salle n'a pas été trouvé ou n'existe plus."));
+        assertSeasonHasNoAssociations(season);
+        seasonRepository.delete(season);
         log.info("Saison supprimée : {}", uuid);
+    }
+
+    private void assertSeasonHasNoAssociations(Season season) {
+        int numberOfTeamBySeason = this.teamAPI.findTeamUUIDBySeasonUUID(season.getId()).size();
+        if (numberOfTeamBySeason > 0) {
+            throw new SeasonInUseException("La saison est utilisée par des équipes et ne peut pas être supprimée");
+        }
     }
 
     public SeasonResponse createSeason(SeasonCreateRequest seasonCreateRequest) {

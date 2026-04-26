@@ -10,4 +10,6 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
 
 
     List<Team> findDistinctByStaffs_StaffId(UUID staffId);
+
+    List<Team> findAllBySeasonId(UUID seasonId);
 }

@@ -1,6 +1,6 @@
 @let viewModel = seasonCardViewModelSignal();
 @if(isLoadingSignal()) {
-  <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement de la salle"/>
 } @else if (errorSignal()) {
   <app-error-data dataName="saisons" (onRetry)="retry()" />
 } @else if (!viewModel) {

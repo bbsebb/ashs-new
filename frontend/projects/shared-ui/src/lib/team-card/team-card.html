@@ -11,7 +11,7 @@
     } @else {
       <div class="photo-placeholder">
         <mat-icon>groups</mat-icon>
-        <span>Pas de photo d'équipe</span>
+        <span>Photo d'équipe bientôt disponible</span>
       </div>
     }
 
@@ -50,7 +50,7 @@
     <section class="info-section">
       <h3 class="section-title">
         <mat-icon>person</mat-icon>
-        Staff
+        Encadrement
       </h3>
       @if (viewModel.staffs.length > 0) {
         <div class="staff-list">
@@ -61,7 +61,7 @@
           }
         </div>
       } @else {
-        <p class="empty-state">No staff assigned</p>
+        <p class="empty-state">Aucun encadrant n'a encore été ajouté</p>
       }
     </section>
 
@@ -71,7 +71,7 @@
     <section class="info-section">
       <h3 class="section-title">
         <mat-icon>event</mat-icon>
-        Training Sessions
+        Entraînement
       </h3>
       @if (viewModel.trainingSessions.length > 0) {
         <div class="session-list">
@@ -82,7 +82,7 @@
           }
         </div>
       } @else {
-        <p class="empty-state">No sessions scheduled</p>
+        <p class="empty-state">Aucun entrainement n'a encore été ajouté</p>
       }
     </section>
   </mat-card-content>

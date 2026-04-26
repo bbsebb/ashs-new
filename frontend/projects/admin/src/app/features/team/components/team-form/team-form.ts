@@ -12,6 +12,7 @@ import {
   FormFieldErrorDirective,
   FormSubmitButton,
   GenderPipe,
+  ImagePreview,
   PageTitle,
   TeamCard
 } from '@shared-ui';
@@ -22,7 +23,6 @@ import {MatDivider} from '@angular/material/list';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
-import {NgOptimizedImage} from '@angular/common';
 import {TeamFormService} from '../../services/team-form.service';
 import {TeamStaffFields} from './team-staff-fields/team-staff-fields';
 import {TeamTrainingSessionFields} from './team-training-session-fields/team-training-session-fields';
@@ -41,15 +41,16 @@ import {TeamTrainingSessionFields} from './team-training-session-fields/team-tra
     PageTitle,
     FormFieldErrorDirective,
     TeamCard,
+    ImagePreview,
     MatDivider,
     FormDeleteButton,
     ImageCropper,
     ImageCropperPreview,
-    NgOptimizedImage,
     GenderPipe,
     FormRoot,
     TeamStaffFields,
-    TeamTrainingSessionFields
+    TeamTrainingSessionFields,
+    ImagePreview
   ],
   templateUrl: './team-form.html',
   styleUrl: './team-form.scss',
@@ -64,6 +65,12 @@ export class TeamForm {
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
+
+  /** URL signal for the existing photo, returns null if no filename exists. */
+  existingPhotoUrlSignal = computed(() => {
+    const fileName = this.teamFormService.teamSignal()?.photoFileName;
+    return fileName ? this._imageService.createImageSourceUrl(fileName) : null;
+  });
 
   teamCardViewModelSignal = computed(() => {
     const preview = this.teamFormService.teamPreviewSignal();

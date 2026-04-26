@@ -1,0 +1,21 @@
+@if (imageUrlInputSignal(); as url) {
+  <img
+    class="image-preview"
+    [class.is-circular]="isCircularInputSignal()"
+    [ngSrc]="url"
+    [height]="heightInputSignal()"
+    [width]="widthInputSignal()"
+    [alt]="altInputSignal()"
+    priority
+  />
+} @else {
+  <div
+    class="image-error"
+    [class.is-circular]="isCircularInputSignal()"
+    [style.width.px]="widthInputSignal()"
+    [style.height.px]="heightInputSignal()"
+  >
+    <mat-icon color="error">error</mat-icon>
+    <span>{{ errorLabelInputSignal() }}</span>
+  </div>
+}

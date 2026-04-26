@@ -1,6 +1,6 @@
 @let viewModel = staffCardViewModelSignal();
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement de l'encadrant" [isLoading]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement de l'encadrant"/>
 } @else if (errorSignal()) {
   <app-error-data dataName="encadrants" (onRetry)="retry()"/>
 } @else if (!viewModel) {

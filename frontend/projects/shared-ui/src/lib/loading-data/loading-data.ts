@@ -14,8 +14,6 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
   styleUrl: './loading-data.scss',
 })
 export class LoadingData {
-  /** Visibility state. */
-  isLoadingInputSignal = input<boolean>(true, {alias: 'isLoading'});
   /** Text message to display below the spinner. */
   labelInputSignal = input<string>('Téléchargement des données…', {alias: 'label'});
 }

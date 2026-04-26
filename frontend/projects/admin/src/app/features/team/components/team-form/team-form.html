@@ -82,10 +82,12 @@
     </div>
     @if (teamFormService.showExistingPhotoSignal()) {
       <div class="image-preview-container">
-        <img class="image-preview" [ngSrc]="createImageSourceUrl(teamFormService.teamSignal()?.photoFileName)"
-             [height]="PHOTO_HEIGHT"
-             [width]="PHOTO_WIDTH"
-             alt="avatar" priority/>
+        <app-image-preview
+          [imageUrl]="existingPhotoUrlSignal()"
+          [height]="PHOTO_HEIGHT"
+          [width]="PHOTO_WIDTH"
+          alt="photo d'équipe"
+        />
         <app-form-delete-button
           [confirmMessage]="'Êtes-vous sûr de vouloir supprimer la photo d\'équipe ?'"
           [iconOnly]="!isHandsetSignal()"

@@ -1,6 +1,6 @@
 <app-public-page-container title="Encadrement">
   @if (isLoadingSignal()) {
-    <app-loading-data label="Chargement de l'encadrement" [isLoading]="isLoadingSignal()"/>
+    <app-loading-data label="Chargement de l'encadrement"/>
   } @else if (errorSignal()) {
     <app-error-data dataName="encadrants" (onRetry)="retry()"/>
   } @else {

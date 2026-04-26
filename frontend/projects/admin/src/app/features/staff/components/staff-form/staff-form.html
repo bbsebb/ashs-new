@@ -60,10 +60,13 @@
       @if (staffFormService.showExistingAvatarSignal()) {
         <!-- Display Existing Avatar with Option to Delete/Replace -->
         <div class="image-preview-container">
-          <img class="image-preview" [ngSrc]="createImageSourceUrl(staffFormService.staffSignal()?.avatarFileName)"
-               [height]="PHOTO_HEIGHT"
-               [width]="PHOTO_WIDTH"
-               alt="avatar" priority/>
+        <app-image-preview
+          [imageUrl]="existingAvatarUrlSignal()"
+          [height]="PHOTO_HEIGHT"
+          [width]="PHOTO_WIDTH"
+          [isCircular]="true"
+          alt="avatar"
+        />
           <app-form-delete-button
             [confirmMessage]="'Êtes-vous sûr de vouloir supprimer la photo ?'"
             [iconOnly]="!isHandsetSignal()"

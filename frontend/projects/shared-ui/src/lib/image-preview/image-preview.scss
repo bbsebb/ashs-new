@@ -1,35 +1,39 @@
-.image-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
 }
 
-.image-preview-container {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 16px 0;
+.image-preview {
+  object-fit: cover;
+  border-radius: var(--mat-sys-corner-medium);
 }
 
 .image-error {
-  width: 100px;
-  height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: var(--mat-sys-error-container);
   color: var(--mat-sys-on-error-container);
-  border-radius: 50%;
+  border-radius: var(--mat-sys-corner-medium);
   gap: 4px;
   font: var(--mat-sys-label-small);
   text-align: center;
   padding: 8px;
+  border: 1px dashed var(--mat-sys-error);
 
   mat-icon {
     font-size: 24px;
     width: 24px;
     height: 24px;
+  }
+}
+
+.is-circular {
+  border-radius: 50%;
+
+  .image-preview, .image-error {
+    border-radius: 50%;
   }
 }

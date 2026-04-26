@@ -6,13 +6,19 @@ import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import {BreakpointService, FormFieldErrorDirective, FormSubmitButton, PageTitle, StaffCard} from '@shared-ui';
+import {
+  BreakpointService,
+  FormFieldErrorDirective,
+  FormSubmitButton,
+  ImagePreview,
+  PageTitle,
+  StaffCard
+} from '@shared-ui';
 import {ImageService} from '@shared-api';
 import {Router} from '@angular/router';
 import {ImageCropper} from '../../../../shared/image-cropper/image-cropper';
 import {ImageCropperPreview} from '../../../../shared/image-cropper/image-cropper-preview/image-cropper-preview';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
-import {NgOptimizedImage} from '@angular/common';
 import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {StaffFormService} from '../../services/staff-form.service';
 
@@ -28,12 +34,13 @@ import {StaffFormService} from '../../services/staff-form.service';
     PageTitle,
     FormFieldErrorDirective,
     StaffCard,
+    ImagePreview,
     ImageCropper,
     ImageCropperPreview,
     FormDeleteButton,
-    NgOptimizedImage,
     MatDialogModule,
-    FormRoot
+    FormRoot,
+    ImagePreview
   ],
   templateUrl: './staff-form.html',
   styleUrl: './staff-form.scss',
@@ -49,6 +56,12 @@ export class StaffForm {
 
   isHandsetSignal = this._breakpointService.isHandsetSignal;
   idInputSignal = input<string | undefined>(undefined, {alias: 'id'});
+
+  /** URL signal for the existing avatar, returns null if no filename exists. */
+  existingAvatarUrlSignal = computed(() => {
+    const fileName = this.staffFormService.staffSignal()?.avatarFileName;
+    return fileName ? this._imageService.createImageSourceUrl(fileName) : null;
+  });
 
   staffCardViewModelSignal = computed(() => {
     const staff = this.staffFormService.staffPreviewSignal();

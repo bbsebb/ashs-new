@@ -1,6 +1,6 @@
 @let hallCardViewModel = hallCardViewModelSignal();
 @if (isLoadingSignal()) {
-  <app-loading-data label="Chargement de la salle" [isLoading]="isLoadingSignal()"/>
+  <app-loading-data label="Chargement de la salle"/>
 } @else if (errorSignal()) {
   <app-error-data dataName="salles" (onRetry)="retry()"/>
 } @else if (!hallCardViewModel) {

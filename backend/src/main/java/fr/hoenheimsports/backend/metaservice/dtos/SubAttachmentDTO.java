@@ -1,4 +1,4 @@
-package fr.hoenheimsports.backend.metaservice.dto;
+package fr.hoenheimsports.backend.metaservice.dtos;
 
 /**
  * Représente une sous-pièce jointe (par exemple, une photo ou une vidéo dans un album).

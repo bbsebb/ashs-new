@@ -1,8 +1,7 @@
-package fr.hoenheimsports.backend.metaservice.dto;
+package fr.hoenheimsports.backend.metaservice.dtos;
 
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Représente une publication individuelle dans le flux.

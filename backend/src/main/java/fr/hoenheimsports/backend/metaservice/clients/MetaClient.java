@@ -1,10 +1,7 @@
 package fr.hoenheimsports.backend.metaservice.clients;
 
 
-import fr.hoenheimsports.backend.metaservice.dto.GraphApiResponse;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Fallback;
-import org.springframework.resilience.annotation.Retryable;
+import fr.hoenheimsports.backend.metaservice.dtos.GraphApiResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;

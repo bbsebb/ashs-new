@@ -1,4 +1,4 @@
-package fr.hoenheimsports.backend.metaservice.dto;
+package fr.hoenheimsports.backend.metaservice.dtos;
 
 import java.util.List;
 

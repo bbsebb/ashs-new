@@ -1,6 +1,6 @@
 package fr.hoenheimsports.backend.metaservice.controllers;
 
-import fr.hoenheimsports.backend.metaservice.dto.GraphApiResponse;
+import fr.hoenheimsports.backend.metaservice.dtos.GraphApiResponse;
 import fr.hoenheimsports.backend.metaservice.services.MetaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

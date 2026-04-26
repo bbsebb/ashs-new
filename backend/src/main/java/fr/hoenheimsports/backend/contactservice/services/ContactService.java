@@ -24,10 +24,14 @@ public class ContactService {
             simpleMailMessage.setFrom(senderEmailAddress);
             simpleMailMessage.setTo(ADMINISTRATOR_EMAIL_ADDRESS);
             simpleMailMessage.setSubject("Email reçu depuis contact : " + contactMessageSubject);
-            
-            String formattedEmailContent = "Expéditeur : " + senderEmailAddress + "\n" +
-                                          "Sujet : " + contactMessageSubject + "\n\n" +
-                                          "Message :\n" + contactMessageContent;
+
+            String formattedEmailContent = STR."""
+                Expéditeur : \{senderEmailAddress}
+                Sujet : \{contactMessageSubject}
+
+                Message :
+                \{contactMessageContent}
+                """;
             simpleMailMessage.setText(formattedEmailContent);
 
             this.javaMailSender.send(simpleMailMessage);

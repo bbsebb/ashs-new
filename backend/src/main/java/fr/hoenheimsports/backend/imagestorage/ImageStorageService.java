@@ -82,12 +82,12 @@ public class ImageStorageService {
 
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
         if (originalFilename.contains("..")) {
-            throw new ImageUploadException("Nom de fichier invalide : \"" + originalFilename + "\". ) ;Le nom ne doit pas contenir de séquences de chemin (ex: \"..\", \"/\", \"\\\").");
+            throw new ImageUploadException(STR."Nom de fichier invalide : \"\{originalFilename}\". Le nom ne doit pas contenir de séquences de chemin (ex: \"..\", \"/\", \"\\\").");
         }
 
         String contentType = file.getContentType();
         if (!isImageContentType(contentType)) {
-            throw new ImageUploadException("Type de fichier %s sont non supporté. Formats acceptés : JPG, PNG, WEBP.".formatted(contentType));
+            throw new ImageUploadException(STR."Type de fichier \{contentType} sont non supporté. Formats acceptés : JPG, PNG, WEBP.");
         }
 
         BufferedImage bi = ImageIO.read(file.getInputStream());

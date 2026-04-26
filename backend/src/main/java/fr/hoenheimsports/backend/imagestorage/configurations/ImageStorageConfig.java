@@ -15,6 +15,6 @@ public class ImageStorageConfig implements WebMvcConfigurer {
         // Mappe l'URL http://localhost:8080/uploads/mon-fichier.jpg
         // Vers le dossier physique "uploads/"
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadDir + "/");
+                .addResourceLocations(STR."file:\{uploadDir}/");
     }
 }

@@ -1,12 +1,10 @@
 package fr.hoenheimsports.backend.metaservice.services;
 
 import fr.hoenheimsports.backend.metaservice.clients.MetaClient;
-import fr.hoenheimsports.backend.metaservice.dto.GraphApiResponse;
+import fr.hoenheimsports.backend.metaservice.dtos.GraphApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;

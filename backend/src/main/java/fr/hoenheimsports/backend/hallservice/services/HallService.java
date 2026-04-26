@@ -47,7 +47,7 @@ public class HallService {
 
     public HallResponse updateHall(UUID id, HallUpdateRequest hallUpdateRequest) {
         log.debug("Tentative de mise à jour de la salle avec le nom: {}", hallUpdateRequest.name());
-        Hall hall = hallRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("La salle avec le nom -" + hallUpdateRequest.name() + "- n'a pas été trouvé ou n'existe plus."));
+        Hall hall = hallRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(STR."La salle avec le nom -\{hallUpdateRequest.name()}- n'a pas été trouvé ou n'existe plus."));
         hall.setName(hallUpdateRequest.name());
         hall.getAddress().setStreet(hallUpdateRequest.addressStreet());
         hall.getAddress().setCity(hallUpdateRequest.addressCity());

@@ -36,7 +36,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -127,7 +129,7 @@ class TeamControllerTest {
         @Test
         void shouldReturn200AndManyTeams_WithinTimeLimit() {
             List<TeamReponseDTO> manyTeams = IntStream.range(0, 100)
-                    .mapToObj(_ -> new TeamReponseDTO(UUID.randomUUID(), UUID.randomUUID(), Gender.Male, null, null, Collections.emptyList(), Collections.emptyList()))
+                    .mapToObj(i -> new TeamReponseDTO(UUID.randomUUID(), UUID.randomUUID(), Gender.Male, null, null, Collections.emptyList(), Collections.emptyList()))
                     .toList();
             when(teamService.getAllTeams()).thenReturn(manyTeams);
 
@@ -179,7 +181,8 @@ class TeamControllerTest {
                             .file(dataPart)
                             .header("Authorization", "Bearer token"))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.title").value("Erreur de validation"));
+                    .andExpect(jsonPath("$.title").value("Erreur de validation"))
+                    .andExpect(jsonPath("$.fieldErrors.size()").value(expectedErrors.size()));
 
             for (var entry : expectedErrors.entrySet()) {
                 result.andExpect(jsonPath("$.fieldErrors['" + entry.getKey() + "']").value(entry.getValue()));

@@ -33,12 +33,15 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(AgeGroupController.class)
 @Import(SecurityConfig.class)
 @ActiveProfiles("test")
+@SuppressWarnings("DataFlowIssue")
 class AgeGroupControllerTest {
 
     @Autowired
@@ -177,7 +180,9 @@ class AgeGroupControllerTest {
                     .jsonPath("$.title").isEqualTo("Erreur de validation")
                     .jsonPath("$.fieldErrors.size()").isEqualTo(expectedErrors.size());
 
-            expectedErrors.forEach((field, message) -> bodySpec.jsonPath("$.fieldErrors['" + field + "']").isEqualTo(message));
+            for (var entry : expectedErrors.entrySet()) {
+                bodySpec.jsonPath("$.fieldErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+            }
         }
     }
 
@@ -240,7 +245,9 @@ class AgeGroupControllerTest {
                     .jsonPath("$.title").isEqualTo("Erreur de validation")
                     .jsonPath("$.fieldErrors.size()").isEqualTo(expectedErrors.size());
 
-            expectedErrors.forEach((field, message) -> bodySpec.jsonPath("$.fieldErrors['" + field + "']").isEqualTo(message));
+            for (var entry : expectedErrors.entrySet()) {
+                bodySpec.jsonPath("$.fieldErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+            }
         }
     }
 

@@ -186,7 +186,8 @@ class StaffControllerTest {
                             .file(staffPart)
                             .header("Authorization", "Bearer token"))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.title").value("Erreur de validation"));
+                    .andExpect(jsonPath("$.title").value("Erreur de validation"))
+                    .andExpect(jsonPath("$.fieldErrors.size()").value(expectedErrors.size()));
 
             for (var entry : expectedErrors.entrySet()) {
                 result.andExpect(jsonPath("$.fieldErrors['" + entry.getKey() + "']").value(entry.getValue()));

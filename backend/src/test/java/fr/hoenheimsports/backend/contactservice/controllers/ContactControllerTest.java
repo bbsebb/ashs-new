@@ -19,7 +19,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -29,6 +28,7 @@ import static org.mockito.Mockito.doNothing;
 @WebMvcTest(controllers = ContactController.class)
 @Import(SecurityConfig.class)
 @ActiveProfiles("test")
+@SuppressWarnings("DataFlowIssue")
 class ContactControllerTest {
 
     @Autowired
@@ -63,26 +63,29 @@ class ContactControllerTest {
 
         @ParameterizedTest
         @MethodSource("fr.hoenheimsports.backend.contactservice.controllers.ContactControllerTest#invalidContactRequests")
-        void shouldReturn400AndSpecificFieldErrors_WhenInvalidRequest(ContactRequest request, List<String> expectedFields, Map<String, String> expectedErrors) {
+        void shouldReturn400AndSpecificFieldErrors_WhenInvalidRequest(ContactRequest request, Map<String, String> expectedErrors) {
             var bodySpec = restTestClient.post().uri("/api/v1/contact/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .exchange()
                     .expectStatus().isBadRequest()
                     .expectBody()
-                    .jsonPath("$.title").isEqualTo("Erreur de validation");
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors.size()").isEqualTo(expectedErrors.size());
 
-            expectedErrors.forEach((field, message) -> bodySpec.jsonPath("$.fieldErrors['" + field + "']").isEqualTo(message));
+            for (var entry : expectedErrors.entrySet()) {
+                bodySpec.jsonPath("$.fieldErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+            }
         }
     }
 
     static Stream<Arguments> invalidContactRequests() {
         return Stream.of(
-                Arguments.of(new ContactRequest("invalid-email", "Subject", "Content that is long enough"), List.of("from"), Map.of("from", "L'adresse e-mail est invalide")),
-                Arguments.of(new ContactRequest("test@example.com", "Sub", "Content that is long enough"), List.of("subject"), Map.of("subject", "Le sujet doit contenir entre 5 et 100 caractères")),
-                Arguments.of(new ContactRequest("test@example.com", "Subject", "Short"), List.of("content"), Map.of("content", "Le message doit contenir entre 10 et 2000 caractères")),
+                Arguments.of(new ContactRequest("invalid-email", "Subject", "Content that is long enough"), Map.of("from", "L'adresse e-mail est invalide")),
+                Arguments.of(new ContactRequest("test@example.com", "Sub", "Content that is long enough"), Map.of("subject", "Le sujet doit contenir entre 5 et 100 caractères")),
+                Arguments.of(new ContactRequest("test@example.com", "Subject", "Short"), Map.of("content", "Le message doit contenir entre 10 et 2000 caractères")),
                 // Multiple errors
-                Arguments.of(new ContactRequest("invalid", "S", "C"), List.of("from", "subject", "content"), Map.of(
+                Arguments.of(new ContactRequest("invalid", "S", "C"), Map.of(
                         "from", "L'adresse e-mail est invalide",
                         "subject", "Le sujet doit contenir entre 5 et 100 caractères",
                         "content", "Le message doit contenir entre 10 et 2000 caractères"

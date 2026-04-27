@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.shared.configurations;
 
+import fr.hoenheimsports.backend.shared.configurations.test.SecurityTestController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,9 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.RestTestClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,9 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@WebMvcTest(SecurityConfigTest.SecurityTestController.class)
+@WebMvcTest(SecurityTestController.class)
 @Import(SecurityConfig.class)
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "test-security"})
 class SecurityConfigTest {
 
     @Autowired
@@ -79,7 +77,6 @@ class SecurityConfigTest {
                     .toList();
 
             // Assert
-            // On vérifie que nos rôles sont bien présents (d'autres autorités comme FACTOR_BEARER peuvent être ajoutées par Spring)
             assertThat(authorities).contains("ROLE_USER", "ROLE_ADMIN");
         }
 
@@ -106,13 +103,15 @@ class SecurityConfigTest {
     class AccessControlRules {
         @Test
         void actuator_ShouldBePublic() {
-            restTestClient.get().uri("/actuator/health")
+            // /actuator/** is permitAll in SecurityConfig
+            restTestClient.get().uri("/test-security/actuator/health")
                     .exchange()
                     .expectStatus().isOk();
         }
 
         @Test
         void contactSend_ShouldBePublic() {
+            // POST /api/v1/contact/send is permitAll in SecurityConfig
             restTestClient.post().uri("/api/v1/contact/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{}")
@@ -122,14 +121,16 @@ class SecurityConfigTest {
 
         @Test
         void anyGetRequest_ShouldBePublic() {
-            restTestClient.get().uri("/api/v1/any-random-resource")
+            // GET /** is permitAll in SecurityConfig
+            restTestClient.get().uri("/test-security/public")
                     .exchange()
                     .expectStatus().isOk();
         }
 
         @Test
-        void anyPostRequest_ShouldBeProtected() {
-            restTestClient.post().uri("/api/v1/protected-resource")
+        void protectedPostRequest_ShouldBeProtected() {
+            // Other requests are authenticated()
+            restTestClient.post().uri("/test-security/protected")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{}")
                     .exchange()
@@ -137,8 +138,8 @@ class SecurityConfigTest {
         }
 
         @Test
-        void anyPostRequest_ShouldBeAccessible_WhenAuthenticated() {
-            authRestTestClient.post().uri("/api/v1/protected-resource")
+        void protectedPostRequest_ShouldBeAccessible_WhenAuthenticated() {
+            authRestTestClient.post().uri("/test-security/protected")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{}")
                     .exchange()
@@ -150,35 +151,12 @@ class SecurityConfigTest {
     class CorsConfiguration {
         @Test
         void shouldIncludeCorsHeaders_OnPublicOptionsRequest() {
-            // Note: les origines autorisées dépendent de application-test.yml ou SecurityConfig
             restTestClient.options().uri("/api/v1/contact/send")
                     .header("Origin", "http://localhost:4200")
                     .header("Access-Control-Request-Method", "POST")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().exists("Access-Control-Allow-Origin");
-        }
-    }
-
-    /**
-     * Contrôleur de test minimal pour vérifier les règles de sécurité sans charger les services métier.
-     */
-    @RestController
-    static class SecurityTestController {
-        @GetMapping("/actuator/health")
-        void health() {
-        }
-
-        @PostMapping("/api/v1/contact/send")
-        void sendContact() {
-        }
-
-        @GetMapping("/api/v1/any-random-resource")
-        void publicGet() {
-        }
-
-        @PostMapping("/api/v1/protected-resource")
-        void protectedPost() {
         }
     }
 }

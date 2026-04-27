@@ -1,7 +1,5 @@
 package fr.hoenheimsports.backend.hallservice.dtos;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.UUID;

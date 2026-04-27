@@ -44,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(StaffController.class)
 @Import(SecurityConfig.class)
 @ActiveProfiles("test")
-@SuppressWarnings("DataFlowIssue")
 class StaffControllerTest {
 
     @Autowired

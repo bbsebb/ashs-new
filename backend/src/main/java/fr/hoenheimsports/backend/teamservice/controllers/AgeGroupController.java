@@ -1,9 +1,10 @@
 package fr.hoenheimsports.backend.teamservice.controllers;
 
-import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
 import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupCreateRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
 import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.services.AgeGroupService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +24,12 @@ public class AgeGroupController {
     }
 
     @PostMapping
-    public ResponseEntity<AgeGroupResponseDTO> createAgeGroup(@RequestBody AgeGroupCreateRequest ageGroupCreateRequest) {
+    public ResponseEntity<AgeGroupResponseDTO> createAgeGroup(@Valid @RequestBody AgeGroupCreateRequest ageGroupCreateRequest) {
         return ResponseEntity.ok(ageGroupService.createAgeGroup(ageGroupCreateRequest));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AgeGroupResponseDTO> updateAgeGroup(@PathVariable UUID id, @RequestBody AgeGroupUpdateRequest ageGroupUpdateRequest) {
+    public ResponseEntity<AgeGroupResponseDTO> updateAgeGroup(@PathVariable UUID id, @Valid @RequestBody AgeGroupUpdateRequest ageGroupUpdateRequest) {
         return ResponseEntity.ok(ageGroupService.updateAgeGroup(id, ageGroupUpdateRequest));
     }
 

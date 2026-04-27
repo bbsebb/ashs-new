@@ -25,41 +25,142 @@ Spring Boot 4.0+).
 ## Modern Testing with RestTestClient
 
 Always use `RestTestClient` for testing web layers, following the pattern of initializing it in a `@BeforeEach` method.
+The minimum level of binding required is `RestTestClient.bindTo(mockMvc)` to ensure security and web layers are properly
+tested together.
 
 ### 1. Web Slice Tests (@WebMvcTest)
 
-Bind to `MockMvc` to test controller logic, validation, and security.
+Bind to `MockMvc` to test controller logic, validation, and security in a single class. Use `@Nested` to organize tests
+and `@MockitoBean` for mocks.
+
+#### Security Mocking
+
+Do **not** exclude security configuration. Instead, mock the `JwtDecoder` and simulate authentication by adding an
+`Authorization: Bearer token` header.
 
 ```java
 @WebMvcTest(MyController.class)
+@Import(SecurityConfig.class)
+@ActiveProfiles("test")
 class MyControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    private RestTestClient restTestClient;
+   @MockitoBean
+   private JwtDecoder jwtDecoder;
+
+   private RestTestClient restTestClient; // anonymous
+   private RestTestClient authRestTestClient; // authenticated
 
     @BeforeEach
     void setUp() {
         this.restTestClient = RestTestClient.bindTo(mockMvc).build();
-    }
+       this.authRestTestClient = RestTestClient.bindTo(mockMvc)
+               .defaultHeader("Authorization", "Bearer token")
+               .build();
 
-    @Test
-    void shouldReturnData() {
-        restTestClient.get().uri("/api/data")
+       Jwt jwt = Jwt.withTokenValue("token")
+               .header("alg", "none")
+               .claim("sub", "user")
+               .claim("realm_access", Map.of("roles", List.of("ADMIN")))
+               .issuedAt(Instant.now())
+               .expiresAt(Instant.now().plusSeconds(3600))
+               .build();
+
+       when(jwtDecoder.decode(anyString())).thenReturn(jwt);
+    }
+}
+```
+
+#### Exhaustive Exception Handling Testing
+
+When testing error scenarios (e.g., entity not found, validation error):
+
+1. **Status & Body**: Verify the HTTP status **and** the response body (standard `ProblemDetail`).
+2. **Error Message**: Verify that the `detail` field in the `ProblemDetail` matches the message thrown by the service or
+   the validation error.
+3. **Validation Errors**: For 400 Bad Request, verify the `fieldErrors` map in the `ProblemDetail`.
+
+```java
+
+@Test
+void shouldReturn404_WhenEntityNotFound() {
+   String errorMessage = "Item not found";
+   when(service.getById(any())).thenThrow(new EntityNotFoundException(errorMessage));
+
+   restTestClient.get().uri("/api/v1/items/{id}", UUID.randomUUID())
+           .exchange()
+           .expectStatus().isNotFound()
+           .expectBody()
+           .jsonPath("$.title").isEqualTo("L'entité n'a pas été trouvée")
+           .jsonPath("$.detail").isEqualTo(errorMessage);
+}
+```
+
+#### Exhaustive Creation & Update Testing
+
+For endpoints creating or updating resources (POST/PUT):
+
+1. **Field-by-Field Verification**: Verify **every single field** of the response DTO via `jsonPath` to ensure the
+   mapping is correct.
+2. **Security**: Test both authenticated (success) and anonymous (401) access.
+3. **Validation**: Use `@ParameterizedTest` to test all validation constraints. The parameters should include the *
+   *expected failing fields**. Also, add a test case with **multiple invalid fields** to ensure the `fieldErrors` map
+   contains all of them.
+
+```java
+
+@ParameterizedTest
+@MethodSource("invalidRequests")
+void shouldReturn400AndSpecificFields_WhenInvalid(ItemRequest request, List<String> expectedFields) {
+   restTestClient.post().uri("/api/v1/items")
+           .body(request)
+           .exchange()
+           .expectStatus().isBadRequest()
+           .expectBody()
+           .jsonPath("$.fieldErrors.size()").isEqualTo(expectedFields.size());
+
+   for (String field : expectedFields) {
+      restTestClient.expectBody().jsonPath("$.fieldErrors['" + field + "']").exists();
+   }
+}
+```
+
+#### Exhaustive Collection Testing
+
+For endpoints returning lists (GET all):
+
+1. **Empty list**: Verify 200 OK and length 0.
+2. **Single element**: Verify 200 OK, length 1, and **all fields** via `jsonPath`.
+3. **Multiple elements**: Verify 200 OK, length 2, and identify objects via `jsonPath`.
+4. **Load/Performance**: Mock a list of 100 elements and use `assertTimeout(Duration.ofMillis(500), ...)` to verify
+   performance.
+
+```java
+
+@Test
+void shouldReturn200AndListWithOneItem_WhenOneExists() {
+   ItemResponse response = new ItemResponse(UUID.randomUUID(), "Name", "Desc");
+   when(service.getAll()).thenReturn(List.of(response));
+
+   restTestClient.get().uri("/api/v1/items")
             .exchange()
             .expectStatus().isOk()
-            .expectBody().jsonPath("$.name").isEqualTo("Example");
-    }
+           .expectBody()
+           .jsonPath("$.length()").isEqualTo(1)
+           .jsonPath("$[0].name").isEqualTo("Name")
+           .jsonPath("$[0].description").isEqualTo("Desc");
 }
 ```
 
 ### 2. Integration Tests (@SpringBootTest)
 
-Bind to the `ApplicationContext` or a running server.
+Bind to the `ApplicationContext` to test the full stack including security.
 
 ```java
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
+@SpringBootTest
 class MyIntegrationTest {
 
     @Autowired
@@ -76,16 +177,53 @@ class MyIntegrationTest {
 
 ### 3. Unit Tests (Isolated)
 
-Bind directly to the controller instance for maximum speed.
+Pure unit tests (JUnit 6 + Mockito) are reserved **exclusively for pure functions** or business logic without any Spring
+context. For controllers, always use the `WebMvcTest` approach above.
+
+#### Handling Nullability Warnings in Tests
+
+Since the project uses JSpecify `@NullMarked`, passing `null` to mandatory fields in tests may trigger IntelliJ
+warnings.
+
+- **Preferred**: Use a real empty object if possible (e.g., `Collections.emptyList()`).
+- **If needed**: Use `@SuppressWarnings("DataFlowIssue")` at the method or class level to ignore these warnings in test
+  code.
+
+## References
+
+#### Exhaustive Repository Testing (@DataJpaTest)
+
+For repository tests:
+
+1. **CRUD Operations**: Test `save`, `findById`, `findAll`, `delete`, and `existsById`.
+2. **Field-by-Field Verification**: After saving or fetching, verify **every single attribute** of the entity using
+   AssertJ.
+3. **Custom Queries**: Test every custom method defined in the interface with various scenarios (0, 1, multiple
+   results).
+4. **Data Integrity**: Verify that database constraints (unique, not null, check constraints) are enforced by flushing
+   the `EntityManager` or using `saveAndFlush`.
 
 ```java
-class MyControllerUnitTest {
 
-    private RestTestClient restTestClient;
+@DataJpaTest
+@Import(TestcontainersConfiguration.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
+class MyRepositoryTest {
+   @Autowired
+   private MyRepository repository;
 
-    @BeforeEach
-    void setUp() {
-        this.restTestClient = RestTestClient.bindToController(new MyController()).build();
+   @Test
+   void shouldSaveAndVerifyAllFields() {
+      MyEntity entity = new MyEntity();
+      entity.setName("Test");
+      entity.setCount(10);
+
+      MyEntity saved = repository.saveAndFlush(entity);
+
+      assertThat(saved.getId()).isNotNull();
+      assertThat(saved.getName()).isEqualTo("Test");
+      assertThat(saved.getCount()).isEqualTo(10);
     }
 }
 ```

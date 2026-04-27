@@ -10,6 +10,7 @@ import java.time.LocalDate;
  * DTO for {@link fr.hoenheimsports.backend.seasonservice.entities.Season}
  */
 @DateRange(startDate = "startDate", endDate = "endDate")
-public record SeasonCreateRequest(@NotNull LocalDate startDate, @NotNull LocalDate endDate) implements Serializable {
+public record SeasonCreateRequest(@NotNull(message = "La date de début est obligatoire") LocalDate startDate,
+                                  @NotNull(message = "La date de fin est obligatoire") LocalDate endDate) implements Serializable {
 
 }

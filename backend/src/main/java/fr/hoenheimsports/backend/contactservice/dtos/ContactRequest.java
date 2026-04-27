@@ -12,13 +12,13 @@ import jakarta.validation.constraints.Size;
  * @param content the content of the contact message
  */
 public record ContactRequest(
-        @Email
-        @NotBlank
+        @Email(message = "L'adresse e-mail est invalide")
+        @NotBlank(message = "L'adresse e-mail est obligatoire")
         String from,
-        @NotBlank
-        @Size(min = 5, max = 100)
+        @NotBlank(message = "Le sujet est obligatoire")
+        @Size(min = 5, max = 100, message = "Le sujet doit contenir entre 5 et 100 caractères")
         String subject,
-        @NotBlank
-        @Size(min = 10, max = 2000)
+        @NotBlank(message = "Le message est obligatoire")
+        @Size(min = 10, max = 2000, message = "Le message doit contenir entre 10 et 2000 caractères")
         String content) {
 }

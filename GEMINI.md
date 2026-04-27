@@ -100,17 +100,34 @@
       modules).
     - Favorise les événements d'application (`ApplicationEventPublisher`) pour la communication entre modules.
 - **Tests (Standard Spring Boot 4.0) :**
-    - **Exigences :** Les tests doivent être **exhaustifs** (couvrant tous les endpoints, services et cas limites via
-      Boundary Value Analysis).
-    - **Assertions :** Utilise exclusivement **AssertJ** pour sa fluidité et sa puissance.
-    - **Logiciel (Services & Entités) :** Privilégie les tests unitaires purs avec JUnit 6 et Mockito (sans chargement
-      de contexte).
+    - **Exigences :** Les tests doivent être **exhaustifs** (couvrant tous les endpoints, services et cas limites).
+      Utilise systématiquement `@Nested` pour organiser les cas de test.
+    - **Assertions :** Utilise exclusivement **AssertJ**. Pour les collections (GET all), vérifie systématiquement les
+      cas : liste vide, 1 élément, 2 éléments.
+    - **Vérification DTO :** Pour les listes de 1 ou 2 éléments, ainsi que pour les opérations de **création (POST)** et
+      de **mise à jour (PUT)**, vérifie **l'intégralité des champs** du DTO de réponse via `jsonPath`.
+    - **Gestion des Exceptions :** Pour les cas d'erreur (404, 400, etc.), vérifie systématiquement le corps de la
+      réponse (**ProblemDetail**). Valide que le champ `detail` correspond exactement au message d'erreur attendu. Pour
+      les erreurs de validation (400), utilise des **tests paramétrés** incluant la liste des champs attendus en erreur,
+      et teste systématiquement un cas avec **plusieurs erreurs simultanées**.
+    - **Performance :** Pour les endpoints de collection, effectue un test avec 100 éléments simulés et valide le temps
+      de réponse via `assertTimeout(Duration.ofMillis(500), ...)`.
+    - **Logiciel (Services & Entités) :** Privilégie les tests unitaires purs avec JUnit 6 et Mockito **uniquement pour
+      les fonctions pures** ou la logique métier isolée.
+    - **Dépôts (Repository Tests) :**
+        - Utilise `@DataJpaTest`, `@Import(TestcontainersConfiguration.class)`,
+          `@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)` et `@ActiveProfiles("test")`.
+        - Teste les opérations CRUD de base et **toutes** les méthodes personnalisées.
+        - Après chaque opération, vérifie **l'intégralité des attributs** de l'entité via AssertJ.
+        - Valide les contraintes d'intégrité (not null, unique, check) via `saveAndFlush`.
     - **Contrôleurs (Slice Tests) :**
-        - Utilise
-          `@WebMvcTest(value = MyController.class, excludeAutoConfiguration = {SecurityAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class})`.
-        - Utilise **`RestTestClient`** (`org.springframework.test.web.servlet.client.RestTestClient`) initialisé
-          manuellement dans un `@BeforeEach` via `RestTestClient.bindTo(mockMvc).build()` pour les tests d'API fluides.
-    - **Mocking :** Utilise systématiquement **`@MockitoBean`** pour l'injection de mocks dans le contexte Spring.
+        - Utilise `@WebMvcTest(value = MyController.class)`. **Interdiction d'exclure la sécurité**.
+        - **Mocking Sécurité :** Mocker systématiquement le `JwtDecoder` via `@MockitoBean` et simuler
+          l'authentification via un header `Authorization: Bearer [token]`.
+        - Utilise **`RestTestClient`** initialisé dans un `@BeforeEach` via `RestTestClient.bindTo(mockMvc).build()` (
+          binding minimum obligatoire). Préfère créer deux clients : un anonyme (`restTestClient`) et un authentifié (
+          `authRestTestClient`).
+    - **Mocking :** Utilise systématiquement **`@MockitoBean`**.
 - **Persistance & Migration :**
     - **Flyway :** Un schéma de base de données par module Spring Modulith pour garantir l'isolation des données.
     - **Développement :** Utilisation du support **Docker Compose** de Spring Boot pour l'instanciation automatique de la base de données en local.

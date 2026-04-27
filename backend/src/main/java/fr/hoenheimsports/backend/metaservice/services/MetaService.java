@@ -34,7 +34,7 @@ public class MetaService {
      * Fetches social media feeds using the configured page ID and access token.
      * The results are cached to minimize API usage and improve performance.
      *
-     * @return the Graph API response containing the latest feed items
+     * @return the Graph API response containing the latest feed items@
      */
     @Cacheable(value = "metaFeeds")
     @Retryable(

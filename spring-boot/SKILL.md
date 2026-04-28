@@ -105,26 +105,27 @@ For endpoints creating or updating resources (POST/PUT):
 1. **Field-by-Field Verification**: Verify **every single field** of the response DTO via `jsonPath` to ensure the
    mapping is correct.
 2. **Security**: Test both authenticated (success) and anonymous (401) access.
-3. **Validation**: Use `@ParameterizedTest` to test all validation constraints. The parameters should include the *
-   *expected failing fields**. Also, add a test case with **multiple invalid fields** to ensure the `fieldErrors` map
-   contains all of them.
+3. **Validation**: Use `@ParameterizedTest` to test all validation constraints. The parameters should include a `Map<String, String>` of **expected failing fields and their exact messages**.
+4. **Exhaustive Loop**: Systematically use a **classic for-each loop** (not `Map.forEach`) over the map entries to verify each message via `jsonPath`. This ensures every assertion is strictly evaluated by the test runner.
 
 ```java
-
 @ParameterizedTest
 @MethodSource("invalidRequests")
-void shouldReturn400AndSpecificFields_WhenInvalid(ItemRequest request, List<String> expectedFields) {
-   restTestClient.post().uri("/api/v1/items")
-           .body(request)
-           .exchange()
-           .expectStatus().isBadRequest()
-           .expectBody()
-           .jsonPath("$.fieldErrors.size()").isEqualTo(expectedFields.size());
+void shouldReturn400AndSpecificFieldErrors_WhenInvalid(ItemRequest request, Map<String, String> expectedErrors) {
+    var bodySpec = restTestClient.post().uri("/api/v1/items")
+            .body(request)
+            .exchange()
+            .expectStatus().isBadRequest()
+            .expectBody()
+            .jsonPath("$.fieldErrors.size()").isEqualTo(expectedErrors.size());
 
-   for (String field : expectedFields) {
-      restTestClient.expectBody().jsonPath("$.fieldErrors['" + field + "']").exists();
-   }
+    for (var entry : expectedErrors.entrySet()) {
+        bodySpec.jsonPath("$.fieldErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+    }
 }
+```
+
+#### Exhaustive Collection Testing
 ```
 
 #### Exhaustive Collection Testing

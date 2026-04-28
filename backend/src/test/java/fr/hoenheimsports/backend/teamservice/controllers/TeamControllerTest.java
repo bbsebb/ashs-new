@@ -6,6 +6,7 @@ import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamCreateRequest;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamReponseDTO;
 import fr.hoenheimsports.backend.teamservice.dtos.TeamUpdateRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.TimeSlotDTO;
 import fr.hoenheimsports.backend.teamservice.entities.Gender;
 import fr.hoenheimsports.backend.teamservice.services.TeamService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +28,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.time.Duration;
+import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +59,7 @@ class TeamControllerTest {
     private RestTestClient restTestClient;
     private RestTestClient authRestTestClient;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
     @MockitoBean
     private TeamService teamService;
@@ -287,15 +290,27 @@ class TeamControllerTest {
     }
 
     static Stream<Arguments> invalidTeamCreateRequests() {
+        UUID seasonId = UUID.randomUUID();
+        UUID ageGroupId = UUID.randomUUID();
+        UUID hallId = UUID.randomUUID();
+        
         return Stream.of(
-                Arguments.of(new TeamCreateRequest(null, Gender.Male, 1, UUID.randomUUID(), Collections.emptyList(), Collections.emptyList()), Map.of("seasonId", "La saison est obligatoire")),
-                Arguments.of(new TeamCreateRequest(UUID.randomUUID(), null, 1, UUID.randomUUID(), Collections.emptyList(), Collections.emptyList()), Map.of("gender", "Le genre est obligatoire")),
+                Arguments.of(new TeamCreateRequest(null, Gender.Male, 1, ageGroupId, Collections.emptyList(), Collections.emptyList()), Map.of("seasonId", "La saison est obligatoire")),
+                Arguments.of(new TeamCreateRequest(seasonId, null, 1, ageGroupId, Collections.emptyList(), Collections.emptyList()), Map.of("gender", "Le genre est obligatoire")),
                 // Multiple errors
                 Arguments.of(new TeamCreateRequest(null, null, 1, null, Collections.emptyList(), Collections.emptyList()), Map.of(
                         "seasonId", "La saison est obligatoire",
                         "gender", "Le genre est obligatoire",
                         "ageGroupId", "La catégorie d'âge est obligatoire"
-                ))
+                )),
+                // Invalid TimeSlot: start after end
+                Arguments.of(new TeamCreateRequest(seasonId, Gender.Male, 1, ageGroupId, Collections.emptyList(), 
+                        List.of(new TeamCreateRequest.TrainingSessionCreateRequest(hallId, DayOfWeek.MONDAY, new TimeSlotDTO(LocalTime.of(20, 0), LocalTime.of(18, 0))))), 
+                        Map.of("trainingSessions[0].timeSlot", "L'heure de début doit être avant l'heure de fin")),
+                // Invalid TimeSlot: start equal to end
+                Arguments.of(new TeamCreateRequest(seasonId, Gender.Male, 1, ageGroupId, Collections.emptyList(), 
+                        List.of(new TeamCreateRequest.TrainingSessionCreateRequest(hallId, DayOfWeek.MONDAY, new TimeSlotDTO(LocalTime.of(18, 0), LocalTime.of(18, 0))))), 
+                        Map.of("trainingSessions[0].timeSlot", "L'heure de début doit être avant l'heure de fin"))
         );
     }
 }

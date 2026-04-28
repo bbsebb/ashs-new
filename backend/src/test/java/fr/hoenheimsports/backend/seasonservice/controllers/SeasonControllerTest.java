@@ -34,7 +34,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTimeout;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(SeasonController.class)
@@ -184,9 +186,13 @@ class SeasonControllerTest {
                     .expectBody()
                     .jsonPath("$.title").isEqualTo("Erreur de validation");
 
-            expectedFields.forEach((field, message) -> bodySpec.jsonPath("$.fieldErrors['" + field + "']").isEqualTo(message));
+            for (var entry : expectedFields.entrySet()) {
+                bodySpec.jsonPath("$.fieldErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+            }
 
-            expectedGlobalErrors.forEach((error, message) -> bodySpec.jsonPath("$.globalErrors['" + error + "']").isEqualTo(message));
+            for (var entry : expectedGlobalErrors.entrySet()) {
+                bodySpec.jsonPath("$.globalErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+            }
         }
     }
 
@@ -249,9 +255,13 @@ class SeasonControllerTest {
                     .expectBody()
                     .jsonPath("$.title").isEqualTo("Erreur de validation");
 
-            expectedFields.forEach((field, message) -> bodySpec.jsonPath("$.fieldErrors['" + field + "']").isEqualTo(message));
+            for (var entry : expectedFields.entrySet()) {
+                bodySpec.jsonPath("$.fieldErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+            }
 
-            expectedGlobalErrors.forEach((error, message) -> bodySpec.jsonPath("$.globalErrors['" + error + "']").isEqualTo(message));
+            for (var entry : expectedGlobalErrors.entrySet()) {
+                bodySpec.jsonPath("$.globalErrors['" + entry.getKey() + "']").isEqualTo(entry.getValue());
+            }
         }
     }
 

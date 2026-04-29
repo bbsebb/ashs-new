@@ -14,7 +14,10 @@ spring:
     clean-disabled: false
     validate-on-migrate: false
 
-
+contact:
+  administrator:
+    email:
+      address: sebastien.burckhardt@hoenheimsports.fr
 
 logging:
   level:

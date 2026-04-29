@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.contactservice.services;
 
 import fr.hoenheimsports.backend.contactservice.exceptions.MailServiceException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ContactService {
     private final JavaMailSender javaMailSender;
-    private final static String ADMINISTRATOR_EMAIL_ADDRESS ="sebastien.burckhardt@hoenheimsports.fr";
+    @Value("${contact.administrator.email.address}")
+    private String ADMINISTRATOR_EMAIL_ADDRESS;
 
 
     /**

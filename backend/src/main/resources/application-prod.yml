@@ -17,7 +17,10 @@ spring:
     clean-disabled: true # CRITIQUE : Empêche la suppression des données en prod
     validate-on-migrate: true
 
-
+contact:
+  administrator:
+    email:
+      address: president@hoenheimsports.fr
 
 
 logging:

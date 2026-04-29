@@ -1,0 +1,5 @@
+<app-contact
+  [contactViewModel]="contactViewModelSignal()"
+  [isSubmitting]="isSubmittingSignal()"
+  (submitted)="onSubmit($event)"
+/>

@@ -10,7 +10,6 @@ export * from './lib/utils/formatters';
 
 // Contact
 export * from './lib/services/contact/contact.view-models';
-export * from './lib/services/contact/contact.gateway';
 
 // Hall
 export * from './lib/services/hall/hall.view-models';

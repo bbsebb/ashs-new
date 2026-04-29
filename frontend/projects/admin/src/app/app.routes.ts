@@ -1,5 +1,5 @@
 import {Routes} from '@angular/router';
-import {Contact, Error404, MentionsLegales, Rgpd} from '@shared-ui'
+import {Error404, MentionsLegales, Rgpd} from '@shared-ui'
 import {authGuard} from './core/guards/auth-guard';
 
 // noinspection SpellCheckingInspection
@@ -112,7 +112,10 @@ export const routes: Routes = [
     ]
   },
   {path: 'mentions-legales', component: MentionsLegales},
-  {path: 'contact', component: Contact},
+  {
+    path: 'contact',
+    loadComponent: () => import('./features/contact/components/contact-view/contact-view').then(m => m.ContactView)
+  },
   {path: 'rgpd', component: Rgpd},
   {path: '404', component: Error404},
   {path: '**', redirectTo: '404'},

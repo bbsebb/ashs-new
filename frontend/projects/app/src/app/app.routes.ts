@@ -52,7 +52,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/meta/components/feeds-list/feeds-list').then(m => m.FeedsList)
   },
   {path: 'mentions-legales', title: 'Mentions Légales', component: MentionsLegales},
-  {path: 'contact', title: 'Contact', component: Contact},
+  {
+    path: 'contact',
+    title: 'Contact',
+    loadComponent: () => import('./features/contact/components/contact-view/contact-view').then(m => m.ContactView)
+  },
   {path: 'rgpd', title: 'RGPD', component: Rgpd},
   {path: '**', title: 'Page non trouvée', component: Error404},
 ];

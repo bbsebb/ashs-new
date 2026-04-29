@@ -99,7 +99,8 @@ export class Contact {
 
   /** Public method to reset the form, intended to be called by parent via template ref if needed. */
   resetForm() {
-    this.contactModelSignal.set({from: '', subject: '', content: ''});
+
+    this.contactFormSignal().reset({from: '', subject: '', content: ''})
   }
 }
 

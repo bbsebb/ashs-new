@@ -24,7 +24,7 @@ describe('FormDeleteButton', () => {
 
   it('should render icon-only button when iconOnlySignal is true', async () => {
     await render(FormDeleteButton, {
-      inputs: {iconOnly: true},
+      componentInputs: {iconOnly: true},
       providers: [{provide: DialogService, useValue: mockDialogService}]
     });
     // Text "Supprimer" should not be there
@@ -67,7 +67,7 @@ describe('FormDeleteButton', () => {
 
   it('should be disabled when disabledSignal is true', async () => {
     const {fixture} = await render(FormDeleteButton, {
-      inputs: {disabled: true},
+      componentInputs: {disabled: true},
       providers: [{provide: DialogService, useValue: mockDialogService}]
     });
 

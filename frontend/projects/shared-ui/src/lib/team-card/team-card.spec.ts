@@ -68,7 +68,7 @@ describe('TeamCard Component', () => {
       providers: [provideRouter([])]
     });
 
-    expect(screen.getByText(/no staff assigned/i)).toBeDefined();
-    expect(screen.getByText(/no sessions scheduled/i)).toBeDefined();
+    expect(screen.getByText(/Aucun encadrant n'a encore été ajouté/i)).toBeDefined();
+    expect(screen.getByText(/Aucun entrainement n'a encore été ajouté/i)).toBeDefined();
   });
 });

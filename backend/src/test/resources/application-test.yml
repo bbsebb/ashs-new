@@ -24,3 +24,8 @@ spring:
 
 meta:
   page-access-token: dummy-token
+
+contact:
+  administrator:
+    email:
+      address: test@test.com

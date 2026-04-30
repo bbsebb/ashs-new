@@ -4,6 +4,7 @@ import {http, HttpResponse} from 'msw';
 import {TestBed} from '@angular/core/testing';
 import {provideHttpClient} from '@angular/common/http';
 import {StaffsStore} from './staffs.store';
+import {StaffEventsService} from './staff-events.service';
 import {TeamsStore} from '../team/teams.store';
 import {APP_CONFIG} from '../../configs/app-config';
 import {firstValueFrom} from 'rxjs';
@@ -45,6 +46,9 @@ describe('StaffsStore', () => {
     });
     store = TestBed.inject(StaffsStore);
     teamsStore = TestBed.inject(TeamsStore);
+    
+    // On s'abonne manuellement pour le mock car c'est Normalement TeamsStore qui le fait dans son constructeur
+    TestBed.inject(StaffEventsService).staffDeleted$.subscribe(id => teamsStore.onStaffDeleted(id));
   });
 
   it('should load staffs and initialize staffsSignal', async () => {

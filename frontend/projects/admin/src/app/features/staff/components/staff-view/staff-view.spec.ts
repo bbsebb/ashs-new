@@ -22,6 +22,7 @@ describe('StaffView Component (Admin)', () => {
   const setupMocks = (staffData?: Staff | null) => {
     return {
       staffsStore: {
+        staffsSignal: signal(staffData ? [staffData] : []),
         staffById: vi.fn().mockReturnValue(signal(staffData)),
         isLoadingSignal: signal(false),
         errorSignal: signal<Error | null>(null),
@@ -38,7 +39,7 @@ describe('StaffView Component (Admin)', () => {
     mocks.staffsStore.isLoadingSignal.set(true);
 
     await render(StaffView, {
-      componentProperties: {idInputSignal: 's1'} as any,
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -47,7 +48,7 @@ describe('StaffView Component (Admin)', () => {
       ]
     });
 
-    expect(screen.getByText(/Chargement du membre/i)).toBeDefined();
+    expect(screen.getByText(/Chargement de l'encadrant/i)).toBeDefined();
   });
 
   it('should render error state and allow retry', async () => {
@@ -56,7 +57,7 @@ describe('StaffView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(StaffView, {
-      componentProperties: {idInputSignal: 's1'} as any,
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -77,7 +78,7 @@ describe('StaffView Component (Admin)', () => {
     const mocks = setupMocks(mockStaff);
 
     await render(StaffView, {
-      componentProperties: {idInputSignal: 's1'} as any,
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -94,7 +95,7 @@ describe('StaffView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(StaffView, {
-      componentProperties: {idInputSignal: 's1'} as any,
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },

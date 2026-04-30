@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {SeasonView} from './season-view';
-import {SeasonsStore} from '@shared-api';
+import {APP_CONFIG, SeasonsStore} from '@shared-api';
 import {signal} from '@angular/core';
 import {provideRouter, Router} from '@angular/router';
 import {NotificationService} from '@shared-ui';
@@ -38,10 +38,11 @@ describe('SeasonView Component (Admin)', () => {
     mocks.seasonsStore.isLoadingSignal.set(true);
 
     await render(SeasonView, {
-      inputs: {idInputSignal: 's1'},
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
       ]
     });
@@ -55,10 +56,11 @@ describe('SeasonView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(SeasonView, {
-      inputs: {idInputSignal: 's1'},
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
       ]
     });
@@ -75,10 +77,11 @@ describe('SeasonView Component (Admin)', () => {
     const mocks = setupMocks(mockSeason);
 
     await render(SeasonView, {
-      inputs: {idInputSignal: 's1'},
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
       ]
     });
@@ -90,11 +93,12 @@ describe('SeasonView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(SeasonView, {
-      inputs: {idInputSignal: 's1'},
+      componentInputs: {id: 's1'} as any,
       providers: [
         { provide: SeasonsStore, useValue: mocks.seasonsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
-        { provide: Router, useValue: mocks.router }
+        { provide: Router, useValue: mocks.router },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 

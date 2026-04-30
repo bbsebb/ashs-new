@@ -16,7 +16,7 @@ describe('SeasonsList Component', () => {
       seasonsStore: {
         seasonsSignal: signal(seasons),
         isLoadingSignal: signal(false),
-        errorSignal: signal(null),
+        errorSignal: signal<Error | null>(null),
         reload: vi.fn(),
         deleteById: vi.fn().mockReturnValue(of(void 0))
       },

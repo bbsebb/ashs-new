@@ -2,6 +2,7 @@ import {TestBed} from '@angular/core/testing';
 import {describe, expect, it, vi, beforeEach} from 'vitest';
 import {AgeGroupFormService} from './age-group-form.service';
 import {AgeGroupStore, FormErrorHandleService} from '@shared-api';
+import {submit} from '@angular/forms/signals';
 import {NotificationService} from '@shared-ui';
 import {Router} from '@angular/router';
 import {MatDialogRef} from '@angular/material/dialog';
@@ -63,7 +64,7 @@ describe('AgeGroupFormService', () => {
     const createdAgeGroup = {id: 'new-id', ...formValue};
     mocks.ageGroupStore.createAgeGroup.mockReturnValue(of(createdAgeGroup));
 
-    await submit(service.ageGroupFormSignal, async () => undefined);
+    await submit(service.ageGroupForm);
 
     expect(mocks.ageGroupStore.createAgeGroup).toHaveBeenCalledWith(formValue);
     expect(mocks.notificationService.show).toHaveBeenCalledWith(expect.stringContaining('enregistrée'), 'success');
@@ -74,7 +75,7 @@ describe('AgeGroupFormService', () => {
     mocks.ageGroupStore.createAgeGroup.mockReturnValue(throwError(() => new Error('API Error')));
     mocks.formErrorHandler.handleError.mockReturnValue('AgeGroup Error');
 
-    await submit(service.ageGroupFormSignal, async () => undefined);
+    await submit(service.ageGroupForm);
 
     expect(mocks.notificationService.show).toHaveBeenCalledWith('AgeGroup Error', 'error');
   });

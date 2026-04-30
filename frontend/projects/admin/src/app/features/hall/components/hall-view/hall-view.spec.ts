@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {HallView} from './hall-view';
-import {HallsStore} from '@shared-api';
+import {APP_CONFIG, HallsStore} from '@shared-api';
 import {signal} from '@angular/core';
 import {provideRouter, Router} from '@angular/router';
 import {NotificationService} from '@shared-ui';
@@ -38,10 +38,11 @@ describe('HallView Component (Admin)', () => {
     mocks.hallsStore.isLoadingSignal.set(true);
 
     await render(HallView, {
-      inputs: {idInputSignal: '1'},
+      componentInputs: {id: '1'} as any,
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
       ]
     });
@@ -55,10 +56,11 @@ describe('HallView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(HallView, {
-      inputs: {idInputSignal: '1'},
+      componentInputs: {id: '1'} as any,
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
       ]
     });
@@ -75,10 +77,11 @@ describe('HallView Component (Admin)', () => {
     const mocks = setupMocks(mockHall);
 
     await render(HallView, {
-      inputs: {idInputSignal: '1'},
+      componentInputs: {id: '1'} as any,
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
         provideRouter([])
       ]
     });
@@ -91,11 +94,12 @@ describe('HallView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(HallView, {
-      inputs: {idInputSignal: '1'},
+      componentInputs: {id: '1'} as any,
       providers: [
         { provide: HallsStore, useValue: mocks.hallsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
-        { provide: Router, useValue: mocks.router }
+        { provide: Router, useValue: mocks.router },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
       ]
     });
 

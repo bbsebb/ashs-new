@@ -1,6 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {of} from 'rxjs';
+import {of, Subject} from 'rxjs';
 import {describe, it, expect, vi, beforeEach} from 'vitest';
 import {AdminDialogService} from './admin-dialog.service';
 import {SeasonForm} from '../../features/season/components/season-form/season-form';
@@ -53,10 +53,22 @@ describe('AdminDialogService', () => {
   });
 
   it('should prevent opening multiple dialogs simultaneously', () => {
+    const afterClosedSubject = new Subject<any>();
+    dialogMock.open.mockReturnValue({
+      afterClosed: () => afterClosedSubject.asObservable()
+    } as MatDialogRef<any>);
+
     service.openSeasonForm().subscribe();
     service.openAgeGroupForm().subscribe();
-    // The second call should not trigger dialog.open if a dialog is already open
-    // (Based on the _isDialogOpen flag logic in the service)
+    
     expect(dialogMock.open).toHaveBeenCalledTimes(1);
+    
+    // On ferme le premier
+    afterClosedSubject.next({id: '1'});
+    afterClosedSubject.complete();
+    
+    // Maintenant on peut en ouvrir un autre
+    service.openAgeGroupForm().subscribe();
+    expect(dialogMock.open).toHaveBeenCalledTimes(2);
   });
 });

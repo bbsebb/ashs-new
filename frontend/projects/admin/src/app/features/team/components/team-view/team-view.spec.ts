@@ -25,6 +25,7 @@ describe('TeamView Component (Admin)', () => {
   const setupMocks = (teamData?: Team | null) => {
     return {
       teamsStore: {
+        teamsSignal: signal(teamData ? [teamData] : []),
         teamById: vi.fn().mockReturnValue(signal(teamData)),
         isLoadingSignal: signal(false),
         errorSignal: signal<Error | null>(null),
@@ -41,7 +42,7 @@ describe('TeamView Component (Admin)', () => {
     mocks.teamsStore.isLoadingSignal.set(true);
 
     await render(TeamView, {
-      inputs: {idInputSignal: 't1'},
+      componentInputs: {id: 't1'} as any,
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -59,7 +60,7 @@ describe('TeamView Component (Admin)', () => {
 
     const user = userEvent.setup();
     await render(TeamView, {
-      inputs: {idInputSignal: 't1'},
+      componentInputs: {id: 't1'} as any,
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -80,7 +81,7 @@ describe('TeamView Component (Admin)', () => {
     const mocks = setupMocks(mockTeam);
 
     await render(TeamView, {
-      inputs: {idInputSignal: 't1'},
+      componentInputs: {id: 't1'} as any,
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
@@ -97,7 +98,7 @@ describe('TeamView Component (Admin)', () => {
     const mocks = setupMocks(null);
 
     await render(TeamView, {
-      inputs: {idInputSignal: 't1'},
+      componentInputs: {id: 't1'} as any,
       providers: [
         { provide: TeamsStore, useValue: mocks.teamsStore },
         { provide: NotificationService, useValue: mocks.notificationService },

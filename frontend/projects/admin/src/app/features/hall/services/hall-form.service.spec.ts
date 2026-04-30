@@ -2,10 +2,11 @@ import {TestBed} from '@angular/core/testing';
 import {describe, expect, it, vi, beforeEach} from 'vitest';
 import {HallFormService} from './hall-form.service';
 import {FormErrorHandleService, HallsStore} from '@shared-api';
+import {submit} from '@angular/forms/signals';
 import {NotificationService} from '@shared-ui';
 import {Router} from '@angular/router';
 import {MatDialogRef} from '@angular/material/dialog';
-import {signal} from '@angular/core';
+import {computed, Signal, signal} from '@angular/core';
 import {of, throwError} from 'rxjs';
 import {Hall} from '@shared-domain';
 
@@ -19,7 +20,19 @@ describe('HallFormService', () => {
         handleError: vi.fn()
       },
       hallsStore: {
-        hallById: vi.fn().mockReturnValue(signal(undefined)),
+        hallById: vi.fn().mockImplementation((idSignal: Signal<string | undefined>) => {
+          return computed(() => {
+            const id = idSignal();
+            return id === '1' ? {
+              id: '1',
+              name: 'Salle 1',
+              addressStreet: 'Rue 1',
+              addressCity: 'Ville 1',
+              addressPostalCode: '12345',
+              addressCountry: 'Pays 1'
+            } : undefined;
+          });
+        }),
         isLoadingSignal: signal(false),
         createHall: vi.fn(),
         updateHall: vi.fn()
@@ -62,12 +75,9 @@ describe('HallFormService', () => {
       addressPostalCode: '12345',
       addressCountry: 'Pays 1'
     };
-    mocks.hallsStore.hallById.mockReturnValue(signal(mockHall));
 
-    // Re-inject or re-init if needed, but here it's reactive
     service.init('1');
 
-    expect(mocks.hallsStore.hallById).toHaveBeenCalled();
     expect(service.hallSignal()).toEqual(mockHall);
     expect(service.hallModelSignal()).toEqual({
       name: 'Salle 1',
@@ -109,7 +119,7 @@ describe('HallFormService', () => {
     const createdHall = {id: 'new-id', ...formValue};
     mocks.hallsStore.createHall.mockReturnValue(of(createdHall));
 
-    await service.hallForm().submit();
+    await submit(service.hallForm);
 
     expect(mocks.hallsStore.createHall).toHaveBeenCalledWith(formValue);
     expect(mocks.notificationService.show).toHaveBeenCalledWith(expect.stringContaining('enregistrée'), 'success');
@@ -146,7 +156,7 @@ describe('HallFormService', () => {
     service.init('existing-id');
     service.hallForm().value.set(formValue);
 
-    await service.hallForm().submit();
+    await submit(service.hallForm);
 
     expect(mocks.hallsStore.updateHall).toHaveBeenCalledWith('existing-id', formValue);
     expect(mocks.router.navigateByUrl).toHaveBeenCalledWith('/halls/existing-id');
@@ -165,7 +175,7 @@ describe('HallFormService', () => {
       addressCountry: 'Test'
     });
 
-    await service.hallForm().submit();
+    await submit(service.hallForm);
 
     expect(mocks.formErrorHandler.handleError).toHaveBeenCalled();
     expect(mocks.notificationService.show).toHaveBeenCalledWith('Detailed Error', 'error');

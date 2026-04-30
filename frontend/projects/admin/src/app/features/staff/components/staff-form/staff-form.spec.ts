@@ -3,15 +3,19 @@ import {describe, expect, it, vi} from 'vitest';
 import {StaffForm} from './staff-form';
 import {APP_CONFIG, StaffsStore} from '@shared-api';
 import {signal} from '@angular/core';
-import {Router} from '@angular/router';
+import {provideRouter, Router, ActivatedRoute} from '@angular/router';
 import {NotificationService} from '@shared-ui';
 import {of} from 'rxjs';
 import userEvent from '@testing-library/user-event';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {ImageService} from '@shared-api';
+import {provideNativeDateAdapter} from '@angular/material/core';
 
 describe('StaffForm Component (Admin)', () => {
   const setupMocks = () => {
     return {
       staffsStore: {
+        staffsSignal: signal([]),
         staffById: vi.fn().mockReturnValue(signal(undefined)),
         createStaff: vi.fn().mockReturnValue(of({ id: 'new-staff' })),
         isLoadingSignal: signal(false)
@@ -21,6 +25,9 @@ describe('StaffForm Component (Admin)', () => {
       },
       router: {
         navigateByUrl: vi.fn().mockReturnValue(Promise.resolve(true))
+      },
+      activatedRoute: {
+        snapshot: { params: {} }
       }
     };
   };
@@ -33,8 +40,12 @@ describe('StaffForm Component (Admin)', () => {
       providers: [
         { provide: StaffsStore, useValue: mocks.staffsStore },
         { provide: NotificationService, useValue: mocks.notificationService },
+        { provide: ImageService, useValue: { createImageSourceUrl: vi.fn().mockReturnValue('dummy.png') } },
         { provide: Router, useValue: mocks.router },
-        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } }
+        { provide: ActivatedRoute, useValue: mocks.activatedRoute },
+        { provide: APP_CONFIG, useValue: { apiUrl: 'http://test.api' } },
+        provideAnimationsAsync('noop'),
+        provideNativeDateAdapter()
       ]
     });
 

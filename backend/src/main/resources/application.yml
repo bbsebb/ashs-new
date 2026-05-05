@@ -26,7 +26,7 @@ spring:
 
   flyway:
     enabled: true
-    schemas: hall_schema, staff_schema, team_schema, flyway_schema, season_schema, modulith_schema
+    schemas: hall_schema, staff_schema, team_schema, flyway_schema, season_schema, modulith_schema, membership_schema
     default-schema: flyway_schema
 
   servlet:
@@ -50,6 +50,15 @@ spring:
           # L'URL exacte de ton Realm Keycloak
           issuer-uri: ${RESOURCE_SERVER_ISSUER_URI:http://localhost:8079/realms/ashs}
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  scalar:
+    enabled: true
+    path: /scalar
+  swagger-ui:
+    path: /swagger-ui.html
+
 meta:
   page-access-token: ${PAGE_ACCESS_TOKEN}
   version: v24.0
@@ -67,3 +76,8 @@ contact:
   administrator:
     email:
       address: ${CONTACT_ADMIN_EMAIL:admin@hoenheimsports.fr}
+
+sumup:
+  api-key: ${SUMUP_API_KEY}
+  merchant-email: ${SUMUP_MERCHANT_EMAIL}
+  return-url: ${SUMUP_RETURN_URL:http://localhost:4200/membership/payment-success}

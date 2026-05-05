@@ -48,6 +48,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     // Spring Boot 4 a amélioré l'auto-configuration pour les aspects
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-scalar'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
     runtimeOnly 'org.springframework.modulith:spring-modulith-runtime'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
@@ -76,9 +78,9 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.modulith:spring-modulith-bom:${springModulithVersion}"
+        mavenBom "org.springdoc:springdoc-openapi-bom:3.0.3"
     }
 }
-
 tasks.named('test') {
     useJUnitPlatform()
 }

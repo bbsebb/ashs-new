@@ -91,5 +91,5 @@
 - Modifier : `backend/src/main/java/fr/hoenheimsports/backend/membershipservice/controllers/CampaignController.java`
 - Tester : Ajouter des cas de test dans `CampaignControllerTest`.
 
-- [ ] **Étape 1 : Ajouter un endpoint `GET /api/admin/campaigns/{id}/memberships`** pour lister les inscrits.
-- [ ] **Étape 2 : Ajouter un endpoint `PATCH /api/admin/memberships/{id}/process`** pour passer une adhésion `PAID` à `PROCESSED`.
+- [x] **Étape 1 : Ajouter un endpoint `GET /api/admin/campaigns/{id}/memberships`** pour lister les inscrits.
+- [x] **Étape 2 : Ajouter un endpoint `PATCH /api/admin/memberships/{id}/process`** pour passer une adhésion `PAID` à `PROCESSED`.

@@ -163,6 +163,43 @@ class CampaignControllerTest {
     }
 
     @Nested
+    class ProcessMembership {
+        @Test
+        void shouldProcessMembership() {
+            // Given
+            UUID membershipId = UUID.randomUUID();
+
+            // When & Then
+            authRestTestClient.patch()
+                .uri("/api/admin/memberships/{id}/process", membershipId)
+                .exchange()
+                .expectStatus().isOk();
+
+            verify(membershipService).processMembership(membershipId);
+        }
+
+        @Test
+        void shouldReturnForbiddenWhenNotAdmin() {
+            // Given
+            UUID membershipId = UUID.randomUUID();
+            Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "none")
+                .claim("sub", "user")
+                .claim("realm_access", Map.of("roles", List.of("USER")))
+                .issuedAt(Instant.now())
+                .expiresAt(Instant.now().plusSeconds(3600))
+                .build();
+            when(jwtDecoder.decode(anyString())).thenReturn(jwt);
+
+            // When & Then
+            authRestTestClient.patch()
+                .uri("/api/admin/memberships/{id}/process", membershipId)
+                .exchange()
+                .expectStatus().isForbidden();
+        }
+    }
+
+    @Nested
     class GetActiveCampaign {
         @Test
         void shouldReturnActiveCampaign() {

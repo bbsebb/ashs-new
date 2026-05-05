@@ -36,6 +36,11 @@ public class CampaignController {
         return membershipService.getMembershipsByCampaign(id);
     }
 
+    @PatchMapping("/admin/memberships/{id}/process")
+    public void processMembership(@PathVariable UUID id) {
+        membershipService.processMembership(id);
+    }
+
     @GetMapping("/public/campaigns/active")
     public ResponseEntity<CampaignResponse> getActiveCampaign() {
         return campaignService.getActiveCampaign()

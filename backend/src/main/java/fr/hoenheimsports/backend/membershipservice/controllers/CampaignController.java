@@ -2,9 +2,11 @@ package fr.hoenheimsports.backend.membershipservice.controllers;
 
 import fr.hoenheimsports.backend.membershipservice.dtos.CampaignCreateRequest;
 import fr.hoenheimsports.backend.membershipservice.dtos.CampaignResponse;
+import fr.hoenheimsports.backend.membershipservice.dtos.CampaignUpdateRequest;
 import fr.hoenheimsports.backend.membershipservice.dtos.MembershipResponse;
 import fr.hoenheimsports.backend.membershipservice.services.CampaignService;
 import fr.hoenheimsports.backend.membershipservice.services.MembershipService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,34 +16,51 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/campaigns")
 @RequiredArgsConstructor
 public class CampaignController {
     private final CampaignService campaignService;
     private final MembershipService membershipService;
 
-    @PostMapping("/admin/campaigns")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CampaignResponse createCampaign(@RequestBody CampaignCreateRequest request) {
-        return campaignService.createCampaign(request);
+    @PostMapping()
+    public ResponseEntity<CampaignResponse> createCampaign(@RequestBody @Valid CampaignCreateRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(campaignService.createCampaign(request));
     }
 
-    @PostMapping("/admin/campaigns/{id}/launch")
-    public void launchCampaign(@PathVariable UUID id) {
+    @GetMapping()
+    public ResponseEntity<List<CampaignResponse>> getCampaigns() {
+        return ResponseEntity.ok(campaignService.getCampaigns());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CampaignResponse> updateCampaign(@PathVariable UUID id, @RequestBody @Valid CampaignUpdateRequest request) {
+        return ResponseEntity.ok(campaignService.updateCampaign(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCampaign(@PathVariable UUID id) {
+        campaignService.deleteCampaign(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/launch")
+    public ResponseEntity<Void> launchCampaign(@PathVariable UUID id) {
         campaignService.launchCampaign(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/admin/campaigns/{id}/memberships")
-    public List<MembershipResponse> getMembershipsByCampaign(@PathVariable UUID id) {
-        return membershipService.getMembershipsByCampaign(id);
+    @GetMapping("/{id}/memberships")
+    public ResponseEntity<List<MembershipResponse>> getMembershipsByCampaign(@PathVariable UUID id) {
+        return ResponseEntity.ok(membershipService.getMembershipsByCampaign(id));
     }
 
-    @PatchMapping("/admin/memberships/{id}/process")
-    public void processMembership(@PathVariable UUID id) {
+    @PatchMapping("/{id}/process")
+    public ResponseEntity<Void> processMembership(@PathVariable UUID id) {
         membershipService.processMembership(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/public/campaigns/active")
+    @GetMapping("/active")
     public ResponseEntity<CampaignResponse> getActiveCampaign() {
         return campaignService.getActiveCampaign()
             .map(ResponseEntity::ok)

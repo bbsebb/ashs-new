@@ -1,18 +1,19 @@
 package fr.hoenheimsports.backend.membershipservice.controllers;
 
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignCreateRequest;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignResponse;
-import fr.hoenheimsports.backend.membershipservice.dtos.CategoryDto;
-import fr.hoenheimsports.backend.membershipservice.dtos.MembershipResponse;
+import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.entities.CampaignStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
 import fr.hoenheimsports.backend.membershipservice.services.CampaignService;
 import fr.hoenheimsports.backend.membershipservice.services.MembershipService;
 import fr.hoenheimsports.backend.shared.configurations.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -25,11 +26,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -39,6 +36,7 @@ import static org.mockito.Mockito.when;
 @WebMvcTest(CampaignController.class)
 @Import(SecurityConfig.class)
 @ActiveProfiles("test")
+@AutoConfigureRestTestClient
 class CampaignControllerTest {
 
     @Autowired
@@ -53,12 +51,13 @@ class CampaignControllerTest {
     @MockitoBean
     private JwtDecoder jwtDecoder;
 
+    @Autowired
     private RestTestClient restTestClient;
     private RestTestClient authRestTestClient;
 
     @BeforeEach
     void setUp() {
-        this.restTestClient = RestTestClient.bindTo(mockMvc).build();
+
         this.authRestTestClient = RestTestClient.bindTo(mockMvc)
             .defaultHeader("Authorization", "Bearer token")
             .build();
@@ -81,7 +80,10 @@ class CampaignControllerTest {
             // Given
             UUID seasonId = UUID.randomUUID();
             UUID campaignId = UUID.randomUUID();
-            Set<CategoryDto> categories = Set.of(new CategoryDto("Sénior", new BigDecimal("150.00")));
+            Set<CategoryDto> categories = Set.of(
+                    new CategoryDto("Sénior", new BigDecimal("0.01")),
+                    new CategoryDto("U11", new BigDecimal("100"))
+            );
             CampaignCreateRequest request = new CampaignCreateRequest(seasonId, categories);
             CampaignResponse response = new CampaignResponse(campaignId, seasonId, CampaignStatus.DRAFT, categories);
 
@@ -89,7 +91,7 @@ class CampaignControllerTest {
 
             // When & Then
             authRestTestClient.post()
-                .uri("/api/admin/campaigns")
+                    .uri("/api/v1/campaigns")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .exchange()
@@ -97,7 +99,336 @@ class CampaignControllerTest {
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(campaignId.toString())
                 .jsonPath("$.seasonId").isEqualTo(seasonId.toString())
-                .jsonPath("$.status").isEqualTo("DRAFT");
+                    .jsonPath("$.status").isEqualTo("DRAFT")
+                    .jsonPath("$.categories.length()").isEqualTo(2)
+                    .jsonPath("$.categories[?(@.name == 'Sénior')].amount").isEqualTo(0.01)
+                    .jsonPath("$.categories[?(@.name == 'U11')].amount").isEqualTo(100);
+
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenSeasonIdIsNull() {
+            // Given
+            Set<CategoryDto> categories = Set.of(new CategoryDto("Sénior", new BigDecimal("150.00")));
+            CampaignCreateRequest request = new CampaignCreateRequest(null, categories);
+
+            // When & Then
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors.seasonId").isEqualTo("L'identifiant de la saison est obligatoire");
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenCategoriesAreEmpty() {
+            // Given
+            CampaignCreateRequest request = new CampaignCreateRequest(UUID.randomUUID(), Set.of());
+
+            // When & Then
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors.categories").isEqualTo("La campagne doit contenir au moins une catégorie");
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenCategoryNameIsTooLong() {
+            // Given
+            Set<CategoryDto> categories = Set.of(new CategoryDto("Nom de catégorie beaucoup trop long pour la validation", new BigDecimal("100.00")));
+            CampaignCreateRequest request = new CampaignCreateRequest(UUID.randomUUID(), categories);
+
+            // When & Then
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].name']").isEqualTo("Le nom de la catégorie ne doit pas dépasser 20 caractères");
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenCategoryAmountHasMoreThanTwoDecimals() {
+            // Given
+            Set<CategoryDto> categories = Set.of(new CategoryDto("U 11", new BigDecimal("100.005")));
+            CampaignCreateRequest request = new CampaignCreateRequest(UUID.randomUUID(), categories);
+
+            // When & Then
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].amount']").isEqualTo("Le montant doit être un nombre décimal à 2 chiffres après la virgule");
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenCategoryAmountIsNullFromJson() {
+            // Given
+            UUID seasonId = UUID.randomUUID();
+
+            String json = """
+                    {
+                      "seasonId": "%s",
+                      "categories": [
+                        {
+                          "name": "U11",
+                          "amount": null
+                        }
+                      ]
+                    }
+                    """.formatted(seasonId);
+
+            // When & Then
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].amount']").isEqualTo("Le montant est obligatoire");
+        }
+
+
+        @ParameterizedTest
+        @ValueSource(strings = {"-100.00", "-10.00", "-1.00", "-0.01", "0"})
+        void shouldReturnBadRequestWhenCategoryAmountIsNegative(String amount) {
+            // Given
+            Set<CategoryDto> categories = Set.of(new CategoryDto("U 11", new BigDecimal(amount)));
+            CampaignCreateRequest request = new CampaignCreateRequest(UUID.randomUUID(), categories);
+
+            // When & Then
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].amount']").isEqualTo("Le montant doit être positif");
+
+        }
+
+        @Test
+        @DisplayName("Devrait retourner 401 Unauthorized quand l'utilisateur n'est pas authentifié")
+        void shouldReturnUnauthorizedWhenAnonymous() {
+            // Given
+            Set<CategoryDto> categories = Set.of(new CategoryDto("Sénior", new BigDecimal("150.00")));
+            CampaignCreateRequest request = new CampaignCreateRequest(UUID.randomUUID(), categories);
+
+            // When & Then
+            restTestClient.post()
+                    .uri("/api/v1/campaigns")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
+
+    @Nested
+    class UpdateCampaign {
+        @Test
+        void shouldUpdateCampaign() {
+            // Given
+            UUID seasonId = UUID.randomUUID();
+            UUID campaignId = UUID.randomUUID();
+            Set<CategoryDto> categories = Set.of(
+                    new CategoryDto("Sénior", new BigDecimal("0.01")),
+                    new CategoryDto("U11", new BigDecimal("100"))
+            );
+            CampaignUpdateRequest request = new CampaignUpdateRequest(categories);
+            CampaignResponse response = new CampaignResponse(campaignId, seasonId, CampaignStatus.DRAFT, categories);
+
+            when(campaignService.updateCampaign(any(UUID.class), any(CampaignUpdateRequest.class))).thenReturn(response);
+
+            // When & Then
+            authRestTestClient.put()
+                    .uri("/api/v1/campaigns/" + campaignId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(campaignId.toString())
+                    .jsonPath("$.seasonId").isEqualTo(seasonId.toString())
+                    .jsonPath("$.status").isEqualTo("DRAFT")
+                    .jsonPath("$.categories.length()").isEqualTo(2)
+                    .jsonPath("$.categories[?(@.name == 'Sénior')].amount").isEqualTo(0.01)
+                    .jsonPath("$.categories[?(@.name == 'U11')].amount").isEqualTo(100);
+
+        }
+
+
+        @Test
+        void shouldReturnBadRequestWhenCategoriesAreEmpty() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            CampaignUpdateRequest request = new CampaignUpdateRequest(Set.of());
+
+            // When & Then
+            authRestTestClient.put()
+                    .uri("/api/v1/campaigns/" + campaignId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors.categories").isEqualTo("La campagne doit contenir au moins une catégorie");
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenCategoryNameIsTooLong() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            Set<CategoryDto> categories = Set.of(new CategoryDto("Nom de catégorie beaucoup trop long pour la validation", new BigDecimal("100.00")));
+            CampaignUpdateRequest request = new CampaignUpdateRequest(categories);
+
+            // When & Then
+            authRestTestClient.put()
+                    .uri("/api/v1/campaigns/" + campaignId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].name']").isEqualTo("Le nom de la catégorie ne doit pas dépasser 20 caractères");
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenCategoryAmountHasMoreThanTwoDecimals() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            Set<CategoryDto> categories = Set.of(new CategoryDto("U 11", new BigDecimal("100.005")));
+            CampaignUpdateRequest request = new CampaignUpdateRequest(categories);
+
+
+            // When & Then
+            authRestTestClient.put()
+                    .uri("/api/v1/campaigns/" + campaignId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].amount']").isEqualTo("Le montant doit être un nombre décimal à 2 chiffres après la virgule");
+        }
+
+        @Test
+        void shouldReturnBadRequestWhenCategoryAmountIsNullFromJson() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+
+            String json = """
+                    {
+                      "categories": [
+                        {
+                          "name": "U11",
+                          "amount": null
+                        }
+                      ]
+                    }
+                    """;
+
+            // When & Then
+            authRestTestClient.put()
+                    .uri("/api/v1/campaigns/" + campaignId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].amount']").isEqualTo("Le montant est obligatoire");
+        }
+
+
+        @ParameterizedTest
+        @ValueSource(strings = {"-100.00", "-10.00", "-1.00", "-0.01", "0"})
+        void shouldReturnBadRequestWhenCategoryAmountIsNegative(String amount) {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            Set<CategoryDto> categories = Set.of(new CategoryDto("U 11", new BigDecimal(amount)));
+            CampaignUpdateRequest request = new CampaignUpdateRequest(categories);
+            // When & Then
+            authRestTestClient.put()
+                    .uri("/api/v1/campaigns/" + campaignId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody()
+                    .jsonPath("$.title").isEqualTo("Erreur de validation")
+                    .jsonPath("$.fieldErrors['categories[].amount']").isEqualTo("Le montant doit être positif");
+
+        }
+
+        @Test
+        @DisplayName("Devrait retourner 401 Unauthorized quand l'utilisateur n'est pas authentifié")
+        void shouldReturnUnauthorizedWhenAnonymous() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            Set<CategoryDto> categories = Set.of(new CategoryDto("Sénior", new BigDecimal("150.00")));
+            CampaignUpdateRequest request = new CampaignUpdateRequest(categories);
+            // When & Then
+            restTestClient.post()
+                    .uri("/api/v1/campaigns/" + campaignId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
+
+    @Nested
+    class deleteCampaign {
+        @Test
+        void shouldDeleteCampaign() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+
+            // When & Then
+            authRestTestClient.delete()
+                    .uri("/api/v1/campaigns/{id}", campaignId)
+                    .exchange()
+                    .expectStatus().isNoContent();
+
+            verify(campaignService).deleteCampaign(campaignId);
+        }
+
+        @Test
+        void shouldDeleteCampaignWithWrongUUID() {
+            // Given
+
+
+            // When & Then
+            authRestTestClient.delete()
+                    .uri("/api/v1/campaigns/{id}", "test")
+                    .exchange()
+                    .expectStatus().isBadRequest();
+
+
         }
     }
 
@@ -110,9 +441,9 @@ class CampaignControllerTest {
 
             // When & Then
             authRestTestClient.post()
-                .uri("/api/admin/campaigns/{id}/launch", campaignId)
+                    .uri("/api/v1/campaigns/{id}/launch", campaignId)
                 .exchange()
-                .expectStatus().isOk();
+                    .expectStatus().isNoContent();
 
             verify(campaignService).launchCampaign(campaignId);
         }
@@ -140,25 +471,13 @@ class CampaignControllerTest {
 
             // When & Then
             authRestTestClient.get()
-                .uri("/api/admin/campaigns/{id}/memberships", campaignId)
+                    .uri("/api/v1/campaigns/{id}/memberships", campaignId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$[0].id").isEqualTo(membershipResponse.id().toString())
                 .jsonPath("$[0].firstName").isEqualTo("John")
                 .jsonPath("$[0].lastName").isEqualTo("Doe");
-        }
-
-        @Test
-        void shouldReturnUnauthorizedWhenAnonymous() {
-            // Given
-            UUID campaignId = UUID.randomUUID();
-
-            // When & Then
-            restTestClient.get()
-                .uri("/api/admin/campaigns/{id}/memberships", campaignId)
-                .exchange()
-                .expectStatus().isUnauthorized();
         }
     }
 
@@ -171,9 +490,9 @@ class CampaignControllerTest {
 
             // When & Then
             authRestTestClient.patch()
-                .uri("/api/admin/memberships/{id}/process", membershipId)
+                    .uri("/api/v1/campaigns/{id}/process", membershipId)
                 .exchange()
-                .expectStatus().isOk();
+                    .expectStatus().isNoContent();
 
             verify(membershipService).processMembership(membershipId);
         }
@@ -193,9 +512,44 @@ class CampaignControllerTest {
 
             // When & Then
             authRestTestClient.patch()
-                .uri("/api/admin/memberships/{id}/process", membershipId)
+                    .uri("/api/v1/campaigns/{id}/process", membershipId)
                 .exchange()
                 .expectStatus().isForbidden();
+        }
+    }
+
+    @Nested
+    class GetCampaigns {
+        @Test
+        void shouldReturnAllCampaigns() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            UUID seasonId = UUID.randomUUID();
+            CampaignResponse response = new CampaignResponse(campaignId, seasonId, CampaignStatus.DRAFT, Set.of());
+            when(campaignService.getCampaigns()).thenReturn(List.of(response));
+
+            // When & Then
+            restTestClient.get()
+                    .uri("/api/v1/campaigns")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.length()").isEqualTo(1)
+                    .jsonPath("$[0].id").isEqualTo(campaignId.toString());
+        }
+
+        @Test
+        void shouldReturnEmptyList() {
+            // Given
+            when(campaignService.getCampaigns()).thenReturn(List.of());
+
+            // When & Then
+            restTestClient.get()
+                    .uri("/api/v1/campaigns")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.length()").isEqualTo(0);
         }
     }
 
@@ -213,7 +567,7 @@ class CampaignControllerTest {
 
             // When & Then
             restTestClient.get()
-                .uri("/api/public/campaigns/active")
+                    .uri("/api/v1/campaigns/active")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -229,7 +583,7 @@ class CampaignControllerTest {
 
             // When & Then
             restTestClient.get()
-                .uri("/api/public/campaigns/active")
+                    .uri("/api/v1/campaigns/active")
                 .exchange()
                 .expectStatus().isNotFound();
         }

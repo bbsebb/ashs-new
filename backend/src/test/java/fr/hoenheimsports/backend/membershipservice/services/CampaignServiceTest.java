@@ -185,7 +185,6 @@ class CampaignServiceTest {
             campaign.setStatus(CampaignStatus.DRAFT);
 
             when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
-            when(campaignRepository.existsByStatus(CampaignStatus.LAUNCHED)).thenReturn(false);
             when(campaignRepository.save(any())).thenReturn(campaign);
 
             // When
@@ -197,43 +196,61 @@ class CampaignServiceTest {
         }
 
         @Test
-        @DisplayName("Should throw exception when launching campaign if another one is already launched")
-        void shouldThrowExceptionWhenAnotherCampaignIsLaunched() {
+        @DisplayName("Should throw exception when campaign doesn't exist")
+        void shouldThrowExceptionWhenCampaignDontExist() {
             // Given
             UUID campaignId = UUID.randomUUID();
             Campaign campaign = new Campaign();
             campaign.setId(campaignId);
 
-            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
-            when(campaignRepository.existsByStatus(CampaignStatus.LAUNCHED)).thenReturn(true);
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.empty());
+
 
             // When & Then
             assertThatThrownBy(() -> campaignService.launchCampaign(campaignId))
-                    .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .hasMessageContaining("Campagne non trouvée");
         }
     }
 
     @Nested
-    @DisplayName("Get Active Campaign")
-    class GetActiveCampaign {
+    @DisplayName("close Campaign")
+    class CloseCampaign {
         @Test
-        @DisplayName("Should return the active campaign")
-        void shouldReturnActiveCampaign() {
+        @DisplayName("Should successfully close a campaign")
+        void shouldCloseCampaign() {
             // Given
+            UUID campaignId = UUID.randomUUID();
             Campaign campaign = new Campaign();
-            campaign.setId(UUID.randomUUID());
-            campaign.setSeasonId(UUID.randomUUID());
-            campaign.setStatus(CampaignStatus.LAUNCHED);
-            campaign.setCategories(Set.of(new Category("U11", Price.of("100.00"))));
+            campaign.setId(campaignId);
+            campaign.setStatus(CampaignStatus.DRAFT);
 
-            when(campaignRepository.findByStatus(CampaignStatus.LAUNCHED)).thenReturn(Optional.of(campaign));
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+            when(campaignRepository.save(any())).thenReturn(campaign);
 
             // When
-            Optional<CampaignResponse> response = campaignService.getActiveCampaign();
+            campaignService.closeCampaign(campaignId);
 
             // Then
-            assertThat(response).isPresent();
-            assertThat(response.get().status()).isEqualTo(CampaignStatus.LAUNCHED);
+            assertThat(campaign.getStatus()).isEqualTo(CampaignStatus.CLOSED);
+            verify(campaignRepository).save(campaign);
+        }
+
+        @Test
+        @DisplayName("Should throw exception when campaign doesn't exist")
+        void shouldThrowExceptionWhenCampaignDontExist() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            Campaign campaign = new Campaign();
+            campaign.setId(campaignId);
+
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.empty());
+
+
+            // When & Then
+            assertThatThrownBy(() -> campaignService.closeCampaign(campaignId))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .hasMessageContaining("Campagne non trouvée");
         }
     }
 

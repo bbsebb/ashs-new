@@ -69,6 +69,74 @@ class CampaignRepositoryTest {
         }
 
         @Test
+        @DisplayName("Should find all campaigns")
+        void shouldFindAllCampaigns() {
+            // Given
+            Campaign campaign1 = new Campaign();
+            campaign1.setSeasonId(UUID.randomUUID());
+            campaign1.setStatus(CampaignStatus.DRAFT);
+            campaignRepository.save(campaign1);
+
+            Campaign campaign2 = new Campaign();
+            campaign2.setSeasonId(UUID.randomUUID());
+            campaign2.setStatus(CampaignStatus.LAUNCHED);
+            campaignRepository.save(campaign2);
+
+            campaignRepository.flush();
+
+            // When
+            var allCampaigns = campaignRepository.findAll();
+
+            // Then
+            assertThat(allCampaigns).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("Should delete a campaign and its categories")
+        void shouldDeleteCampaign() {
+            // Given
+            Campaign campaign = new Campaign();
+            campaign.setSeasonId(UUID.randomUUID());
+            campaign.setStatus(CampaignStatus.DRAFT);
+            Set<Category> categories = new java.util.HashSet<>();
+            categories.add(new Category("U11", Price.of("100.00")));
+            campaign.setCategories(categories);
+            Campaign saved = campaignRepository.saveAndFlush(campaign);
+            UUID id = saved.getId();
+
+            // When
+            campaignRepository.delete(saved);
+            campaignRepository.flush();
+
+            // Then
+            assertThat(campaignRepository.findById(id)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Should update categories by overwriting the set")
+        void shouldUpdateCategories() {
+            // Given
+            Campaign campaign = new Campaign();
+            campaign.setSeasonId(UUID.randomUUID());
+            campaign.setStatus(CampaignStatus.DRAFT);
+            Set<Category> initialCategories = new java.util.HashSet<>();
+            initialCategories.add(new Category("U11", Price.of("100.00")));
+            campaign.setCategories(initialCategories);
+            Campaign saved = campaignRepository.saveAndFlush(campaign);
+
+            // When
+            Set<Category> updatedCategories = new java.util.HashSet<>();
+            updatedCategories.add(new Category("Sénior", Price.of("150.00")));
+            saved.setCategories(updatedCategories);
+            campaignRepository.saveAndFlush(saved);
+
+            // Then
+            Campaign updated = campaignRepository.findById(saved.getId()).orElseThrow();
+            assertThat(updated.getCategories()).hasSize(1);
+            assertThat(updated.getCategories().iterator().next().getName()).isEqualTo("Sénior");
+        }
+
+        @Test
         @DisplayName("Should fail to save when seasonId is null")
         void shouldFailWhenSeasonIdIsNull() {
             Campaign campaign = new Campaign();

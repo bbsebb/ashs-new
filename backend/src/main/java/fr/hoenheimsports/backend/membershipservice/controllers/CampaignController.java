@@ -49,21 +49,16 @@ public class CampaignController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/close")
+    public ResponseEntity<Void> closeCampaign(@PathVariable UUID id) {
+        campaignService.closeCampaign(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/memberships")
     public ResponseEntity<List<MembershipResponse>> getMembershipsByCampaign(@PathVariable UUID id) {
         return ResponseEntity.ok(membershipService.getMembershipsByCampaign(id));
     }
 
-    @PatchMapping("/{id}/process")
-    public ResponseEntity<Void> processMembership(@PathVariable UUID id) {
-        membershipService.processMembership(id);
-        return ResponseEntity.noContent().build();
-    }
 
-    @GetMapping("/active")
-    public ResponseEntity<CampaignResponse> getActiveCampaign() {
-        return campaignService.getActiveCampaign()
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-    }
 }

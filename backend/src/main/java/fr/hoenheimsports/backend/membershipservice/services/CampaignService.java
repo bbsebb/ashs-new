@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -63,19 +62,19 @@ public class CampaignService {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new EntityNotFoundException("Campagne non trouvée"));
 
-        if (campaignRepository.existsByStatus(CampaignStatus.LAUNCHED)) {
-            throw new IllegalStateException("Une campagne est déjà lancée");
-        }
-
         campaign.setStatus(CampaignStatus.LAUNCHED);
         campaignRepository.save(campaign);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<CampaignResponse> getActiveCampaign() {
-        return campaignRepository.findByStatus(CampaignStatus.LAUNCHED)
-            .map(this::toResponse);
+    @Transactional
+    public void closeCampaign(UUID campaignId) {
+        Campaign campaign = campaignRepository.findById(campaignId)
+                .orElseThrow(() -> new EntityNotFoundException("Campagne non trouvée"));
+
+        campaign.setStatus(CampaignStatus.CLOSED);
+        campaignRepository.save(campaign);
     }
+
 
     private CampaignResponse toResponse(Campaign campaign) {
         return new CampaignResponse(

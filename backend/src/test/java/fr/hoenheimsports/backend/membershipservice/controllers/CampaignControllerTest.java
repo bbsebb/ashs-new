@@ -26,7 +26,10 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -450,6 +453,24 @@ class CampaignControllerTest {
     }
 
     @Nested
+    class CloseCampaign {
+        @Test
+        void shouldCloseCampaign() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+
+            // When & Then
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns/{id}/close", campaignId)
+                    .exchange()
+                    .expectStatus().isNoContent();
+
+            verify(campaignService).closeCampaign(campaignId);
+        }
+    }
+
+
+    @Nested
     class GetMembershipsByCampaign {
         @Test
         void shouldReturnMembershipsByCampaign() {
@@ -470,7 +491,7 @@ class CampaignControllerTest {
             when(membershipService.getMembershipsByCampaign(campaignId)).thenReturn(List.of(membershipResponse));
 
             // When & Then
-            authRestTestClient.get()
+            restTestClient.get()
                     .uri("/api/v1/campaigns/{id}/memberships", campaignId)
                 .exchange()
                 .expectStatus().isOk()
@@ -496,28 +517,7 @@ class CampaignControllerTest {
 
             verify(membershipService).processMembership(membershipId);
         }
-
-        @Test
-        void shouldReturnForbiddenWhenNotAdmin() {
-            // Given
-            UUID membershipId = UUID.randomUUID();
-            Jwt jwt = Jwt.withTokenValue("token")
-                .header("alg", "none")
-                .claim("sub", "user")
-                .claim("realm_access", Map.of("roles", List.of("USER")))
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(3600))
-                .build();
-            when(jwtDecoder.decode(anyString())).thenReturn(jwt);
-
-            // When & Then
-            authRestTestClient.patch()
-                    .uri("/api/v1/campaigns/{id}/process", membershipId)
-                .exchange()
-                .expectStatus().isForbidden();
-        }
     }
-
     @Nested
     class GetCampaigns {
         @Test
@@ -553,39 +553,5 @@ class CampaignControllerTest {
         }
     }
 
-    @Nested
-    class GetActiveCampaign {
-        @Test
-        void shouldReturnActiveCampaign() {
-            // Given
-            UUID seasonId = UUID.randomUUID();
-            UUID campaignId = UUID.randomUUID();
-            Set<CategoryDto> categories = Set.of(new CategoryDto("U11", new BigDecimal("100.00")));
-            CampaignResponse response = new CampaignResponse(campaignId, seasonId, CampaignStatus.LAUNCHED, categories);
 
-            when(campaignService.getActiveCampaign()).thenReturn(Optional.of(response));
-
-            // When & Then
-            restTestClient.get()
-                    .uri("/api/v1/campaigns/active")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(campaignId.toString())
-                .jsonPath("$.seasonId").isEqualTo(seasonId.toString())
-                .jsonPath("$.status").isEqualTo("LAUNCHED");
-        }
-
-        @Test
-        void shouldReturnNotFoundWhenNoActiveCampaign() {
-            // Given
-            when(campaignService.getActiveCampaign()).thenReturn(Optional.empty());
-
-            // When & Then
-            restTestClient.get()
-                    .uri("/api/v1/campaigns/active")
-                .exchange()
-                .expectStatus().isNotFound();
-        }
-    }
 }

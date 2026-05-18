@@ -47,6 +47,7 @@ class CampaignUseCasesTest {
     private RestTestClient restTestClient;
     private RestTestClient authRestTestClient;
 
+
     @BeforeEach
     void setUp() {
         this.authRestTestClient = RestTestClient.bindToApplicationContext(webApplicationContext).build();
@@ -127,13 +128,14 @@ class CampaignUseCasesTest {
             Season season = createAndSaveSeason();
             createCampaignHelper(season.getId());
             createCampaignHelper(season.getId());
+            createCampaignHelper(season.getId());
 
             authRestTestClient.get()
                     .uri("/api/v1/campaigns")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
-                    .jsonPath("$.length()").isEqualTo(2);
+                    .jsonPath("$.length()").isEqualTo(3);
         }
 
         @Test
@@ -171,6 +173,7 @@ class CampaignUseCasesTest {
                     .expectStatus().isOk()
                     .expectBody()
                     .jsonPath("$.id").isEqualTo(campaignId.toString())
+                    .jsonPath("$.status").isEqualTo("DRAFT")
                     .jsonPath("$.categories.length()").isEqualTo(2);
         }
 
@@ -202,7 +205,6 @@ class CampaignUseCasesTest {
                     .exchange()
                     .expectStatus().isNoContent();
 
-            // Vérification supplémentaire : la campagne ne doit plus être accessible (404 sur un second DELETE)
             authRestTestClient.delete()
                     .uri("/api/v1/campaigns/" + campaignId)
                     .exchange()
@@ -216,6 +218,119 @@ class CampaignUseCasesTest {
                     .uri("/api/v1/campaigns/" + UUID.randomUUID())
                     .exchange()
                     .expectStatus().isUnauthorized();
+        }
+    }
+
+    @Nested
+    @DisplayName("Test du lancement d'une campagne")
+    class launchCampaign {
+        @Test
+        @DisplayName("Devrait lancer une campagne")
+        void shouldLaunchCampaignSuccessfully() {
+            //Given
+            Season season = createAndSaveSeason();
+            CampaignResponse campaign = createCampaignHelper(season.getId());
+            UUID campaignId = campaign.id();
+            //When
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns/{campaignId}/launch", campaignId)
+                    .exchange()
+                    .expectStatus().isNoContent();
+            //Then
+            authRestTestClient.get()
+                    .uri("/api/v1/campaigns")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$[?(@.id == '" + campaignId + "')].status")
+                    .isEqualTo("LAUNCHED");
+        }
+
+        @Test
+        @DisplayName("devrait renvoyer une erreur 404 si la campagne n'existe pas")
+        void shouldReturnNotFoundWhenCampaignDoesNotExist() {
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns/{campaignId}/launch", UUID.randomUUID())
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        @DisplayName("Devrait refuser la lancement aux utilisateurs non authentifiés")
+        void shouldReturnUnauthorizedWhenAnonymous() {
+            restTestClient.post()
+                    .uri("/api/v1/campaigns/{campaignId}/launch", UUID.randomUUID())
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
+
+
+    @Nested
+    @DisplayName("Test de la fermeture d'une campagne")
+    class closeCampaign {
+        @Test
+        @DisplayName("Devrait fermer une campagne")
+        void shouldCloseCampaignSuccessfully() {
+            //Given
+            Season season = createAndSaveSeason();
+            CampaignResponse campaign = createCampaignHelper(season.getId());
+            UUID campaignId = campaign.id();
+            //When
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns/{campaignId}/close", campaignId)
+                    .exchange()
+                    .expectStatus().isNoContent();
+            //Then
+            authRestTestClient.get()
+                    .uri("/api/v1/campaigns")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$[?(@.id == '" + campaignId + "')].status")
+                    .isEqualTo("CLOSED");
+        }
+
+        @Test
+        @DisplayName("devrait renvoyer une erreur 404 si la campagne n'existe pas")
+        void shouldReturnNotFoundWhenCampaignDoesNotExist() {
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns/{campaignId}/close", UUID.randomUUID())
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        @DisplayName("Devrait refuser la fermeture aux utilisateurs non authentifiés")
+        void shouldReturnUnauthorizedWhenAnonymous() {
+            restTestClient.post()
+                    .uri("/api/v1/campaigns/{campaignId}/close", UUID.randomUUID())
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
+
+
+    @Nested
+    @DisplayName("Récupération des adhésions par campagne")
+    class GetMembershipsByCampaign {
+        @Test
+        @DisplayName("Devrait récupérer les adhésions d'une campagne")
+        void shouldGetMembershipsByCampaign() {
+            // Given
+            Season season = createAndSaveSeason();
+            CampaignResponse campaign = createCampaignHelper(season.getId());
+
+            // Note: Pour un test d'intégration complet, on devrait créer des adhésions ici via l'API publique
+            // Mais pour l'instant on vérifie au moins l'endpoint et le retour (liste vide possible)
+
+            // When & Then
+            authRestTestClient.get()
+                    .uri("/api/v1/campaigns/" + campaign.id() + "/memberships")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.length()").isEqualTo(0);
         }
     }
 

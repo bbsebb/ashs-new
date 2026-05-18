@@ -5,5 +5,6 @@ package fr.hoenheimsports.backend.membershipservice.entities;
  */
 public enum CampaignStatus {
     DRAFT,
-    LAUNCHED
+    LAUNCHED,
+    CLOSED
 }

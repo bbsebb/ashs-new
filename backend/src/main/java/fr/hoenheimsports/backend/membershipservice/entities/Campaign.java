@@ -21,13 +21,14 @@ public class Campaign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "season_id", nullable = false)
     private UUID seasonId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private CampaignStatus status;
 
     @ElementCollection

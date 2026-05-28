@@ -1,0 +1,40 @@
+<div class="table-toolbar">
+  <app-page-title title="Catégories d'adhésion"/>
+  <button mat-fab type="button" extended aria-label="Ajouter une catégorie" (click)="campaignFormService.addCategory()">
+    <mat-icon>add</mat-icon>
+    Ajouter
+  </button>
+</div>
+
+<mat-error
+  class="alert alert-danger"
+  style="display: block; margin-bottom: 1rem;"
+  *appError="categoriesArrayInputSignal(); let errorMsg">
+  {{ errorMsg }}
+</mat-error>
+
+@for (categoryField of categoriesFormSignal(); track $index) {
+  <div class="optional-form-fields">
+    <div class="form-fields">
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Nom de la catégorie</mat-label>
+        <input matInput [formField]="categoryField.name" placeholder="Ex: Senior, Jeune..."/>
+        <mat-error *appError="categoryField.name; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="field" appearance="outline">
+        <mat-label>Montant (€)</mat-label>
+        <input matInput type="number" [formField]="categoryField.amount" placeholder="0.00"/>
+        <mat-error *appError="categoryField.amount; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <app-form-delete-button
+      [confirmMessage]="null"
+      [iconOnly]="!isHandsetSignal()"
+      (deleteConfirmed)="campaignFormService.removeCategory($index)">
+    </app-form-delete-button>
+  </div>
+}

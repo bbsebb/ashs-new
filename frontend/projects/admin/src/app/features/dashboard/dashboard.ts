@@ -30,6 +30,13 @@ export class Dashboard {
     { icon: 'stadium', label: 'Salles', description: 'Gérez les lieux d\'entrainement et de match.', path: '/halls', color: 'accent' },
     { icon: 'diversity_3', label: 'Équipes', description: 'Gérez vos effectifs et catégories.', path: '/teams', color: 'warn' },
     { icon: 'supervisor_account', label: 'Staff', description: 'Gérez les entraineurs et encadrants.', path: '/staffs', color: 'primary' },
+    {
+      icon: 'card_membership',
+      label: 'Adhésions',
+      description: 'Gérez les campagnes d\'adhésion et les tarifs.',
+      path: '/membership',
+      color: 'accent'
+    },
   ];
 
   /**

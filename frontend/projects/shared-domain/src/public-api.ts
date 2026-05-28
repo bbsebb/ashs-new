@@ -9,3 +9,5 @@ export * from './lib/team/team';
 export * from './lib/team/age-group';
 export * from './lib/team/gender';
 export * from './lib/team/day-of-week';
+export * from './lib/membership/category';
+export * from './lib/membership/campaign';

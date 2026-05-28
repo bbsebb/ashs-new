@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @Import(TestcontainersConfiguration.class)
@@ -26,24 +29,33 @@ class MembershipRepositoryTest {
     @Autowired
     private MembershipRepository membershipRepository;
 
+    @Autowired
+    private PaymentTransactionRepository paymentTransactionRepository;
+
     @Nested
-    @DisplayName("Basic CRUD Operations")
+    @DisplayName("CRUD Operations")
     class CrudOperations {
 
         @Test
-        @DisplayName("Should save and find a membership by ID")
-        void shouldSaveAndFindMembershipById() {
+        @DisplayName("Should save and find a membership with all its attributes")
+        void shouldSaveAndFindMembership() {
             // Given
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setAmount(Price.of("150.00"));
+            transaction.setCampaignId(UUID.randomUUID());
+            transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
+            transaction.setSumupCheckoutId(new SumUpCheckoutId("checkout-123"));
+            PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
+
             Membership membership = new Membership();
             membership.setCampaignId(UUID.randomUUID());
-            membership.setFirstName("John");
+            membership.setFirstName("Jane");
             membership.setLastName("Doe");
-            membership.setEmail(new Email("john.doe@example.com"));
-            membership.setLicenseNumber(new LicenseNumber("12345678"));
-            membership.setCategoryName("U11");
-            membership.setAmount(Price.of("100.00"));
+            membership.setEmail(new Email("jane.doe@example.com"));
+            membership.setLicenseNumber(new LicenseNumber("LIC-123"));
+            membership.setCategory(new Category("Sénior", Price.of("150.00")));
             membership.setStatus(MembershipStatus.PENDING);
-            membership.setSumupCheckoutId(new SumUpCheckoutId("checkout-123"));
+            savedTransaction.addMembership(membership);
 
             // When
             Membership savedMembership = membershipRepository.saveAndFlush(membership);
@@ -51,16 +63,77 @@ class MembershipRepositoryTest {
 
             // Then
             assertThat(foundMembership).isPresent();
-            assertThat(foundMembership.get().getId()).isNotNull();
-            assertThat(foundMembership.get().getCampaignId()).isEqualTo(membership.getCampaignId());
-            assertThat(foundMembership.get().getFirstName()).isEqualTo(membership.getFirstName());
-            assertThat(foundMembership.get().getLastName()).isEqualTo(membership.getLastName());
-            assertThat(foundMembership.get().getEmail()).isEqualTo(membership.getEmail());
-            assertThat(foundMembership.get().getLicenseNumber()).isEqualTo(membership.getLicenseNumber());
-            assertThat(foundMembership.get().getCategoryName()).isEqualTo(membership.getCategoryName());
-            assertThat(foundMembership.get().getAmount()).isEqualTo(membership.getAmount());
-            assertThat(foundMembership.get().getStatus()).isEqualTo(membership.getStatus());
-            assertThat(foundMembership.get().getSumupCheckoutId()).isEqualTo(membership.getSumupCheckoutId());
+            Membership actual = foundMembership.get();
+            assertThat(actual.getId()).isEqualTo(savedMembership.getId());
+            assertThat(actual.getCampaignId()).isEqualTo(membership.getCampaignId());
+            assertThat(actual.getFirstName()).isEqualTo("Jane");
+            assertThat(actual.getLastName()).isEqualTo("Doe");
+            assertThat(actual.getEmail()).isNotNull();
+            assertThat(actual.getEmail().value()).isEqualTo("jane.doe@example.com");
+            assertThat(actual.getLicenseNumber().value()).isEqualTo("LIC-123");
+            assertThat(actual.getCategory().getName()).isEqualTo("Sénior");
+            assertThat(actual.getCategory().getPrice().amount()).isEqualByComparingTo("150.00");
+            assertThat(actual.getStatus()).isEqualTo(MembershipStatus.PENDING);
+            assertThat(actual.getPaymentTransaction().getId()).isEqualTo(savedTransaction.getId());
+        }
+
+        @Test
+        @DisplayName("Should fail to save when required fields are null")
+        void shouldFailToSaveWithNullFields() {
+            Membership membership = new Membership();
+            // All required fields are null
+
+            assertThatThrownBy(() -> membershipRepository.saveAndFlush(membership))
+                    .isInstanceOf(DataIntegrityViolationException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Custom Queries")
+    class CustomQueries {
+
+        @Test
+        @DisplayName("Should find memberships by SumUp checkout identifier")
+        void shouldFindBySumupCheckoutId() {
+            // Given
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setAmount(Price.of("300.00"));
+            transaction.setCampaignId(UUID.randomUUID());
+            transaction.setPayerInfo(new PaymentPayerInfo("Marc", "Dupont", "marc.dupont@example.com"));
+            transaction.setSumupCheckoutId(new SumUpCheckoutId("checkout-unique-999"));
+            PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
+
+            Membership m1 = new Membership();
+            m1.setCampaignId(UUID.randomUUID());
+            m1.setFirstName("Child1");
+            m1.setLastName("Dupont");
+            m1.setEmail(new Email("child1@example.com"));
+            m1.setLicenseNumber(new LicenseNumber("LIC-C1"));
+            m1.setCategory(new Category("U11", Price.of("150.00")));
+            m1.setStatus(MembershipStatus.PENDING);
+            savedTransaction.addMembership(m1);
+            membershipRepository.save(m1);
+
+            Membership m2 = new Membership();
+            m2.setCampaignId(UUID.randomUUID());
+            m2.setFirstName("Child2");
+            m2.setLastName("Dupont");
+            m2.setEmail(new Email("child2@example.com"));
+            m2.setLicenseNumber(new LicenseNumber("LIC-C2"));
+            m2.setCategory(new Category("U11", Price.of("150.00")));
+            m2.setStatus(MembershipStatus.PENDING);
+            savedTransaction.addMembership(m2);
+            membershipRepository.save(m2);
+
+            membershipRepository.flush();
+
+            // When
+            List<Membership> found = membershipRepository.findByPaymentTransactionSumupCheckoutId(new SumUpCheckoutId("checkout-unique-999"));
+
+            // Then
+            assertThat(found).hasSize(2)
+                    .extracting(Membership::getFirstName)
+                    .containsExactlyInAnyOrder("Child1", "Child2");
         }
     }
 }

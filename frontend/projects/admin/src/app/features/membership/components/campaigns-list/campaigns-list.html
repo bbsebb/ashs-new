@@ -1,0 +1,96 @@
+@if (isLoadingSignal()) {
+  <app-loading-data label="Chargement des campagnes"/>
+} @else if (errorSignal()) {
+  <app-error-data dataName="campagnes" (onRetry)="retry()"/>
+} @else {
+  <app-admin-page-container title="Campagnes" subtitle="Gestion des campagnes d'adhésion">
+    <a mat-fab extended color="primary" routerLink="/membership/campaign/create" aria-label="Nouvelle campagne"
+       header-actions>
+      <mat-icon>add</mat-icon>
+      Ajouter
+    </a>
+
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <!-- Season Name Column -->
+        <ng-container matColumnDef="seasonName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Saison</th>
+          <td mat-cell *matCellDef="let campaign"> {{ campaign.seasonName }}</td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+          <td mat-cell *matCellDef="let campaign">
+            @switch (campaign.status) {
+              @case (CampaignStatus.DRAFT) {
+                <span class="badge badge-draft">Brouillon</span>
+              }
+              @case (CampaignStatus.LAUNCHED) {
+                <span class="badge badge-launched">Ouverte</span>
+              }
+              @case (CampaignStatus.CLOSED) {
+                <span class="badge badge-closed">Fermée</span>
+              }
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions</th>
+          <td mat-cell *matCellDef="let campaign" data-label="Actions">
+            <!-- View Action (Always visible) -->
+            <button mat-icon-button type="button" aria-label="Voir"
+                    [routerLink]="['/membership/campaign', campaign.id]">
+              <mat-icon>visibility</mat-icon>
+            </button>
+
+            <!-- Edit Action (Only if DRAFT) -->
+            @if (campaign.status === CampaignStatus.DRAFT) {
+              <button mat-icon-button type="button" aria-label="Modifier"
+                      [routerLink]="['/membership/campaign', campaign.id, 'update']">
+                <mat-icon>edit</mat-icon>
+              </button>
+            }
+
+            <!-- Launch Action (Only if DRAFT) -->
+            @if (campaign.status === CampaignStatus.DRAFT) {
+              <button mat-icon-button type="button" aria-label="Lancer" (click)="onLaunch(campaign.id)" color="primary">
+                <mat-icon>play_arrow</mat-icon>
+              </button>
+            }
+
+            <!-- Close Action (Only if LAUNCHED) -->
+            @if (campaign.status === CampaignStatus.LAUNCHED) {
+              <button mat-icon-button type="button" aria-label="Fermer" (click)="onClose(campaign.id)" color="warn">
+                <mat-icon>lock</mat-icon>
+              </button>
+            }
+
+            <!-- Delete Action (Only if DRAFT) -->
+            @if (campaign.status === CampaignStatus.DRAFT) {
+              <app-form-delete-button
+                confirmMessage="Êtes-vous sûr de vouloir supprimer cette campagne ?"
+                [iconOnly]="true"
+                (deleteConfirmed)="onDelete(campaign.id)">
+              </app-form-delete-button>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let _; columns: displayedColumns;"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            Aucune campagne à afficher.
+          </td>
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  </app-admin-page-container>
+}

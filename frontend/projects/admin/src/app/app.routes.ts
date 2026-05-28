@@ -111,6 +111,28 @@ export const routes: Routes = [
       },
     ]
   },
+  {
+    path: 'membership',
+    canActivateChild: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/membership/components/campaigns-list/campaigns-list').then(m => m.CampaignsList)
+      },
+      {
+        path: 'campaign/create',
+        loadComponent: () => import('./features/membership/components/campaign-form/campaign-form').then(m => m.CampaignForm)
+      },
+      {
+        path: 'campaign/:id/update',
+        loadComponent: () => import('./features/membership/components/campaign-form/campaign-form').then(m => m.CampaignForm)
+      },
+      {
+        path: 'campaign/:id',
+        loadComponent: () => import('./features/membership/components/campaign-view/campaign-view').then(m => m.CampaignView)
+      },
+    ]
+  },
   {path: 'mentions-legales', component: MentionsLegales},
   {
     path: 'contact',

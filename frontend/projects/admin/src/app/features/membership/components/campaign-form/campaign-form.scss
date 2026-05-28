@@ -1,0 +1,12 @@
+/**
+ * Campaign form specific styles.
+ * Most styles are inherited from the global form styles in shared-ui.
+ */
+
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}

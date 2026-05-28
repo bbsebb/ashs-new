@@ -8,12 +8,15 @@ import fr.hoenheimsports.backend.membershipservice.entities.Campaign;
 import fr.hoenheimsports.backend.membershipservice.entities.CampaignStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.Category;
 import fr.hoenheimsports.backend.membershipservice.entities.Price;
+import fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotDraftException;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -28,8 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CampaignService Unit Tests")
@@ -263,6 +265,7 @@ class CampaignServiceTest {
             // Given
             UUID campaignId = UUID.randomUUID();
             Campaign campaign = new Campaign();
+            campaign.setStatus(CampaignStatus.DRAFT);
             when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
 
             // When
@@ -270,6 +273,28 @@ class CampaignServiceTest {
 
             // Then
             verify(campaignRepository).delete(campaign);
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+                value = CampaignStatus.class,
+                names = {"LAUNCHED", "CLOSED"}
+        )
+        @DisplayName("Should throw an exception when the campaign is not in DRAFT status ")
+        void shouldThrowExceptionWhenCampaignIsNotInDraftStatus(CampaignStatus status) {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            Campaign campaign = new Campaign();
+            campaign.setId(campaignId);
+            campaign.setStatus(status);
+
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+
+            // When & Then
+            assertThatThrownBy(() -> campaignService.deleteCampaign(campaignId))
+                    .isInstanceOf(CampaignNotDraftException.class)
+                    .hasMessageContaining("La campagne doit être en statut DRAFT pour être supprimée");
+            verify(campaignRepository, never()).delete(campaign);
         }
 
         @Test

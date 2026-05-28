@@ -1,0 +1,175 @@
+@let campaign = campaignSignal();
+@if (isLoadingSignal()) {
+  <app-loading-data label="Chargement de la campagne"/>
+} @else if (errorSignal()) {
+  <app-error-data dataName="campagne" (onRetry)="retry()"/>
+} @else if (!campaign) {
+  <p>Aucune campagne trouvée</p>
+} @else {
+  <app-admin-page-container
+    [title]="'Campagne ' + seasonNameSignal()"
+    subtitle="Détails et statistiques de la campagne d'adhésion.">
+
+    <!-- Global Actions Menu -->
+    <div header-actions class="header-actions">
+      <a mat-button routerLink="/membership">
+        <mat-icon>arrow_back</mat-icon>
+        Retour
+      </a>
+      <!-- Edit Action -->
+      @if (campaign.status === CampaignStatus.DRAFT) {
+        <a mat-stroked-button [routerLink]="['/membership/campaign', campaign.id, 'update']">
+          <mat-icon>edit</mat-icon>
+          Modifier
+        </a>
+      }
+      <!-- Launch Action -->
+      @if (campaign.status === CampaignStatus.DRAFT || campaign.status === CampaignStatus.CLOSED) {
+        <button mat-flat-button color="primary" (click)="onLaunch()">
+          <mat-icon>play_arrow</mat-icon>
+          Lancer la campagne
+        </button>
+      }
+      <!-- Close Action -->
+      @if (campaign.status === CampaignStatus.LAUNCHED) {
+        <button mat-flat-button color="warn" (click)="onClose()">
+          <mat-icon>lock</mat-icon>
+          Fermer la campagne
+        </button>
+      }
+    </div>
+
+    <div class="view-layout">
+      <!-- Left Column: Informations & Categories -->
+      <div class="info-column">
+        <mat-card class="info-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>info</mat-icon>
+            <mat-card-title>Informations Générales</mat-card-title>
+            <div class="status-badge" [class]="'badge-' + campaign.status.toLowerCase()">
+              @switch (campaign.status) {
+                @case (CampaignStatus.DRAFT) {
+                  Brouillon
+                }
+                @case (CampaignStatus.LAUNCHED) {
+                  Ouverte
+                }
+                @case (CampaignStatus.CLOSED) {
+                  Fermée
+                }
+              }
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="categories-list">
+              <h3>Catégories et Tarifs</h3>
+              <ul>
+                @for (category of campaign.categories; track category.name) {
+                  <li>
+                    <span class="category-name">{{ category.name }}</span>
+                    <span class="category-amount">{{ category.amount | currency:'EUR' }}</span>
+                  </li>
+                } @empty {
+                  <li class="empty-state">Aucune catégorie définie.</li>
+                }
+              </ul>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Danger Zone (Delete) -->
+        @if (campaign.status === CampaignStatus.DRAFT) {
+          <mat-card class="danger-card">
+            <mat-card-content>
+              <div class="danger-content">
+                <div class="danger-text">
+                  <h3>Zone de danger</h3>
+                  <p>La suppression d'une campagne est définitive.</p>
+                </div>
+                <app-form-delete-button
+                  confirmMessage="Êtes-vous sûr de vouloir supprimer définitivement cette campagne ?"
+                  [iconOnly]="false"
+                  (deleteConfirmed)="onDelete()">
+                  Supprimer
+                </app-form-delete-button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+
+      <!-- Right Column: Statistics Grid -->
+      <div class="stats-column">
+        @let stats = statsSignal();
+        <h2 class="section-title">Aperçu Financier (Fictif)</h2>
+
+        <div class="stats-grid">
+          <!-- Joined & Paid -->
+          <mat-card class="stat-card stat-success">
+            <mat-card-content>
+              <div class="stat-icon">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+              <div class="stat-data">
+                <div class="stat-value">{{ stats.joinedAndPaid.count }}</div>
+                <div class="stat-label">Adhérents (Payé)</div>
+                <div class="stat-amount">{{ stats.joinedAndPaid.amount | currency:'EUR' }}</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Processed -->
+          <mat-card class="stat-card stat-primary">
+            <mat-card-content>
+              <div class="stat-icon">
+                <mat-icon>verified</mat-icon>
+              </div>
+              <div class="stat-data">
+                <div class="stat-value">{{ stats.processed.count }}</div>
+                <div class="stat-label">Adhérents (Traités)</div>
+                <div class="stat-amount">{{ stats.processed.amount | currency:'EUR' }}</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Payment Errors -->
+          <mat-card class="stat-card stat-warn">
+            <mat-card-content>
+              <div class="stat-icon">
+                <mat-icon>error</mat-icon>
+              </div>
+              <div class="stat-data">
+                <div class="stat-value">{{ stats.paymentErrors.count }}</div>
+                <div class="stat-label">Erreurs de Paiement</div>
+                <div class="stat-amount">{{ stats.paymentErrors.amount | currency:'EUR' }}</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Total (Sum) -->
+          <mat-card class="stat-card stat-total">
+            <mat-card-content>
+              <div class="stat-icon">
+                <mat-icon>account_balance</mat-icon>
+              </div>
+              <div class="stat-data">
+                <div class="stat-value">{{ stats.totalValidAmount | currency:'EUR' }}</div>
+                <div class="stat-label">Somme Totale Valide</div>
+                <div class="stat-amount">Payés + Traités</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+
+    <!-- Future Members List Section -->
+    <mat-divider style="margin: 2rem 0;"></mat-divider>
+    <div class="members-section">
+      <h2 class="section-title">Liste des Adhérents</h2>
+      <p class="text-muted">L'affichage des membres pour cette campagne sera implémenté prochainement.</p>
+      <!-- TODO: Intégrer le composant de liste des membres ici -->
+    </div>
+
+  </app-admin-page-container>
+}

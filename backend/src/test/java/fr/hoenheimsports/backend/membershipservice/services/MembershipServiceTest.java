@@ -4,6 +4,12 @@ import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.entities.*;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
+import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
+import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryNotAvailableException;
+import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryPriceMismatchException;
+import fr.hoenheimsports.backend.membershipservice.exceptions.MembershipInvalidStatusException;
+import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,231 +27,395 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for {@link MembershipService}.
+ */
 @ExtendWith(MockitoExtension.class)
+@DisplayName("MembershipService Unit Tests")
 class MembershipServiceTest {
 
     @Mock
     private CampaignRepository campaignRepository;
 
     @Mock
+    private PaymentTransactionRepository paymentTransactionRepository;
+
+    @Mock
     private MembershipRepository membershipRepository;
-
-    @Mock
-    private SumUpClient sumUpClient;
-
-    @Mock
-    private SumUpProperties sumUpProperties;
 
     @InjectMocks
     private MembershipService membershipService;
 
+    /**
+     * Test suite grouping all tests for the initiateMembershipPayment method.
+     */
     @Nested
-    class InitiatePayment {
+    @DisplayName("Membership Payment Tests")
+    class InitiateMembershipPaymentTests {
 
+        /**
+         * Verifies that when a valid request is provided, a membership payment is successfully initiated.
+         * Checks the DTO response mapping and the transaction state being persisted.
+         */
         @Test
-        void shouldInitiatePaymentSuccessfully() {
-            // Given
-            UUID membershipId = UUID.randomUUID();
-            Membership membership = new Membership();
-            membership.setId(membershipId);
-            membership.setAmount(new Price(new BigDecimal("150.00")));
-            membership.setEmail(new Email("john.doe@example.com"));
-
-            SumUpCheckoutResponse sumUpResponse = new SumUpCheckoutResponse(
-                "checkout-id-123",
-                "PENDING",
-                "https://checkout.sumup.com/pay/checkout-id-123"
-            );
-
-            when(membershipRepository.findById(membershipId)).thenReturn(Optional.of(membership));
-            when(sumUpProperties.getMerchantEmail()).thenReturn("merchant@example.com");
-            when(sumUpProperties.getReturnUrl()).thenReturn("https://example.com/return");
-            when(sumUpClient.createCheckout(any(SumUpCheckoutRequest.class))).thenReturn(sumUpResponse);
-
-            // When
-            String checkoutUrl = membershipService.initiatePayment(membershipId);
-
-            // Then
-            assertThat(checkoutUrl).isEqualTo("https://checkout.sumup.com/pay/checkout-id-123");
-            assertThat(membership.getSumupCheckoutId().value()).isEqualTo("checkout-id-123");
-
-            ArgumentCaptor<SumUpCheckoutRequest> requestCaptor = ArgumentCaptor.forClass(SumUpCheckoutRequest.class);
-            verify(sumUpClient).createCheckout(requestCaptor.capture());
-            SumUpCheckoutRequest capturedRequest = requestCaptor.getValue();
-            assertThat(capturedRequest.checkout_reference()).isEqualTo(membershipId.toString());
-            assertThat(capturedRequest.amount()).isEqualByComparingTo(new BigDecimal("150.00"));
-            assertThat(capturedRequest.currency()).isEqualTo("EUR");
-            assertThat(capturedRequest.pay_to_email()).isEqualTo("merchant@example.com");
-            assertThat(capturedRequest.return_url()).isEqualTo("https://example.com/return");
-            
-            verify(membershipRepository).save(membership);
-        }
-
-        @Test
-        void shouldThrowExceptionWhenMembershipNotFound() {
-            // Given
-            UUID membershipId = UUID.randomUUID();
-            when(membershipRepository.findById(membershipId)).thenReturn(Optional.empty());
-
-            // When / Then
-            assertThatThrownBy(() -> membershipService.initiatePayment(membershipId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Membership not found with ID: " + membershipId);
-        }
-    }
-
-    @Nested
-    class CreateMembership {
-
-        @Test
-        void shouldCreateMembershipSuccessfully() {
+        @DisplayName("Should initiate membership payment and return response when request is valid")
+        void shouldInitiateMembershipSuccessfully() {
             // Given
             UUID campaignId = UUID.randomUUID();
-            String categoryName = "Senior";
-            BigDecimal amount = new BigDecimal("150.00");
-            
-            Campaign campaign = new Campaign();
-            campaign.setId(campaignId);
-            campaign.setStatus(CampaignStatus.LAUNCHED);
-            Category category = new Category(categoryName, new Price(amount));
-            campaign.setCategories(Set.of(category));
-
-            MembershipCreateRequest request = new MembershipCreateRequest(
-                campaignId,
-                "John",
-                "Doe",
-                "john.doe@example.com",
-                "123456789",
-                categoryName
+            MembershipCreateRequest request1 = new MembershipCreateRequest(
+                    "John", "Doe", "john.doe@example.com", "LIC-12345",
+                    new CategoryDto("U11", new BigDecimal("100.00"))
             );
+            MembershipCreateRequest request2 = new MembershipCreateRequest(
+                    "Rene", "Dupont", "rene.dupont@example.com", "LIC-6789",
+                    new CategoryDto("U13", new BigDecimal("120.00"))
+            );
+            MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(request1, request2));
+
+            Campaign campaign = createCampaign(campaignId, Set.of(
+                    new Category("U11", Price.of("100.00")),
+                    new Category("U13", Price.of("120.00"))
+            ));
 
             when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
-            when(membershipRepository.save(any(Membership.class))).thenAnswer(invocation -> {
-                Membership membership = invocation.getArgument(0);
-                membership.setId(UUID.randomUUID());
-                return membership;
+            mockPaymentTransactionSave();
+
+            // When
+            MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.checkoutUrl()).isEqualTo("test");
+            assertThat(result.paymentTransactionId()).isNotNull();
+            assertThat(result.memberships()).hasSize(2);
+
+            assertThat(result.memberships()).anySatisfy(response -> {
+                assertThat(response).isNotNull();
+                assertThat(response.campaignId()).isEqualTo(campaignId);
+                assertThat(response.firstName()).isEqualTo("John");
+                assertThat(response.lastName()).isEqualTo("Doe");
+                assertThat(response.email()).isEqualTo("john.doe@example.com");
+                assertThat(response.licenseNumber()).isEqualTo("LIC-12345");
+                assertThat(response.categoryName()).isEqualTo("U11");
+                assertThat(response.amount()).isEqualByComparingTo("100.00");
+                assertThat(response.status()).isEqualTo(MembershipStatus.PENDING);
             });
 
-            // When
-            MembershipResponse response = membershipService.createMembership(request);
+            assertThat(result.memberships()).anySatisfy(response -> {
+                assertThat(response).isNotNull();
+                assertThat(response.campaignId()).isEqualTo(campaignId);
+                assertThat(response.firstName()).isEqualTo("Rene");
+                assertThat(response.lastName()).isEqualTo("Dupont");
+                assertThat(response.email()).isEqualTo("rene.dupont@example.com");
+                assertThat(response.licenseNumber()).isEqualTo("LIC-6789");
+                assertThat(response.categoryName()).isEqualTo("U13");
+                assertThat(response.amount()).isEqualByComparingTo("120.00");
+                assertThat(response.status()).isEqualTo(MembershipStatus.PENDING);
+            });
 
-            // Then
-            assertThat(response).isNotNull();
-            assertThat(response.campaignId()).isEqualTo(campaignId);
-            assertThat(response.firstName()).isEqualTo("John");
-            assertThat(response.lastName()).isEqualTo("Doe");
-            assertThat(response.email()).isEqualTo("john.doe@example.com");
-            assertThat(response.licenseNumber()).isEqualTo("123456789");
-            assertThat(response.categoryName()).isEqualTo(categoryName);
-            assertThat(response.amount()).isEqualByComparingTo(amount);
-            assertThat(response.status()).isEqualTo(MembershipStatus.PENDING);
+            ArgumentCaptor<PaymentTransaction> captor = ArgumentCaptor.forClass(PaymentTransaction.class);
+            verify(paymentTransactionRepository).save(captor.capture());
+            PaymentTransaction savedTx = captor.getValue();
+            assertThat(savedTx.getSumupCheckoutId().value()).isEqualTo("test");
+            assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("220.00");
+            assertThat(savedTx.getPayerInfo().firstName()).isEqualTo("John");
+            assertThat(savedTx.getPayerInfo().lastName()).isEqualTo("Doe");
+            assertThat(savedTx.getPayerInfo().email()).isEqualTo("john.doe@example.com");
         }
 
+        /**
+         * Verifies that when the requested campaign ID does not exist, an EntityNotFoundException is thrown.
+         */
         @Test
-        void shouldThrowExceptionWhenCampaignNotFound() {
+        @DisplayName("Should throw EntityNotFoundException when campaign does not exist")
+        void shouldThrowEntityNotFoundExceptionWhenCampaignDoesNotExist() {
             // Given
             UUID campaignId = UUID.randomUUID();
-            MembershipCreateRequest request = new MembershipCreateRequest(
-                campaignId, "John", "Doe", "john.doe@example.com", "123456789", "Senior"
-            );
-
+            MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of());
             when(campaignRepository.findById(campaignId)).thenReturn(Optional.empty());
 
-            // When / Then
-            assertThatThrownBy(() -> membershipService.createMembership(request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Campaign not found with ID: " + campaignId);
+            // When & Then
+            assertThatThrownBy(() -> membershipService.initiateMembershipPayment(order))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .satisfies(throwable -> {
+                        EntityNotFoundException ex = (EntityNotFoundException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Campagne non trouvée");
+                    });
         }
 
+        /**
+         * Verifies that when a membership category name is not configured in the campaign,
+         * a CategoryNotAvailableException is thrown.
+         */
         @Test
-        void shouldThrowExceptionWhenCampaignNotLaunched() {
+        @DisplayName("Should throw CategoryNotAvailableException when category is not configured in campaign")
+        void shouldThrowCategoryNotAvailableExceptionWhenCategoryNotConfigured() {
             // Given
             UUID campaignId = UUID.randomUUID();
-            Campaign campaign = new Campaign();
-            campaign.setId(campaignId);
-            campaign.setStatus(CampaignStatus.DRAFT);
-
-            MembershipCreateRequest request = new MembershipCreateRequest(
-                campaignId, "John", "Doe", "john.doe@example.com", "123456789", "Senior"
+            MembershipCreateRequest invalidRequest = new MembershipCreateRequest(
+                    "John", "Doe", "john.doe@example.com", "LIC-123",
+                    new CategoryDto("UNKNOWN_CATEGORY", new BigDecimal("100.00"))
             );
+            MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(invalidRequest));
+
+            Campaign campaign = createCampaign(campaignId, Set.of(new Category("U11", Price.of("100.00"))));
 
             when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
 
-            // When / Then
-            assertThatThrownBy(() -> membershipService.createMembership(request))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Campaign is not launched");
+            // When & Then
+            assertThatThrownBy(() -> membershipService.initiateMembershipPayment(order))
+                    .isInstanceOf(CategoryNotAvailableException.class)
+                    .satisfies(throwable -> {
+                        CategoryNotAvailableException ex = (CategoryNotAvailableException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("La catégorie UNKNOWN_CATEGORY n'est pas disponible pour cette campagne");
+                    });
         }
 
+        /**
+         * Verifies that when the price of the requested category differs from the campaign configuration,
+         * a CategoryPriceMismatchException is thrown.
+         */
         @Test
-        void shouldThrowExceptionWhenCategoryNotFound() {
+        @DisplayName("Should throw CategoryPriceMismatchException when price does not match campaign configuration")
+        void shouldThrowCategoryPriceMismatchExceptionWhenPriceDoesNotMatch() {
             // Given
             UUID campaignId = UUID.randomUUID();
+            MembershipCreateRequest invalidPriceRequest = new MembershipCreateRequest(
+                    "John", "Doe", "john.doe@example.com", "LIC-123",
+                    new CategoryDto("U11", new BigDecimal("50.00"))
+            );
+            MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(invalidPriceRequest));
+
+            Campaign campaign = createCampaign(campaignId, Set.of(new Category("U11", Price.of("100.00"))));
+
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.initiateMembershipPayment(order))
+                    .isInstanceOf(CategoryPriceMismatchException.class)
+                    .satisfies(throwable -> {
+                        CategoryPriceMismatchException ex = (CategoryPriceMismatchException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Le montant pour la catégorie U11 ne correspond pas à la configuration de la campagne");
+                    });
+        }
+
+        /**
+         * Verifies that when the price of the requested category is negative,
+         * a CategoryPriceMismatchException is thrown.
+         */
+        @Test
+        @DisplayName("Should throw CategoryPriceMismatchException when price is negative")
+        void shouldThrowCategoryPriceMismatchExceptionWhenPriceIsNegative() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            MembershipCreateRequest invalidRequest = new MembershipCreateRequest(
+                    "John", "Doe", "john.doe@example.com", "LIC-123",
+                    new CategoryDto("U11", new BigDecimal("-50.00"))
+            );
+            MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(invalidRequest));
+
+            Campaign campaign = createCampaign(campaignId, Set.of(new Category("U11", Price.of("100.00"))));
+
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.initiateMembershipPayment(order))
+                    .isInstanceOf(CategoryPriceMismatchException.class)
+                    .satisfies(throwable -> {
+                        CategoryPriceMismatchException ex = (CategoryPriceMismatchException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Le montant pour la catégorie U11 ne correspond pas à la configuration de la campagne");
+                    });
+        }
+
+        // --- Helper Methods ---
+
+        /**
+         * Helper to instantiate a test Campaign entity.
+         */
+        private Campaign createCampaign(UUID id, Set<Category> categories) {
             Campaign campaign = new Campaign();
-            campaign.setId(campaignId);
+            campaign.setId(id);
+            campaign.setSeasonId(UUID.randomUUID());
             campaign.setStatus(CampaignStatus.LAUNCHED);
-            campaign.setCategories(Set.of(new Category("Junior", new Price(new BigDecimal("100.00")))));
+            campaign.setCategories(categories);
+            return campaign;
+        }
 
-            MembershipCreateRequest request = new MembershipCreateRequest(
-                campaignId, "John", "Doe", "john.doe@example.com", "123456789", "Senior"
-            );
+        /**
+         * Helper to instantiate a default PaymentPayerInfoCreateRequest.
+         */
+        private PaymentPayerInfoCreateRequest createDefaultPayerRequest() {
+            return new PaymentPayerInfoCreateRequest("John", "Doe", "john.doe@example.com");
+        }
 
-            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+        /**
+         * Helper to instantiate a MembershipPaymentOrder.
+         */
+        private MembershipPaymentOrder createPaymentOrder(UUID campaignId, List<MembershipCreateRequest> requests) {
+            return new MembershipPaymentOrder(campaignId, createDefaultPayerRequest(), requests);
+        }
 
-            // When / Then
-            assertThatThrownBy(() -> membershipService.createMembership(request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Category Senior not found in campaign");
+        /**
+         * Helper to mock the PaymentTransactionRepository save logic,
+         * generating simulated IDs for parent and children entities.
+         */
+        private void mockPaymentTransactionSave() {
+            when(paymentTransactionRepository.save(any(PaymentTransaction.class)))
+                    .thenAnswer(invocation -> {
+                        PaymentTransaction paymentTransaction = invocation.getArgument(0);
+                        paymentTransaction.setId(UUID.randomUUID());
+                        paymentTransaction.getMemberships().forEach(membership -> membership.setId(UUID.randomUUID()));
+                        return paymentTransaction;
+                    });
         }
     }
 
     @Nested
-    class GetMembershipsByCampaign {
+    @DisplayName("Get Memberships By Campaign Tests")
+    class GetMembershipsByCampaignTests {
 
         @Test
-        void shouldReturnMembershipsByCampaign() {
+        @DisplayName("Should return mapped membership responses when campaign has memberships")
+        void shouldReturnMappedMembershipResponses() {
             // Given
             UUID campaignId = UUID.randomUUID();
-            Membership membership1 = new Membership();
-            membership1.setId(UUID.randomUUID());
-            membership1.setCampaignId(campaignId);
-            membership1.setFirstName("John");
-            membership1.setLastName("Doe");
-            membership1.setEmail(new Email("john.doe@example.com"));
-            membership1.setLicenseNumber(new LicenseNumber("123456"));
-            membership1.setCategoryName("Senior");
-            membership1.setAmount(new Price(new BigDecimal("150.00")));
-            membership1.setStatus(MembershipStatus.PAID);
+            Membership m1 = new Membership();
+            m1.setId(UUID.randomUUID());
+            m1.setCampaignId(campaignId);
+            m1.setFirstName("John");
+            m1.setLastName("Doe");
+            m1.setEmail(new Email("john.doe@example.com"));
+            m1.setLicenseNumber(new LicenseNumber("LIC-123"));
+            m1.setCategory(new Category("U11", Price.of("100.00")));
+            m1.setStatus(MembershipStatus.PENDING);
 
-            Membership membership2 = new Membership();
-            membership2.setId(UUID.randomUUID());
-            membership2.setCampaignId(campaignId);
-            membership2.setFirstName("Jane");
-            membership2.setLastName("Doe");
-            membership2.setEmail(new Email("jane.doe@example.com"));
-            membership2.setLicenseNumber(new LicenseNumber("654321"));
-            membership2.setCategoryName("Junior");
-            membership2.setAmount(new Price(new BigDecimal("100.00")));
-            membership2.setStatus(MembershipStatus.PENDING);
+            Membership m2 = new Membership();
+            m2.setId(UUID.randomUUID());
+            m2.setCampaignId(campaignId);
+            m2.setFirstName("Jane");
+            m2.setLastName("Doe");
+            m2.setEmail(new Email("jane.doe@example.com"));
+            m2.setLicenseNumber(new LicenseNumber("LIC-456"));
+            m2.setCategory(new Category("Sénior", Price.of("150.00")));
+            m2.setStatus(MembershipStatus.PENDING);
 
-            when(membershipRepository.findByCampaignId(campaignId)).thenReturn(List.of(membership1, membership2));
+            when(membershipRepository.findAllByCampaignId(campaignId)).thenReturn(List.of(m1, m2));
 
             // When
             List<MembershipResponse> result = membershipService.getMembershipsByCampaign(campaignId);
 
             // Then
             assertThat(result).hasSize(2);
-            assertThat(result.get(0).id()).isEqualTo(membership1.getId());
-            assertThat(result.get(1).id()).isEqualTo(membership2.getId());
+            assertThat(result).anySatisfy(response -> {
+                assertThat(response.id()).isEqualTo(m1.getId());
+                assertThat(response.campaignId()).isEqualTo(campaignId);
+                assertThat(response.firstName()).isEqualTo("John");
+                assertThat(response.lastName()).isEqualTo("Doe");
+                assertThat(response.email()).isEqualTo("john.doe@example.com");
+                assertThat(response.licenseNumber()).isEqualTo("LIC-123");
+                assertThat(response.categoryName()).isEqualTo("U11");
+                assertThat(response.amount()).isEqualByComparingTo("100.00");
+                assertThat(response.status()).isEqualTo(MembershipStatus.PENDING);
+            });
+            assertThat(result).anySatisfy(response -> {
+                assertThat(response.id()).isEqualTo(m2.getId());
+                assertThat(response.campaignId()).isEqualTo(campaignId);
+                assertThat(response.firstName()).isEqualTo("Jane");
+                assertThat(response.lastName()).isEqualTo("Doe");
+                assertThat(response.email()).isEqualTo("jane.doe@example.com");
+                assertThat(response.licenseNumber()).isEqualTo("LIC-456");
+                assertThat(response.categoryName()).isEqualTo("Sénior");
+                assertThat(response.amount()).isEqualByComparingTo("150.00");
+                assertThat(response.status()).isEqualTo(MembershipStatus.PENDING);
+            });
+
+            verify(membershipRepository).findAllByCampaignId(campaignId);
+        }
+
+        @Test
+        @DisplayName("Should return empty list when no memberships exist for campaign")
+        void shouldReturnEmptyListWhenNoMemberships() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            when(membershipRepository.findAllByCampaignId(campaignId)).thenReturn(List.of());
+
+            // When
+            List<MembershipResponse> result = membershipService.getMembershipsByCampaign(campaignId);
+
+            // Then
+            assertThat(result).isEmpty();
+            verify(membershipRepository).findAllByCampaignId(campaignId);
         }
     }
 
     @Nested
-    class ProcessMembership {
+    @DisplayName("Get Membership Tests")
+    class GetMembershipTests {
 
         @Test
+        @DisplayName("Should return mapped membership response when membership exists")
+        void shouldReturnMembershipWhenExists() {
+            // Given
+            UUID membershipId = UUID.randomUUID();
+            UUID campaignId = UUID.randomUUID();
+            Membership membership = new Membership();
+            membership.setId(membershipId);
+            membership.setCampaignId(campaignId);
+            membership.setFirstName("John");
+            membership.setLastName("Doe");
+            membership.setEmail(new Email("john.doe@example.com"));
+            membership.setLicenseNumber(new LicenseNumber("LIC-123"));
+            membership.setCategory(new Category("U11", Price.of("100.00")));
+            membership.setStatus(MembershipStatus.PENDING);
+
+            when(membershipRepository.findById(membershipId)).thenReturn(Optional.of(membership));
+
+            // When
+            MembershipResponse result = membershipService.getMembership(membershipId);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.id()).isEqualTo(membershipId);
+            assertThat(result.campaignId()).isEqualTo(campaignId);
+            assertThat(result.firstName()).isEqualTo("John");
+            assertThat(result.lastName()).isEqualTo("Doe");
+            assertThat(result.email()).isEqualTo("john.doe@example.com");
+            assertThat(result.licenseNumber()).isEqualTo("LIC-123");
+            assertThat(result.categoryName()).isEqualTo("U11");
+            assertThat(result.amount()).isEqualByComparingTo("100.00");
+            assertThat(result.status()).isEqualTo(MembershipStatus.PENDING);
+
+            verify(membershipRepository).findById(membershipId);
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when membership does not exist")
+        void shouldThrowEntityNotFoundExceptionWhenNotExists() {
+            // Given
+            UUID membershipId = UUID.randomUUID();
+            when(membershipRepository.findById(membershipId)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.getMembership(membershipId))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .satisfies(throwable -> {
+                        EntityNotFoundException ex = (EntityNotFoundException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Adhérent non trouvé");
+                    });
+
+            verify(membershipRepository).findById(membershipId);
+        }
+    }
+
+    @Nested
+    @DisplayName("Process Membership Tests")
+    class ProcessMembershipTests {
+
+        @Test
+        @DisplayName("Should successfully change status from PAID to PROCESSED and save")
         void shouldProcessMembershipSuccessfully() {
             // Given
             UUID membershipId = UUID.randomUUID();
@@ -260,23 +430,13 @@ class MembershipServiceTest {
 
             // Then
             assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PROCESSED);
+            verify(membershipRepository).findById(membershipId);
             verify(membershipRepository).save(membership);
         }
 
         @Test
-        void shouldThrowExceptionWhenMembershipNotFound() {
-            // Given
-            UUID membershipId = UUID.randomUUID();
-            when(membershipRepository.findById(membershipId)).thenReturn(Optional.empty());
-
-            // When / Then
-            assertThatThrownBy(() -> membershipService.processMembership(membershipId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Membership not found with ID: " + membershipId);
-        }
-
-        @Test
-        void shouldThrowExceptionWhenMembershipStatusIsNotPaid() {
+        @DisplayName("Should throw MembershipInvalidStatusException when status is not PAID")
+        void shouldThrowMembershipInvalidStatusExceptionWhenStatusIsNotPaid() {
             // Given
             UUID membershipId = UUID.randomUUID();
             Membership membership = new Membership();
@@ -285,10 +445,34 @@ class MembershipServiceTest {
 
             when(membershipRepository.findById(membershipId)).thenReturn(Optional.of(membership));
 
-            // When / Then
+            // When & Then
             assertThatThrownBy(() -> membershipService.processMembership(membershipId))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Membership must be PAID to be processed. Current status: PENDING");
+                    .isInstanceOf(MembershipInvalidStatusException.class)
+                    .satisfies(throwable -> {
+                        MembershipInvalidStatusException ex = (MembershipInvalidStatusException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("L'adhésion doit être au statut PAID pour être traitée");
+                    });
+
+            verify(membershipRepository).findById(membershipId);
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when membership does not exist")
+        void shouldThrowEntityNotFoundExceptionWhenMembershipDoesNotExist() {
+            // Given
+            UUID membershipId = UUID.randomUUID();
+            when(membershipRepository.findById(membershipId)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.processMembership(membershipId))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .satisfies(throwable -> {
+                        EntityNotFoundException ex = (EntityNotFoundException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Adhérent non trouvé");
+                    });
+
+            verify(membershipRepository).findById(membershipId);
         }
     }
 }
+

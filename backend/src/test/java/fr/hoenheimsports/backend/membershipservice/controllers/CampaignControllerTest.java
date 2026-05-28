@@ -1,6 +1,10 @@
 package fr.hoenheimsports.backend.membershipservice.controllers;
 
-import fr.hoenheimsports.backend.membershipservice.dtos.*;
+import fr.hoenheimsports.backend.membershipservice.dtos.CampaignCreateRequest;
+import fr.hoenheimsports.backend.membershipservice.dtos.CampaignResponse;
+import fr.hoenheimsports.backend.membershipservice.dtos.CampaignUpdateRequest;
+import fr.hoenheimsports.backend.membershipservice.dtos.CategoryDto;
+import fr.hoenheimsports.backend.membershipservice.dtos.MembershipResponse;
 import fr.hoenheimsports.backend.membershipservice.entities.CampaignStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
 import fr.hoenheimsports.backend.membershipservice.services.CampaignService;
@@ -473,54 +477,94 @@ class CampaignControllerTest {
     @Nested
     class GetMembershipsByCampaign {
         @Test
+        @DisplayName("Devrait retourner les adhésions d'une campagne")
         void shouldReturnMembershipsByCampaign() {
             // Given
             UUID campaignId = UUID.randomUUID();
-            MembershipResponse membershipResponse = new MembershipResponse(
-                UUID.randomUUID(),
-                campaignId,
-                "John",
-                "Doe",
-                "john.doe@example.com",
-                "123456",
-                "Senior",
-                new BigDecimal("150.00"),
-                MembershipStatus.PAID
+            MembershipResponse m1 = new MembershipResponse(
+                    UUID.randomUUID(),
+                    campaignId,
+                    "John",
+                    "Doe",
+                    "john.doe@example.com",
+                    "LIC-123",
+                    "U11",
+                    new BigDecimal("100.00"),
+                    MembershipStatus.PENDING
+            );
+            MembershipResponse m2 = new MembershipResponse(
+                    UUID.randomUUID(),
+                    campaignId,
+                    "Jane",
+                    "Doe",
+                    "jane.doe@example.com",
+                    "LIC-456",
+                    "Sénior",
+                    new BigDecimal("150.00"),
+                    MembershipStatus.PENDING
             );
 
-            when(membershipService.getMembershipsByCampaign(campaignId)).thenReturn(List.of(membershipResponse));
+            when(membershipService.getMembershipsByCampaign(campaignId)).thenReturn(List.of(m1, m2));
 
             // When & Then
-            restTestClient.get()
-                    .uri("/api/v1/campaigns/{id}/memberships", campaignId)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$[0].id").isEqualTo(membershipResponse.id().toString())
-                .jsonPath("$[0].firstName").isEqualTo("John")
-                .jsonPath("$[0].lastName").isEqualTo("Doe");
+            authRestTestClient.get()
+                    .uri("/api/v1/campaigns/" + campaignId + "/memberships")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.length()").isEqualTo(2)
+                    .jsonPath("$[0].id").isEqualTo(m1.id().toString())
+                    .jsonPath("$[0].campaignId").isEqualTo(campaignId.toString())
+                    .jsonPath("$[0].firstName").isEqualTo("John")
+                    .jsonPath("$[0].lastName").isEqualTo("Doe")
+                    .jsonPath("$[0].email").isEqualTo("john.doe@example.com")
+                    .jsonPath("$[0].licenseNumber").isEqualTo("LIC-123")
+                    .jsonPath("$[0].categoryName").isEqualTo("U11")
+                    .jsonPath("$[0].amount").isEqualTo(100.00)
+                    .jsonPath("$[0].status").isEqualTo("PENDING")
+                    .jsonPath("$[1].id").isEqualTo(m2.id().toString())
+                    .jsonPath("$[1].campaignId").isEqualTo(campaignId.toString())
+                    .jsonPath("$[1].firstName").isEqualTo("Jane")
+                    .jsonPath("$[1].lastName").isEqualTo("Doe")
+                    .jsonPath("$[1].email").isEqualTo("jane.doe@example.com")
+                    .jsonPath("$[1].licenseNumber").isEqualTo("LIC-456")
+                    .jsonPath("$[1].categoryName").isEqualTo("Sénior")
+                    .jsonPath("$[1].amount").isEqualTo(150.00)
+                    .jsonPath("$[1].status").isEqualTo("PENDING");
         }
-    }
 
-    @Nested
-    class ProcessMembership {
         @Test
-        void shouldProcessMembership() {
+        @DisplayName("Devrait retourner une liste vide si aucune adhésion")
+        void shouldReturnEmptyListWhenNoMemberships() {
             // Given
-            UUID membershipId = UUID.randomUUID();
+            UUID campaignId = UUID.randomUUID();
+            when(membershipService.getMembershipsByCampaign(campaignId)).thenReturn(List.of());
 
             // When & Then
-            authRestTestClient.patch()
-                    .uri("/api/v1/campaigns/{id}/process", membershipId)
-                .exchange()
-                    .expectStatus().isNoContent();
+            authRestTestClient.get()
+                    .uri("/api/v1/campaigns/" + campaignId + "/memberships")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.length()").isEqualTo(0);
+        }
 
-            verify(membershipService).processMembership(membershipId);
+        @Test
+        @DisplayName("Devrait refuser l'accès aux utilisateurs non authentifiés")
+        void shouldRejectUnauthorizedAccess() {
+            UUID campaignId = UUID.randomUUID();
+            restTestClient.get()
+                    .uri("/api/v1/campaigns/" + campaignId + "/memberships")
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
+
+
     @Nested
     class GetCampaigns {
         @Test
+        @DisplayName("Devrait renvoyer toutes les campagnes")
         void shouldReturnAllCampaigns() {
             // Given
             UUID campaignId = UUID.randomUUID();
@@ -529,7 +573,7 @@ class CampaignControllerTest {
             when(campaignService.getCampaigns()).thenReturn(List.of(response));
 
             // When & Then
-            restTestClient.get()
+            authRestTestClient.get()
                     .uri("/api/v1/campaigns")
                     .exchange()
                     .expectStatus().isOk()
@@ -539,17 +583,27 @@ class CampaignControllerTest {
         }
 
         @Test
+        @DisplayName("Devrait renvoyer une liste vide si aucune campagne n'est trouvée")
         void shouldReturnEmptyList() {
             // Given
             when(campaignService.getCampaigns()).thenReturn(List.of());
 
             // When & Then
-            restTestClient.get()
+            authRestTestClient.get()
                     .uri("/api/v1/campaigns")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
                     .jsonPath("$.length()").isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("Devrait refuser l'accès aux utilisateurs non authentifiés")
+        void shouldRejectUnauthorizedAccess() {
+            restTestClient.get()
+                    .uri("/api/v1/campaigns")
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
 

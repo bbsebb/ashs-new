@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -15,12 +14,12 @@ import java.util.UUID;
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
     /**
-     * Finds a membership by its SumUp checkout identifier.
+     * Finds memberships by their SumUp checkout identifier.
      *
      * @param sumupCheckoutId the SumUp checkout identifier
-     * @return an Optional containing the found membership, or empty if not found
+     * @return a list of memberships for the checkout identifier
      */
-    Optional<Membership> findBySumupCheckoutId(SumUpCheckoutId sumupCheckoutId);
+    List<Membership> findByPaymentTransactionSumupCheckoutId(SumUpCheckoutId sumupCheckoutId);
 
     /**
      * Finds all memberships for a given campaign.
@@ -29,4 +28,6 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
      * @return a list of memberships for the campaign
      */
     List<Membership> findByCampaignId(UUID campaignId);
+
+    List<Membership> findAllByCampaignId(UUID campaignId);
 }

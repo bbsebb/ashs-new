@@ -1,0 +1,64 @@
+<section class="form">
+  <app-page-title
+    eyebrow="Gestion des adhésions"
+    [title]="idInputSignal() ? 'Modifier la campagne' : 'Nouvelle campagne'"
+    subtitle="Configurez la saison et les tarifs par catégorie."
+  />
+
+  <form class="content" autocomplete="off" [formRoot]="campaignFormService.campaignFormSignal">
+    <div class="form-fields">
+      <!-- Season Selection -->
+      @if (idInputSignal()) {
+        <!-- Display season as read-only in edit mode -->
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Saison</mat-label>
+          @let campaign = campaignFormService.campaignSignal();
+          @let seasons = campaignFormService.seasonsSignal();
+          @let currentSeason = seasons.find(s => s.id === campaign?.seasonId);
+          <input matInput [value]="currentSeason?.name ?? 'Chargement...'" disabled/>
+          <mat-hint>La saison ne peut pas être modifiée pour une campagne existante.</mat-hint>
+        </mat-form-field>
+      } @else {
+        <!-- Allow selection in creation mode -->
+        <mat-form-field class="field" appearance="outline">
+          <mat-label>Saison</mat-label>
+          <mat-select [formField]="campaignFormService.campaignFormSignal.seasonId">
+            @for (season of campaignFormService.seasonsSignal(); track season.id) {
+              <mat-option [value]="season.id">
+                {{ season.name }}
+              </mat-option>
+            }
+            <mat-option
+              (onSelectionChange)="$event.isUserInput && $event.source.selected && campaignFormService.addSeason()"
+              [value]="null">Ajouter une saison
+            </mat-option>
+          </mat-select>
+          <mat-error *appError="campaignFormService.campaignFormSignal.seasonId; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
+      }
+    </div>
+
+    <app-campaign-category-fields [categoriesArray]="campaignFormService.campaignFormSignal.categories"/>
+
+    <!-- Global Form Errors -->
+    @let globalErrors = campaignFormService.campaignFormSignal().errors();
+    @if (globalErrors.length > 0) {
+      @for (globalError of globalErrors; track globalError.kind) {
+        <mat-error class="alert alert-danger">
+          {{ globalError.message }}
+        </mat-error>
+      }
+    }
+
+    <!-- Form Action Buttons -->
+    <div class="actions">
+      <app-form-submit-button
+        [disabled]="campaignFormService.isSubmitDisabledSignal()"
+        [content]="idInputSignal() ? 'Modifier' : 'Enregistrer'"
+        [submitting]="campaignFormService.campaignFormSignal().submitting()"/>
+      <button mat-button type="button" (click)="cancel()">Retour</button>
+    </div>
+  </form>
+</section>

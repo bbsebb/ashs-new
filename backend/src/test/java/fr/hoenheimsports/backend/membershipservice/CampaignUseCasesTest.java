@@ -1,12 +1,13 @@
 package fr.hoenheimsports.backend.membershipservice;
 
 import fr.hoenheimsports.backend.TestcontainersConfiguration;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignCreateRequest;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignResponse;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignUpdateRequest;
-import fr.hoenheimsports.backend.membershipservice.dtos.CategoryDto;
+import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.seasonservice.entities.Season;
 import fr.hoenheimsports.backend.seasonservice.repositories.SeasonRepository;
+import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
+import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
+import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -44,6 +46,15 @@ class CampaignUseCasesTest {
     private SeasonRepository seasonRepository;
 
     @Autowired
+    private CampaignRepository campaignRepository;
+
+    @Autowired
+    private MembershipRepository membershipRepository;
+
+    @Autowired
+    private PaymentTransactionRepository paymentTransactionRepository;
+
+    @Autowired
     private RestTestClient restTestClient;
     private RestTestClient authRestTestClient;
 
@@ -51,6 +62,10 @@ class CampaignUseCasesTest {
     @BeforeEach
     void setUp() {
         this.authRestTestClient = RestTestClient.bindToApplicationContext(webApplicationContext).build();
+        this.membershipRepository.deleteAll();
+        this.paymentTransactionRepository.deleteAll();
+        this.campaignRepository.deleteAll();
+        this.seasonRepository.deleteAll();
     }
 
     @Nested
@@ -147,6 +162,15 @@ class CampaignUseCasesTest {
                     .expectStatus().isOk()
                     .expectBody()
                     .jsonPath("$.length()").isEqualTo(0);
+        }
+
+        @Test
+        @DisplayName("Devrait refuser l'accès aux utilisateurs non authentifiés")
+        void shouldRejectUnauthorizedAccess() {
+            restTestClient.get()
+                    .uri("/api/v1/campaigns")
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
 
@@ -321,8 +345,33 @@ class CampaignUseCasesTest {
             Season season = createAndSaveSeason();
             CampaignResponse campaign = createCampaignHelper(season.getId());
 
-            // Note: Pour un test d'intégration complet, on devrait créer des adhésions ici via l'API publique
-            // Mais pour l'instant on vérifie au moins l'endpoint et le retour (liste vide possible)
+            // Create memberships via the public API
+            MembershipCreateRequest membershipCreateRequest1 = new MembershipCreateRequest(
+                    "Doe",
+                    "John",
+                    "john@doe.com",
+                    "LIC-12345",
+                    new CategoryDto("U11", new BigDecimal("100.00"))
+            );
+            PaymentPayerInfoCreateRequest paymentPayerInfoCreateRequest = new PaymentPayerInfoCreateRequest(
+                    "John",
+                    "doe",
+                    "john.doe@example.com"
+            );
+
+            MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
+                    campaign.id(),
+                    paymentPayerInfoCreateRequest,
+                    List.of(membershipCreateRequest1)
+            );
+
+            // Initiate payment to create the membership in database
+            authRestTestClient.post()
+                    .uri("/api/v1/memberships/orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(membershipPaymentOrder)
+                    .exchange()
+                    .expectStatus().isCreated();
 
             // When & Then
             authRestTestClient.get()
@@ -330,11 +379,29 @@ class CampaignUseCasesTest {
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
-                    .jsonPath("$.length()").isEqualTo(0);
+                    .jsonPath("$.length()").isEqualTo(1)
+                    .jsonPath("$[0].id").exists()
+                    .jsonPath("$[0].campaignId").isEqualTo(campaign.id().toString())
+                    .jsonPath("$[0].firstName").isEqualTo("Doe")
+                    .jsonPath("$[0].lastName").isEqualTo("John")
+                    .jsonPath("$[0].email").isEqualTo("john@doe.com")
+                    .jsonPath("$[0].licenseNumber").isEqualTo("LIC-12345")
+                    .jsonPath("$[0].categoryName").isEqualTo("U11")
+                    .jsonPath("$[0].amount").isEqualTo(100.00)
+                    .jsonPath("$[0].status").isEqualTo("PENDING");
+        }
+
+        @Test
+        @DisplayName("Devrait refuser l'accès aux utilisateurs non authentifiés")
+        void shouldRejectUnauthorizedAccess() {
+            restTestClient.get()
+                    .uri("/api/v1/campaigns/" + UUID.randomUUID() + "/memberships")
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
 
-    private CampaignResponse createCampaignHelper(UUID seasonId) {
+    private @Nullable CampaignResponse createCampaignHelper(UUID seasonId) {
         Set<CategoryDto> categories = Set.of(new CategoryDto("U11", new BigDecimal("100.00")));
         CampaignCreateRequest request = new CampaignCreateRequest(seasonId, categories);
 

@@ -121,13 +121,11 @@
         - Après chaque opération, vérifie **l'intégralité des attributs** de l'entité via AssertJ.
         - Valide les contraintes d'intégrité (not null, unique, check) via `saveAndFlush`.
     - **Contrôleurs (Slice Tests) :**
-        - Utilise `@WebMvcTest(value = MyController.class)`. **Interdiction d'exclure la sécurité**.
-        - **Mocking Sécurité :** Mocker systématiquement le `JwtDecoder` via `@MockitoBean` et simuler
-          l'authentification via un header `Authorization: Bearer [token]`.
-        - Utilise **`RestTestClient`** initialisé dans un `@BeforeEach` via `RestTestClient.bindTo(mockMvc).build()` (
-          binding minimum obligatoire). Préfère créer deux clients : un anonyme (`restTestClient`) et un authentifié (
-          `authRestTestClient`).
+        - Utilise `@WebMvcTest(value = MyController.class)` avec MockMvcTester. Utilise .jwt() pour simuler
+          l'authentification.
     - **Mocking :** Utilise systématiquement **`@MockitoBean`**.
+  - **Test d'intégration ou USE CASE :** Fait les tests d'intégration pour les scénarios complexes impliquant plusieurs
+    couches. Utilise RestTestClient pour simuler les requêtes HTTP avec @SpringBootTest et RANDOM_PORT.
 - **Persistance & Migration :**
     - **Flyway :** Un schéma de base de données par module Spring Modulith pour garantir l'isolation des données.
     - **Développement :** Utilisation du support **Docker Compose** de Spring Boot pour l'instanciation automatique de la base de données en local.

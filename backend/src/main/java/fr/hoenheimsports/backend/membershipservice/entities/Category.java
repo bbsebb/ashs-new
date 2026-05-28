@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.membershipservice.entities;
 
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
@@ -28,12 +29,13 @@ public class Category {
     private String name;
 
     @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "amount", nullable = false, precision = 19, scale = 2))
     private Price price;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (getClass() != o.getClass()) return false;
         Category category = (Category) o;
         return Objects.equals(name, category.name);
     }

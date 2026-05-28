@@ -1,0 +1,16 @@
+/**
+ * Campaign category fields styles.
+ * Uses shared form styles for consistency.
+ */
+
+.optional-form-fields {
+  /* This class is already defined globally in _forms.scss */
+}
+
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 16px;
+}

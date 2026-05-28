@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.seasonservice.services;
 
+import fr.hoenheimsports.backend.membershipservice.CampaignAPI;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonCreateRequest;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonResponse;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonUpdateRequest;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +39,10 @@ class SeasonServiceTest {
 
     @Mock
     private TeamAPI teamAPI;
+
+
+    @Mock
+    private CampaignAPI campaignAPI;
 
     @InjectMocks
     private SeasonService seasonService;
@@ -92,7 +98,7 @@ class SeasonServiceTest {
     }
 
     @Test
-    void deleteById_ShouldThrowException_WhenSeasonIsInUse() {
+    void deleteById_ShouldThrowException_WhenSeasonIsInUseInTeam() {
         // Arrange
         UUID id = UUID.randomUUID();
         Season season = new Season();
@@ -100,11 +106,29 @@ class SeasonServiceTest {
 
         when(seasonRepository.findById(id)).thenReturn(Optional.of(season));
         when(teamAPI.findTeamUUIDBySeasonUUID(id)).thenReturn(Collections.singleton(UUID.randomUUID()));
+        when(campaignAPI.findCampaignUUIDBySeasonUUID(id)).thenReturn(Set.of());
 
         // Act & Assert
         assertThatThrownBy(() -> seasonService.deleteById(id))
                 .isInstanceOf(SeasonInUseException.class)
-                .hasMessageContaining("La saison est utilisée par des équipes");
+                .hasMessageContaining("La saison est utilisée par des équipes ou campagnes et ne peut pas être supprimée");
+    }
+
+    @Test
+    void deleteById_ShouldThrowException_WhenSeasonIsInUseInCampaign() {
+        // Arrange
+        UUID id = UUID.randomUUID();
+        Season season = new Season();
+        season.setId(id);
+
+        when(seasonRepository.findById(id)).thenReturn(Optional.of(season));
+        when(teamAPI.findTeamUUIDBySeasonUUID(id)).thenReturn(Set.of());
+        when(campaignAPI.findCampaignUUIDBySeasonUUID(id)).thenReturn(Collections.singleton(UUID.randomUUID()));
+
+        // Act & Assert
+        assertThatThrownBy(() -> seasonService.deleteById(id))
+                .isInstanceOf(SeasonInUseException.class)
+                .hasMessageContaining("La saison est utilisée par des équipes ou campagnes et ne peut pas être supprimée");
     }
 
     @Test

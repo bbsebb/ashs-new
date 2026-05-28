@@ -35,6 +35,11 @@ export * from './lib/services/team/team.dtos';
 export * from './lib/services/team/team.gateway';
 export * from './lib/services/team/teams.store';
 
+// Membership
+export * from './lib/services/membership/campaign.dtos';
+export * from './lib/services/membership/campaign.gateway';
+export * from './lib/services/membership/campaign.store';
+
 // ViewModels
 export * from './lib/services/view-model-mapper.service';
 

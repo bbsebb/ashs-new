@@ -28,7 +28,9 @@ export class FormErrorHandleService {
     // Handle field errors from ProblemDetail
     if (errorData?.fieldErrors && Object.keys(errorData.fieldErrors).length > 0) {
       return Object.entries(errorData.fieldErrors).map(([field, message]) => {
-        const fieldPath = field.split('.');
+        // Normalise le chemin : remplace [0] par .0 pour la navigation
+        const normalizedField = field.replace(/\[(\d+)\]/g, '.$1');
+        const fieldPath = normalizedField.split('.');
         let targetFieldTree: any = formFieldTree;
 
         // Navigate through the field tree to find the matching control

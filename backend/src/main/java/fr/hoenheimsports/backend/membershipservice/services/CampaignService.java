@@ -8,6 +8,7 @@ import fr.hoenheimsports.backend.membershipservice.entities.Campaign;
 import fr.hoenheimsports.backend.membershipservice.entities.CampaignStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.Category;
 import fr.hoenheimsports.backend.membershipservice.entities.Price;
+import fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotDraftException;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -91,6 +92,9 @@ public class CampaignService {
     public void deleteCampaign(UUID campaignId) {
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new EntityNotFoundException("Campagne non trouvée"));
+        if (campaign.getStatus() != CampaignStatus.DRAFT) {
+            throw new CampaignNotDraftException("La campagne doit être en statut DRAFT pour être supprimée");
+        }
         campaignRepository.delete(campaign);
     }
 }

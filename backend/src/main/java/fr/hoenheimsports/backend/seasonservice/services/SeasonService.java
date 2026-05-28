@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.seasonservice.services;
 
+import fr.hoenheimsports.backend.membershipservice.CampaignAPI;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonCreateRequest;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonResponse;
 import fr.hoenheimsports.backend.seasonservice.dtos.SeasonUpdateRequest;
@@ -31,6 +32,7 @@ public class SeasonService {
     private final SeasonRepository seasonRepository;
     private final SeasonMapper seasonMapper;
     private final TeamAPI teamAPI;
+    private final CampaignAPI campaignAPI;
 
     /**
      * Retrieves all seasons.
@@ -63,8 +65,9 @@ public class SeasonService {
 
     private void assertSeasonHasNoAssociations(Season season) {
         int numberOfTeamBySeason = this.teamAPI.findTeamUUIDBySeasonUUID(season.getId()).size();
-        if (numberOfTeamBySeason > 0) {
-            throw new SeasonInUseException("La saison est utilisée par des équipes et ne peut pas être supprimée");
+        int numberOfCampaignBySeason = this.campaignAPI.findCampaignUUIDBySeasonUUID(season.getId()).size();
+        if (numberOfTeamBySeason + numberOfCampaignBySeason > 0) {
+            throw new SeasonInUseException("La saison est utilisée par des équipes ou campagnes et ne peut pas être supprimée");
         }
     }
 

@@ -2,6 +2,9 @@ package fr.hoenheimsports.backend.contactservice;
 
 import fr.hoenheimsports.backend.TestcontainersConfiguration;
 import fr.hoenheimsports.backend.contactservice.dtos.ContactRequest;
+import jakarta.mail.Message;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, properties = "management.health.mail.enabled=false")
 @ActiveProfiles("test")
@@ -35,6 +39,12 @@ class ContactUseCasesTest {
 
     @MockitoBean
     private JavaMailSender mailSender;
+
+    @Autowired
+    private org.springframework.context.ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    private org.springframework.transaction.support.TransactionTemplate transactionTemplate;
 
     @BeforeEach
     void setUp() {
@@ -68,5 +78,41 @@ class ContactUseCasesTest {
         assertThat(capturedMessage.getText()).contains("test@user.com");
         assertThat(capturedMessage.getText()).contains("Demande d'information");
         assertThat(capturedMessage.getText()).contains("Bonjour, je souhaiterais avoir des informations sur les inscriptions.");
+    }
+
+    @Test
+    @DisplayName("Devrait envoyer un email personnalisé lors de la publication d'un EmailNotificationEvent")
+    void shouldSendEmailOnEmailNotificationEvent() throws Exception {
+        // Given
+        EmailNotificationEvent event = new EmailNotificationEvent(
+                "member@example.com",
+                "Confirmation d'adhésion",
+                "Votre adhésion a bien été enregistrée !"
+        );
+
+        java.util.Properties properties = new java.util.Properties();
+        Session session = Session.getInstance(properties);
+        MimeMessage mimeMessage = new MimeMessage(session);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doNothing().when(mailSender).send(any(MimeMessage.class));
+
+        // When
+        transactionTemplate.executeWithoutResult(status -> {
+            eventPublisher.publishEvent(event);
+        });
+
+        // Then
+        verify(mailSender, org.mockito.Mockito.timeout(2000)).send(any(MimeMessage.class));
+
+        ArgumentCaptor<MimeMessage> messageCaptor = ArgumentCaptor.forClass(MimeMessage.class);
+        verify(mailSender).send(messageCaptor.capture());
+
+        MimeMessage capturedMessage = messageCaptor.getValue();
+        assertThat(capturedMessage.getRecipients(Message.RecipientType.TO)[0].toString()).isEqualTo("member@example.com");
+        assertThat(capturedMessage.getSubject()).isEqualTo("Confirmation d'adhésion");
+        
+        String content = (String) capturedMessage.getContent();
+        assertThat(content).contains("AS Hoenheim Sports");
+        assertThat(content).contains("Votre adhésion a bien été enregistrée !");
     }
 }

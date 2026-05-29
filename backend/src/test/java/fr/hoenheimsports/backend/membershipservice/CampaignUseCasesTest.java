@@ -2,11 +2,12 @@ package fr.hoenheimsports.backend.membershipservice;
 
 import fr.hoenheimsports.backend.TestcontainersConfiguration;
 import fr.hoenheimsports.backend.membershipservice.dtos.*;
-import fr.hoenheimsports.backend.seasonservice.entities.Season;
-import fr.hoenheimsports.backend.seasonservice.repositories.SeasonRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
+import fr.hoenheimsports.backend.membershipservice.services.SumUpService;
+import fr.hoenheimsports.backend.seasonservice.entities.Season;
+import fr.hoenheimsports.backend.seasonservice.repositories.SeasonRepository;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -31,6 +33,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -58,6 +63,9 @@ class CampaignUseCasesTest {
     private RestTestClient restTestClient;
     private RestTestClient authRestTestClient;
 
+    @MockitoBean
+    private SumUpService sumUpService;
+
 
     @BeforeEach
     void setUp() {
@@ -66,6 +74,7 @@ class CampaignUseCasesTest {
         this.paymentTransactionRepository.deleteAll();
         this.campaignRepository.deleteAll();
         this.seasonRepository.deleteAll();
+        when(sumUpService.createCheckout(any(), any(), any())).thenReturn("https://checkout.sumup.com/test");
     }
 
     @Nested
@@ -344,6 +353,11 @@ class CampaignUseCasesTest {
             // Given
             Season season = createAndSaveSeason();
             CampaignResponse campaign = createCampaignHelper(season.getId());
+
+            authRestTestClient.post()
+                    .uri("/api/v1/campaigns/{campaignId}/launch", campaign.id())
+                    .exchange()
+                    .expectStatus().isNoContent();
 
             // Create memberships via the public API
             MembershipCreateRequest membershipCreateRequest1 = new MembershipCreateRequest(

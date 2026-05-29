@@ -6,6 +6,7 @@ import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
+import fr.hoenheimsports.backend.membershipservice.services.SumUpService;
 import fr.hoenheimsports.backend.seasonservice.entities.Season;
 import fr.hoenheimsports.backend.seasonservice.repositories.SeasonRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -51,18 +53,25 @@ public class MembershipUseCasesTest {
     @Autowired
     private PaymentTransactionRepository paymentTransactionRepository;
 
+
     @Autowired
     private RestTestClient restTestClient;
     private RestTestClient authRestTestClient;
 
+    @MockitoBean
+    private SumUpService sumUpService;
+
 
     @BeforeEach
     void setUp() {
-        this.authRestTestClient = RestTestClient.bindToApplicationContext(webApplicationContext).build();
+        this.authRestTestClient = RestTestClient.bindToApplicationContext(webApplicationContext)
+
+                .build();
         this.membershipRepository.deleteAll();
         this.paymentTransactionRepository.deleteAll();
         this.campaignRepository.deleteAll();
         this.seasonRepository.deleteAll();
+        when(sumUpService.createCheckout(any(), any(), any())).thenReturn("https://checkout.sumup.com/test");
     }
 
     @Nested
@@ -157,7 +166,14 @@ public class MembershipUseCasesTest {
                 .returnResult()
                 .getResponseBody();
 
-        return Objects.requireNonNull(campaignResponse).id();
+        UUID campaignId = Objects.requireNonNull(campaignResponse).id();
+
+        authRestTestClient.post()
+                .uri("/api/v1/campaigns/{campaignId}/launch", campaignId)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        return campaignId;
     }
 
     private Season createAndSaveSeason() {

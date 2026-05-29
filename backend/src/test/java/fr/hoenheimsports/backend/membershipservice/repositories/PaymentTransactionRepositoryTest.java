@@ -4,7 +4,7 @@ import fr.hoenheimsports.backend.TestcontainersConfiguration;
 import fr.hoenheimsports.backend.membershipservice.entities.PaymentPayerInfo;
 import fr.hoenheimsports.backend.membershipservice.entities.PaymentTransaction;
 import fr.hoenheimsports.backend.membershipservice.entities.Price;
-import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckoutId;
+import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckoutUrl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,10 +40,11 @@ class PaymentTransactionRepositoryTest {
         void shouldSaveAndFindPaymentTransaction() {
             // Given
             PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
             transaction.setAmount(Price.of("200.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("Jane", "Smith", "jane.smith@example.com"));
-            transaction.setSumupCheckoutId(new SumUpCheckoutId("sumup-checkout-xyz"));
+            transaction.setSumupCheckoutUrl(new SumUpCheckoutUrl("sumup-checkout-xyz"));
 
             // When
             PaymentTransaction saved = paymentTransactionRepository.saveAndFlush(transaction);
@@ -57,7 +58,7 @@ class PaymentTransactionRepositoryTest {
             assertThat(actual.getPayerInfo().firstName()).isEqualTo("Jane");
             assertThat(actual.getPayerInfo().lastName()).isEqualTo("Smith");
             assertThat(actual.getPayerInfo().email()).isEqualTo("jane.smith@example.com");
-            assertThat(actual.getSumupCheckoutId().value()).isEqualTo("sumup-checkout-xyz");
+            assertThat(actual.getSumupCheckoutUrl().value()).isEqualTo("sumup-checkout-xyz");
         }
 
         @Test
@@ -65,6 +66,7 @@ class PaymentTransactionRepositoryTest {
         void shouldFailWhenRequiredFieldsAreNull() {
             // Given
             PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
             transaction.setAmount(Price.of("200.00"));
             // Payer info is null
             transaction.setPayerInfo(null);
@@ -84,14 +86,15 @@ class PaymentTransactionRepositoryTest {
         void shouldFindBySumupCheckoutId() {
             // Given
             PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
             transaction.setAmount(Price.of("50.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("Bob", "Sponge", "bob@example.com"));
-            transaction.setSumupCheckoutId(new SumUpCheckoutId("checkout-bob-777"));
+            transaction.setSumupCheckoutUrl(new SumUpCheckoutUrl("checkout-bob-777"));
             paymentTransactionRepository.saveAndFlush(transaction);
 
             // When
-            Optional<PaymentTransaction> found = paymentTransactionRepository.findBySumupCheckoutId(new SumUpCheckoutId("checkout-bob-777"));
+            Optional<PaymentTransaction> found = paymentTransactionRepository.findBySumupCheckoutUrl(new SumUpCheckoutUrl("checkout-bob-777"));
 
             // Then
             assertThat(found).isPresent();

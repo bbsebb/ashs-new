@@ -2,7 +2,7 @@ package fr.hoenheimsports.backend.membershipservice.services;
 
 import fr.hoenheimsports.backend.membershipservice.entities.Membership;
 import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
-import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckoutId;
+import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckoutUrl;
 import fr.hoenheimsports.backend.membershipservice.events.SumUpPaymentEvent;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class MembershipEventListener {
     public void on(SumUpPaymentEvent event) {
         log.info("Received SumUpPaymentEvent for checkoutId: {} with status: {}", event.checkoutId(), event.status());
 
-        List<Membership> memberships = membershipRepository.findByPaymentTransactionSumupCheckoutId(new SumUpCheckoutId(event.checkoutId()));
+        List<Membership> memberships = membershipRepository.findByPaymentTransactionSumupCheckoutUrl(new SumUpCheckoutUrl(event.checkoutId()));
         if (memberships.isEmpty()) {
             log.warn("No membership found for checkoutId: {}", event.checkoutId());
             return;

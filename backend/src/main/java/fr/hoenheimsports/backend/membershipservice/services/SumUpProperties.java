@@ -18,15 +18,16 @@ public class SumUpProperties {
      */
     private String apiKey;
 
+
     /**
-     * Merchant email associated with the SumUp account.
+     * Merchant code associated with the SumUp account.
      */
-    private String merchantEmail;
+    private String merchantCode;
 
     /**
      * Base URL for the SumUp API.
      */
-    private String baseUrl = "https://api.sumup.com";
+    private String baseUrl;
 
     /**
      * Return URL after a successful or failed payment.

@@ -16,8 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PaymentTransaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "campaign_id", nullable = false)
@@ -39,8 +38,8 @@ public class PaymentTransaction {
     private List<Membership> memberships = new ArrayList<>();
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "sumup_checkout_id", nullable = false))
-    private SumUpCheckoutId sumupCheckoutId;
+    @AttributeOverride(name = "value", column = @Column(name = "sumup_checkout_url", nullable = false))
+    private SumUpCheckoutUrl sumupCheckoutUrl;
 
     public void addMembership(Membership membership) {
         memberships.add(membership);

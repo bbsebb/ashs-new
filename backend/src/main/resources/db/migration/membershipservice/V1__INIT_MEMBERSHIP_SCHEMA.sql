@@ -21,7 +21,7 @@ CREATE TABLE membership_schema.payment_transaction
     payer_first_name  VARCHAR(255)   NOT NULL,
     payer_last_name   VARCHAR(255)   NOT NULL,
     payer_email       VARCHAR(255)   NOT NULL,
-    sumup_checkout_id VARCHAR(255),
+    sumup_checkout_url VARCHAR(255),
     CONSTRAINT pk_payment_transaction PRIMARY KEY (id)
 );
 

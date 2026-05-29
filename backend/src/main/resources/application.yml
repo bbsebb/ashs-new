@@ -64,6 +64,7 @@ meta:
   version: v24.0
   page-id: 500999826723464
 
+
 app:
   cors:
     allowed-headers: "Authorization,Content-Type,Accept,Origin,X-Requested-With"
@@ -79,5 +80,6 @@ contact:
 
 sumup:
   api-key: ${SUMUP_API_KEY}
-  merchant-email: ${SUMUP_MERCHANT_EMAIL}
+  merchant-code: ${SUMUP_MERCHANT_CODE}
   return-url: ${SUMUP_RETURN_URL:http://localhost:4200/membership/payment-success}
+  base-url: ${SUMUP_BASE_URL:https://api.sumup.com}

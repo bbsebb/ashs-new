@@ -16,7 +16,8 @@ Ajouter un module complet permettant la gestion des campagnes de cotisations par
 ### 1. Backend (`membershipservice`)
 - **Entités JPA** :
   - `Campaign` : `id` (UUID), `seasonId` (UUID), `status` (Enum: `DRAFT`, `LAUNCHED`), `categories` (ElementCollection de Map<String, BigDecimal>).
-  - `Membership` : `id` (UUID), `campaignId` (UUID), `firstName`, `lastName`, `email`, `licenseNumber`, `categoryName`, `amount`, `status` (Enum: `PENDING`, `PAID`, `FAILED`, `PROCESSED`), `sumupCheckoutId` (String).
+  - `Membership` : `id` (UUID), `campaignId` (UUID), `firstName`, `lastName`, `email`, `licenseNumber`, `categoryName`,
+    `amount`, `status` (Enum: `PENDING`, `PAID`, `FAILED`, `PROCESSED`), `sumupCheckoutUrl` (String).
 - **Intégration SumUp** :
   - Client REST pour appeler `POST https://api.sumup.com/v0.1/checkouts`.
   - Contrôleur Webhook `/api/webhooks/sumup` recevant les événements SumUp.

@@ -7,8 +7,8 @@ import jakarta.persistence.Embeddable;
  * Value object representing a SumUp checkout identifier.
  */
 @Embeddable
-public record SumUpCheckoutId(
-        @Column(name = "sumup_checkout_id", nullable = false)
+public record SumUpCheckoutUrl(
+        @Column(name = "sumup_checkout_url", nullable = false)
     String value
 ) {
 }

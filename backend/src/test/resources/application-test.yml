@@ -1,4 +1,6 @@
 spring:
+  mvc:
+    log-request-details: true
   flyway:
     enabled: false # On désactive Flyway pour les tests de repository pour éviter les soucis de schémas multiples
 
@@ -29,3 +31,14 @@ contact:
   administrator:
     email:
       address: test@test.com
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+
+sumup:
+  api-key: sup_sk_sYTHXcHKiRqdDMHrz69ZM4AtBEoX23QRT
+  merchant-code: MEXCPN1E
+  return-url: ${SUMUP_RETURN_URL:http://localhost:4200/membership/payment-success}
+  base-url: ${SUMUP_BASE_URL:https://api.sumup.com}

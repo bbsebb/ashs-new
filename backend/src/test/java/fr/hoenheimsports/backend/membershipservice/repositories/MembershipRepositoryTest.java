@@ -41,10 +41,11 @@ class MembershipRepositoryTest {
         void shouldSaveAndFindMembership() {
             // Given
             PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
             transaction.setAmount(Price.of("150.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
-            transaction.setSumupCheckoutId(new SumUpCheckoutId("checkout-123"));
+            transaction.setSumupCheckoutUrl(new SumUpCheckoutUrl("checkout-123"));
             PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
 
             Membership membership = new Membership();
@@ -97,10 +98,11 @@ class MembershipRepositoryTest {
         void shouldFindBySumupCheckoutId() {
             // Given
             PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
             transaction.setAmount(Price.of("300.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("Marc", "Dupont", "marc.dupont@example.com"));
-            transaction.setSumupCheckoutId(new SumUpCheckoutId("checkout-unique-999"));
+            transaction.setSumupCheckoutUrl(new SumUpCheckoutUrl("checkout-unique-999"));
             PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
 
             Membership m1 = new Membership();
@@ -128,7 +130,7 @@ class MembershipRepositoryTest {
             membershipRepository.flush();
 
             // When
-            List<Membership> found = membershipRepository.findByPaymentTransactionSumupCheckoutId(new SumUpCheckoutId("checkout-unique-999"));
+            List<Membership> found = membershipRepository.findByPaymentTransactionSumupCheckoutUrl(new SumUpCheckoutUrl("checkout-unique-999"));
 
             // Then
             assertThat(found).hasSize(2)

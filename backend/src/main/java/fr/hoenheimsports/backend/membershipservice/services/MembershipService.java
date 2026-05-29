@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.membershipservice.services;
 
 import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.entities.*;
+import fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotLaunchedException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryNotAvailableException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryPriceMismatchException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.MembershipInvalidStatusException;
@@ -9,6 +10,7 @@ import fr.hoenheimsports.backend.membershipservice.repositories.CampaignReposito
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +26,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MembershipService {
 
-    private static final SumUpCheckoutId TEMPORARY_CHECKOUT_ID = new SumUpCheckoutId("test");
 
     private final CampaignRepository campaignRepository;
     private final MembershipRepository membershipRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
+    private final SumUpService sumUpService;
 
     /**
      * Initiates a membership payment process.
@@ -41,8 +43,12 @@ public class MembershipService {
      * @throws CategoryNotAvailableException if any requested category is not configured in the campaign
      * @throws CategoryPriceMismatchException if the price in the request does not match the campaign configuration
      */
+    @Transactional
     public MembershipPaymentResponse initiateMembershipPayment(MembershipPaymentOrder membershipPaymentOrder) {
         Campaign campaign = findCampaign(membershipPaymentOrder.campaignId());
+        if (campaign.getStatus() != CampaignStatus.LAUNCHED) {
+            throw new CampaignNotLaunchedException("La campagne n'est pas lancée");
+        }
         PaymentTransaction paymentTransaction = createPaymentTransaction(campaign, membershipPaymentOrder);
 
         BigDecimal totalAmount = addMembershipsAndCalculateTotalAmount(
@@ -52,7 +58,11 @@ public class MembershipService {
         );
 
         paymentTransaction.setAmount(Price.of(totalAmount));
-
+        paymentTransaction.setSumupCheckoutUrl(new SumUpCheckoutUrl(sumUpService.createCheckout(
+                paymentTransaction.getId().toString(),
+                paymentTransaction.getAmount().amount(),
+                "Licence"
+        )));
         PaymentTransaction savedPaymentTransaction = paymentTransactionRepository.save(paymentTransaction);
         return mapToResponse(savedPaymentTransaction);
     }
@@ -103,9 +113,9 @@ public class MembershipService {
             MembershipPaymentOrder membershipPaymentOrder
     ) {
         PaymentTransaction paymentTransaction = new PaymentTransaction();
+        paymentTransaction.setId(UUID.randomUUID());
         paymentTransaction.setPayerInfo(createPayerInfo(membershipPaymentOrder));
         paymentTransaction.setCampaignId(campaign.getId());
-        paymentTransaction.setSumupCheckoutId(TEMPORARY_CHECKOUT_ID);
         return paymentTransaction;
     }
 
@@ -226,7 +236,7 @@ public class MembershipService {
     private MembershipPaymentResponse mapToResponse(PaymentTransaction paymentTransaction) {
         return new MembershipPaymentResponse(
                 paymentTransaction.getId(),
-                paymentTransaction.getSumupCheckoutId().value(),
+                paymentTransaction.getSumupCheckoutUrl().value(),
                 paymentTransaction.getMemberships().stream()
                         .map(this::mapToResponse)
                         .toList()

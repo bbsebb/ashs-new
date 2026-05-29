@@ -295,7 +295,7 @@ classDiagram
         -String categoryName
         -Price amount
         -MembershipStatus status
-        -SumUpCheckoutId sumupCheckoutId
+        -SumUpCheckoutId sumupCheckoutUrl
     }
     class CampaignStatus {
         <<enumeration>>

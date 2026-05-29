@@ -2,12 +2,12 @@ package fr.hoenheimsports.backend.membershipservice.services;
 
 import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.entities.*;
-import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
-import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
-import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryNotAvailableException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryPriceMismatchException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.MembershipInvalidStatusException;
+import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
+import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
+import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -46,6 +46,9 @@ class MembershipServiceTest {
     @Mock
     private MembershipRepository membershipRepository;
 
+    @Mock
+    private SumUpService sumUpService;
+
     @InjectMocks
     private MembershipService membershipService;
 
@@ -82,6 +85,7 @@ class MembershipServiceTest {
 
             when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
             mockPaymentTransactionSave();
+            when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn("test");
 
             // When
             MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
@@ -119,7 +123,7 @@ class MembershipServiceTest {
             ArgumentCaptor<PaymentTransaction> captor = ArgumentCaptor.forClass(PaymentTransaction.class);
             verify(paymentTransactionRepository).save(captor.capture());
             PaymentTransaction savedTx = captor.getValue();
-            assertThat(savedTx.getSumupCheckoutId().value()).isEqualTo("test");
+            assertThat(savedTx.getSumupCheckoutUrl().value()).isEqualTo("test");
             assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("220.00");
             assertThat(savedTx.getPayerInfo().firstName()).isEqualTo("John");
             assertThat(savedTx.getPayerInfo().lastName()).isEqualTo("Doe");
@@ -227,6 +231,61 @@ class MembershipServiceTest {
                     .satisfies(throwable -> {
                         CategoryPriceMismatchException ex = (CategoryPriceMismatchException) throwable;
                         assertThat(ex.getBody().getDetail()).isEqualTo("Le montant pour la catégorie U11 ne correspond pas à la configuration de la campagne");
+                    });
+        }
+
+        /**
+         * Verifies that when SumUpService throws an exception, it is propagated.
+         */
+        @Test
+        @DisplayName("Should propagate exception when SumUpService fails")
+        void shouldPropagateExceptionWhenSumUpServiceFails() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            MembershipCreateRequest request = new MembershipCreateRequest(
+                    "John", "Doe", "john.doe@example.com", "LIC-12345",
+                    new CategoryDto("U11", new BigDecimal("100.00"))
+            );
+            MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(request));
+
+            Campaign campaign = createCampaign(campaignId, Set.of(new Category("U11", Price.of("100.00"))));
+
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+            when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class)))
+                    .thenThrow(new fr.hoenheimsports.backend.membershipservice.exceptions.SumUpCheckoutCreationFailedException("Erreur de paiement"));
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.initiateMembershipPayment(order))
+                    .isInstanceOf(fr.hoenheimsports.backend.membershipservice.exceptions.SumUpCheckoutCreationFailedException.class)
+                    .hasMessageContaining("Erreur de paiement");
+        }
+
+        /**
+         * Verifies that when the campaign status is not LAUNCHED, a CampaignNotLaunchedException is thrown.
+         */
+        @Test
+        @DisplayName("Should throw CampaignNotLaunchedException when campaign status is not LAUNCHED")
+        void shouldThrowCampaignNotLaunchedExceptionWhenCampaignNotLaunched() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            MembershipCreateRequest request = new MembershipCreateRequest(
+                    "John", "Doe", "john.doe@example.com", "LIC-12345",
+                    new CategoryDto("U11", new BigDecimal("100.00"))
+            );
+            MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(request));
+
+            Campaign campaign = createCampaign(campaignId, Set.of(new Category("U11", Price.of("100.00"))));
+            campaign.setStatus(CampaignStatus.DRAFT); // non-LAUNCHED status
+
+            when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.initiateMembershipPayment(order))
+                    .isInstanceOf(fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotLaunchedException.class)
+                    .satisfies(throwable -> {
+                        fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotLaunchedException ex =
+                                (fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotLaunchedException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("La campagne n'est pas lancée");
                     });
         }
 

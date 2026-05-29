@@ -19,6 +19,7 @@ contact:
     email:
       address: sebastien.burckhardt@hoenheimsports.fr
 
+
 logging:
   level:
     root: INFO

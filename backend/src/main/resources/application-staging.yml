@@ -18,6 +18,7 @@ spring:
     validate-on-migrate: true
 
 
+
 contact:
   administrator:
     email:

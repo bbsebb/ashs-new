@@ -58,11 +58,12 @@ public class MembershipService {
         );
 
         paymentTransaction.setAmount(Price.of(totalAmount));
-        paymentTransaction.setSumupCheckoutUrl(new SumUpCheckoutUrl(sumUpService.createCheckout(
+        SumUpCheckout sumUpCheckout = sumUpService.createCheckout(
                 paymentTransaction.getId().toString(),
                 paymentTransaction.getAmount().amount(),
                 "Licence"
-        )));
+        );
+        paymentTransaction.setSumupCheckout(sumUpCheckout);
         PaymentTransaction savedPaymentTransaction = paymentTransactionRepository.save(paymentTransaction);
         return mapToResponse(savedPaymentTransaction);
     }
@@ -234,9 +235,17 @@ public class MembershipService {
      * @return the mapped MembershipPaymentResponse DTO
      */
     private MembershipPaymentResponse mapToResponse(PaymentTransaction paymentTransaction) {
+        SumUpCheckout checkout = paymentTransaction.getSumupCheckout();
+        SumUpCheckoutDto checkoutDto = new SumUpCheckoutDto(
+                checkout.id(),
+                checkout.description(),
+                checkout.returnUrl(),
+                checkout.date(),
+                checkout.checkoutUrl()
+        );
         return new MembershipPaymentResponse(
                 paymentTransaction.getId(),
-                paymentTransaction.getSumupCheckoutUrl().value(),
+                checkoutDto,
                 paymentTransaction.getMemberships().stream()
                         .map(this::mapToResponse)
                         .toList()

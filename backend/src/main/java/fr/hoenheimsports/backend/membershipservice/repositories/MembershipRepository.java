@@ -1,7 +1,6 @@
 package fr.hoenheimsports.backend.membershipservice.repositories;
 
 import fr.hoenheimsports.backend.membershipservice.entities.Membership;
-import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckoutUrl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,18 +15,11 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
     /**
      * Finds memberships by their SumUp checkout identifier.
      *
-     * @param sumupCheckoutUrl the SumUp checkout identifier
+     * @param id the SumUp checkout identifier
      * @return a list of memberships for the checkout identifier
      */
-    List<Membership> findByPaymentTransactionSumupCheckoutUrl(SumUpCheckoutUrl sumupCheckoutUrl);
+    List<Membership> findByPaymentTransactionSumupCheckoutId(String id);
 
-    /**
-     * Finds all memberships for a given campaign.
-     *
-     * @param campaignId the identifier of the campaign
-     * @return a list of memberships for the campaign
-     */
-    List<Membership> findByCampaignId(UUID campaignId);
 
     List<Membership> findAllByCampaignId(UUID campaignId);
 }

@@ -3,6 +3,7 @@ package fr.hoenheimsports.backend.membershipservice;
 import fr.hoenheimsports.backend.TestcontainersConfiguration;
 import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
+import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckout;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
@@ -31,6 +32,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -71,7 +74,14 @@ public class MembershipUseCasesTest {
         this.paymentTransactionRepository.deleteAll();
         this.campaignRepository.deleteAll();
         this.seasonRepository.deleteAll();
-        when(sumUpService.createCheckout(any(), any(), any())).thenReturn("https://checkout.sumup.com/test");
+        SumUpCheckout mockSumupCheckout = new SumUpCheckout(
+                "sumup-chk-123",
+                "Licence",
+                "http://return-url",
+                "2026-05-31T19:30:24",
+                "https://checkout.sumup.com/test"
+        );
+        when(sumUpService.createCheckout(any(), any(), any())).thenReturn(mockSumupCheckout);
     }
 
     @Nested

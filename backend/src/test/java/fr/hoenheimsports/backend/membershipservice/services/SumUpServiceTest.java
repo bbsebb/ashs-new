@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.membershipservice.services;
 
 import fr.hoenheimsports.backend.membershipservice.dtos.SumUpCheckoutRequest;
 import fr.hoenheimsports.backend.membershipservice.dtos.SumUpCheckoutResponse;
+import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckout;
 import fr.hoenheimsports.backend.membershipservice.exceptions.SumUpCheckoutCreationFailedException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.SumUpCheckoutUrlNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -48,10 +49,12 @@ class SumUpServiceTest {
         when(properties.getReturnUrl()).thenReturn("http://return-url");
 
         // When
-        String url = sumUpService.createCheckout("ref-123", BigDecimal.valueOf(45.5), "Adhésion Club");
+        SumUpCheckout response = sumUpService.createCheckout("ref-123", BigDecimal.valueOf(45.5), "Adhésion Club");
 
         // Then
-        assertThat(url).isEqualTo(expectedUrl);
+        assertThat(response).isNotNull();
+        assertThat(response.checkoutUrl()).isEqualTo(expectedUrl);
+        assertThat(response.id()).isEqualTo("chk-999");
 
         verify(sumUpClient).createCheckout(any(SumUpCheckoutRequest.class));
     }

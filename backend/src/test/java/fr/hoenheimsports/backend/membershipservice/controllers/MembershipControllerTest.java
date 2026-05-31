@@ -31,9 +31,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 /**
@@ -66,9 +64,16 @@ class MembershipControllerTest {
             UUID transactionId = UUID.randomUUID();
 
             MembershipPaymentOrder order = createValidOrder(campaignId);
+            SumUpCheckoutDto sumupCheckoutDto = new SumUpCheckoutDto(
+                    "sumup-chk-123",
+                    "Licence",
+                    "http://return-url",
+                    "2026-05-31T19:30:24",
+                    "https://checkout.sumup.com/test"
+            );
             MembershipPaymentResponse response = new MembershipPaymentResponse(
                     transactionId,
-                    "https://checkout.sumup.com/test",
+                    sumupCheckoutDto,
                     List.of(new MembershipResponse(
                             UUID.randomUUID(),
                             campaignId,
@@ -99,7 +104,11 @@ class MembershipControllerTest {
                     .hasStatus(HttpStatus.CREATED);
 
             assertThat(result).bodyJson().extractingPath("$.paymentTransactionId").asString().isEqualTo(transactionId.toString());
-            assertThat(result).bodyJson().extractingPath("$.checkoutUrl").asString().isEqualTo("https://checkout.sumup.com/test");
+            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.id").asString().isEqualTo("sumup-chk-123");
+            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.description").asString().isEqualTo("Licence");
+            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.returnUrl").asString().isEqualTo("http://return-url");
+            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.date").asString().isEqualTo("2026-05-31T19:30:24");
+            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.checkoutUrl").asString().isEqualTo("https://checkout.sumup.com/test");
             assertThat(result).bodyJson().extractingPath("$.memberships[0].firstName").asString().isEqualTo("John");
             assertThat(result).bodyJson().extractingPath("$.memberships[0].lastName").asString().isEqualTo("Doe");
             assertThat(result).bodyJson().extractingPath("$.memberships[0].email").asString().isEqualTo("john.doe@example.com");
@@ -117,9 +126,16 @@ class MembershipControllerTest {
             UUID transactionId = UUID.randomUUID();
 
             MembershipPaymentOrder order = createValidOrder(campaignId);
+            SumUpCheckoutDto sumupCheckoutDto = new SumUpCheckoutDto(
+                    "sumup-chk-123",
+                    "Licence",
+                    "http://return-url",
+                    "2026-05-31T19:30:24",
+                    "https://checkout.sumup.com/test"
+            );
             MembershipPaymentResponse response = new MembershipPaymentResponse(
                     transactionId,
-                    "https://checkout.sumup.com/test",
+                    sumupCheckoutDto,
                     List.of(new MembershipResponse(
                             UUID.randomUUID(),
                             campaignId,

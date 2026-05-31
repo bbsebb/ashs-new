@@ -1,7 +1,6 @@
 package fr.hoenheimsports.backend.membershipservice.repositories;
 
 import fr.hoenheimsports.backend.membershipservice.entities.PaymentTransaction;
-import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckoutUrl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,8 +15,8 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
     /**
      * Finds a payment transaction by its SumUp checkout identifier.
      *
-     * @param sumupCheckoutUrl the SumUp checkout identifier
+     * @param id the SumUp checkout identifier
      * @return an Optional containing the found payment transaction, or empty if not found
      */
-    Optional<PaymentTransaction> findBySumupCheckoutUrl(SumUpCheckoutUrl sumupCheckoutUrl);
+    Optional<PaymentTransaction> findBySumupCheckoutId(String id);
 }

@@ -85,14 +85,26 @@ class MembershipServiceTest {
 
             when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
             mockPaymentTransactionSave();
-            when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn("test");
+            SumUpCheckout mockSumupCheckout = new SumUpCheckout(
+                    "sumup-chk-123",
+                    "Licence",
+                    "http://return-url",
+                    "2026-05-31T19:30:24",
+                    "https://checkout.sumup.com/pay/sumup-chk-123"
+            );
+            when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
 
             // When
             MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
 
             // Then
             assertThat(result).isNotNull();
-            assertThat(result.checkoutUrl()).isEqualTo("test");
+            assertThat(result.sumupCheckout()).isNotNull();
+            assertThat(result.sumupCheckout().id()).isEqualTo("sumup-chk-123");
+            assertThat(result.sumupCheckout().description()).isEqualTo("Licence");
+            assertThat(result.sumupCheckout().returnUrl()).isEqualTo("http://return-url");
+            assertThat(result.sumupCheckout().date()).isEqualTo("2026-05-31T19:30:24");
+            assertThat(result.sumupCheckout().checkoutUrl()).isEqualTo("https://checkout.sumup.com/pay/sumup-chk-123");
             assertThat(result.paymentTransactionId()).isNotNull();
             assertThat(result.memberships()).hasSize(2);
 
@@ -123,7 +135,12 @@ class MembershipServiceTest {
             ArgumentCaptor<PaymentTransaction> captor = ArgumentCaptor.forClass(PaymentTransaction.class);
             verify(paymentTransactionRepository).save(captor.capture());
             PaymentTransaction savedTx = captor.getValue();
-            assertThat(savedTx.getSumupCheckoutUrl().value()).isEqualTo("test");
+            assertThat(savedTx.getSumupCheckout()).isNotNull();
+            assertThat(savedTx.getSumupCheckout().id()).isEqualTo("sumup-chk-123");
+            assertThat(savedTx.getSumupCheckout().description()).isEqualTo("Licence");
+            assertThat(savedTx.getSumupCheckout().returnUrl()).isEqualTo("http://return-url");
+            assertThat(savedTx.getSumupCheckout().date()).isEqualTo("2026-05-31T19:30:24");
+            assertThat(savedTx.getSumupCheckout().checkoutUrl()).isEqualTo("https://checkout.sumup.com/pay/sumup-chk-123");
             assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("220.00");
             assertThat(savedTx.getPayerInfo().firstName()).isEqualTo("John");
             assertThat(savedTx.getPayerInfo().lastName()).isEqualTo("Doe");

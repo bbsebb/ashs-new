@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.membershipservice.services;
 
 import fr.hoenheimsports.backend.membershipservice.dtos.SumUpCheckoutRequest;
 import fr.hoenheimsports.backend.membershipservice.dtos.SumUpCheckoutResponse;
+import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckout;
 import fr.hoenheimsports.backend.membershipservice.exceptions.SumUpCheckoutCreationFailedException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.SumUpCheckoutUrlNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class SumUpService {
      * @param description the description of the transaction
      * @return the hosted checkout URL where the user can pay
      */
-    public String createCheckout(String id, BigDecimal amount, String description) {
+    public SumUpCheckout createCheckout(String id, BigDecimal amount, String description) {
         try {
             SumUpCheckoutRequest request = new SumUpCheckoutRequest(
                     id,
@@ -49,7 +50,13 @@ public class SumUpService {
             SumUpCheckoutResponse response = client.createCheckout(request);
 
             if (response.hostedCheckoutUrl() != null) {
-                return response.hostedCheckoutUrl();
+                return new SumUpCheckout(
+                        response.id(),
+                        response.description(),
+                        response.returnUrl(),
+                        response.date(),
+                        response.hostedCheckoutUrl()
+                );
             }
             throw new SumUpCheckoutUrlNotFoundException("No hosted checkout URL found in SumUp response");
         } catch (SumUpCheckoutUrlNotFoundException exception) {

@@ -38,8 +38,14 @@ public class PaymentTransaction {
     private List<Membership> memberships = new ArrayList<>();
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "sumup_checkout_url", nullable = false))
-    private SumUpCheckoutUrl sumupCheckoutUrl;
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "sumup_checkout_id")),
+            @AttributeOverride(name = "description", column = @Column(name = "sumup_checkout_description")),
+            @AttributeOverride(name = "returnUrl", column = @Column(name = "sumup_checkout_return_url")),
+            @AttributeOverride(name = "date", column = @Column(name = "sumup_checkout_date")),
+            @AttributeOverride(name = "checkoutUrl", column = @Column(name = "sumup_checkout_url"))
+    })
+    private SumUpCheckout sumupCheckout;
 
     public void addMembership(Membership membership) {
         memberships.add(membership);

@@ -8,7 +8,7 @@ import java.util.UUID;
  */
 public record MembershipPaymentResponse(
         UUID paymentTransactionId,
-        String checkoutUrl,
+        SumUpCheckoutDto sumupCheckout,
         List<MembershipResponse> memberships
 ) {
 }

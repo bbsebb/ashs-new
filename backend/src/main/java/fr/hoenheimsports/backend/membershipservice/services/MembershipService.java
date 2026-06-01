@@ -149,7 +149,7 @@ public class MembershipService {
                 .map(Price::amount)
                 .toList();
         BigDecimal discountAmount = BigDecimal.ZERO;
-        if (paymentTransaction.isDiscounted() && paymentTransaction.getMemberships().size() > 3) {
+        if (paymentTransaction.isDiscounted() && paymentTransaction.getMemberships().size() > 2) {
             discountAmount = amounts.stream()
                     .min(BigDecimal::compareTo)
                     .orElse(BigDecimal.ZERO)

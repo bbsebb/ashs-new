@@ -74,24 +74,14 @@ describe('MembershipRegistrationComponent', () => {
   it('should submit registration and call initiatePayment', () => {
     const order: any = {campaignId: 'campaign-123', membershipCreateRequests: []};
 
-    // Stub global location.href change to avoid actual window navigation during test
-    const originalLocation = window.location;
-    Object.defineProperty(window, 'location', {
-      value: {href: ''},
-      writable: true,
-      configurable: true
-    });
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
 
     component.onSubmit(order);
 
     expect(mockMembershipStore.initiatePayment).toHaveBeenCalledWith(order);
     expect(mockNotificationService.show).toHaveBeenCalledWith('Inscription enregistrée. Redirection vers le paiement SumUp...', 'success');
-    expect(window.location.href).toBe('https://checkout.sumup.com/pay/123');
+    expect(openSpy).toHaveBeenCalledWith('https://checkout.sumup.com/pay/123', '_self');
 
-    Object.defineProperty(window, 'location', {
-      value: originalLocation,
-      writable: false,
-      configurable: true
-    });
+    openSpy.mockRestore();
   });
 });

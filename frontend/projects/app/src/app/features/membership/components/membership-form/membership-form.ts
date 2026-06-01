@@ -8,6 +8,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatCardModule} from '@angular/material/card';
 import {MatDividerModule} from '@angular/material/divider';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 import {CommonModule} from '@angular/common';
 import {CategoryDto, MembershipCreateRequest, MembershipPaymentOrder} from '@shared-api';
 import {Campaign} from '@shared-domain';
@@ -39,7 +40,8 @@ export interface MembershipFormViewModel {
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    MatCheckboxModule
   ],
   templateUrl: './membership-form.html',
   styleUrl: './membership-form.scss',
@@ -60,15 +62,35 @@ export class MembershipFormComponent {
   /** Calculates the cumulative price of all chosen membership categories. */
   calculateTotal(): number {
     const campaign = this.viewModelInputSignal().campaign;
-    let total = 0;
     const model = this.membershipFormService.membershipModelSignal();
+    const amounts: number[] = [];
+
     for (const member of model.members) {
       const matchedCategory = campaign.categories.find(c => c.name === member.categoryName);
       if (matchedCategory) {
-        total += matchedCategory.amount;
+        amounts.push(matchedCategory.amount);
       }
     }
-    return total;
+
+    const initialAmount = amounts.reduce((acc, val) => acc + val, 0);
+    let discountAmount = 0;
+
+    if (this.membershipFormService.hasDiscountSignal() && this.membershipFormService.membershipSize() > 2 && amounts.length > 0) {
+      const minAmount = Math.min(...amounts);
+      discountAmount = Math.round((minAmount / 2) * 100) / 100;
+    }
+
+    return initialAmount - discountAmount;
+  }
+
+  /** Adds a new member. */
+  addMember(): void {
+    this.membershipFormService.addMember();
+  }
+
+  /** Handles the manual change of the family discount checkbox. */
+  onDiscountChange(checked: boolean): void {
+    this.membershipFormService.hasDiscountSignal.set(checked);
   }
 
   /** Handles the form submission. */
@@ -102,7 +124,8 @@ export class MembershipFormComponent {
           lastname: val.payer.lastname.trim(),
           email: val.payer.email.trim()
         },
-        membershipCreateRequests: membershipRequests
+        membershipCreateRequests: membershipRequests,
+        hasDiscount: this.membershipFormService.hasDiscountSignal()
       };
 
       this.submitOrder.emit(order);

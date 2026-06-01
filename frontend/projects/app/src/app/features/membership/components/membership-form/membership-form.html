@@ -43,7 +43,7 @@
   <div class="members-container">
     <div class="section-header-flex">
       <h2>Membres à inscrire</h2>
-      <button mat-flat-button color="primary" type="button" (click)="membershipFormService.addMember()">
+      <button mat-flat-button color="primary" type="button" (click)="addMember()">
         <mat-icon>add</mat-icon>
         Ajouter un membre
       </button>
@@ -119,6 +119,15 @@
   <!-- SUMMARY & SUBMIT SECTION -->
   <mat-card class="form-card summary-card">
     <mat-card-content class="summary-content-flex">
+      @if (membershipFormService.membershipSize() > 2) {
+        <div class="discount-checkbox-flex">
+          <mat-checkbox [checked]="membershipFormService.hasDiscountSignal()"
+                        (change)="onDiscountChange($event.checked)">
+            Appliquer la réduction famille (membres du même foyer)
+          </mat-checkbox>
+        </div>
+      }
+
       <div class="total-price-flex">
         <span>Montant total :</span>
         <strong>{{ calculateTotal() | currency:'EUR':'symbol':'1.2-2':'fr' }}</strong>

@@ -27,6 +27,7 @@ export type MembershipPaymentOrder = {
   campaignId: UUID;
   paymentPayerInfoCreateRequest: PaymentPayerInfoCreateRequest;
   membershipCreateRequests: MembershipCreateRequest[];
+  hasDiscount: boolean;
 }
 
 /** DTO for detailed SumUp checkout details returned by the API. */

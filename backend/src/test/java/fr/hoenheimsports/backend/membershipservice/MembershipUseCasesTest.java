@@ -160,7 +160,7 @@ public class MembershipUseCasesTest {
         }
 
         @Test
-        @DisplayName("Création des adhérents avec réduction (hasDiscount = true et plus de 3 adhérents)")
+        @DisplayName("Création des adhérents avec réduction (hasDiscount = true et plus de 2 adhérents)")
         void shouldCreateMembershipWithDiscountSuccessfully() {
             UUID campaignId = createCampaign();
 
@@ -173,9 +173,6 @@ public class MembershipUseCasesTest {
             MembershipCreateRequest membershipCreateRequest3 = new MembershipCreateRequest(
                     "Dupont", "Rene1", "rene1@dupont.com", "12", new CategoryDto("U13", new BigDecimal("120.00"))
             );
-            MembershipCreateRequest membershipCreateRequest4 = new MembershipCreateRequest(
-                    "Dupont", "Rene2", "rene2@dupont.com", "13", new CategoryDto("U13", new BigDecimal("120.00"))
-            );
             PaymentPayerInfoCreateRequest paymentPayerInfoCreateRequest = new PaymentPayerInfoCreateRequest(
                     "John", "doe", "john.doe@example.com"
             );
@@ -183,7 +180,7 @@ public class MembershipUseCasesTest {
             MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
                     campaignId,
                     paymentPayerInfoCreateRequest,
-                    List.of(membershipCreateRequest1, membershipCreateRequest2, membershipCreateRequest3, membershipCreateRequest4),
+                    List.of(membershipCreateRequest1, membershipCreateRequest2, membershipCreateRequest3),
                     true
             );
 
@@ -197,14 +194,14 @@ public class MembershipUseCasesTest {
                     .returnResult().getResponseBody();
 
             assertThat(response).isNotNull();
-            assertThat(response.memberships()).hasSize(4);
+            assertThat(response.memberships()).hasSize(3);
 
             List<PaymentTransaction> transactions = paymentTransactionRepository.findAll();
             assertThat(transactions).hasSize(1);
             PaymentTransaction savedTx = transactions.get(0);
             assertThat(savedTx.isDiscounted()).isTrue();
-            // 100 + 100 + 120 + 120 = 440.00. Moins cher = 100. Réduction = 50. Total = 390.00
-            assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("390.00");
+            // 100 + 100 + 120 = 320.00. Moins cher = 100. Réduction = 50. Total = 270.00
+            assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("270.00");
         }
     }
 

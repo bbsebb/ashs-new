@@ -61,7 +61,7 @@ export class MembershipRegistrationComponent implements OnInit {
       next: (response) => {
         this._notificationService.show('Inscription enregistrée. Redirection vers le paiement SumUp...', 'success');
         // Redirect the window to SumUp hosted payment page
-        window.location.href = response.sumupCheckout.checkoutUrl;
+        window.open(response.sumupCheckout.checkoutUrl, '_self');
       },
       error: () => {
         this._notificationService.show("Une erreur est survenue lors de l'initialisation du paiement.", 'error');

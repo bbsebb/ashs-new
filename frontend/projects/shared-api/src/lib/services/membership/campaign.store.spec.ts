@@ -1,10 +1,9 @@
-import {beforeAll, afterAll, afterEach, describe, expect, it, beforeEach} from 'vitest';
+import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from 'vitest';
 import {setupServer} from 'msw/node';
 import {http, HttpResponse} from 'msw';
 import {TestBed} from '@angular/core/testing';
 import {provideHttpClient} from '@angular/common/http';
-import {CampaignStore} from './campaign.store';
-import {APP_CONFIG} from '../../configs/app-config';
+import {APP_CONFIG, CampaignStore} from '@shared-api';
 import {firstValueFrom} from 'rxjs';
 
 const mockCampaigns = [
@@ -14,6 +13,9 @@ const mockCampaigns = [
 const server = setupServer(
   http.get('*/api/v1/campaigns', () => {
     return HttpResponse.json(mockCampaigns);
+  }),
+  http.get('*/api/public/campaigns/active', () => {
+    return HttpResponse.json(mockCampaigns.find(c => c.status === 'LAUNCHED') || null);
   }),
   http.post('*/api/v1/campaigns', async ({request}) => {
     const dto = await request.json() as any;

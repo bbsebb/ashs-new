@@ -288,64 +288,64 @@ class MembershipControllerTest {
             return Stream.of(
                     // Campaign validation
                     Arguments.of("Campaign ID missing",
-                            new MembershipPaymentOrder(null, validPayer, List.of(validMembership)),
+                            new MembershipPaymentOrder(null, validPayer, List.of(validMembership), false),
                             "campaignId", "La campagne est obligatoire"),
 
                     // Payer validation
                     Arguments.of("Payer firstname missing",
-                            new MembershipPaymentOrder(campaignId, payerNoFirstname, List.of(validMembership)),
+                            new MembershipPaymentOrder(campaignId, payerNoFirstname, List.of(validMembership), false),
                             "paymentPayerInfoCreateRequest.firstname", "Le prénom est obligatoire"),
                     Arguments.of("Payer lastname missing",
-                            new MembershipPaymentOrder(campaignId, payerNoLastname, List.of(validMembership)),
+                            new MembershipPaymentOrder(campaignId, payerNoLastname, List.of(validMembership), false),
                             "paymentPayerInfoCreateRequest.lastname", "Le nom est obligatoire"),
                     Arguments.of("Payer email missing",
-                            new MembershipPaymentOrder(campaignId, payerNoEmail, List.of(validMembership)),
+                            new MembershipPaymentOrder(campaignId, payerNoEmail, List.of(validMembership), false),
                             "paymentPayerInfoCreateRequest.email", "L'email est obligatoire"),
                     Arguments.of("Payer email invalid",
-                            new MembershipPaymentOrder(campaignId, payerInvalidEmail, List.of(validMembership)),
+                            new MembershipPaymentOrder(campaignId, payerInvalidEmail, List.of(validMembership), false),
                             "paymentPayerInfoCreateRequest.email", "L'email doit être valide"),
 
                     // Membership validation
                     Arguments.of("Membership firstname missing",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoFirstname)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoFirstname), false),
                             "membershipCreateRequests[0].firstName", "Le prénom est requis"),
                     Arguments.of("Membership lastname missing",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoLastname)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoLastname), false),
                             "membershipCreateRequests[0].lastName", "Le nom est requis"),
                     Arguments.of("Membership email missing",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoEmail)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoEmail), false),
                             "membershipCreateRequests[0].email", "L’e-mail est requis"),
                     Arguments.of("Membership email invalid",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipInvalidEmail)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipInvalidEmail), false),
                             "membershipCreateRequests[0].email", "L’e-mail doit être valide"),
                     Arguments.of("Membership license missing",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoLicense)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoLicense), false),
                             "membershipCreateRequests[0].licenseNumber", "Le numéro de licence est requis"),
                     Arguments.of("Membership category missing",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoCategory)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipNoCategory), false),
                             "membershipCreateRequests[0].category", "Le nom de la catégorie est requis"),
 
                     // Category validation
                     Arguments.of("Category name missing",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryNoName)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryNoName), false),
                             "membershipCreateRequests[0].category.name", "Le nom de la catégorie est obligatoire"),
                     Arguments.of("Category name too long",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryLongName)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryLongName), false),
                             "membershipCreateRequests[0].category.name", "Le nom de la catégorie ne doit pas dépasser 20 caractères"),
                     Arguments.of("Category name boundary too long (21 chars)",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryBoundaryNameTooLong)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryBoundaryNameTooLong), false),
                             "membershipCreateRequests[0].category.name", "Le nom de la catégorie ne doit pas dépasser 20 caractères"),
                     Arguments.of("Category amount missing",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryNoAmount)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryNoAmount), false),
                             "membershipCreateRequests[0].category.amount", "Le montant est obligatoire"),
                     Arguments.of("Category amount negative",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryNegativeAmount)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryNegativeAmount), false),
                             "membershipCreateRequests[0].category.amount", "Le montant doit être positif"),
                     Arguments.of("Category amount zero",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryZeroAmount)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryZeroAmount), false),
                             "membershipCreateRequests[0].category.amount", "Le montant doit être positif"),
                     Arguments.of("Category amount invalid decimal format",
-                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryInvalidDigitsAmount)),
+                            new MembershipPaymentOrder(campaignId, validPayer, List.of(membershipCategoryInvalidDigitsAmount), false),
                             "membershipCreateRequests[0].category.amount", "Le montant doit être un nombre décimal à 2 chiffres après la virgule")
             );
         }
@@ -356,7 +356,7 @@ class MembershipControllerTest {
                     "John", "Doe", "john.doe@example.com", "LIC-12345",
                     new CategoryDto("U11", new BigDecimal("100.00"))
             );
-            return new MembershipPaymentOrder(campaignId, payer, List.of(membership));
+            return new MembershipPaymentOrder(campaignId, payer, List.of(membership), false);
         }
     }
 

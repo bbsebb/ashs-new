@@ -69,7 +69,7 @@ app:
   cors:
     allowed-headers: "Authorization,Content-Type,Accept,Origin,X-Requested-With"
     allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:4200}
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*}
   upload:
     dir: "uploads/"
 

@@ -5,4 +5,5 @@ export const menuItems: MenuItem[] = [
   {icon: 'stadium', label: 'Salle', path: '/halls'},
   {icon: 'diversity_3', label: 'Équipe', path: '/teams'},
   {icon: 'supervisor_account', label: 'Staff', path: '/staffs'},
+  {icon: 'card_membership', label: 'Adhésion', path: '/membership/register'},
 ];

@@ -1,0 +1,140 @@
+<form [formRoot]="membershipFormService.membershipFormSignal" (submit)="onSubmit($event)"
+      class="membership-form-container">
+
+  <!-- PAYER SECTION -->
+  <mat-card class="form-card payer-card">
+    <mat-card-header>
+      <mat-card-title>Informations de facturation (Payeur)</mat-card-title>
+      <mat-card-subtitle>Saisissez les coordonnées de la personne effectuant le paiement.</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="card-content-flex">
+      <div class="input-row-flex">
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>Prénom</mat-label>
+          <input matInput [formField]="membershipFormService.membershipFormSignal.payer.firstname"
+                 placeholder="Ex. John">
+          <mat-error *appError="membershipFormService.membershipFormSignal.payer.firstname; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>Nom</mat-label>
+          <input matInput [formField]="membershipFormService.membershipFormSignal.payer.lastname" placeholder="Ex. Doe">
+          <mat-error *appError="membershipFormService.membershipFormSignal.payer.lastname; let errorMsg">
+            {{ errorMsg }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="form-field-full">
+        <mat-label>E-mail</mat-label>
+        <input matInput type="email" [formField]="membershipFormService.membershipFormSignal.payer.email"
+               placeholder="Ex. john.doe@example.com">
+        <mat-error *appError="membershipFormService.membershipFormSignal.payer.email; let errorMsg">
+          {{ errorMsg }}
+        </mat-error>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- MEMBERS SECTION -->
+  <div class="members-container">
+    <div class="section-header-flex">
+      <h2>Membres à inscrire</h2>
+      <button mat-flat-button color="primary" type="button" (click)="membershipFormService.addMember()">
+        <mat-icon>add</mat-icon>
+        Ajouter un membre
+      </button>
+    </div>
+
+    @for (memberField of membersFormSignal(); track $index) {
+      <mat-card class="form-card member-card">
+        <mat-card-header class="member-card-header-flex">
+          <mat-card-title>Membre #{{ $index + 1 }}</mat-card-title>
+          @if (membersFormSignal().length > 1) {
+            <button mat-icon-button color="warn" type="button" (click)="membershipFormService.removeMember($index)"
+                    aria-label="Supprimer le membre">
+              <mat-icon>delete</mat-icon>
+            </button>
+          }
+        </mat-card-header>
+
+        <mat-card-content class="card-content-flex">
+          <div class="input-row-flex">
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>Prénom</mat-label>
+              <input matInput [formField]="memberField.firstName" placeholder="Prénom de l'adhérent">
+              <mat-error *appError="memberField.firstName; let errorMsg">
+                {{ errorMsg }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>Nom</mat-label>
+              <input matInput [formField]="memberField.lastName" placeholder="Nom de l'adhérent">
+              <mat-error *appError="memberField.lastName; let errorMsg">
+                {{ errorMsg }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="input-row-flex">
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>E-mail</mat-label>
+              <input matInput type="email" [formField]="memberField.email" placeholder="E-mail de l'adhérent">
+              <mat-error *appError="memberField.email; let errorMsg">
+                {{ errorMsg }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>Numéro de Licence</mat-label>
+              <input matInput [formField]="memberField.licenseNumber" placeholder="Numéro de licence FFHB">
+              <mat-error *appError="memberField.licenseNumber; let errorMsg">
+                {{ errorMsg }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="form-field-full">
+            <mat-label>Catégorie & Tarif</mat-label>
+            <mat-select [formField]="memberField.categoryName">
+              @for (cat of viewModelInputSignal().campaign.categories; track cat.name) {
+                <mat-option [value]="cat.name">
+                  {{ cat.name }} - {{ cat.amount | currency:'EUR':'symbol':'1.2-2':'fr' }}
+                </mat-option>
+              }
+            </mat-select>
+            <mat-error *appError="memberField.categoryName; let errorMsg">
+              {{ errorMsg }}
+            </mat-error>
+          </mat-form-field>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- SUMMARY & SUBMIT SECTION -->
+  <mat-card class="form-card summary-card">
+    <mat-card-content class="summary-content-flex">
+      <div class="total-price-flex">
+        <span>Montant total :</span>
+        <strong>{{ calculateTotal() | currency:'EUR':'symbol':'1.2-2':'fr' }}</strong>
+      </div>
+
+      <div class="actions-flex">
+        <button mat-raised-button color="accent" type="submit"
+                [disabled]="membershipFormService.membershipFormSignal().invalid() || viewModelInputSignal().isSubmitting"
+                class="submit-button">
+          @if (viewModelInputSignal().isSubmitting) {
+            Initialisation du paiement...
+          } @else {
+            Valider et Payer avec SumUp
+          }
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</form>

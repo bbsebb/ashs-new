@@ -32,6 +32,14 @@ public class CampaignService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public java.util.Optional<CampaignResponse> getActiveCampaign() {
+        return campaignRepository.findAll().stream()
+                .filter(c -> c.getStatus() == CampaignStatus.LAUNCHED)
+                .findFirst()
+                .map(this::toResponse);
+    }
+
     @Transactional
     public CampaignResponse createCampaign(CampaignCreateRequest request) {
         Campaign campaign = new Campaign();

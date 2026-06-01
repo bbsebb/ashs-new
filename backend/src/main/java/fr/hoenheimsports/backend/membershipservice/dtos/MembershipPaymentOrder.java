@@ -12,6 +12,7 @@ public record MembershipPaymentOrder(
         @Valid
         PaymentPayerInfoCreateRequest paymentPayerInfoCreateRequest,
         @Valid
-        List<MembershipCreateRequest> membershipCreateRequests) {
+        List<MembershipCreateRequest> membershipCreateRequests,
+        boolean hasDiscount) {
 
 }

@@ -306,6 +306,145 @@ class MembershipServiceTest {
                     });
         }
 
+        @Nested
+        @DisplayName("Discount Logic Tests")
+        class DiscountLogicTests {
+
+            @Test
+            @DisplayName("Should apply 50% discount on cheapest membership when order has discount and size > 3")
+            void shouldApplyDiscountWhenOrderHasDiscountAndSizeGreaterThanThree() {
+                // Given
+                UUID campaignId = UUID.randomUUID();
+                MembershipCreateRequest r1 = new MembershipCreateRequest(
+                        "John", "Doe", "john@example.com", "LIC-1", new CategoryDto("U11", new BigDecimal("100.00"))
+                );
+                MembershipCreateRequest r2 = new MembershipCreateRequest(
+                        "Rene", "Dupont", "rene@example.com", "LIC-2", new CategoryDto("U13", new BigDecimal("120.00"))
+                );
+                MembershipCreateRequest r3 = new MembershipCreateRequest(
+                        "Jane", "Doe", "jane@example.com", "LIC-3", new CategoryDto("Sénior", new BigDecimal("150.00"))
+                );
+                MembershipCreateRequest r4 = new MembershipCreateRequest(
+                        "Bob", "Smith", "bob@example.com", "LIC-4", new CategoryDto("Loisir", new BigDecimal("80.00"))
+                );
+                MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(r1, r2, r3, r4), true);
+
+                Campaign campaign = createCampaign(campaignId, Set.of(
+                        new Category("U11", Price.of("100.00")),
+                        new Category("U13", Price.of("120.00")),
+                        new Category("Sénior", Price.of("150.00")),
+                        new Category("Loisir", Price.of("80.00"))
+                ));
+
+                when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+                mockPaymentTransactionSave();
+                SumUpCheckout mockSumupCheckout = new SumUpCheckout(
+                        "sumup-chk-123", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"
+                );
+                when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
+
+                // When
+                MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+
+                // Then
+                assertThat(result).isNotNull();
+                ArgumentCaptor<PaymentTransaction> captor = ArgumentCaptor.forClass(PaymentTransaction.class);
+                verify(paymentTransactionRepository).save(captor.capture());
+                PaymentTransaction savedTx = captor.getValue();
+                assertThat(savedTx.isDiscounted()).isTrue();
+                // 100 + 120 + 150 + 80 = 450. Less 50% of 80 (40) = 410.00
+                assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("410.00");
+            }
+
+            @Test
+            @DisplayName("Should NOT apply discount when order has discount but size is 3 or less")
+            void shouldNotApplyDiscountWhenSizeIsThreeOrLess() {
+                // Given
+                UUID campaignId = UUID.randomUUID();
+                MembershipCreateRequest r1 = new MembershipCreateRequest(
+                        "John", "Doe", "john@example.com", "LIC-1", new CategoryDto("U11", new BigDecimal("100.00"))
+                );
+                MembershipCreateRequest r2 = new MembershipCreateRequest(
+                        "Rene", "Dupont", "rene@example.com", "LIC-2", new CategoryDto("U13", new BigDecimal("120.00"))
+                );
+                MembershipCreateRequest r3 = new MembershipCreateRequest(
+                        "Jane", "Doe", "jane@example.com", "LIC-3", new CategoryDto("Sénior", new BigDecimal("150.00"))
+                );
+                MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(r1, r2, r3), true);
+
+                Campaign campaign = createCampaign(campaignId, Set.of(
+                        new Category("U11", Price.of("100.00")),
+                        new Category("U13", Price.of("120.00")),
+                        new Category("Sénior", Price.of("150.00"))
+                ));
+
+                when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+                mockPaymentTransactionSave();
+                SumUpCheckout mockSumupCheckout = new SumUpCheckout(
+                        "sumup-chk-123", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"
+                );
+                when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
+
+                // When
+                MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+
+                // Then
+                assertThat(result).isNotNull();
+                ArgumentCaptor<PaymentTransaction> captor = ArgumentCaptor.forClass(PaymentTransaction.class);
+                verify(paymentTransactionRepository).save(captor.capture());
+                PaymentTransaction savedTx = captor.getValue();
+                assertThat(savedTx.isDiscounted()).isTrue();
+                // 100 + 120 + 150 = 370.00
+                assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("370.00");
+            }
+
+            @Test
+            @DisplayName("Should NOT apply discount when order does NOT have discount even if size > 3")
+            void shouldNotApplyDiscountWhenOrderHasNoDiscount() {
+                // Given
+                UUID campaignId = UUID.randomUUID();
+                MembershipCreateRequest r1 = new MembershipCreateRequest(
+                        "John", "Doe", "john@example.com", "LIC-1", new CategoryDto("U11", new BigDecimal("100.00"))
+                );
+                MembershipCreateRequest r2 = new MembershipCreateRequest(
+                        "Rene", "Dupont", "rene@example.com", "LIC-2", new CategoryDto("U13", new BigDecimal("120.00"))
+                );
+                MembershipCreateRequest r3 = new MembershipCreateRequest(
+                        "Jane", "Doe", "jane@example.com", "LIC-3", new CategoryDto("Sénior", new BigDecimal("150.00"))
+                );
+                MembershipCreateRequest r4 = new MembershipCreateRequest(
+                        "Bob", "Smith", "bob@example.com", "LIC-4", new CategoryDto("Loisir", new BigDecimal("80.00"))
+                );
+                MembershipPaymentOrder order = createPaymentOrder(campaignId, List.of(r1, r2, r3, r4), false);
+
+                Campaign campaign = createCampaign(campaignId, Set.of(
+                        new Category("U11", Price.of("100.00")),
+                        new Category("U13", Price.of("120.00")),
+                        new Category("Sénior", Price.of("150.00")),
+                        new Category("Loisir", Price.of("80.00"))
+                ));
+
+                when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
+                mockPaymentTransactionSave();
+                SumUpCheckout mockSumupCheckout = new SumUpCheckout(
+                        "sumup-chk-123", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"
+                );
+                when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
+
+                // When
+                MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+
+                // Then
+                assertThat(result).isNotNull();
+                ArgumentCaptor<PaymentTransaction> captor = ArgumentCaptor.forClass(PaymentTransaction.class);
+                verify(paymentTransactionRepository).save(captor.capture());
+                PaymentTransaction savedTx = captor.getValue();
+                assertThat(savedTx.isDiscounted()).isFalse();
+                // 100 + 120 + 150 + 80 = 450.00
+                assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("450.00");
+            }
+        }
+
         // --- Helper Methods ---
 
         /**
@@ -331,7 +470,11 @@ class MembershipServiceTest {
          * Helper to instantiate a MembershipPaymentOrder.
          */
         private MembershipPaymentOrder createPaymentOrder(UUID campaignId, List<MembershipCreateRequest> requests) {
-            return new MembershipPaymentOrder(campaignId, createDefaultPayerRequest(), requests);
+            return new MembershipPaymentOrder(campaignId, createDefaultPayerRequest(), requests, false);
+        }
+
+        private MembershipPaymentOrder createPaymentOrder(UUID campaignId, List<MembershipCreateRequest> requests, boolean hasDiscount) {
+            return new MembershipPaymentOrder(campaignId, createDefaultPayerRequest(), requests, hasDiscount);
         }
 
         /**

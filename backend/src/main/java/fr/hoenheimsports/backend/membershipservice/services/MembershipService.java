@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,11 +52,13 @@ public class MembershipService {
         }
         PaymentTransaction paymentTransaction = createPaymentTransaction(campaign, membershipPaymentOrder);
 
-        BigDecimal totalAmount = addMembershipsAndCalculateTotalAmount(
-                paymentTransaction,
-                campaign,
-                membershipPaymentOrder.membershipCreateRequests()
-        );
+
+        // Faire deux boucles pour créer les membres et calculer le total, lisibilité améliorer pour une liste <5
+        membershipPaymentOrder.membershipCreateRequests().forEach(membershipCreateRequest -> {
+            findAndValidateConfiguredCategory(campaign, membershipCreateRequest.category());
+            paymentTransaction.addMembership(createMembership(campaign.getId(), membershipCreateRequest));
+        });
+        BigDecimal totalAmount = calculateTotalAmount(paymentTransaction);
 
         paymentTransaction.setAmount(Price.of(totalAmount));
         SumUpCheckout sumUpCheckout = sumUpService.createCheckout(
@@ -117,6 +120,8 @@ public class MembershipService {
         paymentTransaction.setId(UUID.randomUUID());
         paymentTransaction.setPayerInfo(createPayerInfo(membershipPaymentOrder));
         paymentTransaction.setCampaignId(campaign.getId());
+        paymentTransaction.setStatus(MembershipStatus.PENDING);
+        paymentTransaction.setDiscounted(membershipPaymentOrder.hasDiscount());
         return paymentTransaction;
     }
 
@@ -136,29 +141,25 @@ public class MembershipService {
         );
     }
 
-    /**
-     * Validates and adds memberships to the transaction, returning the total amount.
-     *
-     * @param paymentTransaction       the transaction to add memberships to
-     * @param campaign                 the active campaign configuration
-     * @param membershipCreateRequests the list of membership requests to process
-     * @return the sum of all valid membership prices
-     */
-    private BigDecimal addMembershipsAndCalculateTotalAmount(
-            PaymentTransaction paymentTransaction,
-            Campaign campaign,
-            List<MembershipCreateRequest> membershipCreateRequests
-    ) {
-        BigDecimal totalAmount = BigDecimal.ZERO;
 
-        for (MembershipCreateRequest request : membershipCreateRequests) {
-            Category configuredCategory = findAndValidateConfiguredCategory(campaign, request.category());
-
-            totalAmount = totalAmount.add(configuredCategory.getPrice().amount());
-            paymentTransaction.addMembership(createMembership(campaign.getId(), request));
+    private BigDecimal calculateTotalAmount(PaymentTransaction paymentTransaction) {
+        List<BigDecimal> amounts = paymentTransaction.getMemberships().stream()
+                .map(Membership::getCategory)
+                .map(Category::getPrice)
+                .map(Price::amount)
+                .toList();
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        if (paymentTransaction.isDiscounted() && paymentTransaction.getMemberships().size() > 3) {
+            discountAmount = amounts.stream()
+                    .min(BigDecimal::compareTo)
+                    .orElse(BigDecimal.ZERO)
+                    .divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP);
         }
+        BigDecimal initialAmount = amounts.stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return totalAmount;
+
+        return initialAmount.subtract(discountAmount);
     }
 
     /**

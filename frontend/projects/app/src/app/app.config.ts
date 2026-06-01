@@ -1,6 +1,7 @@
 import {ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners} from '@angular/core';
 import {provideRouter, TitleStrategy, withComponentInputBinding, withInMemoryScrolling} from '@angular/router';
-
+import {registerLocaleData} from '@angular/common';
+import localFr from '@angular/common/locales/fr';
 import {routes} from './app.routes';
 import {MENU_CONFIG, provideSharedIcons} from '@shared-ui';
 import {menuItems} from './core/layout/menu-items';
@@ -13,6 +14,7 @@ import {MyCustomPageTitleStrategy} from './shared/services/title-strategy';
   // On ajoute un délai de 2 secondes en développement
   return next(req).pipe(delay(200));
 };*/
+registerLocaleData(localFr);
 export const appConfig: ApplicationConfig = {
   providers: [
     {provide: ErrorHandler, useClass: GlobalErrorHandler},

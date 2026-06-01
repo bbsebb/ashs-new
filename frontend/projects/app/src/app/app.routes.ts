@@ -53,6 +53,11 @@ export const routes: Routes = [
   },
   {path: 'mentions-legales', title: 'Mentions Légales', component: MentionsLegales},
   {
+    path: 'membership/register',
+    title: 'Adhésion en ligne',
+    loadComponent: () => import('./features/membership/components/membership-registration/membership-registration').then(m => m.MembershipRegistrationComponent)
+  },
+  {
     path: 'contact',
     title: 'Contact',
     loadComponent: () => import('./features/contact/components/contact-view/contact-view').then(m => m.ContactView)

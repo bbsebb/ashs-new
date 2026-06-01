@@ -26,6 +26,7 @@ CREATE TABLE membership_schema.payment_transaction
     sumup_checkout_return_url  VARCHAR(255),
     sumup_checkout_date        VARCHAR(255),
     sumup_checkout_url VARCHAR(255),
+    is_discounted BOOLEAN NOT NULL DEFAULT FALSE,
     CONSTRAINT pk_payment_transaction PRIMARY KEY (id)
 );
 

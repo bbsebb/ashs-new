@@ -81,6 +81,21 @@ export class CampaignGateway {
   }
 
   /**
+   * Retrieves the active campaign from the public API using httpResource.
+   * Maps the response to the domain Campaign model.
+   * @returns An HttpResourceRef containing the active campaign or null.
+   */
+  getActiveCampaign(): HttpResourceRef<Campaign | null> {
+    return httpResource<Campaign | null>(() => `${this.appConfig.apiUrl}/api/public/campaigns/active`, {
+      parse: (response: unknown) => {
+        if (!response) return null;
+        return this.toCampaign(response as CampaignResponseDTO);
+      },
+      defaultValue: null,
+    });
+  }
+
+  /**
    * Maps a CampaignResponseDTO from the API to a domain Campaign object.
    * @param dto The API response object.
    * @returns A Campaign domain object.

@@ -1,0 +1,127 @@
+.membership-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem 0;
+
+  .form-card {
+    background: var(--mat-sys-surface-container-low, #fcfcfc);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+
+    mat-card-header {
+      padding: 1.5rem 1.5rem 0.75rem 1.5rem;
+    }
+  }
+
+  .card-content-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+  }
+
+  .input-row-flex {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+
+  .form-field-half {
+    flex: 1;
+    width: 100%;
+  }
+
+  .form-field-full {
+    width: 100%;
+  }
+
+  .members-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+
+    .section-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0 0.5rem 0;
+
+      h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--mat-sys-on-background, #1a1a1a);
+      }
+    }
+  }
+
+  .member-card {
+    position: relative;
+
+    .member-card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  .summary-card {
+    background: var(--mat-sys-surface-container-high, #f5f5f5);
+    border-left: 5px solid var(--mat-sys-primary, #6750a4);
+
+    .summary-content-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+
+      @media (max-width: 480px) {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+    }
+
+    .total-price-flex {
+      display: flex;
+      flex-direction: column;
+
+      span {
+        font-size: 0.9rem;
+        color: var(--mat-sys-on-surface-variant, #5f5f5f);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      strong {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--mat-sys-primary, #6750a4);
+      }
+    }
+
+    .actions-flex {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .submit-button {
+      padding: 1.5rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 30px;
+    }
+  }
+}

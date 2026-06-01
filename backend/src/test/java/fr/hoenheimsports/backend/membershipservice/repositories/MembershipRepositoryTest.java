@@ -45,6 +45,8 @@ class MembershipRepositoryTest {
             transaction.setAmount(Price.of("150.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
+            transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setDiscounted(false);
             transaction.setSumupCheckout(new SumUpCheckout("checkout-123", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"));
             PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
 
@@ -102,6 +104,8 @@ class MembershipRepositoryTest {
             transaction.setAmount(Price.of("300.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("Marc", "Dupont", "marc.dupont@example.com"));
+            transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setDiscounted(false);
             transaction.setSumupCheckout(new SumUpCheckout("checkout-unique-999", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"));
             PaymentTransaction savedTransaction = paymentTransactionRepository.saveAndFlush(transaction);
 

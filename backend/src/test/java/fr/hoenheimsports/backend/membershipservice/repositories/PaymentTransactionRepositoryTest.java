@@ -1,10 +1,7 @@
 package fr.hoenheimsports.backend.membershipservice.repositories;
 
 import fr.hoenheimsports.backend.TestcontainersConfiguration;
-import fr.hoenheimsports.backend.membershipservice.entities.PaymentPayerInfo;
-import fr.hoenheimsports.backend.membershipservice.entities.PaymentTransaction;
-import fr.hoenheimsports.backend.membershipservice.entities.Price;
-import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckout;
+import fr.hoenheimsports.backend.membershipservice.entities.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,7 +41,9 @@ class PaymentTransactionRepositoryTest {
             transaction.setAmount(Price.of("200.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("Jane", "Smith", "jane.smith@example.com"));
+            transaction.setStatus(MembershipStatus.PENDING);
             transaction.setSumupCheckout(new SumUpCheckout("sumup-checkout-xyz", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"));
+            transaction.setDiscounted(true);
 
             // When
             PaymentTransaction saved = paymentTransactionRepository.saveAndFlush(transaction);
@@ -59,6 +58,8 @@ class PaymentTransactionRepositoryTest {
             assertThat(actual.getPayerInfo().lastName()).isEqualTo("Smith");
             assertThat(actual.getPayerInfo().email()).isEqualTo("jane.smith@example.com");
             assertThat(actual.getSumupCheckout().id()).isEqualTo("sumup-checkout-xyz");
+            assertThat(actual.isDiscounted()).isTrue();
+            assertThat(actual.getStatus()).isEqualTo(MembershipStatus.PENDING);
         }
 
         @Test
@@ -68,6 +69,8 @@ class PaymentTransactionRepositoryTest {
             PaymentTransaction transaction = new PaymentTransaction();
             transaction.setId(UUID.randomUUID());
             transaction.setAmount(Price.of("200.00"));
+            transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setDiscounted(false);
             // Payer info is null
             transaction.setPayerInfo(null);
 
@@ -90,7 +93,9 @@ class PaymentTransactionRepositoryTest {
             transaction.setAmount(Price.of("50.00"));
             transaction.setCampaignId(UUID.randomUUID());
             transaction.setPayerInfo(new PaymentPayerInfo("Bob", "Sponge", "bob@example.com"));
+            transaction.setStatus(MembershipStatus.PENDING);
             transaction.setSumupCheckout(new SumUpCheckout("checkout-bob-777", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"));
+            transaction.setDiscounted(false);
             paymentTransactionRepository.saveAndFlush(transaction);
 
             // When
@@ -99,6 +104,8 @@ class PaymentTransactionRepositoryTest {
             // Then
             assertThat(found).isPresent();
             assertThat(found.get().getPayerInfo().firstName()).isEqualTo("Bob");
+            assertThat(found.get().isDiscounted()).isFalse();
+            assertThat(found.get().getStatus()).isEqualTo(MembershipStatus.PENDING);
         }
     }
 }

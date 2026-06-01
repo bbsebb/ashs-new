@@ -15,6 +15,7 @@ import {CreateCampaignDTO, UpdateCampaignDTO} from './campaign.dtos';
 export class CampaignStore {
   private readonly _campaignGateway = inject(CampaignGateway);
   private readonly _campaignsResource = this._campaignGateway.getCampaigns();
+  private readonly _activeCampaignResource = this._campaignGateway.getActiveCampaign();
 
   /** Signal containing the current list of campaigns. */
   readonly campaignsSignal: Signal<Campaign[]> = computed(() =>
@@ -25,6 +26,16 @@ export class CampaignStore {
   isLoadingSignal = this._campaignsResource.isLoading;
   /** Signal containing any error that occurred during campaign loading. */
   errorSignal = this._campaignsResource.error;
+
+  /** Signal containing the single active campaign, loaded from public endpoint. */
+  readonly activeCampaignSignal: Signal<Campaign | null> = computed(() =>
+    this._activeCampaignResource.hasValue() ? this._activeCampaignResource.value() : null
+  );
+
+  /** Signal indicating if the active campaign is currently loading. */
+  readonly isActiveCampaignLoadingSignal = this._activeCampaignResource.isLoading;
+  /** Signal containing any error that occurred during active campaign loading. */
+  readonly activeCampaignErrorSignal = this._activeCampaignResource.error;
 
   /**
    * Returns a Signal for a specific campaign by its ID.

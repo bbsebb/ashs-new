@@ -1,0 +1,38 @@
+<div class="registration-page-container">
+  <!-- LOADING STATE -->
+  @if (isCampaignsLoadingSignal()) {
+    <div class="state-container">
+      <app-loading-data label="Chargement de la campagne d'adhésion..."></app-loading-data>
+    </div>
+  } @else if (campaignsErrorSignal()) {
+    <div class="state-container">
+      <app-error-data
+        dataName="campagne d'adhésion"></app-error-data>
+    </div>
+  } @else {
+    @if (viewModelSignal(); as vm) {
+      <div class="registration-content">
+        <header class="page-header-flex">
+          <span class="eyebrow">Adhésion Saison</span>
+          <h1>Inscriptions en ligne</h1>
+          <p class="subtitle">Remplissez le formulaire ci-dessous pour inscrire un ou plusieurs adhérents et procéder au
+            règlement en ligne.</p>
+        </header>
+
+        <app-membership-form
+          [viewModel]="vm"
+          (submitOrder)="onSubmit($event)">
+        </app-membership-form>
+      </div>
+    } @else {
+      <!-- NO ACTIVE CAMPAIGN STATE -->
+      <div class="no-campaign-card-flex">
+        <div class="no-campaign-icon">
+          <span class="material-icons">info</span>
+        </div>
+        <h2>Inscriptions fermées</h2>
+        <p>Il n'y a aucune campagne d'adhésion active en ce moment. Les inscriptions rouvriront très prochainement.</p>
+      </div>
+    }
+  }
+</div>

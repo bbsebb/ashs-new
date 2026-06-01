@@ -3,6 +3,7 @@ package fr.hoenheimsports.backend.membershipservice;
 import fr.hoenheimsports.backend.TestcontainersConfiguration;
 import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
+import fr.hoenheimsports.backend.membershipservice.entities.PaymentTransaction;
 import fr.hoenheimsports.backend.membershipservice.entities.SumUpCheckout;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
@@ -115,7 +116,8 @@ public class MembershipUseCasesTest {
             MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
                     campaignId,
                     paymentPayerInfoCreateRequest,
-                    List.of(membershipCreateRequest1, membershipCreateRequest2)
+                    List.of(membershipCreateRequest1, membershipCreateRequest2),
+                    false
             );
 
             MembershipPaymentResponse response = authRestTestClient.post()
@@ -155,6 +157,54 @@ public class MembershipUseCasesTest {
                         assertThat(membership.amount()).isEqualByComparingTo(membershipCreateRequest2.category().amount());
                         assertThat(membership.status()).isEqualTo(MembershipStatus.PENDING);
                     });
+        }
+
+        @Test
+        @DisplayName("Création des adhérents avec réduction (hasDiscount = true et plus de 3 adhérents)")
+        void shouldCreateMembershipWithDiscountSuccessfully() {
+            UUID campaignId = createCampaign();
+
+            MembershipCreateRequest membershipCreateRequest1 = new MembershipCreateRequest(
+                    "Doe", "john1", "john1@doe.com", "10", new CategoryDto("U11", new BigDecimal("100.00"))
+            );
+            MembershipCreateRequest membershipCreateRequest2 = new MembershipCreateRequest(
+                    "Doe", "john2", "john2@doe.com", "11", new CategoryDto("U11", new BigDecimal("100.00"))
+            );
+            MembershipCreateRequest membershipCreateRequest3 = new MembershipCreateRequest(
+                    "Dupont", "Rene1", "rene1@dupont.com", "12", new CategoryDto("U13", new BigDecimal("120.00"))
+            );
+            MembershipCreateRequest membershipCreateRequest4 = new MembershipCreateRequest(
+                    "Dupont", "Rene2", "rene2@dupont.com", "13", new CategoryDto("U13", new BigDecimal("120.00"))
+            );
+            PaymentPayerInfoCreateRequest paymentPayerInfoCreateRequest = new PaymentPayerInfoCreateRequest(
+                    "John", "doe", "john.doe@example.com"
+            );
+
+            MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
+                    campaignId,
+                    paymentPayerInfoCreateRequest,
+                    List.of(membershipCreateRequest1, membershipCreateRequest2, membershipCreateRequest3, membershipCreateRequest4),
+                    true
+            );
+
+            MembershipPaymentResponse response = authRestTestClient.post()
+                    .uri("/api/v1/memberships/orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(membershipPaymentOrder)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(MembershipPaymentResponse.class)
+                    .returnResult().getResponseBody();
+
+            assertThat(response).isNotNull();
+            assertThat(response.memberships()).hasSize(4);
+
+            List<PaymentTransaction> transactions = paymentTransactionRepository.findAll();
+            assertThat(transactions).hasSize(1);
+            PaymentTransaction savedTx = transactions.get(0);
+            assertThat(savedTx.isDiscounted()).isTrue();
+            // 100 + 100 + 120 + 120 = 440.00. Moins cher = 100. Réduction = 50. Total = 390.00
+            assertThat(savedTx.getAmount().amount()).isEqualByComparingTo("390.00");
         }
     }
 
@@ -220,7 +270,8 @@ public class MembershipUseCasesTest {
             MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
                     campaignId,
                     paymentPayerInfoCreateRequest,
-                    List.of(membershipCreateRequest1)
+                    List.of(membershipCreateRequest1),
+                    false
             );
 
             MembershipPaymentResponse orderResponse = authRestTestClient.post()
@@ -299,7 +350,8 @@ public class MembershipUseCasesTest {
             MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
                     campaignId,
                     paymentPayerInfoCreateRequest,
-                    List.of(membershipCreateRequest)
+                    List.of(membershipCreateRequest),
+                    false
             );
 
             MembershipPaymentResponse orderResponse = authRestTestClient.post()
@@ -354,7 +406,8 @@ public class MembershipUseCasesTest {
             MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
                     campaignId,
                     paymentPayerInfoCreateRequest,
-                    List.of(membershipCreateRequest)
+                    List.of(membershipCreateRequest),
+                    false
             );
 
             MembershipPaymentResponse orderResponse = authRestTestClient.post()

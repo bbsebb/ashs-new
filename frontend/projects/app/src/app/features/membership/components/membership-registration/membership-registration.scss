@@ -1,0 +1,107 @@
+.registration-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50vh;
+  padding: 2rem 1.5rem;
+  background: var(--mat-sys-background, #fafafa);
+  box-sizing: border-box;
+
+  .state-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    width: 100%;
+  }
+
+  .registration-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    gap: 2rem;
+  }
+
+  .page-header-flex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 0.5rem;
+
+    .eyebrow {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      color: var(--mat-sys-primary, #6750a4);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--mat-sys-on-background, #1a1a1a);
+      margin: 0 0 0.75rem 0;
+      letter-spacing: -0.5px;
+
+      @media (max-width: 600px) {
+        font-size: 2rem;
+      }
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--mat-sys-on-surface-variant, #5f5f5f);
+      max-width: 600px;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+
+  .no-campaign-card-flex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: var(--mat-sys-surface-container-low, #fcfcfc);
+    border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    max-width: 450px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+
+    .no-campaign-icon {
+      background: var(--mat-sys-primary-container, #eaddff);
+      color: var(--mat-sys-primary, #21005d);
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1.5rem;
+
+      .material-icons {
+        font-size: 36px;
+      }
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--mat-sys-on-background, #1a1a1a);
+      margin: 0 0 0.75rem 0;
+    }
+
+    p {
+      font-size: 1rem;
+      color: var(--mat-sys-on-surface-variant, #5f5f5f);
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+}

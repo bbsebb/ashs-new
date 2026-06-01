@@ -47,6 +47,13 @@ public class PaymentTransaction {
     })
     private SumUpCheckout sumupCheckout;
 
+    @Column(name = "is_discounted", nullable = false)
+    private boolean isDiscounted = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private MembershipStatus status;
+
     public void addMembership(Membership membership) {
         memberships.add(membership);
         membership.setPaymentTransaction(this);

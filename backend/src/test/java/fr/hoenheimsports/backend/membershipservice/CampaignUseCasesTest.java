@@ -384,7 +384,8 @@ class CampaignUseCasesTest {
             MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
                     campaign.id(),
                     paymentPayerInfoCreateRequest,
-                    List.of(membershipCreateRequest1)
+                    List.of(membershipCreateRequest1),
+                    false
             );
 
             // Initiate payment to create the membership in database

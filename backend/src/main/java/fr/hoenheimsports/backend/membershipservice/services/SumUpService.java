@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 /**
  * Service responsible for interacting with SumUp API.
@@ -32,6 +34,8 @@ public class SumUpService {
      */
     public SumUpCheckout createCheckout(String id, BigDecimal amount, String description) {
         try {
+            OffsetDateTime expiration = OffsetDateTime.now(ZoneOffset.UTC).plusHours(2);
+
             SumUpCheckoutRequest request = new SumUpCheckoutRequest(
                     id,
                     amount,
@@ -43,7 +47,7 @@ public class SumUpService {
                     sumUpProperties.getMerchantCode(),
                     null,
                     null,
-                    null,
+                    expiration,
                     new SumUpCheckoutRequest.HostedCheckout(true)
             );
 

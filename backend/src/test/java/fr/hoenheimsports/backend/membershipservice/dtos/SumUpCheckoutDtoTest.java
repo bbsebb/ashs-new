@@ -61,6 +61,33 @@ class SumUpCheckoutDtoTest {
             )).isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("currency");
         }
+
+        @Test
+        @DisplayName("Should successfully serialize SumUpCheckoutRequest with formatted valid_until")
+        void shouldSerializeValidUntilCorrectly() throws Exception {
+            // Given
+            java.time.OffsetDateTime validUntil = java.time.OffsetDateTime.of(
+                    2020, 2, 29, 10, 56, 56, 0,
+                    java.time.ZoneOffset.UTC
+            );
+            SumUpCheckoutRequest request = new SumUpCheckoutRequest(
+                    "ref-123",
+                    BigDecimal.TEN,
+                    "EUR",
+                    null, null, null, null, null, null, null,
+                    validUntil,
+                    null
+            );
+
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper()
+                    .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
+            // When
+            String json = objectMapper.writeValueAsString(request);
+
+            // Then
+            assertThat(json).contains("\"valid_until\":\"2020-02-29T10:56:56+00:00\"");
+        }
     }
 
     @Nested

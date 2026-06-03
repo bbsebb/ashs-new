@@ -26,6 +26,9 @@ class SumUpServiceIntegrationTest {
     @Autowired
     private SumUpService sumUpService;
 
+    @Autowired
+    private SumUpProperties sumUpProperties;
+
     @Nested
     @DisplayName("Successful checkout creations")
     class SuccessCases {
@@ -42,11 +45,10 @@ class SumUpServiceIntegrationTest {
             SumUpCheckout checkout = sumUpService.createCheckout(txId, amount, description);
 
             // Then
-            assertThat(checkout).isNotNull();
             assertThat(checkout.id()).isNotNull().isNotEmpty();
             assertThat(checkout.checkoutUrl()).isNotNull().startsWith("https://checkout.sumup.com");
             assertThat(checkout.description()).isEqualTo(description);
-            assertThat(checkout.returnUrl()).isEqualTo("http://localhost:4200/membership/payment-success");
+            assertThat(checkout.returnUrl()).isEqualTo(sumUpProperties.getReturnUrl());
             assertThat(checkout.date()).isNotNull().isNotEmpty();
         }
 
@@ -62,11 +64,10 @@ class SumUpServiceIntegrationTest {
             SumUpCheckout checkout = sumUpService.createCheckout(txId, amount, description);
 
             // Then
-            assertThat(checkout).isNotNull();
             assertThat(checkout.id()).isNotNull().isNotEmpty();
             assertThat(checkout.checkoutUrl()).isNotNull().startsWith("https://checkout.sumup.com");
             assertThat(checkout.description()).isEqualTo(description);
-            assertThat(checkout.returnUrl()).isEqualTo("http://localhost:4200/membership/payment-success");
+            assertThat(checkout.returnUrl()).isEqualTo(sumUpProperties.getReturnUrl());
             assertThat(checkout.date()).isNotNull().isNotEmpty();
         }
     }

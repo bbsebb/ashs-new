@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,8 +44,13 @@ class SumUpServiceTest {
                 expectedUrl
         );
 
-        when(sumUpClient.createCheckout(any(SumUpCheckoutRequest.class))).thenReturn(mockResponse);
+        org.mockito.ArgumentCaptor<SumUpCheckoutRequest> requestCaptor =
+                org.mockito.ArgumentCaptor.forClass(SumUpCheckoutRequest.class);
+
+        when(sumUpClient.createCheckout(requestCaptor.capture())).thenReturn(mockResponse);
         when(properties.getReturnUrl()).thenReturn("http://return-url");
+
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC);
 
         // When
         SumUpCheckout response = sumUpService.createCheckout("ref-123", BigDecimal.valueOf(45.5), "Adhésion Club");
@@ -56,7 +60,15 @@ class SumUpServiceTest {
         assertThat(response.checkoutUrl()).isEqualTo(expectedUrl);
         assertThat(response.id()).isEqualTo("chk-999");
 
-        verify(sumUpClient).createCheckout(any(SumUpCheckoutRequest.class));
+        SumUpCheckoutRequest capturedRequest = requestCaptor.getValue();
+        assertThat(capturedRequest.validUntil()).isNotNull();
+
+        // Assert validUntil is approximately 2 hours from now (within a 10 seconds delta)
+        long secondsDiff = java.time.temporal.ChronoUnit.SECONDS.between(
+                now.plusHours(2),
+                capturedRequest.validUntil()
+        );
+        assertThat(Math.abs(secondsDiff)).isLessThan(10);
     }
 
     @Test

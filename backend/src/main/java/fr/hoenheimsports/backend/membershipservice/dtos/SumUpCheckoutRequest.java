@@ -1,8 +1,11 @@
 package fr.hoenheimsports.backend.membershipservice.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.Nullable;
+
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
@@ -19,7 +22,7 @@ import java.util.Objects;
  * - merchant_code (String, optional): The merchant account ID.
  * - customer_id (String, optional): ID of the customer profile if saved.
  * - purpose (String, optional): Purpose of the checkout (e.g. "CHECKOUT", "SETUP_RECURRING_PAYMENT").
- * - valid_until (String, optional): Expiration date/time (ISO 8601) of the checkout.
+ * - valid_until (OffsetDateTime, optional): Expiration date/time (ISO 8601) of the checkout.
  * - hosted_checkout (HostedCheckout, optional): Configuration block for the SumUp hosted payment page.
  */
 public record SumUpCheckoutRequest(
@@ -33,7 +36,9 @@ public record SumUpCheckoutRequest(
     @Nullable @JsonProperty("merchant_code") String merchantCode,
     @Nullable @JsonProperty("customer_id") String customerId,
     @Nullable String purpose,
-    @Nullable @JsonProperty("valid_until") String validUntil,
+    @Nullable @JsonProperty("valid_until")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssxxx")
+    OffsetDateTime validUntil,
     @Nullable @JsonProperty("hosted_checkout") HostedCheckout hostedCheckout
 ) {
     /**

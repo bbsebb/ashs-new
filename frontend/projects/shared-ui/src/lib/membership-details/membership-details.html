@@ -1,0 +1,50 @@
+<mat-card class="details-card">
+  <mat-card-header class="header">
+    <mat-card-title class="title">
+      {{ viewModelInputSignal().firstName }} {{ viewModelInputSignal().lastName }}
+    </mat-card-title>
+    <mat-chip-set>
+      <mat-chip class="status-chip" [class]="viewModelInputSignal().status.toLowerCase()">
+        {{ viewModelInputSignal().status }}
+      </mat-chip>
+    </mat-chip-set>
+  </mat-card-header>
+
+  <mat-card-content class="content">
+    <mat-divider class="divider"></mat-divider>
+
+    <ul class="details-list">
+      <li class="detail-item">
+        <mat-icon class="icon">email</mat-icon>
+        <section class="field">
+          <span class="label">Email</span>
+          <span class="value">{{ viewModelInputSignal().email }}</span>
+        </section>
+      </li>
+
+      <li class="detail-item">
+        <mat-icon class="icon">badge</mat-icon>
+        <section class="field">
+          <span class="label">Numéro de licence</span>
+          <span class="value">{{ viewModelInputSignal().licenseNumber }}</span>
+        </section>
+      </li>
+
+      <li class="detail-item">
+        <mat-icon class="icon">category</mat-icon>
+        <section class="field">
+          <span class="label">Catégorie</span>
+          <span class="value">{{ viewModelInputSignal().categoryName }}</span>
+        </section>
+      </li>
+
+      <li class="detail-item">
+        <mat-icon class="icon">payments</mat-icon>
+        <section class="field">
+          <span class="label">Montant</span>
+          <span class="value">{{ viewModelInputSignal().amount | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </section>
+      </li>
+    </ul>
+  </mat-card-content>
+</mat-card>

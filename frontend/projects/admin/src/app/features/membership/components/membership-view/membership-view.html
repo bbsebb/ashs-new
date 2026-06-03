@@ -1,0 +1,13 @@
+@if (isLoadingSignal()) {
+  <app-loading-data label="Chargement de l'adhésion..."/>
+} @else if (errorSignal()) {
+  <app-error-data dataName="adhésion"/>
+} @else if (viewModelSignal(); as viewModel) {
+  <app-admin-page-container
+    [title]="'Adhésion de ' + viewModel.firstName + ' ' + viewModel.lastName"
+    subtitle="Informations complètes de l'adhérent.">
+
+    <app-membership-details [viewModel]="viewModel"></app-membership-details>
+
+  </app-admin-page-container>
+}

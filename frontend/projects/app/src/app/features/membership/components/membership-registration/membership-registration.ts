@@ -1,5 +1,5 @@
-import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
-import {CampaignStore, MembershipPaymentOrder, MembershipStore} from '@shared-api';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
+import {CampaignStore, MembershipGateway, MembershipPaymentOrder} from '@shared-api';
 import {ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {MembershipFormComponent, MembershipFormViewModel} from '../membership-form/membership-form';
 import {CommonModule} from '@angular/common';
@@ -20,9 +20,9 @@ import {CommonModule} from '@angular/common';
   styleUrl: './membership-registration.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MembershipRegistrationComponent implements OnInit {
+export class MembershipRegistrationComponent {
   private readonly _campaignStore = inject(CampaignStore);
-  private readonly _membershipStore = inject(MembershipStore);
+  private readonly _membershipGateway = inject(MembershipGateway);
   private readonly _notificationService = inject(NotificationService);
 
   /** Loading state of the campaigns */
@@ -34,10 +34,13 @@ export class MembershipRegistrationComponent implements OnInit {
   /** Resolves the single active campaign at status LAUNCHED. */
   readonly activeCampaignSignal = this._campaignStore.activeCampaignSignal;
 
+  /** Local submission loading state */
+  readonly isSubmittingSignal = signal<boolean>(false);
+
   /** Aggregated ViewModel for the presentational form. */
   readonly viewModelSignal = computed<MembershipFormViewModel | null>(() => {
     const campaign = this.activeCampaignSignal();
-    const isSubmitting = this._membershipStore.isLoadingSignal();
+    const isSubmitting = this.isSubmittingSignal();
     if (!campaign) {
       return null;
     }
@@ -47,23 +50,21 @@ export class MembershipRegistrationComponent implements OnInit {
     };
   });
 
-  ngOnInit(): void {
-    // Reset membership store state to avoid keeping previous transaction responses
-    this._membershipStore.resetState();
-  }
-
   /**
    * Triggers the payment order initiation and redirects user to SumUp checkout page on success.
    * @param order The payment order details.
    */
   onSubmit(order: MembershipPaymentOrder): void {
-    this._membershipStore.initiatePayment(order).subscribe({
-      next: (response) => {
+    this.isSubmittingSignal.set(true);
+    this._membershipGateway.initiateMembershipPayment(order).subscribe({
+      next: (checkoutUrl) => {
+        this.isSubmittingSignal.set(false);
         this._notificationService.show('Inscription enregistrée. Redirection vers le paiement SumUp...', 'success');
         // Redirect the window to SumUp hosted payment page
-        window.open(response.sumupCheckout.checkoutUrl, '_self');
+        window.open(checkoutUrl, '_self');
       },
       error: () => {
+        this.isSubmittingSignal.set(false);
         this._notificationService.show("Une erreur est survenue lors de l'initialisation du paiement.", 'error');
       }
     });

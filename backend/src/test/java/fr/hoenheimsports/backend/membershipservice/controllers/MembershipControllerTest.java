@@ -61,33 +61,10 @@ class MembershipControllerTest {
         void shouldInitiateOrderSuccessfully() throws Exception {
             // Given
             UUID campaignId = UUID.randomUUID();
-            UUID transactionId = UUID.randomUUID();
-
             MembershipPaymentOrder order = createValidOrder(campaignId);
-            SumUpCheckoutDto sumupCheckoutDto = new SumUpCheckoutDto(
-                    "sumup-chk-123",
-                    "Licence",
-                    "http://return-url",
-                    "2026-05-31T19:30:24",
-                    "https://checkout.sumup.com/test"
-            );
-            MembershipPaymentResponse response = new MembershipPaymentResponse(
-                    transactionId,
-                    sumupCheckoutDto,
-                    List.of(new MembershipResponse(
-                            UUID.randomUUID(),
-                            campaignId,
-                            "John",
-                            "Doe",
-                            "john.doe@example.com",
-                            "LIC-12345",
-                            "U11",
-                            new BigDecimal("100.00"),
-                            MembershipStatus.PENDING
-                    ))
-            );
+            String checkoutUrl = "https://checkout.sumup.com/test";
 
-            when(membershipService.initiateMembershipPayment(any(MembershipPaymentOrder.class))).thenReturn(response);
+            when(membershipService.initiateMembershipPayment(any(MembershipPaymentOrder.class))).thenReturn(checkoutUrl);
 
             // When
             var result = mvc.post()
@@ -101,21 +78,8 @@ class MembershipControllerTest {
 
             // Then
             assertThat(result)
-                    .hasStatus(HttpStatus.CREATED);
-
-            assertThat(result).bodyJson().extractingPath("$.paymentTransactionId").asString().isEqualTo(transactionId.toString());
-            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.id").asString().isEqualTo("sumup-chk-123");
-            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.description").asString().isEqualTo("Licence");
-            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.returnUrl").asString().isEqualTo("http://return-url");
-            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.date").asString().isEqualTo("2026-05-31T19:30:24");
-            assertThat(result).bodyJson().extractingPath("$.sumupCheckout.checkoutUrl").asString().isEqualTo("https://checkout.sumup.com/test");
-            assertThat(result).bodyJson().extractingPath("$.memberships[0].firstName").asString().isEqualTo("John");
-            assertThat(result).bodyJson().extractingPath("$.memberships[0].lastName").asString().isEqualTo("Doe");
-            assertThat(result).bodyJson().extractingPath("$.memberships[0].email").asString().isEqualTo("john.doe@example.com");
-            assertThat(result).bodyJson().extractingPath("$.memberships[0].licenseNumber").asString().isEqualTo("LIC-12345");
-            assertThat(result).bodyJson().extractingPath("$.memberships[0].categoryName").asString().isEqualTo("U11");
-            assertThat(result).bodyJson().extractingPath("$.memberships[0].amount").asNumber().isEqualTo(100.00);
-            assertThat(result).bodyJson().extractingPath("$.memberships[0].status").asString().isEqualTo("PENDING");
+                    .hasStatus(HttpStatus.CREATED)
+                    .bodyText().isEqualTo(checkoutUrl);
         }
 
         @Test
@@ -123,33 +87,10 @@ class MembershipControllerTest {
         void shouldInitiateOrderSuccessfullyWhenAnonymous() throws Exception {
             // Given
             UUID campaignId = UUID.randomUUID();
-            UUID transactionId = UUID.randomUUID();
-
             MembershipPaymentOrder order = createValidOrder(campaignId);
-            SumUpCheckoutDto sumupCheckoutDto = new SumUpCheckoutDto(
-                    "sumup-chk-123",
-                    "Licence",
-                    "http://return-url",
-                    "2026-05-31T19:30:24",
-                    "https://checkout.sumup.com/test"
-            );
-            MembershipPaymentResponse response = new MembershipPaymentResponse(
-                    transactionId,
-                    sumupCheckoutDto,
-                    List.of(new MembershipResponse(
-                            UUID.randomUUID(),
-                            campaignId,
-                            "John",
-                            "Doe",
-                            "john.doe@example.com",
-                            "LIC-12345",
-                            "U11",
-                            new BigDecimal("100.00"),
-                            MembershipStatus.PENDING
-                    ))
-            );
+            String checkoutUrl = "https://checkout.sumup.com/test";
 
-            when(membershipService.initiateMembershipPayment(any(MembershipPaymentOrder.class))).thenReturn(response);
+            when(membershipService.initiateMembershipPayment(any(MembershipPaymentOrder.class))).thenReturn(checkoutUrl);
 
             // When
             var result = mvc.post()
@@ -159,9 +100,8 @@ class MembershipControllerTest {
 
             // Then
             assertThat(result)
-                    .hasStatus(HttpStatus.CREATED);
-
-            assertThat(result).bodyJson().extractingPath("$.paymentTransactionId").asString().isEqualTo(transactionId.toString());
+                    .hasStatus(HttpStatus.CREATED)
+                    .bodyText().isEqualTo(checkoutUrl);
         }
 
         @Test
@@ -520,4 +460,96 @@ class MembershipControllerTest {
             assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @Nested
+    @DisplayName("Get Payment Transaction")
+    class GetPaymentTransaction {
+
+        @Test
+        @DisplayName("Should return payment details successfully when authenticated and payment exists")
+        void shouldReturnPaymentWhenExists() throws Exception {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+            UUID campaignId = UUID.randomUUID();
+            UUID mId1 = UUID.randomUUID();
+            UUID mId2 = UUID.randomUUID();
+            List<MembershipResponse> memberships = List.of(
+                    new MembershipResponse(mId1, campaignId, "John", "Doe", "john.doe@example.com", "LIC-1", "U11", new BigDecimal("100.00"), MembershipStatus.PENDING),
+                    new MembershipResponse(mId2, campaignId, "Jane", "Doe", "jane.doe@example.com", "LIC-2", "U13", new BigDecimal("120.00"), MembershipStatus.PENDING)
+            );
+
+            PaymentResponse response = new PaymentResponse(
+                    transactionId,
+                    campaignId,
+                    new BigDecimal("220.00"),
+                    new PaymentPayerResponse("John", "Doe", "john.doe@example.com"),
+                    MembershipStatus.PENDING,
+                    "2026-05-31T19:30:24",
+                    true,
+                    memberships
+            );
+
+            when(membershipService.getPaymentTransaction(transactionId)).thenReturn(response);
+
+            // When
+            var result = mvc.get()
+                    .uri("/api/v1/memberships/payments/" + transactionId)
+                    .with(jwt().jwt(j -> j
+                            .claim("sub", "user")
+                            .claim("realm_access", Map.of("roles", List.of("ADMIN")))
+                    ));
+
+            // Then
+            assertThat(result).hasStatus(HttpStatus.OK);
+            assertThat(result).bodyJson().extractingPath("$.id").asString().isEqualTo(transactionId.toString());
+            assertThat(result).bodyJson().extractingPath("$.campaignId").asString().isEqualTo(campaignId.toString());
+            assertThat(result).bodyJson().extractingPath("$.amount").asNumber().isEqualTo(220.00);
+            assertThat(result).bodyJson().extractingPath("$.payerInfo.firstName").asString().isEqualTo("John");
+            assertThat(result).bodyJson().extractingPath("$.payerInfo.lastName").asString().isEqualTo("Doe");
+            assertThat(result).bodyJson().extractingPath("$.payerInfo.email").asString().isEqualTo("john.doe@example.com");
+            assertThat(result).bodyJson().extractingPath("$.status").asString().isEqualTo("PENDING");
+            assertThat(result).bodyJson().extractingPath("$.checkoutDate").asString().isEqualTo("2026-05-31T19:30:24");
+            assertThat(result).bodyJson().extractingPath("$.isDiscounted").asBoolean().isTrue();
+            assertThat(result).bodyJson().extractingPath("$.memberships[0].id").asString().isEqualTo(mId1.toString());
+            assertThat(result).bodyJson().extractingPath("$.memberships[0].firstName").asString().isEqualTo("John");
+            assertThat(result).bodyJson().extractingPath("$.memberships[1].id").asString().isEqualTo(mId2.toString());
+            assertThat(result).bodyJson().extractingPath("$.memberships[1].firstName").asString().isEqualTo("Jane");
+        }
+
+        @Test
+        @DisplayName("Should return 404 Not Found when payment does not exist")
+        void shouldReturnNotFoundWhenDoesNotExist() throws Exception {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+            when(membershipService.getPaymentTransaction(transactionId))
+                    .thenThrow(new EntityNotFoundException("Paiement non trouvé"));
+
+            // When
+            var result = mvc.get()
+                    .uri("/api/v1/memberships/payments/" + transactionId)
+                    .with(jwt().jwt(j -> j
+                            .claim("sub", "user")
+                            .claim("realm_access", Map.of("roles", List.of("ADMIN")))
+                    ));
+
+            // Then
+            assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
+            assertThat(result).bodyJson().extractingPath("$.detail").asString().isEqualTo("Paiement non trouvé");
+        }
+
+        @Test
+        @DisplayName("Should return 401 Unauthorized when get is called anonymously")
+        void shouldReturnUnauthorizedWhenAnonymous() throws Exception {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+
+            // When
+            var result = mvc.get()
+                    .uri("/api/v1/memberships/payments/" + transactionId);
+
+            // Then
+            assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
+

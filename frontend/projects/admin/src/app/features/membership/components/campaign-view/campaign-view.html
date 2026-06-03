@@ -166,9 +166,19 @@
     <!-- Future Members List Section -->
     <mat-divider style="margin: 2rem 0;"></mat-divider>
     <div class="members-section">
-      <h2 class="section-title">Liste des Adhérents</h2>
-      <p class="text-muted">L'affichage des membres pour cette campagne sera implémenté prochainement.</p>
-      <!-- TODO: Intégrer le composant de liste des membres ici -->
+      <h2 class="section-title">Transactions et adhésions de la campagne</h2>
+
+      @let paymentsViewModel = paymentsViewModelSignal();
+      @if (paymentsViewModel.isLoading) {
+        <app-loading-data label="Chargement des paiements et adhésions..."/>
+      } @else if (paymentsViewModel.error) {
+        <app-error-data dataName="paiements" (onRetry)="retry()"/>
+      } @else {
+        <app-payment-transactions-list
+          [viewModel]="paymentsViewModel"
+          (processMembership)="onProcessMembership($event)">
+        </app-payment-transactions-list>
+      }
     </div>
 
   </app-admin-page-container>

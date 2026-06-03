@@ -1,7 +1,7 @@
-import {describe, expect, it, beforeEach, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {TestBed} from '@angular/core/testing';
 import {CampaignFormService} from './campaign-form.service';
-import {CampaignStore, SeasonsStore, FormErrorHandleService} from '@shared-api';
+import {CampaignStore, FormErrorHandleService, SeasonsStore} from '@shared-api';
 import {NotificationService} from '@shared-ui';
 import {Router} from '@angular/router';
 import {MatDialogRef} from '@angular/material/dialog';
@@ -62,8 +62,11 @@ describe('CampaignFormService', () => {
     expect(service.campaignFormSignal().invalid()).toBe(true);
   });
 
-  it('should be valid if seasonId is set', () => {
-    service.campaignFormModelSignal.update(m => ({...m, seasonId: 'season-1'}));
+  it('should be valid if seasonId is set and at least one valid category is added', () => {
+    service.campaignFormModelSignal.update(m => ({
+      seasonId: 'season-1',
+      categories: [{name: 'U11', amount: 100}]
+    }));
     expect(service.campaignFormSignal().invalid()).toBe(false);
   });
 });

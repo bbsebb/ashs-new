@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MembershipRegistrationComponent} from './membership-registration';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
-import {CampaignStore, MembershipStore} from '@shared-api';
+import {CampaignStore, MembershipGateway} from '@shared-api';
 import {CampaignStatus} from '@shared-domain';
 import {signal} from '@angular/core';
 import {of} from 'rxjs';
@@ -16,7 +16,7 @@ describe('MembershipRegistrationComponent', () => {
   let component: MembershipRegistrationComponent;
   let fixture: ComponentFixture<MembershipRegistrationComponent>;
   let mockCampaignStore: any;
-  let mockMembershipStore: any;
+  let mockMembershipGateway: any;
   let mockNotificationService: any;
 
   const mockCampaign = {
@@ -33,15 +33,8 @@ describe('MembershipRegistrationComponent', () => {
       activeCampaignErrorSignal: signal(null)
     };
 
-    mockMembershipStore = {
-      isLoadingSignal: signal(false),
-      errorSignal: signal(null),
-      initiatePayment: vi.fn().mockReturnValue(of({
-        paymentTransactionId: 'tx-123',
-        sumupCheckout: {checkoutUrl: 'https://checkout.sumup.com/pay/123'},
-        memberships: []
-      })),
-      resetState: vi.fn()
+    mockMembershipGateway = {
+      initiateMembershipPayment: vi.fn().mockReturnValue(of('https://checkout.sumup.com/pay/123'))
     };
 
     mockNotificationService = {
@@ -55,7 +48,7 @@ describe('MembershipRegistrationComponent', () => {
       ],
       providers: [
         {provide: CampaignStore, useValue: mockCampaignStore},
-        {provide: MembershipStore, useValue: mockMembershipStore},
+        {provide: MembershipGateway, useValue: mockMembershipGateway},
         {provide: NotificationService, useValue: mockNotificationService}
       ]
     }).compileComponents();
@@ -78,7 +71,7 @@ describe('MembershipRegistrationComponent', () => {
 
     component.onSubmit(order);
 
-    expect(mockMembershipStore.initiatePayment).toHaveBeenCalledWith(order);
+    expect(mockMembershipGateway.initiateMembershipPayment).toHaveBeenCalledWith(order);
     expect(mockNotificationService.show).toHaveBeenCalledWith('Inscription enregistrée. Redirection vers le paiement SumUp...', 'success');
     expect(openSpy).toHaveBeenCalledWith('https://checkout.sumup.com/pay/123', '_self');
 

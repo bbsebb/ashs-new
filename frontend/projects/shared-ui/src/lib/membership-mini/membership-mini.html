@@ -1,0 +1,13 @@
+<mat-card class="mini-card">
+  <mat-card-content class="content">
+    <section class="info">
+      <span class="name">{{ viewModelInputSignal().firstName }} {{ viewModelInputSignal().lastName }}</span>
+      <span class="category">{{ viewModelInputSignal().categoryName }}</span>
+    </section>
+    <mat-chip-set>
+      <mat-chip class="status-chip" [class]="viewModelInputSignal().status.toLowerCase()">
+        {{ viewModelInputSignal().status }}
+      </mat-chip>
+    </mat-chip-set>
+  </mat-card-content>
+</mat-card>

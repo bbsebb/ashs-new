@@ -1,8 +1,8 @@
 package fr.hoenheimsports.backend.membershipservice.controllers;
 
 import fr.hoenheimsports.backend.membershipservice.dtos.MembershipPaymentOrder;
-import fr.hoenheimsports.backend.membershipservice.dtos.MembershipPaymentResponse;
 import fr.hoenheimsports.backend.membershipservice.dtos.MembershipResponse;
+import fr.hoenheimsports.backend.membershipservice.dtos.PaymentResponse;
 import fr.hoenheimsports.backend.membershipservice.services.MembershipService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,9 @@ public class MembershipController {
 
 
     @PostMapping("/orders")
-    public ResponseEntity<MembershipPaymentResponse> initiateMembershipOrder(@RequestBody @Valid MembershipPaymentOrder membershipPaymentOrder) {
-        MembershipPaymentResponse response = this.membershipService.initiateMembershipPayment(membershipPaymentOrder);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<String> initiateMembershipOrder(@RequestBody @Valid MembershipPaymentOrder membershipPaymentOrder) {
+        String checkoutUrl = this.membershipService.initiateMembershipPayment(membershipPaymentOrder);
+        return ResponseEntity.status(HttpStatus.CREATED).body(checkoutUrl);
     }
 
     @GetMapping("/{id}")
@@ -38,5 +38,10 @@ public class MembershipController {
     public ResponseEntity<Void> processMembership(@PathVariable UUID id) {
         this.membershipService.processMembership(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/payments/{id}")
+    public ResponseEntity<PaymentResponse> getPaymentTransaction(@PathVariable UUID id) {
+        return ResponseEntity.ok(this.membershipService.getPaymentTransaction(id));
     }
 }

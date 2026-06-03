@@ -42,6 +42,7 @@ export * from './lib/services/membership/campaign.store';
 export * from './lib/services/membership/membership.dtos';
 export * from './lib/services/membership/membership.gateway';
 export * from './lib/services/membership/membership.store';
+export * from './lib/services/membership/membership.view-models';
 
 // ViewModels
 export * from './lib/services/view-model-mapper.service';

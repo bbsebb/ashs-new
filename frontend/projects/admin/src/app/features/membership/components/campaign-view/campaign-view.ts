@@ -1,5 +1,5 @@
 import {Component, computed, effect, inject, input} from '@angular/core';
-import {CampaignStore, SeasonsStore} from '@shared-api';
+import {CampaignStore, MembershipStore, SeasonsStore} from '@shared-api';
 import {AdminPageContainer, DialogService, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {Router, RouterLink} from '@angular/router';
 import {MatCardModule} from '@angular/material/card';
@@ -7,9 +7,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delete-button';
-import {CampaignStatus} from '@shared-domain';
+import {CampaignStatus, UUID} from '@shared-domain';
 import {take} from 'rxjs';
 import {CurrencyPipe} from '@angular/common';
+import {PaymentTransactionsList} from '../payment-transactions-list/payment-transactions-list';
 
 @Component({
   selector: 'app-campaign-view',
@@ -23,7 +24,8 @@ import {CurrencyPipe} from '@angular/common';
     MatDividerModule,
     RouterLink,
     FormDeleteButton,
-    CurrencyPipe
+    CurrencyPipe,
+    PaymentTransactionsList
   ],
   templateUrl: './campaign-view.html',
   styleUrl: './campaign-view.scss',
@@ -31,6 +33,7 @@ import {CurrencyPipe} from '@angular/common';
 export class CampaignView {
   private readonly _campaignStore = inject(CampaignStore);
   private readonly _seasonsStore = inject(SeasonsStore);
+  private readonly _membershipStore = inject(MembershipStore);
   private readonly _dialogService = inject(DialogService);
   private readonly _notificationService = inject(NotificationService);
   private readonly _router = inject(Router);
@@ -43,11 +46,14 @@ export class CampaignView {
   readonly isLoadingSignal = this._campaignStore.isLoadingSignal;
   readonly errorSignal = computed(() => !!this._campaignStore.errorSignal());
 
+  /** The payments list ViewModel. */
+  readonly paymentsViewModelSignal = this._membershipStore.campaignPaymentsViewModelSignal;
+
   /** Resolved season name. */
   readonly seasonNameSignal = computed(() => {
     const campaign = this.campaignSignal();
     if (!campaign) return undefined;
-    const season = this._seasonsStore.seasonsSignal().find(s => s.id === campaign.seasonId);
+    const season = this._seasonsStore.seasonsSignal().find(season => season.id === campaign.seasonId);
     return season?.name ?? 'Saison inconnue';
   });
 
@@ -68,6 +74,13 @@ export class CampaignView {
       // Redirect to 404 if loading is finished, no error, but campaign is still undefined
       if (!this.isLoadingSignal() && !this.errorSignal() && !this.campaignSignal()) {
         void this._router.navigateByUrl('/404');
+      }
+    });
+
+    effect(() => {
+      const id = this.idInputSignal();
+      if (id) {
+        this._membershipStore.loadAllPayments(id);
       }
     });
   }
@@ -113,6 +126,20 @@ export class CampaignView {
           this._campaignStore.closeCampaign(id).subscribe({
             next: () => this._notificationService.show("Campagne fermée avec succès", 'success'),
             error: () => this._notificationService.show("Erreur lors de la fermeture de la campagne", 'error'),
+          });
+        }
+      });
+  }
+
+  /** Processes a membership (marks it as PROCESSED) with a confirmation dialog. */
+  protected onProcessMembership(membershipId: UUID) {
+    this._dialogService.showConfirmation("Êtes-vous sûr de vouloir marquer cette adhésion comme traitée ?")
+      .pipe(take(1))
+      .subscribe(confirmed => {
+        if (confirmed) {
+          this._membershipStore.processMembership(membershipId).subscribe({
+            next: () => this._notificationService.show("Adhésion traitée avec succès", 'success'),
+            error: () => this._notificationService.show("Erreur lors du traitement de l'adhésion", 'error'),
           });
         }
       });

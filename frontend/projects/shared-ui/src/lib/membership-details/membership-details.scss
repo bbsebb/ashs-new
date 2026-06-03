@@ -1,0 +1,95 @@
+.details-card {
+  border-radius: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background-color: var(--mat-sys-surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  max-width: 500px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px 24px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--mat-sys-on-surface);
+}
+
+.status-chip {
+  font-weight: 600;
+
+  &.paid {
+    --mdc-chip-label-text-color: var(--mat-sys-on-tertiary-container);
+    background-color: var(--mat-sys-tertiary-container);
+  }
+
+  &.pending {
+    --mdc-chip-label-text-color: var(--mat-sys-on-error-container);
+    background-color: var(--mat-sys-error-container);
+  }
+
+  &.processed {
+    --mdc-chip-label-text-color: var(--mat-sys-on-primary-container);
+    background-color: var(--mat-sys-primary-container);
+  }
+}
+
+.content {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.divider {
+  margin-bottom: 16px;
+}
+
+.details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon {
+  color: var(--mat-sys-primary);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}

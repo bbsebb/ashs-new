@@ -19,4 +19,6 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
      * @return an Optional containing the found payment transaction, or empty if not found
      */
     Optional<PaymentTransaction> findBySumupCheckoutId(String id);
+
+    java.util.List<PaymentTransaction> findByCampaignId(UUID campaignId);
 }

@@ -45,7 +45,7 @@ public class MembershipService {
      * @throws CategoryPriceMismatchException if the price in the request does not match the campaign configuration
      */
     @Transactional
-    public MembershipPaymentResponse initiateMembershipPayment(MembershipPaymentOrder membershipPaymentOrder) {
+    public String initiateMembershipPayment(MembershipPaymentOrder membershipPaymentOrder) {
         Campaign campaign = findCampaign(membershipPaymentOrder.campaignId());
         if (campaign.getStatus() != CampaignStatus.LAUNCHED) {
             throw new CampaignNotLaunchedException("La campagne n'est pas lancée");
@@ -68,11 +68,11 @@ public class MembershipService {
         );
         paymentTransaction.setSumupCheckout(sumUpCheckout);
         PaymentTransaction savedPaymentTransaction = paymentTransactionRepository.save(paymentTransaction);
-        return mapToResponse(savedPaymentTransaction);
+        return savedPaymentTransaction.getSumupCheckout().checkoutUrl();
     }
 
-    public List<MembershipResponse> getMembershipsByCampaign(UUID campaignID) {
-        return membershipRepository.findAllByCampaignId(campaignID).stream().map(this::mapToResponse).toList();
+    public List<MembershipResponse> getMembershipsByCampaign(UUID campaignId) {
+        return membershipRepository.findAllByCampaignId(campaignId).stream().map(this::mapToResponse).toList();
     }
 
     public MembershipResponse getMembership(UUID id) {
@@ -91,6 +91,12 @@ public class MembershipService {
 
         membership.setStatus(MembershipStatus.PROCESSED);
         membershipRepository.save(membership);
+    }
+
+    public PaymentResponse getPaymentTransaction(UUID id) {
+        return this.paymentTransactionRepository.findById(id)
+                .map(this::mapToPaymentResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Paiement non trouvé"));
     }
 
     /**
@@ -251,5 +257,40 @@ public class MembershipService {
                         .map(this::mapToResponse)
                         .toList()
         );
+    }
+
+    private PaymentResponse mapToPaymentResponse(PaymentTransaction paymentTransaction) {
+        PaymentPayerResponse payerResponse = null;
+        if (paymentTransaction.getPayerInfo() != null) {
+            payerResponse = new PaymentPayerResponse(
+                    paymentTransaction.getPayerInfo().firstName(),
+                    paymentTransaction.getPayerInfo().lastName(),
+                    paymentTransaction.getPayerInfo().email()
+            );
+        }
+        String checkoutDate = null;
+        if (paymentTransaction.getSumupCheckout() != null) {
+            checkoutDate = paymentTransaction.getSumupCheckout().date();
+        }
+        List<MembershipResponse> memberships = paymentTransaction.getMemberships().stream()
+                .map(this::mapToResponse)
+                .toList();
+
+        return new PaymentResponse(
+                paymentTransaction.getId(),
+                paymentTransaction.getCampaignId(),
+                paymentTransaction.getAmount().amount(),
+                payerResponse,
+                paymentTransaction.getStatus(),
+                checkoutDate,
+                paymentTransaction.isDiscounted(),
+                memberships
+        );
+    }
+
+    public List<PaymentResponse> getPaymentTransactionsByCampaign(UUID campaignId) {
+        return this.paymentTransactionRepository.findByCampaignId(campaignId).stream()
+                .map(this::mapToPaymentResponse)
+                .toList();
     }
 }

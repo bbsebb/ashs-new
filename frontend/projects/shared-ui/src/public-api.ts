@@ -31,3 +31,7 @@ export * from './lib/pipes/role-staff-pipe';
 export * from './lib/pipes/day-of-week-pipe';
 export * from './lib/pipes/gender-pipe';
 export * from './lib/pipes/category-pipe';
+export * from './lib/membership-details/membership-details';
+export * from './lib/membership-mini/membership-mini';
+export * from './lib/payment-details/payment-details';
+

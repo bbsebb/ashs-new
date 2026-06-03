@@ -1,10 +1,6 @@
 package fr.hoenheimsports.backend.membershipservice.controllers;
 
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignCreateRequest;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignResponse;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignUpdateRequest;
-import fr.hoenheimsports.backend.membershipservice.dtos.CategoryDto;
-import fr.hoenheimsports.backend.membershipservice.dtos.MembershipResponse;
+import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.entities.CampaignStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
 import fr.hoenheimsports.backend.membershipservice.services.CampaignService;
@@ -607,5 +603,58 @@ class CampaignControllerTest {
         }
     }
 
+    @Nested
+    class GetPaymentTransactionsByCampaign {
+        @Test
+        @DisplayName("Devrait retourner les transactions de paiement d'une campagne")
+        void shouldReturnPaymentsByCampaign() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            UUID transactionId = UUID.randomUUID();
+            UUID mId = UUID.randomUUID();
+            List<MembershipResponse> memberships = List.of(
+                    new MembershipResponse(mId, campaignId, "John", "Doe", "john.doe@example.com", "LIC-1", "U11", new BigDecimal("100.00"), MembershipStatus.PENDING)
+            );
+
+            PaymentResponse response = new PaymentResponse(
+                    transactionId,
+                    campaignId,
+                    new BigDecimal("100.00"),
+                    new PaymentPayerResponse("John", "Doe", "john.doe@example.com"),
+                    MembershipStatus.PENDING,
+                    "2026-05-31T19:30:24",
+                    false,
+                    memberships
+            );
+
+            when(membershipService.getPaymentTransactionsByCampaign(campaignId)).thenReturn(List.of(response));
+
+            // When & Then
+            authRestTestClient.get()
+                    .uri("/api/v1/campaigns/" + campaignId + "/payments")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.length()").isEqualTo(1)
+                    .jsonPath("$[0].id").isEqualTo(transactionId.toString())
+                    .jsonPath("$[0].campaignId").isEqualTo(campaignId.toString())
+                    .jsonPath("$[0].amount").isEqualTo(100.00)
+                    .jsonPath("$[0].payerInfo.firstName").isEqualTo("John")
+                    .jsonPath("$[0].payerInfo.lastName").isEqualTo("Doe")
+                    .jsonPath("$[0].payerInfo.email").isEqualTo("john.doe@example.com")
+                    .jsonPath("$[0].status").isEqualTo("PENDING")
+                    .jsonPath("$[0].memberships[0].id").isEqualTo(mId.toString());
+        }
+
+        @Test
+        @DisplayName("Devrait refuser l'accès aux utilisateurs non authentifiés")
+        void shouldRejectUnauthorizedAccess() {
+            UUID campaignId = UUID.randomUUID();
+            restTestClient.get()
+                    .uri("/api/v1/campaigns/" + campaignId + "/payments")
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
 
 }

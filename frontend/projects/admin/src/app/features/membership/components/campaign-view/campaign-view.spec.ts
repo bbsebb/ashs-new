@@ -1,7 +1,7 @@
 import {render, screen} from '@testing-library/angular';
 import {describe, expect, it, vi} from 'vitest';
 import {CampaignView} from './campaign-view';
-import {CampaignStore, SeasonsStore} from '@shared-api';
+import {CampaignStore, MembershipStore, SeasonsStore} from '@shared-api';
 import {signal} from '@angular/core';
 import {provideRouter} from '@angular/router';
 import {DialogService, NotificationService} from '@shared-ui';
@@ -25,6 +25,15 @@ describe('CampaignView Component (Admin)', () => {
         seasonsSignal: signal(seasons),
         isLoadingSignal: signal(false)
       },
+      membershipStore: {
+        campaignPaymentsViewModelSignal: signal({
+          payments: [],
+          isLoading: false,
+          error: null
+        }),
+        loadAllPayments: vi.fn(),
+        processMembership: vi.fn().mockReturnValue(of(void 0))
+      },
       notificationService: {show: vi.fn()},
       dialogService: {showConfirmation: vi.fn().mockReturnValue(of(true))}
     };
@@ -45,6 +54,7 @@ describe('CampaignView Component (Admin)', () => {
       providers: [
         {provide: CampaignStore, useValue: mocks.campaignStore},
         {provide: SeasonsStore, useValue: mocks.seasonsStore},
+        {provide: MembershipStore, useValue: mocks.membershipStore},
         {provide: NotificationService, useValue: mocks.notificationService},
         {provide: DialogService, useValue: mocks.dialogService},
         provideRouter([]),
@@ -67,6 +77,7 @@ describe('CampaignView Component (Admin)', () => {
       providers: [
         {provide: CampaignStore, useValue: mocks.campaignStore},
         {provide: SeasonsStore, useValue: mocks.seasonsStore},
+        {provide: MembershipStore, useValue: mocks.membershipStore},
         {provide: NotificationService, useValue: mocks.notificationService},
         {provide: DialogService, useValue: mocks.dialogService},
         provideRouter([]),

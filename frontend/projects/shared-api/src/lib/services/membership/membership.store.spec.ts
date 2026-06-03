@@ -3,36 +3,45 @@ import {setupServer} from 'msw/node';
 import {http, HttpResponse} from 'msw';
 import {TestBed} from '@angular/core/testing';
 import {provideHttpClient} from '@angular/common/http';
-import {APP_CONFIG, MembershipPaymentOrder, MembershipPaymentResponse, MembershipStore} from '@shared-api';
+import {APP_CONFIG, MembershipStore, PaymentResponse} from '@shared-api';
 import {firstValueFrom} from 'rxjs';
 
-const mockResponse: MembershipPaymentResponse = {
-  paymentTransactionId: 'tx-456',
-  sumupCheckout: {
-    id: 'sumup-chk-789',
-    description: 'Licence',
-    returnUrl: 'http://return-url',
-    date: '2026-05-31T19:30:24',
-    checkoutUrl: 'https://checkout.sumup.com/pay/sumup-chk-789'
-  },
-  memberships: [
-    {
-      id: 'membership-001',
-      campaignId: 'campaign-123',
-      firstName: 'Alice',
+const checkoutUrl = 'https://checkout.sumup.com/pay/sumup-chk-789';
+
+const mockPayments: PaymentResponse[] = [
+  {
+    id: 'tx-123',
+    campaignId: 'campaign-123',
+    amount: 100.00,
+    payerInfo: {
+      firstName: 'John',
       lastName: 'Doe',
-      email: 'alice.doe@example.com',
-      licenseNumber: 'LIC-999',
-      categoryName: 'U11',
-      amount: 100.00,
-      status: 'PENDING'
-    }
-  ]
-};
+      email: 'john.doe@example.com'
+    },
+    status: 'PENDING',
+    isDiscounted: false,
+    memberships: [
+      {
+        id: 'membership-001',
+        campaignId: 'campaign-123',
+        firstName: 'Alice',
+        lastName: 'Doe',
+        email: 'alice@doe.com',
+        licenseNumber: 'LIC-1',
+        categoryName: 'U11',
+        amount: 100.00,
+        status: 'PENDING'
+      }
+    ]
+  }
+];
 
 const server = setupServer(
-  http.post('*/api/v1/memberships/orders', async () => {
-    return HttpResponse.json(mockResponse, {status: 201});
+  http.get('*/api/v1/campaigns/:id/payments', async () => {
+    return HttpResponse.json(mockPayments);
+  }),
+  http.post('*/api/v1/memberships/:id/process', async () => {
+    return new HttpResponse(null, {status: 204});
   })
 );
 
@@ -56,41 +65,41 @@ describe('MembershipStore', () => {
 
   it('should initialize with default states', () => {
     expect(store.isLoadingSignal()).toBe(false);
-    expect(store.errorSignal()).toBeNull();
-    expect(store.paymentResponseSignal()).toBeNull();
+    expect(store.errorSignal()).toBeUndefined();
+    expect(store.paymentsListSignal()).toEqual([]);
+    expect(store.allMembershipsSignal()).toEqual([]);
   });
 
-  it('should initiate payment and update signals', async () => {
-    const order: MembershipPaymentOrder = {
-      campaignId: 'campaign-123',
-      paymentPayerInfoCreateRequest: {
-        firstname: 'John',
-        lastname: 'Doe',
-        email: 'john.doe@example.com'
-      },
-      membershipCreateRequests: [
-        {
-          firstName: 'Alice',
-          lastName: 'Doe',
-          email: 'alice.doe@example.com',
-          licenseNumber: 'LIC-999',
-          category: {
-            name: 'U11',
-            amount: 100.00
-          }
-        }
-      ]
-    };
+  it('should load all payments and compute all memberships', async () => {
+    store.loadAllPayments('campaign-123');
 
-    const promise = firstValueFrom(store.initiatePayment(order));
+    await new Promise(resolve => setTimeout(resolve, 50));
 
-    expect(store.isLoadingSignal()).toBe(true);
+    expect(store.paymentsListSignal()).toEqual(mockPayments);
+    expect(store.allMembershipsSignal()).toEqual(mockPayments[0].memberships);
+  });
 
-    const result = await promise;
+  it('should process a membership and update status in cache', async () => {
+    store.loadAllPayments('campaign-123');
+    await new Promise(resolve => setTimeout(resolve, 50));
 
-    expect(store.isLoadingSignal()).toBe(false);
-    expect(store.errorSignal()).toBeNull();
-    expect(store.paymentResponseSignal()).toEqual(mockResponse);
-    expect(result).toEqual(mockResponse);
+    const promise = firstValueFrom(store.processMembership('membership-001'));
+    await promise;
+
+    const updatedMember = store.allMembershipsSignal().find(membership => membership.id === 'membership-001');
+    expect(updatedMember?.status).toBe('PROCESSED');
+  });
+
+  it('should compute campaignPaymentsViewModelSignal correctly', async () => {
+    store.loadAllPayments('campaign-123');
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const viewModel = store.campaignPaymentsViewModelSignal();
+    expect(viewModel.isLoading).toBe(false);
+    expect(viewModel.error).toBeUndefined();
+    expect(viewModel.payments).toHaveLength(1);
+    expect(viewModel.payments[0].payerName).toBe('John Doe');
+    expect(viewModel.payments[0].memberships).toHaveLength(1);
+    expect(viewModel.payments[0].memberships[0].firstName).toBe('Alice');
   });
 });

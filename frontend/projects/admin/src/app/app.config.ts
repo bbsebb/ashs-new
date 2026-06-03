@@ -19,6 +19,7 @@ import {registerLocaleData} from '@angular/common';
 import {AuthService} from './core/services/auth-service';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
 import {authInterceptor} from './core/interceptors/auth-interceptor';
+import {provideAnimations} from '@angular/platform-browser/animations';
 
 /*export const delayInterceptor: HttpInterceptorFn = (req, next) => {
   // On ajoute un délai de 2 secondes en développement
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideSharedIcons(),
     provideNativeDateAdapter(),
+    provideAnimations(),
     provideHttpClient(
       withInterceptors([authInterceptor]) // <-- C'est ici que la magie opère
     ),

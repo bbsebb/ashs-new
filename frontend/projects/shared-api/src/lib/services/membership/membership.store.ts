@@ -1,16 +1,10 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
-import {catchError, Observable, tap, throwError} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {MembershipGateway} from './membership.gateway';
-import {MembershipPaymentOrder, MembershipPaymentResponse} from './membership.dtos';
+import {MembershipResponse} from './membership.dtos';
+import {UUID} from '@shared-domain';
 
-/**
- * Interface representing the ViewModel for membership operations.
- */
-export interface MembershipViewModel {
-  isLoading: boolean;
-  error: any;
-  paymentResponse: MembershipPaymentResponse | null;
-}
+import {CampaignPaymentsViewModel} from './membership.view-models';
 
 /**
  * Store for managing membership status, payment initialization, and caching.
@@ -21,48 +15,73 @@ export interface MembershipViewModel {
 export class MembershipStore {
   private readonly _membershipGateway = inject(MembershipGateway);
 
-  /** Internal signals for managing state */
-  readonly isLoadingSignal = signal<boolean>(false);
-  readonly errorSignal = signal<any>(null);
-  readonly paymentResponseSignal = signal<MembershipPaymentResponse | null>(null);
+  readonly campaignIdSignal = signal<UUID | undefined>(undefined);
 
-  /** Computed ViewModel for reactive binding in views */
-  readonly membershipViewModelSignal = computed<MembershipViewModel>(() => ({
-    isLoading: this.isLoadingSignal(),
-    error: this.errorSignal(),
-    paymentResponse: this.paymentResponseSignal(),
-  }));
+  private readonly _paymentsResource = this._membershipGateway.getPaymentTransactionsByCampaign(
+    this.campaignIdSignal
+  );
+
+  /** Internal signals for managing state */
+  readonly paymentsListSignal = computed(() =>
+    this._paymentsResource.hasValue() ? this._paymentsResource.value() : []
+  );
+  readonly isLoadingSignal = this._paymentsResource.isLoading;
+  readonly errorSignal = this._paymentsResource.error;
+
+  /** Computed signal extracting all memberships from loaded transactions */
+  readonly allMembershipsSignal = computed<MembershipResponse[]>(() => {
+    return this.paymentsListSignal().flatMap(payment => payment.memberships);
+  });
+
+  /** Computed ViewModel for displaying the campaign payments list */
+  readonly campaignPaymentsViewModelSignal = computed<CampaignPaymentsViewModel>(() => {
+    const payments = this.paymentsListSignal().map(payment => ({
+      id: payment.id,
+      campaignId: payment.campaignId,
+      amount: payment.amount,
+      payerName: payment.payerInfo ? `${payment.payerInfo.firstName} ${payment.payerInfo.lastName}` : 'Inconnu',
+      payerEmail: payment.payerInfo?.email ?? '',
+      status: payment.status,
+      checkoutDate: payment.checkoutDate,
+      isDiscounted: payment.isDiscounted,
+      memberships: payment.memberships.map(membership => ({
+        id: membership.id,
+        firstName: membership.firstName,
+        lastName: membership.lastName,
+        categoryName: membership.categoryName,
+        status: membership.status
+      }))
+    }));
+    return {
+      payments,
+      isLoading: this.isLoadingSignal(),
+      error: this.errorSignal()
+    };
+  });
 
   /**
-   * Initiates a new membership payment transaction.
-   * Updates state signals accordingly.
-   *
-   * @param order The details of the membership order.
-   * @returns An Observable of the payment response.
+   * Loads all payment transactions for a campaign and stores them in the cache.
    */
-  initiatePayment(order: MembershipPaymentOrder): Observable<MembershipPaymentResponse> {
-    this.isLoadingSignal.set(true);
-    this.errorSignal.set(null);
-
-    return this._membershipGateway.initiateMembershipPayment(order).pipe(
-      tap((response) => {
-        this.paymentResponseSignal.set(response);
-        this.isLoadingSignal.set(false);
-      }),
-      catchError((error) => {
-        this.errorSignal.set(error);
-        this.isLoadingSignal.set(false);
-        return throwError(() => error);
-      })
-    );
+  loadAllPayments(campaignId: UUID): void {
+    this.campaignIdSignal.set(campaignId);
   }
 
   /**
-   * Resets the store's state.
+   * Processes a membership (marks it as PROCESSED) and updates the local cache.
+   * @param id The membership ID to process.
    */
-  resetState(): void {
-    this.isLoadingSignal.set(false);
-    this.errorSignal.set(null);
-    this.paymentResponseSignal.set(null);
+  processMembership(id: UUID): Observable<void> {
+    return this._membershipGateway.processMembership(id).pipe(
+      tap(() => {
+        this._paymentsResource.update(payments =>
+          payments ? payments.map(payment => ({
+            ...payment,
+            memberships: payment.memberships.map(membership =>
+              membership.id === id ? {...membership, status: 'PROCESSED'} : membership
+            )
+          })) : []
+        );
+      })
+    );
   }
 }

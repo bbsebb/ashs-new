@@ -131,6 +131,14 @@ export const routes: Routes = [
         path: 'campaign/:id',
         loadComponent: () => import('./features/membership/components/campaign-view/campaign-view').then(m => m.CampaignView)
       },
+      {
+        path: 'payment/:id',
+        loadComponent: () => import('./features/membership/components/payment-view/payment-view').then(m => m.PaymentView)
+      },
+      {
+        path: 'details/:id',
+        loadComponent: () => import('./features/membership/components/membership-view/membership-view').then(m => m.MembershipView)
+      },
     ]
   },
   {path: 'mentions-legales', component: MentionsLegales},

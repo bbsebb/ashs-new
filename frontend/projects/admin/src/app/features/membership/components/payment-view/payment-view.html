@@ -1,0 +1,13 @@
+@if (isLoadingSignal()) {
+  <app-loading-data label="Chargement du paiement..."/>
+} @else if (errorSignal()) {
+  <app-error-data dataName="paiement"/>
+} @else if (viewModelSignal(); as viewModel) {
+  <app-admin-page-container
+    [title]="'Paiement de ' + viewModel.payerName"
+    subtitle="Détails de la transaction et des adhésions rattachées.">
+
+    <app-payment-details [viewModel]="viewModel"></app-payment-details>
+
+  </app-admin-page-container>
+}

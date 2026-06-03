@@ -8,6 +8,7 @@ import {menuItems} from './core/layout/menu-items';
 import {APP_CONFIG, GlobalErrorHandler} from '@shared-api';
 import {environment} from '@environment';
 import {MyCustomPageTitleStrategy} from './shared/services/title-strategy';
+import {provideAnimations} from '@angular/platform-browser/animations';
 
 
 /*export const delayInterceptor: HttpInterceptorFn = (req, next) => {
@@ -26,6 +27,7 @@ export const appConfig: ApplicationConfig = {
     }), withComponentInputBinding()),
     {provide: TitleStrategy, useClass: MyCustomPageTitleStrategy},
     provideSharedIcons(),
+    provideAnimations(),
     {
       provide: MENU_CONFIG,
       useValue: menuItems

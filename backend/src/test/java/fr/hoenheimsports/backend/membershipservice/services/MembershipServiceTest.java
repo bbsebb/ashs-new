@@ -95,42 +95,10 @@ class MembershipServiceTest {
             when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
 
             // When
-            MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+            String result = membershipService.initiateMembershipPayment(order);
 
             // Then
-            assertThat(result).isNotNull();
-            assertThat(result.sumupCheckout()).isNotNull();
-            assertThat(result.sumupCheckout().id()).isEqualTo("sumup-chk-123");
-            assertThat(result.sumupCheckout().description()).isEqualTo("Licence");
-            assertThat(result.sumupCheckout().returnUrl()).isEqualTo("http://return-url");
-            assertThat(result.sumupCheckout().date()).isEqualTo("2026-05-31T19:30:24");
-            assertThat(result.sumupCheckout().checkoutUrl()).isEqualTo("https://checkout.sumup.com/pay/sumup-chk-123");
-            assertThat(result.paymentTransactionId()).isNotNull();
-            assertThat(result.memberships()).hasSize(2);
-
-            assertThat(result.memberships()).anySatisfy(response -> {
-                assertThat(response).isNotNull();
-                assertThat(response.campaignId()).isEqualTo(campaignId);
-                assertThat(response.firstName()).isEqualTo("John");
-                assertThat(response.lastName()).isEqualTo("Doe");
-                assertThat(response.email()).isEqualTo("john.doe@example.com");
-                assertThat(response.licenseNumber()).isEqualTo("LIC-12345");
-                assertThat(response.categoryName()).isEqualTo("U11");
-                assertThat(response.amount()).isEqualByComparingTo("100.00");
-                assertThat(response.status()).isEqualTo(MembershipStatus.PENDING);
-            });
-
-            assertThat(result.memberships()).anySatisfy(response -> {
-                assertThat(response).isNotNull();
-                assertThat(response.campaignId()).isEqualTo(campaignId);
-                assertThat(response.firstName()).isEqualTo("Rene");
-                assertThat(response.lastName()).isEqualTo("Dupont");
-                assertThat(response.email()).isEqualTo("rene.dupont@example.com");
-                assertThat(response.licenseNumber()).isEqualTo("LIC-6789");
-                assertThat(response.categoryName()).isEqualTo("U13");
-                assertThat(response.amount()).isEqualByComparingTo("120.00");
-                assertThat(response.status()).isEqualTo(MembershipStatus.PENDING);
-            });
+            assertThat(result).isEqualTo("https://checkout.sumup.com/pay/sumup-chk-123");
 
             ArgumentCaptor<PaymentTransaction> captor = ArgumentCaptor.forClass(PaymentTransaction.class);
             verify(paymentTransactionRepository).save(captor.capture());
@@ -340,7 +308,7 @@ class MembershipServiceTest {
                 when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
 
                 // When
-                MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+                String result = membershipService.initiateMembershipPayment(order);
 
                 // Then
                 assertThat(result).isNotNull();
@@ -378,7 +346,7 @@ class MembershipServiceTest {
                 when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
 
                 // When
-                MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+                String result = membershipService.initiateMembershipPayment(order);
 
                 // Then
                 assertThat(result).isNotNull();
@@ -420,7 +388,7 @@ class MembershipServiceTest {
                 when(sumUpService.createCheckout(any(String.class), any(BigDecimal.class), any(String.class))).thenReturn(mockSumupCheckout);
 
                 // When
-                MembershipPaymentResponse result = membershipService.initiateMembershipPayment(order);
+                String result = membershipService.initiateMembershipPayment(order);
 
                 // Then
                 assertThat(result).isNotNull();
@@ -681,5 +649,151 @@ class MembershipServiceTest {
             verify(membershipRepository).findById(membershipId);
         }
     }
+
+    @Nested
+    @DisplayName("Get Payment Transaction Tests")
+    class GetPaymentTransactionTests {
+
+        @Test
+        @DisplayName("Should return mapped payment response when transaction exists")
+        void shouldReturnPaymentWhenExists() {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+            UUID campaignId = UUID.randomUUID();
+            UUID mId1 = UUID.randomUUID();
+            UUID mId2 = UUID.randomUUID();
+
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(transactionId);
+            transaction.setCampaignId(campaignId);
+            transaction.setAmount(Price.of("220.00"));
+            transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
+            transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setDiscounted(true);
+            transaction.setSumupCheckout(new SumUpCheckout(
+                    "sumup-chk-123", "Licence", "http://return-url", "2026-05-31T19:30:24", "http://checkout-url"
+            ));
+
+            Membership m1 = new Membership();
+            m1.setId(mId1);
+            m1.setCampaignId(campaignId);
+            m1.setFirstName("John");
+            m1.setLastName("Doe");
+            m1.setEmail(new Email("john.doe@example.com"));
+            m1.setLicenseNumber(new LicenseNumber("LIC-1"));
+            m1.setCategory(new Category("U11", Price.of("100.00")));
+            m1.setStatus(MembershipStatus.PENDING);
+
+            Membership m2 = new Membership();
+            m2.setId(mId2);
+            m2.setCampaignId(campaignId);
+            m2.setFirstName("Jane");
+            m2.setLastName("Doe");
+            m2.setEmail(new Email("jane.doe@example.com"));
+            m2.setLicenseNumber(new LicenseNumber("LIC-2"));
+            m2.setCategory(new Category("U13", Price.of("120.00")));
+            m2.setStatus(MembershipStatus.PENDING);
+
+            transaction.addMembership(m1);
+            transaction.addMembership(m2);
+
+            when(paymentTransactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
+
+            // When
+            PaymentResponse result = membershipService.getPaymentTransaction(transactionId);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.id()).isEqualTo(transactionId);
+            assertThat(result.campaignId()).isEqualTo(campaignId);
+            assertThat(result.amount()).isEqualByComparingTo("220.00");
+            assertThat(result.payerInfo()).isNotNull();
+            assertThat(result.payerInfo().firstName()).isEqualTo("John");
+            assertThat(result.payerInfo().lastName()).isEqualTo("Doe");
+            assertThat(result.payerInfo().email()).isEqualTo("john.doe@example.com");
+            assertThat(result.status()).isEqualTo(MembershipStatus.PENDING);
+            assertThat(result.checkoutDate()).isEqualTo("2026-05-31T19:30:24");
+            assertThat(result.isDiscounted()).isTrue();
+            assertThat(result.memberships()).hasSize(2);
+            assertThat(result.memberships()).anySatisfy(resp -> {
+                assertThat(resp.id()).isEqualTo(mId1);
+                assertThat(resp.firstName()).isEqualTo("John");
+            });
+            assertThat(result.memberships()).anySatisfy(resp -> {
+                assertThat(resp.id()).isEqualTo(mId2);
+                assertThat(resp.firstName()).isEqualTo("Jane");
+            });
+
+            verify(paymentTransactionRepository).findById(transactionId);
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when transaction does not exist")
+        void shouldThrowEntityNotFoundExceptionWhenNotExists() {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+            when(paymentTransactionRepository.findById(transactionId)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.getPaymentTransaction(transactionId))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .satisfies(throwable -> {
+                        EntityNotFoundException ex = (EntityNotFoundException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Paiement non trouvé");
+                    });
+
+            verify(paymentTransactionRepository).findById(transactionId);
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Payment Transactions By Campaign Tests")
+    class GetPaymentTransactionsByCampaignTests {
+
+        @Test
+        @DisplayName("Should return list of mapped payment responses when transactions exist for a campaign")
+        void shouldReturnPaymentsByCampaign() {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+            UUID campaignId = UUID.randomUUID();
+
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(transactionId);
+            transaction.setCampaignId(campaignId);
+            transaction.setAmount(Price.of("100.00"));
+            transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
+            transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setDiscounted(false);
+            transaction.setSumupCheckout(new SumUpCheckout(
+                    "sumup-chk-123", "Licence", "http://return-url", "2026-05-31T19:30:24", "http://checkout-url"
+            ));
+
+            Membership m1 = new Membership();
+            m1.setId(UUID.randomUUID());
+            m1.setCampaignId(campaignId);
+            m1.setFirstName("John");
+            m1.setLastName("Doe");
+            m1.setEmail(new Email("john.doe@example.com"));
+            m1.setLicenseNumber(new LicenseNumber("LIC-1"));
+            m1.setCategory(new Category("U11", Price.of("100.00")));
+            m1.setStatus(MembershipStatus.PENDING);
+
+            transaction.addMembership(m1);
+
+            when(paymentTransactionRepository.findByCampaignId(campaignId)).thenReturn(List.of(transaction));
+
+            // When
+            List<PaymentResponse> result = membershipService.getPaymentTransactionsByCampaign(campaignId);
+
+            // Then
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).id()).isEqualTo(transactionId);
+            assertThat(result.get(0).memberships()).hasSize(1);
+            assertThat(result.get(0).memberships().get(0).firstName()).isEqualTo("John");
+
+            verify(paymentTransactionRepository).findByCampaignId(campaignId);
+        }
+    }
 }
+
 

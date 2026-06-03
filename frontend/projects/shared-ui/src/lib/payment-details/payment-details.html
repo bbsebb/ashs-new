@@ -1,0 +1,70 @@
+<mat-card class="payment-card">
+  <mat-card-header class="header">
+    <mat-card-title class="title">Détails du paiement</mat-card-title>
+    <mat-chip-set class="header-chips">
+      @if (viewModelInputSignal().isDiscounted) {
+        <mat-chip class="discount-chip">
+          <mat-icon class="discount-icon">local_offer</mat-icon>
+          Réduction appliquée
+        </mat-chip>
+      }
+      <mat-chip class="status-chip" [class]="viewModelInputSignal().status.toLowerCase()">
+        {{ viewModelInputSignal().status }}
+      </mat-chip>
+    </mat-chip-set>
+  </mat-card-header>
+
+  <mat-card-content class="content">
+    <mat-divider class="divider"></mat-divider>
+
+    <section class="info-layout">
+      <!-- Section transaction -->
+      <section class="info-group">
+        <h3 class="group-title">Transaction</h3>
+        <ul class="info-list">
+          <li class="info-item">
+            <span class="label">Montant</span>
+            <span class="value highlighted">{{ viewModelInputSignal().amount | currency:'EUR':'symbol':'1.2-2' }}</span>
+          </li>
+          @if (viewModelInputSignal().checkoutDate) {
+            <li class="info-item">
+              <span class="label">Date de transaction</span>
+              <span class="value">{{ viewModelInputSignal().checkoutDate | date:'mediumDate' }}</span>
+            </li>
+          }
+          <li class="info-item">
+            <span class="label">ID de transaction</span>
+            <span class="value tech-id">{{ viewModelInputSignal().id }}</span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section payeur -->
+      <section class="info-group">
+        <h3 class="group-title">Payeur</h3>
+        <ul class="info-list">
+          <li class="info-item">
+            <span class="label">Nom complet</span>
+            <span class="value">{{ viewModelInputSignal().payerName }}</span>
+          </li>
+          <li class="info-item">
+            <span class="label">Email</span>
+            <span class="value">{{ viewModelInputSignal().payerEmail }}</span>
+          </li>
+        </ul>
+      </section>
+    </section>
+
+    <!-- Liste des membres -->
+    <section class="memberships-section">
+      <h3 class="section-title">Adhérents liés</h3>
+      <div class="memberships-list">
+        @for (membership of viewModelInputSignal().memberships; track membership.id) {
+          <app-membership-mini
+            [viewModel]="membership">
+          </app-membership-mini>
+        }
+      </div>
+    </section>
+  </mat-card-content>
+</mat-card>

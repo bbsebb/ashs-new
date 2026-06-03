@@ -1,9 +1,6 @@
 package fr.hoenheimsports.backend.membershipservice.controllers;
 
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignCreateRequest;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignResponse;
-import fr.hoenheimsports.backend.membershipservice.dtos.CampaignUpdateRequest;
-import fr.hoenheimsports.backend.membershipservice.dtos.MembershipResponse;
+import fr.hoenheimsports.backend.membershipservice.dtos.*;
 import fr.hoenheimsports.backend.membershipservice.services.CampaignService;
 import fr.hoenheimsports.backend.membershipservice.services.MembershipService;
 import jakarta.validation.Valid;
@@ -60,5 +57,8 @@ public class CampaignController {
         return ResponseEntity.ok(membershipService.getMembershipsByCampaign(id));
     }
 
-
+    @GetMapping("/{id}/payments")
+    public ResponseEntity<List<PaymentResponse>> getPaymentTransactionsByCampaign(@PathVariable UUID id) {
+        return ResponseEntity.ok(membershipService.getPaymentTransactionsByCampaign(id));
+    }
 }

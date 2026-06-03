@@ -120,42 +120,44 @@ public class MembershipUseCasesTest {
                     false
             );
 
-            MembershipPaymentResponse response = authRestTestClient.post()
+            String response = authRestTestClient.post()
                     .uri("/api/v1/memberships/orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(membershipPaymentOrder)
                     .exchange()
                     .expectStatus().isCreated()
-                    .expectBody(MembershipPaymentResponse.class)
+                    .expectBody(String.class)
                     .returnResult().getResponseBody();
 
-            assertThat(response).isNotNull();
-            assertThat(response.memberships()).hasSize(2);
+            assertThat(response).isEqualTo("https://checkout.sumup.com/test");
 
-            assertThat(response.memberships())
+            List<fr.hoenheimsports.backend.membershipservice.entities.Membership> memberships = membershipRepository.findAll();
+            assertThat(memberships).hasSize(2);
+
+            assertThat(memberships)
                     .anySatisfy(membership -> {
                         assertThat(membership).isNotNull();
-                        assertThat(membership.id()).isNotNull();
-                        assertThat(membership.firstName()).isEqualTo(membershipCreateRequest1.firstName());
-                        assertThat(membership.lastName()).isEqualTo(membershipCreateRequest1.lastName());
-                        assertThat(membership.email()).isEqualTo(membershipCreateRequest1.email());
-                        assertThat(membership.licenseNumber()).isEqualTo(membershipCreateRequest1.licenseNumber());
-                        assertThat(membership.categoryName()).isEqualTo(membershipCreateRequest1.category().name());
-                        assertThat(membership.amount()).isEqualByComparingTo(membershipCreateRequest1.category().amount());
-                        assertThat(membership.status()).isEqualTo(MembershipStatus.PENDING);
+                        assertThat(membership.getId()).isNotNull();
+                        assertThat(membership.getFirstName()).isEqualTo(membershipCreateRequest1.firstName());
+                        assertThat(membership.getLastName()).isEqualTo(membershipCreateRequest1.lastName());
+                        assertThat(membership.getEmail().value()).isEqualTo(membershipCreateRequest1.email());
+                        assertThat(membership.getLicenseNumber().value()).isEqualTo(membershipCreateRequest1.licenseNumber());
+                        assertThat(membership.getCategory().getName()).isEqualTo(membershipCreateRequest1.category().name());
+                        assertThat(membership.getCategory().getPrice().amount()).isEqualByComparingTo(membershipCreateRequest1.category().amount());
+                        assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PENDING);
                     });
 
-            assertThat(response.memberships())
+            assertThat(memberships)
                     .anySatisfy(membership -> {
                         assertThat(membership).isNotNull();
-                        assertThat(membership.id()).isNotNull();
-                        assertThat(membership.firstName()).isEqualTo(membershipCreateRequest2.firstName());
-                        assertThat(membership.lastName()).isEqualTo(membershipCreateRequest2.lastName());
-                        assertThat(membership.email()).isEqualTo(membershipCreateRequest2.email());
-                        assertThat(membership.licenseNumber()).isEqualTo(membershipCreateRequest2.licenseNumber());
-                        assertThat(membership.categoryName()).isEqualTo(membershipCreateRequest2.category().name());
-                        assertThat(membership.amount()).isEqualByComparingTo(membershipCreateRequest2.category().amount());
-                        assertThat(membership.status()).isEqualTo(MembershipStatus.PENDING);
+                        assertThat(membership.getId()).isNotNull();
+                        assertThat(membership.getFirstName()).isEqualTo(membershipCreateRequest2.firstName());
+                        assertThat(membership.getLastName()).isEqualTo(membershipCreateRequest2.lastName());
+                        assertThat(membership.getEmail().value()).isEqualTo(membershipCreateRequest2.email());
+                        assertThat(membership.getLicenseNumber().value()).isEqualTo(membershipCreateRequest2.licenseNumber());
+                        assertThat(membership.getCategory().getName()).isEqualTo(membershipCreateRequest2.category().name());
+                        assertThat(membership.getCategory().getPrice().amount()).isEqualByComparingTo(membershipCreateRequest2.category().amount());
+                        assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PENDING);
                     });
         }
 
@@ -184,17 +186,16 @@ public class MembershipUseCasesTest {
                     true
             );
 
-            MembershipPaymentResponse response = authRestTestClient.post()
+            String response = authRestTestClient.post()
                     .uri("/api/v1/memberships/orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(membershipPaymentOrder)
                     .exchange()
                     .expectStatus().isCreated()
-                    .expectBody(MembershipPaymentResponse.class)
+                    .expectBody(String.class)
                     .returnResult().getResponseBody();
 
-            assertThat(response).isNotNull();
-            assertThat(response.memberships()).hasSize(3);
+            assertThat(response).isEqualTo("https://checkout.sumup.com/test");
 
             List<PaymentTransaction> transactions = paymentTransactionRepository.findAll();
             assertThat(transactions).hasSize(1);
@@ -271,17 +272,17 @@ public class MembershipUseCasesTest {
                     false
             );
 
-            MembershipPaymentResponse orderResponse = authRestTestClient.post()
+            String response = authRestTestClient.post()
                     .uri("/api/v1/memberships/orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(membershipPaymentOrder)
                     .exchange()
                     .expectStatus().isCreated()
-                    .expectBody(MembershipPaymentResponse.class)
+                    .expectBody(String.class)
                     .returnResult().getResponseBody();
 
-            assertThat(orderResponse).isNotNull();
-            UUID membershipId = orderResponse.memberships().get(0).id();
+            assertThat(response).isNotNull();
+            UUID membershipId = membershipRepository.findAll().get(0).getId();
 
             // When & Then
             authRestTestClient.get()
@@ -351,17 +352,17 @@ public class MembershipUseCasesTest {
                     false
             );
 
-            MembershipPaymentResponse orderResponse = authRestTestClient.post()
+            String response = authRestTestClient.post()
                     .uri("/api/v1/memberships/orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(membershipPaymentOrder)
                     .exchange()
                     .expectStatus().isCreated()
-                    .expectBody(MembershipPaymentResponse.class)
+                    .expectBody(String.class)
                     .returnResult().getResponseBody();
 
-            assertThat(orderResponse).isNotNull();
-            UUID membershipId = orderResponse.memberships().get(0).id();
+            assertThat(response).isNotNull();
+            UUID membershipId = membershipRepository.findAll().get(0).getId();
 
             // Passer le statut à PAID directement en base
             fr.hoenheimsports.backend.membershipservice.entities.Membership membership =
@@ -407,17 +408,17 @@ public class MembershipUseCasesTest {
                     false
             );
 
-            MembershipPaymentResponse orderResponse = authRestTestClient.post()
+            String response = authRestTestClient.post()
                     .uri("/api/v1/memberships/orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(membershipPaymentOrder)
                     .exchange()
                     .expectStatus().isCreated()
-                    .expectBody(MembershipPaymentResponse.class)
+                    .expectBody(String.class)
                     .returnResult().getResponseBody();
 
-            assertThat(orderResponse).isNotNull();
-            UUID membershipId = orderResponse.memberships().get(0).id();
+            assertThat(response).isNotNull();
+            UUID membershipId = membershipRepository.findAll().get(0).getId();
 
             // When & Then
             authRestTestClient.post()
@@ -438,4 +439,87 @@ public class MembershipUseCasesTest {
                     .expectStatus().isUnauthorized();
         }
     }
+
+    @Nested
+    @DisplayName("Récupération des détails d'un paiement par ID")
+    class GetPaymentTransaction {
+
+        @Test
+        @DisplayName("Devrait récupérer les détails d'un paiement avec succès")
+        void shouldGetPaymentTransactionById() {
+            // Given
+            UUID campaignId = createCampaign();
+
+            MembershipCreateRequest membershipCreateRequest = new MembershipCreateRequest(
+                    "Doe",
+                    "John",
+                    "john@doe.com",
+                    "LIC-12345",
+                    new CategoryDto("U11", new BigDecimal("100.00"))
+            );
+            PaymentPayerInfoCreateRequest paymentPayerInfoCreateRequest = new PaymentPayerInfoCreateRequest(
+                    "PayerFirstName",
+                    "PayerLastName",
+                    "payer@example.com"
+            );
+
+            MembershipPaymentOrder membershipPaymentOrder = new MembershipPaymentOrder(
+                    campaignId,
+                    paymentPayerInfoCreateRequest,
+                    List.of(membershipCreateRequest),
+                    false
+            );
+
+            String response = authRestTestClient.post()
+                    .uri("/api/v1/memberships/orders")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(membershipPaymentOrder)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(String.class)
+                    .returnResult().getResponseBody();
+
+            assertThat(response).isNotNull();
+            UUID transactionId = paymentTransactionRepository.findAll().get(0).getId();
+            UUID membershipId = membershipRepository.findAll().get(0).getId();
+
+            // When & Then
+            authRestTestClient.get()
+                    .uri("/api/v1/memberships/payments/" + transactionId)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(transactionId.toString())
+                    .jsonPath("$.campaignId").isEqualTo(campaignId.toString())
+                    .jsonPath("$.amount").isEqualTo(100.00)
+                    .jsonPath("$.payerInfo.firstName").isEqualTo("PayerFirstName")
+                    .jsonPath("$.payerInfo.lastName").isEqualTo("PayerLastName")
+                    .jsonPath("$.payerInfo.email").isEqualTo("payer@example.com")
+                    .jsonPath("$.status").isEqualTo("PENDING")
+                    .jsonPath("$.checkoutDate").isEqualTo("2026-05-31T19:30:24")
+                    .jsonPath("$.isDiscounted").isEqualTo(false)
+                    .jsonPath("$.memberships[0].id").isEqualTo(membershipId.toString());
+        }
+
+        @Test
+        @DisplayName("Devrait renvoyer 404 si le paiement n'existe pas")
+        void shouldReturnNotFoundWhenPaymentDoesNotExist() {
+            authRestTestClient.get()
+                    .uri("/api/v1/memberships/payments/" + UUID.randomUUID())
+                    .exchange()
+                    .expectStatus().isNotFound()
+                    .expectBody()
+                    .jsonPath("$.detail").isEqualTo("Paiement non trouvé");
+        }
+
+        @Test
+        @DisplayName("Devrait refuser l'accès aux utilisateurs non authentifiés")
+        void shouldRejectUnauthorizedAccess() {
+            restTestClient.get()
+                    .uri("/api/v1/memberships/payments/" + UUID.randomUUID())
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
 }
+

@@ -1,0 +1,123 @@
+.payments-table {
+  width: 100%;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  background: var(--mat-sys-surface-container-low);
+  cursor: pointer;
+}
+
+tr.element-row:active {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.element-detail-wrapper {
+  overflow: hidden;
+  display: none;
+  width: 100%;
+
+  &.expanded {
+    display: flex;
+  }
+}
+
+.element-detail-container {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: var(--mat-sys-surface-container-lowest);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.memberships-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.membership-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--mat-sys-surface);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 4px;
+  gap: 1rem;
+}
+
+.member-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex: 1;
+}
+
+.member-name {
+  font-weight: 500;
+  color: var(--mat-sys-on-surface);
+}
+
+.member-category {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.member-status-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.member-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.badge-pending {
+    background-color: var(--mat-sys-warning-container, #ffeec1);
+    color: var(--mat-sys-on-warning-container, #8f6c00);
+  }
+
+  &.badge-processed {
+    background-color: var(--mat-sys-success-container, #d1e7dd);
+    color: var(--mat-sys-on-success-container, #0f5132);
+  }
+
+  &.badge-failed {
+    background-color: var(--mat-sys-error-container, #f8d7da);
+    color: var(--mat-sys-on-error-container, #842029);
+  }
+}

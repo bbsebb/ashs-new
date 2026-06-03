@@ -107,5 +107,28 @@ class PaymentTransactionRepositoryTest {
             assertThat(found.get().isDiscounted()).isFalse();
             assertThat(found.get().getStatus()).isEqualTo(MembershipStatus.PENDING);
         }
+
+        @Test
+        @DisplayName("Should find transactions by campaign identifier")
+        void shouldFindByCampaignId() {
+            // Given
+            UUID campaignId = UUID.randomUUID();
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
+            transaction.setAmount(Price.of("50.00"));
+            transaction.setCampaignId(campaignId);
+            transaction.setPayerInfo(new PaymentPayerInfo("Bob", "Sponge", "bob@example.com"));
+            transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setSumupCheckout(new SumUpCheckout("checkout-bob-888", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"));
+            transaction.setDiscounted(false);
+            paymentTransactionRepository.saveAndFlush(transaction);
+
+            // When
+            java.util.List<PaymentTransaction> found = paymentTransactionRepository.findByCampaignId(campaignId);
+
+            // Then
+            assertThat(found).hasSize(1);
+            assertThat(found.get(0).getCampaignId()).isEqualTo(campaignId);
+        }
     }
 }

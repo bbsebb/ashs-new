@@ -52,9 +52,21 @@ export type MembershipResponse = {
   status: string;
 }
 
-/** DTO for the complete payment process initiation response. */
-export type MembershipPaymentResponse = {
-  paymentTransactionId: UUID;
-  sumupCheckout: SumUpCheckoutDto;
+
+export type PaymentPayerResponse = {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export type PaymentResponse = {
+  id: UUID;
+  campaignId: UUID;
+  amount: number;
+  payerInfo: PaymentPayerResponse;
+  status: string;
+  checkoutDate?: string;
+  isDiscounted: boolean;
   memberships: MembershipResponse[];
 }
+

@@ -43,6 +43,6 @@ describe('MembershipDetailsComponent', () => {
     expect(compiled.textContent).toContain('LIC-7890');
     expect(compiled.textContent).toContain('Sénior');
     expect(compiled.textContent).toContain('150');
-    expect(compiled.textContent).toContain('PAID');
+    expect(compiled.textContent).toContain('Payé');
   });
 });

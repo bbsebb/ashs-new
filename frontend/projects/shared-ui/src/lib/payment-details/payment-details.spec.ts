@@ -14,6 +14,8 @@ describe('PaymentDetailsComponent', () => {
     amount: 270.00,
     payerName: 'John Doe',
     payerEmail: 'john.doe@example.com',
+    payerFirstName: 'John',
+    payerLastName: 'Doe',
     status: 'PAID',
     checkoutDate: '2026-05-31T19:30:24',
     isDiscounted: true,
@@ -23,14 +25,16 @@ describe('PaymentDetailsComponent', () => {
         firstName: 'Alice',
         lastName: 'Doe',
         categoryName: 'U11',
-        status: 'PAID'
+        status: 'PAID',
+        amount: 135.00
       },
       {
         id: 'mem-2',
         firstName: 'Bob',
         lastName: 'Doe',
         categoryName: 'U13',
-        status: 'PAID'
+        status: 'PAID',
+        amount: 135.00
       }
     ]
   };
@@ -57,7 +61,7 @@ describe('PaymentDetailsComponent', () => {
     expect(compiled.textContent).toContain('270');
     expect(compiled.textContent).toContain('John Doe');
     expect(compiled.textContent).toContain('john.doe@example.com');
-    expect(compiled.textContent).toContain('PAID');
+    expect(compiled.textContent).toContain('Payé');
     expect(compiled.textContent).toContain('2026');
     expect(compiled.textContent).toContain('Réduction appliquée');
 

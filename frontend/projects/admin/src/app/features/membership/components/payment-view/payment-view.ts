@@ -29,6 +29,8 @@ export class PaymentView {
       amount: payment.amount,
       payerName: payment.payerInfo ? `${payment.payerInfo.firstName} ${payment.payerInfo.lastName}` : 'Inconnu',
       payerEmail: payment.payerInfo?.email ?? '',
+      payerFirstName: payment.payerInfo?.firstName ?? 'Inconnu',
+      payerLastName: payment.payerInfo?.lastName ?? '',
       status: payment.status,
       checkoutDate: payment.checkoutDate,
       isDiscounted: payment.isDiscounted,
@@ -37,7 +39,8 @@ export class PaymentView {
         firstName: membership.firstName,
         lastName: membership.lastName,
         categoryName: membership.categoryName,
-        status: membership.status
+        status: membership.status,
+        amount: membership.amount
       }))
     })
   });

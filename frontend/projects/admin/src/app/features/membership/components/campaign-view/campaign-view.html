@@ -10,6 +10,8 @@
     [title]="'Campagne ' + seasonNameSignal()"
     subtitle="Détails et statistiques de la campagne d'adhésion.">
 
+    @let stats = statsSignal();
+
     <!-- Global Actions Menu -->
     <div header-actions class="header-actions">
       <a mat-button routerLink="/membership">
@@ -77,6 +79,35 @@
           </mat-card-content>
         </mat-card>
 
+        <!-- Category Breakdown Section -->
+        <mat-card class="category-breakdown-card" style="margin-top: 1rem;">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>group</mat-icon>
+            <mat-card-title>Licences par Catégorie</mat-card-title>
+            <mat-card-subtitle>Payées ou traitées</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="categories-flex-container"
+                 style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+              @for (cat of stats.categories; track cat.name) {
+                <div class="category-stat-row"
+                     style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--mat-sys-outline-variant);">
+                  <strong style="color: var(--mat-sys-primary);">{{ cat.name }}</strong>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-weight: 600; font-size: 1rem;">{{ cat.total }}</span>
+                    <span style="font-size: 0.75rem; color: var(--mat-sys-on-surface-variant);">
+                      ({{ cat.paid }} payées, {{ cat.processed }} traitées)
+                    </span>
+                  </div>
+                </div>
+              } @empty {
+                <p style="color: var(--mat-sys-on-surface-variant); font-size: 0.9rem; font-style: italic; margin: 0;">
+                  Aucune licence enregistrée pour le moment.</p>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
         <!-- Danger Zone (Delete) -->
         @if (campaign.status === CampaignStatus.DRAFT) {
           <mat-card class="danger-card">
@@ -100,8 +131,7 @@
 
       <!-- Right Column: Statistics Grid -->
       <div class="stats-column">
-        @let stats = statsSignal();
-        <h2 class="section-title">Aperçu Financier (Fictif)</h2>
+        <h2 class="section-title">Aperçu Financier</h2>
 
         <div class="stats-grid">
           <!-- Joined & Paid -->

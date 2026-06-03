@@ -6,7 +6,7 @@
     </section>
     <mat-chip-set>
       <mat-chip class="status-chip" [class]="viewModelInputSignal().status.toLowerCase()">
-        {{ viewModelInputSignal().status }}
+        {{ viewModelInputSignal().status | status }}
       </mat-chip>
     </mat-chip-set>
   </mat-card-content>

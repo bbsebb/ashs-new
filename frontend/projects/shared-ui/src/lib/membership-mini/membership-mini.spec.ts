@@ -36,6 +36,6 @@ describe('MembershipMiniComponent', () => {
     // Check that name, category and status are rendered
     expect(compiled.textContent).toContain('John Doe');
     expect(compiled.textContent).toContain('U11');
-    expect(compiled.textContent).toContain('PAID');
+    expect(compiled.textContent).toContain('Payé');
   });
 });

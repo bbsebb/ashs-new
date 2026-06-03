@@ -22,6 +22,7 @@ export interface MembershipMiniViewModel {
   lastName: string;
   categoryName: string;
   status: string;
+  amount: number;
 }
 
 /**
@@ -33,6 +34,8 @@ export interface PaymentDetailsViewModel {
   amount: number;
   payerName: string;
   payerEmail: string;
+  payerFirstName: string;
+  payerLastName: string;
   status: string;
   checkoutDate?: string;
   isDiscounted: boolean;

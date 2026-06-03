@@ -64,8 +64,96 @@ describe('CampaignView Component (Admin)', () => {
 
     expect(screen.getByText(/Campagne 2024-2025/i)).toBeDefined();
     expect(screen.getByText('Brouillon')).toBeDefined();
-    expect(screen.getByText('Senior')).toBeDefined();
-    expect(screen.getByText('Aperçu Financier (Fictif)')).toBeDefined();
+    expect(screen.getAllByText('Senior').length).toBeGreaterThan(0);
+    expect(screen.getByText('Aperçu Financier')).toBeDefined();
+  });
+
+  it('should render campaign details and calculated stats and category breakdown', async () => {
+    const campaign = {
+      id: 'c1',
+      seasonId: 's1',
+      status: CampaignStatus.DRAFT,
+      categories: [{name: 'Senior', amount: 150}]
+    };
+    const seasons = [{id: 's1', name: '2024-2025'}];
+    const mocks = setupMocks(campaign, seasons);
+
+    // Set custom payments data with memberships
+    mocks.membershipStore.campaignPaymentsViewModelSignal.set({
+      payments: [
+        {
+          id: 'p1',
+          amount: 300,
+          status: 'PAID',
+          payerName: 'John',
+          payerEmail: 'john@example.com',
+          payerFirstName: 'John',
+          payerLastName: 'Doe',
+          isDiscounted: false,
+          memberships: [
+            {
+              id: 'm1',
+              firstName: 'Alice',
+              lastName: 'Doe',
+              categoryName: 'Senior',
+              status: 'PAID',
+              amount: 150
+            },
+            {
+              id: 'm2',
+              firstName: 'Bob',
+              lastName: 'Doe',
+              categoryName: 'Senior',
+              status: 'PROCESSED',
+              amount: 150
+            }
+          ]
+        },
+        {
+          id: 'p2',
+          amount: 150,
+          status: 'FAILED',
+          payerName: 'Jack',
+          payerEmail: 'jack@example.com',
+          payerFirstName: 'Jack',
+          payerLastName: 'Black',
+          isDiscounted: false,
+          memberships: [
+            {
+              id: 'm3',
+              firstName: 'Charlie',
+              lastName: 'Black',
+              categoryName: 'Junior',
+              status: 'FAILED',
+              amount: 150
+            }
+          ]
+        }
+      ],
+      isLoading: false,
+      error: null
+    });
+
+    await render(CampaignView, {
+      componentInputs: {id: 'c1'},
+      providers: [
+        {provide: CampaignStore, useValue: mocks.campaignStore},
+        {provide: SeasonsStore, useValue: mocks.seasonsStore},
+        {provide: MembershipStore, useValue: mocks.membershipStore},
+        {provide: NotificationService, useValue: mocks.notificationService},
+        {provide: DialogService, useValue: mocks.dialogService},
+        provideRouter([]),
+        provideAnimationsAsync('noop')
+      ]
+    });
+
+    expect(screen.getByText(/Campagne 2024-2025/i)).toBeDefined();
+    expect(screen.getByText('Brouillon')).toBeDefined();
+    expect(screen.getAllByText('Senior').length).toBeGreaterThan(0);
+    expect(screen.getByText('Aperçu Financier')).toBeDefined();
+
+    // Check categories breakdown
+    expect(screen.getByText(/(1 payées, 1 traitées)/i)).toBeDefined();
   });
 
   it('should show launch button only for DRAFT status', async () => {

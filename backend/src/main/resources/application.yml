@@ -81,5 +81,6 @@ contact:
 sumup:
   api-key: ${SUMUP_API_KEY}
   merchant-code: ${SUMUP_MERCHANT_CODE}
-  return-url: ${SUMUP_RETURN_URL:http://localhost:4200/membership/payment-success}
+  return-url: ${SUMUP_RETURN_URL}
+  redirect-url: ${SUMUP_REDIRECT_URL}
   base-url: ${SUMUP_BASE_URL:https://api.sumup.com}

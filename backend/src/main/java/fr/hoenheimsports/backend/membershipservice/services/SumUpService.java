@@ -39,7 +39,7 @@ public class SumUpService {
                     null,
                     description,
                     sumUpProperties.getReturnUrl(),
-                    null,
+                    sumUpProperties.getRedirectUrl(),
                     sumUpProperties.getMerchantCode(),
                     null,
                     null,

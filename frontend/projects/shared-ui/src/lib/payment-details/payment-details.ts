@@ -6,6 +6,7 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatIconModule} from '@angular/material/icon';
 import {MatChipsModule} from '@angular/material/chips';
 import {CurrencyPipe, DatePipe} from '@angular/common';
+import {StatusPipe} from '../pipes';
 
 @Component({
   selector: 'app-payment-details',
@@ -16,7 +17,8 @@ import {CurrencyPipe, DatePipe} from '@angular/common';
     MatChipsModule,
     CurrencyPipe,
     DatePipe,
-    MembershipMini
+    MembershipMini,
+    StatusPipe
   ],
   templateUrl: './payment-details.html',
   styleUrl: './payment-details.scss',

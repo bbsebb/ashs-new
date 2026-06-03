@@ -57,15 +57,63 @@ export class CampaignView {
     return season?.name ?? 'Saison inconnue';
   });
 
-  /** Fictional Statistics Signals (as requested) */
+  /** Calculated Campaign Statistics */
   readonly statsSignal = computed(() => {
-    // These are placeholders for the UI design.
-    // They will be replaced by actual backend data later.
+    const viewModel = this.paymentsViewModelSignal();
+    const payments = viewModel?.payments ?? [];
+
+    let paidCount = 0;
+    let paidAmount = 0;
+    let processedCount = 0;
+    let processedAmount = 0;
+    let errorCount = 0;
+    let errorAmount = 0;
+
+    const categoryStats: Record<string, { paid: number; processed: number; total: number }> = {};
+
+    for (const payment of payments) {
+      if (payment.status === 'FAILED') {
+        errorCount++;
+        errorAmount += payment.amount;
+      }
+
+      for (const membership of payment.memberships ?? []) {
+        if (membership.status === 'PAID') {
+          paidCount++;
+          paidAmount += membership.amount;
+        } else if (membership.status === 'PROCESSED') {
+          processedCount++;
+          processedAmount += membership.amount;
+        }
+
+        if (membership.status === 'PAID' || membership.status === 'PROCESSED') {
+          const cat = membership.categoryName || 'Inconnue';
+          if (!categoryStats[cat]) {
+            categoryStats[cat] = {paid: 0, processed: 0, total: 0};
+          }
+          if (membership.status === 'PAID') {
+            categoryStats[cat].paid++;
+          } else {
+            categoryStats[cat].processed++;
+          }
+          categoryStats[cat].total++;
+        }
+      }
+    }
+
+    const categories = Object.entries(categoryStats).map(([name, stats]) => ({
+      name,
+      paid: stats.paid,
+      processed: stats.processed,
+      total: stats.total
+    })).sort((a, b) => a.name.localeCompare(b.name));
+
     return {
-      joinedAndPaid: {count: 145, amount: 25400},
-      processed: {count: 130, amount: 22800},
-      paymentErrors: {count: 15, amount: 2600},
-      totalValidAmount: 25400 + 22800 // Sum of previous two categories as requested
+      joinedAndPaid: {count: paidCount, amount: paidAmount},
+      processed: {count: processedCount, amount: processedAmount},
+      paymentErrors: {count: errorCount, amount: errorAmount},
+      totalValidAmount: paidAmount + processedAmount,
+      categories
     };
   });
 

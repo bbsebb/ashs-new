@@ -33,4 +33,6 @@ public class SumUpProperties {
      * Return URL after a successful or failed payment.
      */
     private String returnUrl;
+
+    private String redirectUrl;
 }

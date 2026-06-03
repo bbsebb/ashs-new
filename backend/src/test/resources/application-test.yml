@@ -40,5 +40,6 @@ logging:
 sumup:
   api-key: sup_sk_sYTHXcHKiRqdDMHrz69ZM4AtBEoX23QRT
   merchant-code: MEXCPN1E
-  return-url: ${SUMUP_RETURN_URL:http://localhost:4200/membership/payment-success}
+  return-url: ${SUMUP_RETURN_URL:http://localhost:8080/membership/payment/callback}
+  redirect-url: ${SUMUP_REDIRECT_URL:http://localhost:4200/membership/payment/return}
   base-url: ${SUMUP_BASE_URL:https://api.sumup.com}

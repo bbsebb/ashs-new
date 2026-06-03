@@ -5,10 +5,11 @@ import {MatChipsModule} from '@angular/material/chips';
 import {MatIconModule} from '@angular/material/icon';
 import {MatDividerModule} from '@angular/material/divider';
 import {CurrencyPipe} from '@angular/common';
+import {StatusPipe} from '../pipes';
 
 @Component({
   selector: 'app-membership-details',
-  imports: [MatCardModule, MatChipsModule, MatIconModule, MatDividerModule, CurrencyPipe],
+  imports: [MatCardModule, MatChipsModule, MatIconModule, MatDividerModule, CurrencyPipe, StatusPipe],
   templateUrl: './membership-details.html',
   styleUrl: './membership-details.scss',
 })

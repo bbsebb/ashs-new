@@ -36,6 +36,9 @@ public class SumUpService {
         try {
             OffsetDateTime expiration = OffsetDateTime.now(ZoneOffset.UTC).plusHours(2);
 
+            String baseRedirectUrl = sumUpProperties.getRedirectUrl();
+            String redirectUrl = baseRedirectUrl.endsWith("/") ? baseRedirectUrl + id : baseRedirectUrl + "/" + id;
+
             SumUpCheckoutRequest request = new SumUpCheckoutRequest(
                     id,
                     amount,
@@ -43,13 +46,15 @@ public class SumUpService {
                     null,
                     description,
                     sumUpProperties.getReturnUrl(),
-                    sumUpProperties.getRedirectUrl(),
+                    redirectUrl,
+
                     sumUpProperties.getMerchantCode(),
                     null,
                     null,
                     expiration,
                     new SumUpCheckoutRequest.HostedCheckout(true)
             );
+
 
             SumUpCheckoutResponse response = client.createCheckout(request);
 
@@ -68,6 +73,21 @@ public class SumUpService {
         } catch (Exception exception) {
             log.error("Error creating SumUp checkout: {}", exception.getMessage(), exception);
             throw new SumUpCheckoutCreationFailedException("Erreur lors de la création du paiement SumUp");
+        }
+    }
+
+    /**
+     * Retrieves a checkout from SumUp by its checkout ID.
+     *
+     * @param checkoutId the SumUp checkout identifier
+     * @return the SumUpCheckoutResponse containing checkout details
+     */
+    public SumUpCheckoutResponse getCheckout(String checkoutId) {
+        try {
+            return client.getCheckout(checkoutId);
+        } catch (Exception exception) {
+            log.error("Error retrieving SumUp checkout {}: {}", checkoutId, exception.getMessage(), exception);
+            throw new SumUpCheckoutCreationFailedException("Erreur lors de la récupération du paiement SumUp");
         }
     }
 }

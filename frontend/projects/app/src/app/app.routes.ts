@@ -58,6 +58,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/membership/components/membership-registration/membership-registration').then(m => m.MembershipRegistrationComponent)
   },
   {
+    path: 'membership/payment/return/:id',
+    title: 'Retour de paiement',
+    loadComponent: () => import('./features/membership/components/payment-return/payment-return').then(m => m.PaymentReturnComponent)
+  },
+  {
     path: 'contact',
     title: 'Contact',
     loadComponent: () => import('./features/contact/components/contact-view/contact-view').then(m => m.ContactView)

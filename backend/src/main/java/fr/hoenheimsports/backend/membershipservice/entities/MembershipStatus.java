@@ -7,5 +7,6 @@ public enum MembershipStatus {
     PENDING,
     PAID,
     FAILED,
-    PROCESSED
+    PROCESSED,
+    EXPIRED
 }

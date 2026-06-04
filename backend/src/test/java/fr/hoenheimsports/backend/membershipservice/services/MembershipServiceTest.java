@@ -27,8 +27,8 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 /**
  * Unit tests for {@link MembershipService}.
@@ -794,6 +794,185 @@ class MembershipServiceTest {
             verify(paymentTransactionRepository).findByCampaignId(campaignId);
         }
     }
+
+    @Nested
+    @DisplayName("Handle Webhook Payment Status Tests")
+    class HandleWebhookPaymentStatusTests {
+
+        @Test
+        @DisplayName("Should update transaction and membership status to PAID when SumUp status is PAID")
+        void shouldUpdateStatusToPaid() {
+            // Given
+            String checkoutId = "chk-111";
+            SumUpCheckoutResponse sumUpResponse = new SumUpCheckoutResponse(
+                    checkoutId, BigDecimal.TEN, "EUR", null, "Licence", "PAID", null, null, null, null, null, null, null, null, null, null, null, null
+            );
+            when(sumUpService.getCheckout(checkoutId)).thenReturn(sumUpResponse);
+
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
+            transaction.setStatus(MembershipStatus.PENDING);
+            Membership membership = new Membership();
+            membership.setStatus(MembershipStatus.PENDING);
+            transaction.addMembership(membership);
+
+            when(paymentTransactionRepository.findBySumupCheckoutId(checkoutId)).thenReturn(Optional.of(transaction));
+
+            // When
+            membershipService.handleWebhookPaymentStatus(checkoutId);
+
+            // Then
+            assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.PAID);
+            assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PAID);
+            verify(paymentTransactionRepository).save(transaction);
+        }
+
+        @Test
+        @DisplayName("Should update transaction and membership status to FAILED when SumUp status is FAILED")
+        void shouldUpdateStatusToFailed() {
+            // Given
+            String checkoutId = "chk-111";
+            SumUpCheckoutResponse sumUpResponse = new SumUpCheckoutResponse(
+                    checkoutId, BigDecimal.TEN, "EUR", null, "Licence", "FAILED", null, null, null, null, null, null, null, null, null, null, null, null
+            );
+            when(sumUpService.getCheckout(checkoutId)).thenReturn(sumUpResponse);
+
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
+            transaction.setStatus(MembershipStatus.PENDING);
+            Membership membership = new Membership();
+            membership.setStatus(MembershipStatus.PENDING);
+            transaction.addMembership(membership);
+
+            when(paymentTransactionRepository.findBySumupCheckoutId(checkoutId)).thenReturn(Optional.of(transaction));
+
+            // When
+            membershipService.handleWebhookPaymentStatus(checkoutId);
+
+            // Then
+            assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.FAILED);
+            assertThat(membership.getStatus()).isEqualTo(MembershipStatus.FAILED);
+            verify(paymentTransactionRepository).save(transaction);
+        }
+
+        @Test
+        @DisplayName("Should update transaction and membership status to EXPIRED when SumUp status is EXPIRED")
+        void shouldUpdateStatusToExpired() {
+            // Given
+            String checkoutId = "chk-111";
+            SumUpCheckoutResponse sumUpResponse = new SumUpCheckoutResponse(
+                    checkoutId, BigDecimal.TEN, "EUR", null, "Licence", "EXPIRED", null, null, null, null, null, null, null, null, null, null, null, null
+            );
+            when(sumUpService.getCheckout(checkoutId)).thenReturn(sumUpResponse);
+
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
+            transaction.setStatus(MembershipStatus.PENDING);
+            Membership membership = new Membership();
+            membership.setStatus(MembershipStatus.PENDING);
+            transaction.addMembership(membership);
+
+            when(paymentTransactionRepository.findBySumupCheckoutId(checkoutId)).thenReturn(Optional.of(transaction));
+
+            // When
+            membershipService.handleWebhookPaymentStatus(checkoutId);
+
+            // Then
+            assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.EXPIRED);
+            assertThat(membership.getStatus()).isEqualTo(MembershipStatus.EXPIRED);
+            verify(paymentTransactionRepository).save(transaction);
+        }
+
+        @Test
+        @DisplayName("Should not update transaction or membership status when status is identical")
+        void shouldNotUpdateStatusWhenIdentical() {
+            // Given
+            String checkoutId = "chk-111";
+            SumUpCheckoutResponse sumUpResponse = new SumUpCheckoutResponse(
+                    checkoutId, BigDecimal.TEN, "EUR", null, "Licence", "PENDING", null, null, null, null, null, null, null, null, null, null, null, null
+            );
+            when(sumUpService.getCheckout(checkoutId)).thenReturn(sumUpResponse);
+
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(UUID.randomUUID());
+            transaction.setStatus(MembershipStatus.PENDING);
+            Membership membership = new Membership();
+            membership.setStatus(MembershipStatus.PENDING);
+            transaction.addMembership(membership);
+
+            when(paymentTransactionRepository.findBySumupCheckoutId(checkoutId)).thenReturn(Optional.of(transaction));
+
+            // When
+            membershipService.handleWebhookPaymentStatus(checkoutId);
+
+            // Then
+            assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.PENDING);
+            assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PENDING);
+            verify(paymentTransactionRepository, never()).save(any());
+
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when transaction not found by checkout ID")
+        void shouldThrowEntityNotFoundExceptionWhenTransactionNotFound() {
+            // Given
+            String checkoutId = "chk-111";
+            SumUpCheckoutResponse sumUpResponse = new SumUpCheckoutResponse(
+                    checkoutId, BigDecimal.TEN, "EUR", null, "Licence", "PAID", null, null, null, null, null, null, null, null, null, null, null, null
+            );
+            when(sumUpService.getCheckout(checkoutId)).thenReturn(sumUpResponse);
+            when(paymentTransactionRepository.findBySumupCheckoutId(checkoutId)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.handleWebhookPaymentStatus(checkoutId))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .satisfies(throwable -> {
+                        EntityNotFoundException ex = (EntityNotFoundException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Transaction non trouvée pour le checkout: " + checkoutId);
+                    });
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Payment Transaction Status Tests")
+    class GetPaymentTransactionStatusTests {
+
+        @Test
+        @DisplayName("Should return status response when transaction exists")
+        void shouldReturnStatusResponseWhenTransactionExists() {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+            PaymentTransaction transaction = new PaymentTransaction();
+            transaction.setId(transactionId);
+            transaction.setStatus(MembershipStatus.PAID);
+
+            when(paymentTransactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
+
+            // When
+            PaymentStatusResponse response = membershipService.getPaymentTransactionStatus(transactionId);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.status()).isEqualTo(MembershipStatus.PAID);
+        }
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when transaction does not exist")
+        void shouldThrowEntityNotFoundExceptionWhenTransactionDoesNotExist() {
+            // Given
+            UUID transactionId = UUID.randomUUID();
+            when(paymentTransactionRepository.findById(transactionId)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> membershipService.getPaymentTransactionStatus(transactionId))
+                    .isInstanceOf(EntityNotFoundException.class)
+                    .satisfies(throwable -> {
+                        EntityNotFoundException ex = (EntityNotFoundException) throwable;
+                        assertThat(ex.getBody().getDetail()).isEqualTo("Paiement non trouvé");
+                    });
+        }
+    }
 }
+
 
 

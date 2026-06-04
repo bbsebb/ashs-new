@@ -11,7 +11,8 @@ describe('MembershipMiniComponent', () => {
     firstName: 'John',
     lastName: 'Doe',
     categoryName: 'U11',
-    status: 'PAID'
+    status: 'PAID',
+    amount: 100
   };
 
   beforeEach(async () => {

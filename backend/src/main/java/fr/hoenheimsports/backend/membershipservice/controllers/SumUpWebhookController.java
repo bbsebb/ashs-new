@@ -1,8 +1,8 @@
 package fr.hoenheimsports.backend.membershipservice.controllers;
 
 import fr.hoenheimsports.backend.membershipservice.dtos.SumUpWebhookRequest;
-import fr.hoenheimsports.backend.membershipservice.events.SumUpPaymentEvent;
-import org.springframework.context.ApplicationEventPublisher;
+import fr.hoenheimsports.backend.membershipservice.services.MembershipService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,12 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/public/webhooks/sumup")
+@Slf4j
 public class SumUpWebhookController {
 
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final MembershipService membershipService;
 
-    public SumUpWebhookController(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
+    public SumUpWebhookController(MembershipService membershipService) {
+        this.membershipService = membershipService;
     }
 
     /**
@@ -28,6 +29,8 @@ public class SumUpWebhookController {
      */
     @PostMapping
     public void handleWebhook(@RequestBody SumUpWebhookRequest request) {
-        this.applicationEventPublisher.publishEvent(new SumUpPaymentEvent(request.data().id(), request.data().status()));
+        log.info("Received SumUp webhook for payment ID: {}", request.id());
+        this.membershipService.handleWebhookPaymentStatus(request.id());
     }
 }
+

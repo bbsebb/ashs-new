@@ -3,7 +3,13 @@ import {TestBed} from '@angular/core/testing';
 import {signal} from '@angular/core';
 import {provideHttpClient} from '@angular/common/http';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
-import {APP_CONFIG, MembershipGateway, MembershipPaymentOrder} from '@shared-api';
+import {
+  APP_CONFIG,
+  MembershipGateway,
+  MembershipPaymentOrder,
+  PaymentResponse,
+  PaymentStatusResponse
+} from '@shared-api';
 import {firstValueFrom} from 'rxjs';
 
 describe('MembershipGateway', () => {
@@ -90,6 +96,21 @@ describe('MembershipGateway', () => {
 
     const result = await promise;
     expect(result).toEqual(mockPayment);
+  });
+
+  it('should fetch payment transaction status publicly', async () => {
+    const mockStatusResponse: PaymentStatusResponse = {
+      status: 'PENDING'
+    };
+
+    const promise = firstValueFrom(gateway.getPaymentTransactionStatus('tx-456'));
+
+    const req = httpTestingController.expectOne('http://test.api/api/public/memberships/payments/tx-456/status');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockStatusResponse);
+
+    const result = await promise;
+    expect(result).toEqual(mockStatusResponse);
   });
 
   it('should fetch payment transactions by campaign using httpResource', async () => {

@@ -1,0 +1,53 @@
+<div class="payment-return-container">
+  @if (statusSignal() === 'LOADING') {
+    <div class="status-card loading-card">
+      <mat-spinner diameter="64"></mat-spinner>
+      <h2>Vérification en cours...</h2>
+      <p class="subtitle">Nous vérifions le statut de votre transaction auprès de SumUp, merci de patienter.</p>
+    </div>
+  }
+
+  @if (statusSignal() === 'SUCCESS') {
+    <div class="status-card success-card">
+      <div class="icon-wrapper">
+        <mat-icon color="primary">check_circle</mat-icon>
+      </div>
+      <h2>Paiement réussi !</h2>
+      <p class="message">Votre payement pour l'adhésion a été validée avec succès. Nous allons traité la validation de
+        votre licence rapidement. Merci !</p>
+
+      <div class="actions">
+        <button mat-flat-button back-home route="/" label="Retour au menu principal"></button>
+      </div>
+    </div>
+  }
+
+  @if (statusSignal() === 'FAILED') {
+    <div class="status-card failed-card">
+      <div class="icon-wrapper">
+        <mat-icon class="error-icon">cancel</mat-icon>
+      </div>
+      <h2>Le paiement a échoué</h2>
+      <p class="message">La transaction a été annulée, a échoué ou a expiré. Veuillez réessayer.</p>
+
+      <div class="actions">
+        <button mat-flat-button back-home route="/" label="Retour au menu principal"></button>
+      </div>
+    </div>
+  }
+
+  @if (statusSignal() === 'PENDING_TIMEOUT') {
+    <div class="status-card pending-card">
+      <div class="icon-wrapper">
+        <mat-icon class="info-icon">mail</mat-icon>
+      </div>
+      <h2>Paiement en attente</h2>
+      <p class="message">Votre paiement est toujours en cours de validation de notre coté. Ne vous inquiétez pas, vous
+        serez prévenu par e-mail dès qu'il sera validé.</p>
+
+      <div class="actions">
+        <button mat-flat-button back-home route="/" label="Retour au menu principal"></button>
+      </div>
+    </div>
+  }
+</div>

@@ -49,6 +49,7 @@ class SumUpServiceTest {
 
         when(sumUpClient.createCheckout(requestCaptor.capture())).thenReturn(mockResponse);
         when(properties.getReturnUrl()).thenReturn("http://return-url");
+        when(properties.getRedirectUrl()).thenReturn("http://redirect-url");
 
         java.time.OffsetDateTime now = java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC);
 
@@ -62,6 +63,7 @@ class SumUpServiceTest {
 
         SumUpCheckoutRequest capturedRequest = requestCaptor.getValue();
         assertThat(capturedRequest.validUntil()).isNotNull();
+        assertThat(capturedRequest.redirectUrl()).isEqualTo("http://redirect-url/ref-123");
 
         // Assert validUntil is approximately 2 hours from now (within a 10 seconds delta)
         long secondsDiff = java.time.temporal.ChronoUnit.SECONDS.between(
@@ -70,6 +72,7 @@ class SumUpServiceTest {
         );
         assertThat(Math.abs(secondsDiff)).isLessThan(10);
     }
+
 
     @Test
     @DisplayName("Should throw SumUpCheckoutUrlNotFoundException when hosted checkout URL is null in response")
@@ -84,6 +87,7 @@ class SumUpServiceTest {
 
         when(sumUpClient.createCheckout(any(SumUpCheckoutRequest.class))).thenReturn(mockResponse);
         when(properties.getReturnUrl()).thenReturn("http://return-url");
+        when(properties.getRedirectUrl()).thenReturn("http://redirect-url");
 
         // When & Then
         assertThatThrownBy(() -> sumUpService.createCheckout("ref-123", BigDecimal.valueOf(45.5), "Adhésion Club"))
@@ -97,11 +101,49 @@ class SumUpServiceTest {
         // Given
         when(sumUpClient.createCheckout(any(SumUpCheckoutRequest.class))).thenThrow(new RuntimeException("Network error"));
         when(properties.getReturnUrl()).thenReturn("http://return-url");
+        when(properties.getRedirectUrl()).thenReturn("http://redirect-url");
+
 
         // When & Then
         assertThatThrownBy(() -> sumUpService.createCheckout("ref-123", BigDecimal.valueOf(45.5), "Adhésion Club"))
                 .isInstanceOf(SumUpCheckoutCreationFailedException.class)
                 .hasMessageContaining("Erreur lors de la création du paiement SumUp");
+    }
+
+    @Test
+    @DisplayName("Should retrieve checkout session successfully from client")
+    void shouldRetrieveCheckoutSuccessfully() {
+        // Given
+        String checkoutId = "chk-999";
+        SumUpCheckoutResponse mockResponse = new SumUpCheckoutResponse(
+                checkoutId,
+                BigDecimal.TEN,
+                "EUR",
+                null, "Licence Test", "PAID", null, null, null, null, null, null, null, null, null, null, null, null
+        );
+
+        when(sumUpClient.getCheckout(checkoutId)).thenReturn(mockResponse);
+
+        // When
+        SumUpCheckoutResponse response = sumUpService.getCheckout(checkoutId);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.id()).isEqualTo(checkoutId);
+        assertThat(response.status()).isEqualTo("PAID");
+    }
+
+    @Test
+    @DisplayName("Should throw SumUpCheckoutCreationFailedException when retrieving checkout fails")
+    void shouldThrowExceptionWhenRetrievingFails() {
+        // Given
+        String checkoutId = "chk-999";
+        when(sumUpClient.getCheckout(checkoutId)).thenThrow(new RuntimeException("Network error"));
+
+        // When & Then
+        assertThatThrownBy(() -> sumUpService.getCheckout(checkoutId))
+                .isInstanceOf(SumUpCheckoutCreationFailedException.class)
+                .hasMessageContaining("Erreur lors de la récupération du paiement SumUp");
     }
 }
 

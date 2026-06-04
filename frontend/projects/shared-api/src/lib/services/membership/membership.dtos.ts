@@ -70,3 +70,8 @@ export type PaymentResponse = {
   memberships: MembershipResponse[];
 }
 
+export type PaymentStatusResponse = {
+  status: 'PENDING' | 'PAID' | 'FAILED' | 'PROCESSED' | 'EXPIRED';
+}
+
+

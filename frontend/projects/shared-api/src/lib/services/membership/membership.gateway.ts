@@ -2,7 +2,7 @@ import {inject, Injectable, Signal} from '@angular/core';
 import {HttpClient, httpResource, HttpResourceRef} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {APP_CONFIG} from '../../configs/app-config';
-import {MembershipPaymentOrder, MembershipResponse, PaymentResponse} from './membership.dtos';
+import {MembershipPaymentOrder, MembershipResponse, PaymentResponse, PaymentStatusResponse} from './membership.dtos';
 import {UUID} from '@shared-domain';
 
 /**
@@ -36,6 +36,16 @@ export class MembershipGateway {
   getPaymentTransaction(id: UUID): Observable<PaymentResponse> {
     return this.http.get<PaymentResponse>(
       `${this.appConfig.apiUrl}/api/v1/memberships/payments/${id}`
+    );
+  }
+
+  /**
+   * Fetches the status of a single payment transaction publicly.
+   * @param id The transaction ID.
+   */
+  getPaymentTransactionStatus(id: UUID): Observable<PaymentStatusResponse> {
+    return this.http.get<PaymentStatusResponse>(
+      `${this.appConfig.apiUrl}/api/public/memberships/payments/${id}/status`
     );
   }
 

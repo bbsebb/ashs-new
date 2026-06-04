@@ -58,7 +58,6 @@ export class MembershipRegistrationComponent {
     this.isSubmittingSignal.set(true);
     this._membershipGateway.initiateMembershipPayment(order).subscribe({
       next: (checkoutUrl) => {
-        this.isSubmittingSignal.set(false);
         this._notificationService.show('Inscription enregistrée. Redirection vers le paiement SumUp...', 'success');
         // Redirect the window to SumUp hosted payment page
         window.open(checkoutUrl, '_self');

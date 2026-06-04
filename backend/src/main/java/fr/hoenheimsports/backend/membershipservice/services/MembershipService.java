@@ -93,9 +93,51 @@ public class MembershipService {
         membershipRepository.save(membership);
     }
 
+    /**
+     * Handles SumUp webhook notifications by retrieving the checkout status and updating the transaction.
+     *
+     * @param checkoutId the SumUp checkout ID
+     */
+    @Transactional
+    public void handleWebhookPaymentStatus(String checkoutId) {
+        SumUpCheckoutResponse sumUpResponse = sumUpService.getCheckout(checkoutId);
+        String sumUpStatus = sumUpResponse.status();
+
+        PaymentTransaction transaction = paymentTransactionRepository.findBySumupCheckoutId(checkoutId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction non trouvée pour le checkout: " + checkoutId));
+
+        MembershipStatus targetStatus;
+        if (sumUpStatus.equalsIgnoreCase("PAID") || sumUpStatus.equalsIgnoreCase("SUCCESSFUL")) {
+            targetStatus = MembershipStatus.PAID;
+        } else if (sumUpStatus.equalsIgnoreCase("FAILED")) {
+            targetStatus = MembershipStatus.FAILED;
+        } else if (sumUpStatus.equalsIgnoreCase("EXPIRED")) {
+            targetStatus = MembershipStatus.EXPIRED;
+        } else if (sumUpStatus.equalsIgnoreCase("PENDING")) {
+            targetStatus = MembershipStatus.PENDING;
+        } else {
+            return;
+        }
+
+        if (transaction.getStatus() != targetStatus) {
+            transaction.setStatus(targetStatus);
+            for (Membership membership : transaction.getMemberships()) {
+                membership.setStatus(targetStatus);
+            }
+            paymentTransactionRepository.save(transaction);
+        }
+    }
+
+
     public PaymentResponse getPaymentTransaction(UUID id) {
         return this.paymentTransactionRepository.findById(id)
                 .map(this::mapToPaymentResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Paiement non trouvé"));
+    }
+
+    public PaymentStatusResponse getPaymentTransactionStatus(UUID id) {
+        return this.paymentTransactionRepository.findById(id)
+                .map(transaction -> new PaymentStatusResponse(transaction.getStatus()))
                 .orElseThrow(() -> new EntityNotFoundException("Paiement non trouvé"));
     }
 
@@ -173,11 +215,10 @@ public class MembershipService {
      *
      * @param campaign    the campaign to check against
      * @param categoryDto the category details to validate
-     * @return the valid Campaign Category
      * @throws CategoryNotAvailableException  if the category name is not found
      * @throws CategoryPriceMismatchException if the category price does not match the configuration
      */
-    private Category findAndValidateConfiguredCategory(Campaign campaign, CategoryDto categoryDto) {
+    private void findAndValidateConfiguredCategory(Campaign campaign, CategoryDto categoryDto) {
         Category configuredCategory = campaign.getCategories().stream()
                 .filter(category -> category.getName().equalsIgnoreCase(categoryDto.name()))
                 .findFirst()
@@ -193,7 +234,6 @@ public class MembershipService {
             );
         }
 
-        return configuredCategory;
     }
 
     /**

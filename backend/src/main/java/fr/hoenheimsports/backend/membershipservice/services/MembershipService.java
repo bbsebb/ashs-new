@@ -27,11 +27,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MembershipService {
 
-
     private final CampaignRepository campaignRepository;
     private final MembershipRepository membershipRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
     private final SumUpService sumUpService;
+    private final MembershipMapper membershipMapper;
+    private final MembershipEmailService membershipEmailService;
 
     /**
      * Initiates a membership payment process.
@@ -52,7 +53,6 @@ public class MembershipService {
         }
         PaymentTransaction paymentTransaction = createPaymentTransaction(campaign, membershipPaymentOrder);
 
-
         // Faire deux boucles pour créer les membres et calculer le total, lisibilité améliorer pour une liste <5
         membershipPaymentOrder.membershipCreateRequests().forEach(membershipCreateRequest -> {
             findAndValidateConfiguredCategory(campaign, membershipCreateRequest.category());
@@ -68,16 +68,22 @@ public class MembershipService {
         );
         paymentTransaction.setSumupCheckout(sumUpCheckout);
         PaymentTransaction savedPaymentTransaction = paymentTransactionRepository.save(paymentTransaction);
+
+        // Publish event to notify the payer that their membership request is recorded and waiting for payment
+        this.membershipEmailService.sendPaymentInitiatedEmail(savedPaymentTransaction.getPayerInfo());
+
         return savedPaymentTransaction.getSumupCheckout().checkoutUrl();
     }
 
     public List<MembershipResponse> getMembershipsByCampaign(UUID campaignId) {
-        return membershipRepository.findAllByCampaignId(campaignId).stream().map(this::mapToResponse).toList();
+        return membershipRepository.findAllByCampaignId(campaignId).stream()
+                .map(membershipMapper::mapToResponse)
+                .toList();
     }
 
     public MembershipResponse getMembership(UUID id) {
         return membershipRepository.findById(id)
-                .map(this::mapToResponse)
+                .map(membershipMapper::mapToResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Adhérent non trouvé"));
     }
 
@@ -91,6 +97,9 @@ public class MembershipService {
 
         membership.setStatus(MembershipStatus.PROCESSED);
         membershipRepository.save(membership);
+
+        // Publish event to notify the member that their license has been successfully processed
+        this.membershipEmailService.sendLicenceValidatedEmail(membership);
     }
 
     /**
@@ -125,13 +134,15 @@ public class MembershipService {
                 membership.setStatus(targetStatus);
             }
             paymentTransactionRepository.save(transaction);
+
+            // Send notification email to the payer if the status has transitioned to PAID, FAILED, or EXPIRED
+            this.membershipEmailService.sendPaymentStatusTransitionEmail(transaction.getPayerInfo(), targetStatus);
         }
     }
 
-
     public PaymentResponse getPaymentTransaction(UUID id) {
         return this.paymentTransactionRepository.findById(id)
-                .map(this::mapToPaymentResponse)
+                .map(membershipMapper::mapToPaymentResponse)
                 .orElseThrow(() -> new EntityNotFoundException("Paiement non trouvé"));
     }
 
@@ -189,7 +200,6 @@ public class MembershipService {
         );
     }
 
-
     private BigDecimal calculateTotalAmount(PaymentTransaction paymentTransaction) {
         List<BigDecimal> amounts = paymentTransaction.getMemberships().stream()
                 .map(Membership::getCategory)
@@ -205,7 +215,6 @@ public class MembershipService {
         }
         BigDecimal initialAmount = amounts.stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
 
         return initialAmount.subtract(discountAmount);
     }
@@ -233,7 +242,6 @@ public class MembershipService {
                             + " ne correspond pas à la configuration de la campagne"
             );
         }
-
     }
 
     /**
@@ -255,82 +263,9 @@ public class MembershipService {
         return membership;
     }
 
-    /**
-     * Maps a Membership entity to a MembershipResponse DTO.
-     *
-     * @param membership the membership to map
-     * @return the mapped MembershipResponse DTO
-     */
-    private MembershipResponse mapToResponse(Membership membership) {
-        return new MembershipResponse(
-                membership.getId(),
-                membership.getCampaignId(),
-                membership.getFirstName(),
-                membership.getLastName(),
-                membership.getEmail().value(),
-                membership.getLicenseNumber().value(),
-                membership.getCategory().getName(),
-                membership.getCategory().getPrice().amount(),
-                membership.getStatus()
-        );
-    }
-
-    /**
-     * Maps a PaymentTransaction entity to a MembershipPaymentResponse DTO.
-     *
-     * @param paymentTransaction the transaction to map
-     * @return the mapped MembershipPaymentResponse DTO
-     */
-    private MembershipPaymentResponse mapToResponse(PaymentTransaction paymentTransaction) {
-        SumUpCheckout checkout = paymentTransaction.getSumupCheckout();
-        SumUpCheckoutDto checkoutDto = new SumUpCheckoutDto(
-                checkout.id(),
-                checkout.description(),
-                checkout.returnUrl(),
-                checkout.date(),
-                checkout.checkoutUrl()
-        );
-        return new MembershipPaymentResponse(
-                paymentTransaction.getId(),
-                checkoutDto,
-                paymentTransaction.getMemberships().stream()
-                        .map(this::mapToResponse)
-                        .toList()
-        );
-    }
-
-    private PaymentResponse mapToPaymentResponse(PaymentTransaction paymentTransaction) {
-        PaymentPayerResponse payerResponse = null;
-        if (paymentTransaction.getPayerInfo() != null) {
-            payerResponse = new PaymentPayerResponse(
-                    paymentTransaction.getPayerInfo().firstName(),
-                    paymentTransaction.getPayerInfo().lastName(),
-                    paymentTransaction.getPayerInfo().email()
-            );
-        }
-        String checkoutDate = null;
-        if (paymentTransaction.getSumupCheckout() != null) {
-            checkoutDate = paymentTransaction.getSumupCheckout().date();
-        }
-        List<MembershipResponse> memberships = paymentTransaction.getMemberships().stream()
-                .map(this::mapToResponse)
-                .toList();
-
-        return new PaymentResponse(
-                paymentTransaction.getId(),
-                paymentTransaction.getCampaignId(),
-                paymentTransaction.getAmount().amount(),
-                payerResponse,
-                paymentTransaction.getStatus(),
-                checkoutDate,
-                paymentTransaction.isDiscounted(),
-                memberships
-        );
-    }
-
     public List<PaymentResponse> getPaymentTransactionsByCampaign(UUID campaignId) {
         return this.paymentTransactionRepository.findByCampaignId(campaignId).stream()
-                .map(this::mapToPaymentResponse)
+                .map(membershipMapper::mapToPaymentResponse)
                 .toList();
     }
 }

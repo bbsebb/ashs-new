@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -48,6 +49,12 @@ class MembershipServiceTest {
 
     @Mock
     private SumUpService sumUpService;
+
+    @Spy
+    private MembershipMapper membershipMapper = new MembershipMapper();
+
+    @Mock
+    private MembershipEmailService membershipEmailService;
 
     @InjectMocks
     private MembershipService membershipService;
@@ -113,6 +120,8 @@ class MembershipServiceTest {
             assertThat(savedTx.getPayerInfo().firstName()).isEqualTo("John");
             assertThat(savedTx.getPayerInfo().lastName()).isEqualTo("Doe");
             assertThat(savedTx.getPayerInfo().email()).isEqualTo("john.doe@example.com");
+
+            verify(membershipEmailService).sendPaymentInitiatedEmail(savedTx.getPayerInfo());
         }
 
         /**
@@ -590,12 +599,16 @@ class MembershipServiceTest {
     class ProcessMembershipTests {
 
         @Test
-        @DisplayName("Should successfully change status from PAID to PROCESSED and save")
+        @DisplayName("Should successfully change status from PAID to PROCESSED, save and send validation email to member")
         void shouldProcessMembershipSuccessfully() {
             // Given
             UUID membershipId = UUID.randomUUID();
             Membership membership = new Membership();
             membership.setId(membershipId);
+            membership.setFirstName("Jane");
+            membership.setLastName("Doe");
+            membership.setEmail(new Email("jane.doe@example.com"));
+            membership.setCategory(new Category("U11", Price.of("100.00")));
             membership.setStatus(MembershipStatus.PAID);
 
             when(membershipRepository.findById(membershipId)).thenReturn(Optional.of(membership));
@@ -607,6 +620,8 @@ class MembershipServiceTest {
             assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PROCESSED);
             verify(membershipRepository).findById(membershipId);
             verify(membershipRepository).save(membership);
+
+            verify(membershipEmailService).sendLicenceValidatedEmail(membership);
         }
 
         @Test
@@ -812,6 +827,7 @@ class MembershipServiceTest {
             PaymentTransaction transaction = new PaymentTransaction();
             transaction.setId(UUID.randomUUID());
             transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
             Membership membership = new Membership();
             membership.setStatus(MembershipStatus.PENDING);
             transaction.addMembership(membership);
@@ -825,6 +841,8 @@ class MembershipServiceTest {
             assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.PAID);
             assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PAID);
             verify(paymentTransactionRepository).save(transaction);
+
+            verify(membershipEmailService).sendPaymentStatusTransitionEmail(transaction.getPayerInfo(), MembershipStatus.PAID);
         }
 
         @Test
@@ -840,6 +858,7 @@ class MembershipServiceTest {
             PaymentTransaction transaction = new PaymentTransaction();
             transaction.setId(UUID.randomUUID());
             transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
             Membership membership = new Membership();
             membership.setStatus(MembershipStatus.PENDING);
             transaction.addMembership(membership);
@@ -853,6 +872,8 @@ class MembershipServiceTest {
             assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.FAILED);
             assertThat(membership.getStatus()).isEqualTo(MembershipStatus.FAILED);
             verify(paymentTransactionRepository).save(transaction);
+
+            verify(membershipEmailService).sendPaymentStatusTransitionEmail(transaction.getPayerInfo(), MembershipStatus.FAILED);
         }
 
         @Test
@@ -868,6 +889,7 @@ class MembershipServiceTest {
             PaymentTransaction transaction = new PaymentTransaction();
             transaction.setId(UUID.randomUUID());
             transaction.setStatus(MembershipStatus.PENDING);
+            transaction.setPayerInfo(new PaymentPayerInfo("John", "Doe", "john.doe@example.com"));
             Membership membership = new Membership();
             membership.setStatus(MembershipStatus.PENDING);
             transaction.addMembership(membership);
@@ -881,6 +903,8 @@ class MembershipServiceTest {
             assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.EXPIRED);
             assertThat(membership.getStatus()).isEqualTo(MembershipStatus.EXPIRED);
             verify(paymentTransactionRepository).save(transaction);
+
+            verify(membershipEmailService).sendPaymentStatusTransitionEmail(transaction.getPayerInfo(), MembershipStatus.EXPIRED);
         }
 
         @Test
@@ -909,7 +933,7 @@ class MembershipServiceTest {
             assertThat(transaction.getStatus()).isEqualTo(MembershipStatus.PENDING);
             assertThat(membership.getStatus()).isEqualTo(MembershipStatus.PENDING);
             verify(paymentTransactionRepository, never()).save(any());
-
+            verify(membershipEmailService, never()).sendPaymentStatusTransitionEmail(any(), any());
         }
 
         @Test

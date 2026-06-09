@@ -4,8 +4,10 @@ import fr.hoenheimsports.backend.membershipservice.dtos.MembershipPaymentRespons
 import fr.hoenheimsports.backend.membershipservice.dtos.MembershipResponse;
 import fr.hoenheimsports.backend.membershipservice.dtos.PaymentResponse;
 import fr.hoenheimsports.backend.membershipservice.entities.*;
+import fr.hoenheimsports.backend.membershipservice.mappers.MembershipMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.util.UUID;
 
@@ -14,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("MembershipMapper Unit Tests")
 class MembershipMapperTest {
 
-    private final MembershipMapper mapper = new MembershipMapper();
+    private final MembershipMapper mapper = Mappers.getMapper(MembershipMapper.class);
 
     @Test
     @DisplayName("Should map Membership to MembershipResponse DTO")

@@ -5,6 +5,7 @@ import fr.hoenheimsports.backend.membershipservice.entities.*;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryNotAvailableException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryPriceMismatchException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.MembershipInvalidStatusException;
+import fr.hoenheimsports.backend.membershipservice.mappers.MembershipMapper;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -51,7 +53,7 @@ class MembershipServiceTest {
     private SumUpService sumUpService;
 
     @Spy
-    private MembershipMapper membershipMapper = new MembershipMapper();
+    private MembershipMapper membershipMapper = Mappers.getMapper(MembershipMapper.class);
 
     @Mock
     private MembershipEmailService membershipEmailService;

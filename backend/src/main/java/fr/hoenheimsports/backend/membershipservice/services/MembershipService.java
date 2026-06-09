@@ -6,13 +6,15 @@ import fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotLaunche
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryNotAvailableException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CategoryPriceMismatchException;
 import fr.hoenheimsports.backend.membershipservice.exceptions.MembershipInvalidStatusException;
+import fr.hoenheimsports.backend.membershipservice.mappers.MembershipMapper;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.MembershipRepository;
 import fr.hoenheimsports.backend.membershipservice.repositories.PaymentTransactionRepository;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,6 +27,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MembershipService {
 
     private final CampaignRepository campaignRepository;
@@ -47,18 +50,22 @@ public class MembershipService {
      */
     @Transactional
     public String initiateMembershipPayment(MembershipPaymentOrder membershipPaymentOrder) {
+        log.info("Initiating membership payment process for campaign ID: {}", membershipPaymentOrder.campaignId());
         Campaign campaign = findCampaign(membershipPaymentOrder.campaignId());
         if (campaign.getStatus() != CampaignStatus.LAUNCHED) {
+            log.warn("Cannot initiate payment. Campaign {} is in status {}", campaign.getId(), campaign.getStatus());
             throw new CampaignNotLaunchedException("La campagne n'est pas lancée");
         }
         PaymentTransaction paymentTransaction = createPaymentTransaction(campaign, membershipPaymentOrder);
 
         // Faire deux boucles pour créer les membres et calculer le total, lisibilité améliorer pour une liste <5
         membershipPaymentOrder.membershipCreateRequests().forEach(membershipCreateRequest -> {
+            log.debug("Validating category {} for request", membershipCreateRequest.category());
             findAndValidateConfiguredCategory(campaign, membershipCreateRequest.category());
             paymentTransaction.addMembership(createMembership(campaign.getId(), membershipCreateRequest));
         });
         BigDecimal totalAmount = calculateTotalAmount(paymentTransaction);
+        log.debug("Calculated total amount for payment transaction (after discount if applicable): {}", totalAmount);
 
         paymentTransaction.setAmount(Price.of(totalAmount));
         SumUpCheckout sumUpCheckout = sumUpService.createCheckout(
@@ -68,6 +75,8 @@ public class MembershipService {
         );
         paymentTransaction.setSumupCheckout(sumUpCheckout);
         PaymentTransaction savedPaymentTransaction = paymentTransactionRepository.save(paymentTransaction);
+        log.info("Payment transaction created successfully with ID: {} and SumUp checkout ID: {}",
+                savedPaymentTransaction.getId(), sumUpCheckout.id());
 
         // Publish event to notify the payer that their membership request is recorded and waiting for payment
         this.membershipEmailService.sendPaymentInitiatedEmail(savedPaymentTransaction.getPayerInfo());
@@ -75,28 +84,43 @@ public class MembershipService {
         return savedPaymentTransaction.getSumupCheckout().checkoutUrl();
     }
 
+    @Transactional(readOnly = true)
     public List<MembershipResponse> getMembershipsByCampaign(UUID campaignId) {
-        return membershipRepository.findAllByCampaignId(campaignId).stream()
+        log.debug("Fetching memberships for campaign ID: {}", campaignId);
+        List<MembershipResponse> results = membershipRepository.findAllByCampaignId(campaignId).stream()
                 .map(membershipMapper::mapToResponse)
                 .toList();
+        log.debug("Fetched {} memberships for campaign ID: {}", results.size(), campaignId);
+        return results;
     }
 
+    @Transactional(readOnly = true)
     public MembershipResponse getMembership(UUID id) {
+        log.debug("Fetching membership with ID: {}", id);
         return membershipRepository.findById(id)
                 .map(membershipMapper::mapToResponse)
-                .orElseThrow(() -> new EntityNotFoundException("Adhérent non trouvé"));
+                .orElseThrow(() -> {
+                    log.warn("Membership not found with ID: {}", id);
+                    return new EntityNotFoundException("Adhérent non trouvé");
+                });
     }
 
     public void processMembership(UUID id) {
+        log.info("Processing/validating membership ID: {}", id);
         Membership membership = membershipRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Adhérent non trouvé"));
+                .orElseThrow(() -> {
+                    log.warn("Membership not found for processing. ID: {}", id);
+                    return new EntityNotFoundException("Adhérent non trouvé");
+                });
 
         if (membership.getStatus() != MembershipStatus.PAID) {
+            log.warn("Cannot process membership {}. Invalid status: {}", id, membership.getStatus());
             throw new MembershipInvalidStatusException("L'adhésion doit être au statut PAID pour être traitée");
         }
 
         membership.setStatus(MembershipStatus.PROCESSED);
         membershipRepository.save(membership);
+        log.info("Membership ID {} status updated to PROCESSED", id);
 
         // Publish event to notify the member that their license has been successfully processed
         this.membershipEmailService.sendLicenceValidatedEmail(membership);
@@ -109,11 +133,16 @@ public class MembershipService {
      */
     @Transactional
     public void handleWebhookPaymentStatus(String checkoutId) {
+        log.info("Handling webhook payment status update for checkout ID: {}", checkoutId);
         SumUpCheckoutResponse sumUpResponse = sumUpService.getCheckout(checkoutId);
         String sumUpStatus = sumUpResponse.status();
+        log.debug("Retrieved SumUp status: {} for checkout: {}", sumUpStatus, checkoutId);
 
         PaymentTransaction transaction = paymentTransactionRepository.findBySumupCheckoutId(checkoutId)
-                .orElseThrow(() -> new EntityNotFoundException("Transaction non trouvée pour le checkout: " + checkoutId));
+                .orElseThrow(() -> {
+                    log.warn("Payment transaction not found for checkout ID: {}", checkoutId);
+                    return new EntityNotFoundException("Transaction non trouvée pour le checkout: " + checkoutId);
+                });
 
         MembershipStatus targetStatus;
         if (sumUpStatus.equalsIgnoreCase("PAID") || sumUpStatus.equalsIgnoreCase("SUCCESSFUL")) {
@@ -125,31 +154,49 @@ public class MembershipService {
         } else if (sumUpStatus.equalsIgnoreCase("PENDING")) {
             targetStatus = MembershipStatus.PENDING;
         } else {
+            log.warn("Unsupported SumUp checkout status: {}", sumUpStatus);
             return;
         }
 
         if (transaction.getStatus() != targetStatus) {
+            log.info("Updating transaction status from {} to {} for checkout: {}", transaction.getStatus(), targetStatus, checkoutId);
             transaction.setStatus(targetStatus);
             for (Membership membership : transaction.getMemberships()) {
                 membership.setStatus(targetStatus);
             }
             paymentTransactionRepository.save(transaction);
+            log.debug("Saved transaction status update to database");
 
             // Send notification email to the payer if the status has transitioned to PAID, FAILED, or EXPIRED
             this.membershipEmailService.sendPaymentStatusTransitionEmail(transaction.getPayerInfo(), targetStatus);
+        } else {
+            log.debug("Transaction status already matched target status: {}. No update needed.", targetStatus);
         }
     }
 
+    @Transactional(readOnly = true)
     public PaymentResponse getPaymentTransaction(UUID id) {
+        log.debug("Fetching payment transaction with ID: {}", id);
         return this.paymentTransactionRepository.findById(id)
                 .map(membershipMapper::mapToPaymentResponse)
-                .orElseThrow(() -> new EntityNotFoundException("Paiement non trouvé"));
+                .orElseThrow(() -> {
+                    log.warn("Payment transaction not found with ID: {}", id);
+                    return new EntityNotFoundException("Paiement non trouvé");
+                });
     }
 
+    @Transactional(readOnly = true)
     public PaymentStatusResponse getPaymentTransactionStatus(UUID id) {
+        log.debug("Fetching payment transaction status for ID: {}", id);
         return this.paymentTransactionRepository.findById(id)
-                .map(transaction -> new PaymentStatusResponse(transaction.getStatus()))
-                .orElseThrow(() -> new EntityNotFoundException("Paiement non trouvé"));
+                .map(transaction -> {
+                    log.debug("Payment transaction ID: {} status is: {}", id, transaction.getStatus());
+                    return new PaymentStatusResponse(transaction.getStatus());
+                })
+                .orElseThrow(() -> {
+                    log.warn("Payment transaction not found for status lookup. ID: {}", id);
+                    return new EntityNotFoundException("Paiement non trouvé");
+                });
     }
 
     /**
@@ -263,6 +310,7 @@ public class MembershipService {
         return membership;
     }
 
+    @Transactional(readOnly = true)
     public List<PaymentResponse> getPaymentTransactionsByCampaign(UUID campaignId) {
         return this.paymentTransactionRepository.findByCampaignId(campaignId).stream()
                 .map(membershipMapper::mapToPaymentResponse)

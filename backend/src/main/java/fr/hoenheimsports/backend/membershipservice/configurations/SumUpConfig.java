@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.membershipservice.configurations;
 
 import fr.hoenheimsports.backend.membershipservice.services.SumUpClient;
 import fr.hoenheimsports.backend.membershipservice.services.SumUpProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -16,6 +17,7 @@ import java.io.IOException;
  * Configuration for the SumUp REST client.
  */
 @Configuration
+@Slf4j
 public class SumUpConfig {
 
     /**
@@ -26,6 +28,7 @@ public class SumUpConfig {
      */
     @Bean
     public SumUpClient sumUpClient(SumUpProperties properties) {
+        log.info("Initializing SumUp client with base URL: {}", properties.getBaseUrl());
         RestClient restClient = RestClient.builder()
             .baseUrl(properties.getBaseUrl())
             .defaultHeader("Authorization", "Bearer " + properties.getApiKey())
@@ -54,13 +57,18 @@ public class SumUpConfig {
 
             for (int attempt = 1; attempt <= maxAttempts; attempt++) {
                 try {
+                    log.debug("Executing SumUp request to {}: attempt {}/{}", request.getURI(), attempt, maxAttempts);
                     response = execution.execute(request, body);
 
                     // Success or non-retryable client error (like 400, 401, 403, 404, etc., except 429)
                     if (response.getStatusCode().is2xxSuccessful() || (response.getStatusCode().is4xxClientError() && response.getStatusCode().value() != 429)) {
+                        log.debug("SumUp request successful with status: {}", response.getStatusCode());
                         return response;
+                    } else {
+                        log.warn("SumUp request returned retryable status code: {} on attempt {}/{}", response.getStatusCode(), attempt, maxAttempts);
                     }
                 } catch (IOException e) {
+                    log.warn("IOException during SumUp request on attempt {}/{}: {}", attempt, maxAttempts, e.getMessage());
                     if (attempt == maxAttempts) {
                         throw e;
                     }
@@ -68,8 +76,11 @@ public class SumUpConfig {
 
                 if (attempt < maxAttempts) {
                     try {
-                        Thread.sleep(backoffMs * attempt);
+                        long sleepTime = backoffMs * attempt;
+                        log.debug("Backing off for {} ms before next retry attempt", sleepTime);
+                        Thread.sleep(sleepTime);
                     } catch (InterruptedException ie) {
+                        log.error("Retry backoff interrupted");
                         Thread.currentThread().interrupt();
                         throw new IOException("Retry interrupted", ie);
                     }

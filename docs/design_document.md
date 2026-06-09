@@ -271,7 +271,8 @@ classDiagram
 ```
 
 ### 4.8 Module `MembershipService` (Adhésions et Campagnes)
-Gère les campagnes d'adhésion et les inscriptions des membres.
+
+Gère les campagnes d'adhésion, les inscriptions des membres et l'orchestration des paiements via SumUp.
 
 ```mermaid
 classDiagram
@@ -292,18 +293,39 @@ classDiagram
         -String lastName
         -Email email
         -LicenseNumber licenseNumber
-        -String categoryName
-        -Price amount
+        -Category category
         -MembershipStatus status
-        -SumUpCheckoutId sumupCheckoutUrl
+        -PaymentTransaction paymentTransaction
+    }
+    class PaymentTransaction {
+        -UUID id
+        -UUID campaignId
+        -Price amount
+        -PaymentPayerInfo payerInfo
+        -List~Membership~ memberships
+        -SumUpCheckout sumupCheckout
+        -boolean isDiscounted
+        -MembershipStatus status
+    }
+    class PaymentPayerInfo {
+        -String firstName
+        -String lastName
+        -String email
+    }
+    class SumUpCheckout {
+        -String id
+        -String description
+        -String returnUrl
+        -String date
+        -String checkoutUrl
     }
     class CampaignStatus {
         <<enumeration>>
-        DRAFT, LAUNCHED
+        DRAFT, LAUNCHED, CLOSED
     }
     class MembershipStatus {
         <<enumeration>>
-        PENDING, PAID, FAILED, PROCESSED
+        PENDING, PAID, FAILED, EXPIRED, PROCESSED
     }
     class Price {
         -BigDecimal amount
@@ -318,10 +340,16 @@ classDiagram
     Campaign "1" *-- "many" Category
     Campaign "1" --> "1" CampaignStatus
     Membership "many" --> "1" Campaign
+    Membership "1" --> "1" Category
     Membership "1" --> "1" MembershipStatus
     Membership "1" *-- "1" Email
     Membership "1" *-- "1" LicenseNumber
-    Membership "1" *-- "1" Price
+    Membership "many" --> "1" PaymentTransaction
+    PaymentTransaction "1" *-- "1" Price
+    PaymentTransaction "1" *-- "1" PaymentPayerInfo
+    PaymentTransaction "1" *-- "many" Membership
+    PaymentTransaction "1" *-- "1" SumUpCheckout
+    PaymentTransaction "1" --> "1" MembershipStatus
     Category "1" *-- "1" Price
 ```
 
@@ -1330,51 +1358,102 @@ sequenceDiagram
 ### 5.7. Module Memberships (`MembershipService`)
 
 #### 5.7.1. Paiement de cotisation (Public & SumUp)
-**Description** : Un visiteur remplit le formulaire, un `Membership` `PENDING` est créé, et il est redirigé vers SumUp. Le statut est mis à jour via webhook.
+
+**Description** : Un utilisateur remplit le formulaire d'adhésion. Une transaction de paiement SumUp est initiée. Après
+le paiement réussi sur la page hébergée de SumUp, le webhook notifie le système, qui vérifie de manière sécurisée et met
+à jour le statut.
 
 **Diagramme de Séquence**
 ```mermaid
 sequenceDiagram
-    actor Visitor
-    participant App as App Frontend
-    participant API as MembershipController
-    participant SumUp as SumUp API
+    actor Payeur
+    participant App as Frontend
+    participant Ctrl as MembershipController
+    participant Service as MembershipService
+    participant SumUpService as SumUpService
+    participant SumUpAPI as SumUp REST API
+    participant Webhook as SumUpWebhookController
     participant DB as Database
-    participant Hook as WebhookController
-    participant Bus as EventBus
-
-    Visitor->>App: Remplit le formulaire
-    App->>API: POST /api/public/memberships (Public)
-    API->>DB: save(Membership PENDING)
-    API->>SumUp: POST /checkouts (Hosted)
-    SumUp-->>API: 200 OK (hosted_checkout_url)
-    API-->>App: 200 OK (url)
-    App->>Visitor: Redirection vers SumUp
-    
-    Note over Visitor,SumUp: Paiement sur la page SumUp
-    
-    SumUp->>Hook: POST /api/webhooks/sumup (status: PAID)
-    Hook->>Bus: publish(SumUpPaymentEvent)
-    Bus->>API: updateStatus(membershipId, PAID)
-    API->>DB: update Membership status
-    
-    SumUp->>Visitor: Redirection vers /membership/success
+    participant Email as MembershipEmailService
+    Payeur ->> App: Remplit le formulaire d'adhésion (détails & payer)
+    App ->> Ctrl: POST /api/v1/memberships/orders (MembershipPaymentOrder) + JWT
+    Ctrl ->> Service: initiateMembershipPayment(order)
+    Service ->> Service: Valide la campagne active LAUNCHED
+    Service ->> Service: Valide les catégories & montants
+    Service ->> DB: save(PaymentTransaction PENDING & Memberships PENDING)
+    Service ->> SumUpService: createCheckout(transactionId, amount)
+    SumUpService ->> SumUpAPI: POST /v0.1/checkouts (Hosted checkout request)
+    SumUpAPI -->> SumUpService: SumUpCheckoutResponse (hosted_checkout_url)
+    SumUpService -->> Service: SumUpCheckout (checkoutUrl)
+    Service ->> Email: sendPaymentInitiatedEmail(payerInfo)
+    Note over Service, Email: Publie EmailNotificationEvent (ContactService)
+    Service -->> Ctrl: checkoutUrl
+    Ctrl -->> App: 201 Created (checkoutUrl)
+    App ->> Payeur: Redirige vers la page de paiement SumUp
+    Note over Payeur, SumUpAPI: Le payeur saisit sa carte et valide le paiement
+    SumUpAPI ->> Webhook: POST /api/public/webhooks/sumup (checkoutId)
+    Webhook ->> Service: handleWebhookPaymentStatus(checkoutId)
+    Service ->> SumUpService: getCheckout(checkoutId)
+    SumUpService ->> SumUpAPI: GET /v0.1/checkouts/{checkoutId} (Secure verification)
+    SumUpAPI -->> SumUpService: SumUpCheckoutResponse (status: PAID)
+    SumUpService -->> Service: SumUpCheckoutResponse
+    alt Statut a changé (PAID)
+        Service ->> DB: update PaymentTransaction & Memberships status to PAID
+        Service ->> Email: sendPaymentStatusTransitionEmail(payerInfo, PAID)
+        Note over Service, Email: Publie EmailNotificationEvent (ContactService)
+    end
+    Webhook -->> SumUpAPI: 200 OK
 ```
 
-#### 5.7.2. Gestion des Campagnes (Admin)
-**Description** : L'administrateur configure la saison et les prix par catégorie.
+#### 5.7.2. Traitement d'une Adhésion (Admin)
+
+**Description** : L'administrateur valide définitivement la licence d'un membre après confirmation de son paiement.
 
 **Diagramme de Séquence**
 ```mermaid
 sequenceDiagram
     actor Admin
-    participant API as CampaignController
+    participant Ctrl as MembershipController
+    participant Service as MembershipService
     participant DB as Database
+    participant Email as MembershipEmailService
+    Admin ->> Ctrl: POST /api/v1/memberships/{id}/process + JWT
+    Ctrl ->> Service: processMembership(id)
+    Service ->> DB: find Membership by ID
+    alt Membership n'existe pas ou n'est pas PAID
+        Service -->> Ctrl: EntityNotFoundException / MembershipInvalidStatusException
+        Ctrl -->> Admin: 404 / 400 Bad Request
+    else Membership est PAID
+        Service ->> DB: update Membership status to PROCESSED
+        Service ->> Email: sendLicenceValidatedEmail(membership)
+        Note over Service, Email: Publie EmailNotificationEvent (ContactService)
+        Service -->> Ctrl: void
+        Ctrl -->> Admin: 204 No Content
+    end
+```
 
-    Admin->>API: POST /api/campaigns (Season + Categories)
-    API->>DB: save(Campaign DRAFT)
-    Admin->>API: PATCH /api/campaigns/{id}/launch
-    API->>DB: update status LAUNCHED
+#### 5.7.3. Gestion des Campagnes (Admin)
+
+**Description** : L'administrateur configure une saison et les catégories tarifaires de la campagne.
+
+**Diagramme de Séquence**
+
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant Ctrl as CampaignController
+    participant Service as CampaignService
+    participant DB as Database
+    Admin ->> Ctrl: POST /api/v1/campaigns (CampaignCreateRequest) + JWT
+    Ctrl ->> Service: createCampaign(request)
+    Service ->> DB: save(Campaign status: DRAFT)
+    Service -->> Ctrl: CampaignResponse
+    Ctrl -->> Admin: 201 Created
+    Admin ->> Ctrl: POST /api/v1/campaigns/{id}/launch + JWT
+    Ctrl ->> Service: launchCampaign(id)
+    Service ->> DB: update Campaign status to LAUNCHED
+    Service -->> Ctrl: void
+    Ctrl -->> Admin: 204 No Content
 ```
 
 ---

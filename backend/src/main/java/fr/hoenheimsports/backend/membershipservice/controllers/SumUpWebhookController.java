@@ -23,14 +23,15 @@ public class SumUpWebhookController {
     }
 
     /**
-     * Handles SumUp webhook notifications.
+     * POST /api/public/webhooks/sumup : Handles SumUp webhook notifications.
      *
-     * @param request the webhook request body
+     * @param request the webhook request body containing transaction status updates
      */
     @PostMapping
     public void handleWebhook(@RequestBody SumUpWebhookRequest request) {
-        log.info("Received SumUp webhook for payment ID: {}", request.id());
+        log.info("Received SumUp webhook event. Checkout ID: {}", request.id());
         this.membershipService.handleWebhookPaymentStatus(request.id());
+        log.debug("Successfully processed SumUp webhook event for checkout ID: {}", request.id());
     }
 }
 

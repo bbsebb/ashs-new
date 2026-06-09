@@ -5,6 +5,7 @@ import fr.hoenheimsports.backend.membershipservice.entities.Membership;
 import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.PaymentPayerInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MembershipEmailService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -24,6 +26,7 @@ public class MembershipEmailService {
      */
     public void sendPaymentInitiatedEmail(PaymentPayerInfo payerInfo) {
         String recipientEmailAddress = payerInfo.email();
+        log.info("Request to send payment initiated email to recipient: {}", recipientEmailAddress);
         String emailSubject = "Demande d'adhésion prise en compte - AS Hoenheim Sports";
         String emailBodyContent = """
                 Bonjour,
@@ -39,6 +42,7 @@ public class MembershipEmailService {
                 emailSubject,
                 emailBodyContent
         ));
+        log.debug("Payment initiated email event published for recipient: {}", recipientEmailAddress);
     }
 
     /**
@@ -49,6 +53,7 @@ public class MembershipEmailService {
      */
     public void sendPaymentStatusTransitionEmail(PaymentPayerInfo payerInfo, MembershipStatus targetStatus) {
         String recipientEmailAddress = payerInfo.email();
+        log.info("Request to send payment status transition email to: {} for status: {}", recipientEmailAddress, targetStatus);
         String emailSubject = "";
         String emailBodyContent = "";
 
@@ -90,6 +95,9 @@ public class MembershipEmailService {
                     emailSubject,
                     emailBodyContent
             ));
+            log.debug("Payment status transition ({}) email event published for recipient: {}", targetStatus, recipientEmailAddress);
+        } else {
+            log.warn("No transition email sent. Status: {} has no template configured.", targetStatus);
         }
     }
 
@@ -100,6 +108,7 @@ public class MembershipEmailService {
      */
     public void sendLicenceValidatedEmail(Membership membership) {
         String recipientEmailAddress = membership.getEmail().value();
+        log.info("Request to send licence validated email to recipient: {} (Membership ID: {})", recipientEmailAddress, membership.getId());
         String emailSubject = "Validation de votre licence - AS Hoenheim Sports";
         String emailBodyContent = """
                 Bonjour %s %s,
@@ -114,5 +123,6 @@ public class MembershipEmailService {
                 emailSubject,
                 emailBodyContent
         ));
+        log.debug("Licence validated email event published for recipient: {} (Membership ID: {})", recipientEmailAddress, membership.getId());
     }
 }

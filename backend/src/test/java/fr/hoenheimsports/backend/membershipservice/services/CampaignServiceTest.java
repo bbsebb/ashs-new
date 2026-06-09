@@ -9,6 +9,7 @@ import fr.hoenheimsports.backend.membershipservice.entities.CampaignStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.Category;
 import fr.hoenheimsports.backend.membershipservice.entities.Price;
 import fr.hoenheimsports.backend.membershipservice.exceptions.CampaignNotDraftException;
+import fr.hoenheimsports.backend.membershipservice.mappers.CampaignMapper;
 import fr.hoenheimsports.backend.membershipservice.repositories.CampaignRepository;
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +18,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -39,6 +42,9 @@ class CampaignServiceTest {
 
     @Mock
     private CampaignRepository campaignRepository;
+
+    @Spy
+    private CampaignMapper campaignMapper = Mappers.getMapper(CampaignMapper.class);
 
     @InjectMocks
     private CampaignService campaignService;

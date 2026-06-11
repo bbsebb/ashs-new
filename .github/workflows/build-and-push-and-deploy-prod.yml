@@ -162,6 +162,10 @@ jobs:
           SPRING_DATASOURCE_USERNAME=${{ vars.DB_USERNAME }}
           SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }}
           RESOURCE_SERVER_ISSUER_URI=${{ vars.RESOURCE_SERVER_ISSUER_URI }}
+          SUMUP_API_KEY=${{ secrets.SUMUP_API_KEY }}
+          SUMUP_MERCHANT_CODE=${{ vars.SUMUP_MERCHANT_CODE }}
+          SUMUP_RETURN_URL=${{ vars.SUMUP_RETURN_URL }}
+          SUMUP_REDIRECT_URL=${{ vars.SUMUP_REDIRECT_URL }}
           IMAGE_TAG=${{ github.ref_name }}
           EOF
 

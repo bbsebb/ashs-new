@@ -960,6 +960,56 @@ class MembershipServiceTest {
     }
 
     @Nested
+    @DisplayName("Sync Pending Payments Tests")
+    class SyncPendingPaymentsTests {
+
+        @Test
+        @DisplayName("Should fetch pending transactions and update them using SumUp checkouts")
+        void shouldSyncPendingPaymentsSuccessfully() {
+            // Given
+            PaymentTransaction transaction1 = new PaymentTransaction();
+            transaction1.setId(UUID.randomUUID());
+            transaction1.setStatus(MembershipStatus.PENDING);
+            transaction1.setSumupCheckout(new SumUpCheckout("sumup-chk-1", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"));
+            transaction1.setPayerInfo(new PaymentPayerInfo("Alice", "Wonderland", "alice@example.com"));
+
+            PaymentTransaction transaction2 = new PaymentTransaction();
+            transaction2.setId(UUID.randomUUID());
+            transaction2.setStatus(MembershipStatus.PENDING);
+            transaction2.setSumupCheckout(new SumUpCheckout("sumup-chk-2", "Licence", "http://return-url", "2026-05-31", "http://checkout-url"));
+            transaction2.setPayerInfo(new PaymentPayerInfo("Bob", "Builder", "bob@example.com"));
+
+            when(paymentTransactionRepository.findByStatus(MembershipStatus.PENDING))
+                    .thenReturn(List.of(transaction1, transaction2));
+
+            // Pour transaction1, SumUp retourne PAID
+            SumUpCheckoutResponse sumUpResponse1 = new SumUpCheckoutResponse(
+                    "sumup-chk-1", BigDecimal.TEN, "EUR", null, "Licence", "PAID", null, null, null, null, null, null, null, null, null, null, null, null
+            );
+            when(sumUpService.getCheckout("sumup-chk-1")).thenReturn(sumUpResponse1);
+            when(paymentTransactionRepository.findBySumupCheckoutId("sumup-chk-1")).thenReturn(Optional.of(transaction1));
+
+            // Pour transaction2, SumUp retourne PENDING (pas de changement)
+            SumUpCheckoutResponse sumUpResponse2 = new SumUpCheckoutResponse(
+                    "sumup-chk-2", BigDecimal.TEN, "EUR", null, "Licence", "PENDING", null, null, null, null, null, null, null, null, null, null, null, null
+            );
+            when(sumUpService.getCheckout("sumup-chk-2")).thenReturn(sumUpResponse2);
+            when(paymentTransactionRepository.findBySumupCheckoutId("sumup-chk-2")).thenReturn(Optional.of(transaction2));
+
+            // When
+            membershipService.syncPendingPayments();
+
+            // Then
+            assertThat(transaction1.getStatus()).isEqualTo(MembershipStatus.PAID);
+            assertThat(transaction2.getStatus()).isEqualTo(MembershipStatus.PENDING);
+
+            verify(paymentTransactionRepository).save(transaction1);
+            verify(paymentTransactionRepository, never()).save(transaction2);
+            verify(membershipEmailService).sendPaymentStatusTransitionEmail(transaction1.getPayerInfo(), MembershipStatus.PAID);
+        }
+    }
+
+    @Nested
     @DisplayName("Get Payment Transaction Status Tests")
     class GetPaymentTransactionStatusTests {
 

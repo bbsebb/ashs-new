@@ -130,5 +130,35 @@ class PaymentTransactionRepositoryTest {
             assertThat(found).hasSize(1);
             assertThat(found.get(0).getCampaignId()).isEqualTo(campaignId);
         }
+
+        @Test
+        @DisplayName("Should find transactions by status")
+        void shouldFindByStatus() {
+            // Given
+            PaymentTransaction transaction1 = new PaymentTransaction();
+            transaction1.setId(UUID.randomUUID());
+            transaction1.setAmount(Price.of("50.00"));
+            transaction1.setCampaignId(UUID.randomUUID());
+            transaction1.setPayerInfo(new PaymentPayerInfo("Alice", "Wonderland", "alice@example.com"));
+            transaction1.setStatus(MembershipStatus.PENDING);
+            transaction1.setDiscounted(false);
+            paymentTransactionRepository.saveAndFlush(transaction1);
+
+            PaymentTransaction transaction2 = new PaymentTransaction();
+            transaction2.setId(UUID.randomUUID());
+            transaction2.setAmount(Price.of("75.00"));
+            transaction2.setCampaignId(UUID.randomUUID());
+            transaction2.setPayerInfo(new PaymentPayerInfo("Bob", "Builder", "bob@example.com"));
+            transaction2.setStatus(MembershipStatus.PAID);
+            transaction2.setDiscounted(false);
+            paymentTransactionRepository.saveAndFlush(transaction2);
+
+            // When
+            java.util.List<PaymentTransaction> pendingTransactions = paymentTransactionRepository.findByStatus(MembershipStatus.PENDING);
+
+            // Then
+            assertThat(pendingTransactions).hasSize(1);
+            assertThat(pendingTransactions.get(0).getPayerInfo().firstName()).isEqualTo("Alice");
+        }
     }
 }

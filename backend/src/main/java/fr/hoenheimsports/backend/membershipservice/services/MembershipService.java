@@ -316,4 +316,25 @@ public class MembershipService {
                 .map(membershipMapper::mapToPaymentResponse)
                 .toList();
     }
+
+    /**
+     * Synchronizes all pending payment transactions by querying SumUp API.
+     */
+    @Transactional
+    public void syncPendingPayments() {
+        log.info("Starting synchronization of pending payments with SumUp");
+        List<PaymentTransaction> pendingTransactions = this.paymentTransactionRepository.findByStatus(MembershipStatus.PENDING);
+        log.debug("Found {} pending transactions to synchronize", pendingTransactions.size());
+
+        for (PaymentTransaction transaction : pendingTransactions) {
+            String checkoutId = transaction.getSumupCheckout().id();
+            try {
+                log.debug("Synchronizing transaction ID: {} with SumUp checkout ID: {}", transaction.getId(), checkoutId);
+                this.handleWebhookPaymentStatus(checkoutId);
+            } catch (Exception exception) {
+                log.error("Failed to synchronize transaction ID: {} (checkout ID: {}) due to error: {}", transaction.getId(), checkoutId, exception.getMessage(), exception);
+            }
+        }
+        log.info("Finished synchronization of pending payments");
+    }
 }

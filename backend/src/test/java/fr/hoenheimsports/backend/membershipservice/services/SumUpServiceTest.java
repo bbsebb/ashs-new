@@ -33,6 +33,12 @@ class SumUpServiceTest {
     private SumUpService sumUpService;
 
     @Test
+    @DisplayName("Should have checkout expiration set to 2 hours")
+    void shouldHaveCorrectCheckoutExpirationConstant() {
+        assertThat(SumUpService.CHECKOUT_EXPIRATION_IN_HOURS).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("Should create hosted checkout using REST client and return correct hosted checkout URL")
     void shouldCreateCheckoutSuccessfully() {
         // Given
@@ -65,9 +71,9 @@ class SumUpServiceTest {
         assertThat(capturedRequest.validUntil()).isNotNull();
         assertThat(capturedRequest.redirectUrl()).isEqualTo("http://redirect-url/ref-123");
 
-        // Assert validUntil is approximately 2 hours from now (within a 10 seconds delta)
+        // Assert validUntil is approximately the configured expiration hours from now (within a 10 seconds delta)
         long secondsDiff = java.time.temporal.ChronoUnit.SECONDS.between(
-                now.plusHours(2),
+                now.plusHours(SumUpService.CHECKOUT_EXPIRATION_IN_HOURS),
                 capturedRequest.validUntil()
         );
         assertThat(Math.abs(secondsDiff)).isLessThan(10);

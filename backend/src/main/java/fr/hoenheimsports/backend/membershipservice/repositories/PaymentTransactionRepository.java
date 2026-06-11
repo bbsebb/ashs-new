@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.membershipservice.repositories;
 
+import fr.hoenheimsports.backend.membershipservice.entities.MembershipStatus;
 import fr.hoenheimsports.backend.membershipservice.entities.PaymentTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -21,4 +22,6 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
     Optional<PaymentTransaction> findBySumupCheckoutId(String id);
 
     java.util.List<PaymentTransaction> findByCampaignId(UUID campaignId);
+
+    java.util.List<PaymentTransaction> findByStatus(MembershipStatus status);
 }

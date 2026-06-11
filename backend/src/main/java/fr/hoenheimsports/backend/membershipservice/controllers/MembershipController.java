@@ -79,4 +79,17 @@ public class MembershipController {
         log.debug("Found payment transaction details for ID: {}", id);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * POST /api/v1/memberships/payments/sync-pending : Forces synchronization of all pending payment transactions with SumUp.
+     *
+     * @return the ResponseEntity with status 204 (No Content)
+     */
+    @PostMapping("/payments/sync-pending")
+    public ResponseEntity<Void> syncPendingPayments() {
+        log.info("REST request to manually synchronize pending payment transactions");
+        this.membershipService.syncPendingPayments();
+        log.debug("Manual synchronization of pending payments completed successfully");
+        return ResponseEntity.noContent().build();
+    }
 }

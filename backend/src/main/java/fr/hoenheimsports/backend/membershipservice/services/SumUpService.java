@@ -21,6 +21,8 @@ import java.time.ZoneOffset;
 @Slf4j
 public class SumUpService {
 
+    public static final int CHECKOUT_EXPIRATION_IN_HOURS = 2;
+
     private final SumUpProperties sumUpProperties;
     private final SumUpClient client;
 
@@ -34,7 +36,7 @@ public class SumUpService {
      */
     public SumUpCheckout createCheckout(String id, BigDecimal amount, String description) {
         try {
-            OffsetDateTime expiration = OffsetDateTime.now(ZoneOffset.UTC).plusHours(2);
+            OffsetDateTime expiration = OffsetDateTime.now(ZoneOffset.UTC).plusHours(CHECKOUT_EXPIRATION_IN_HOURS);
 
             String baseRedirectUrl = sumUpProperties.getRedirectUrl();
             String redirectUrl = baseRedirectUrl.endsWith("/") ? baseRedirectUrl + id : baseRedirectUrl + "/" + id;

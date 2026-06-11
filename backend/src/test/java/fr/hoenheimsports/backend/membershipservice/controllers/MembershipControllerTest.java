@@ -551,5 +551,37 @@ class MembershipControllerTest {
             assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @Nested
+    @DisplayName("Sync Pending Payments")
+    class SyncPendingPayments {
+
+        @Test
+        @DisplayName("Should sync pending payments successfully when authenticated")
+        void shouldSyncPendingPaymentsSuccessfully() throws Exception {
+            // When
+            var result = mvc.post()
+                    .uri("/api/v1/memberships/payments/sync-pending")
+                    .with(jwt().jwt(j -> j
+                            .claim("sub", "user")
+                            .claim("realm_access", Map.of("roles", List.of("ADMIN")))
+                    ));
+
+            // Then
+            assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
+            verify(membershipService).syncPendingPayments();
+        }
+
+        @Test
+        @DisplayName("Should return 401 Unauthorized when sync is called anonymously")
+        void shouldReturnUnauthorizedWhenAnonymous() throws Exception {
+            // When
+            var result = mvc.post()
+                    .uri("/api/v1/memberships/payments/sync-pending");
+
+            // Then
+            assertThat(result).hasStatus(HttpStatus.UNAUTHORIZED);
+        }
+    }
 }
 

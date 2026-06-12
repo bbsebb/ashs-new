@@ -1,7 +1,7 @@
 <!-- Main container for the floating bottom bar -->
   <div class="bar-container">
     <!-- Iterate through menu items -->
-    @for (item of menuItems; track item.label) {
+    @for (item of menuItems(); track item.label) {
       <a class="nav-item" [routerLink]="item.path" routerLinkActive="active" matRipple>
         <mat-icon>{{ item.icon }}</mat-icon>
         <span class="label">{{ item.label }}</span>

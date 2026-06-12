@@ -4,7 +4,8 @@ import {
   inject,
   LOCALE_ID,
   provideAppInitializer,
-  provideBrowserGlobalErrorListeners
+  provideBrowserGlobalErrorListeners,
+  signal
 } from '@angular/core';
 import {provideRouter, withComponentInputBinding} from '@angular/router';
 import localFr from '@angular/common/locales/fr';
@@ -51,7 +52,7 @@ export const appConfig: ApplicationConfig = {
     {provide: LOCALE_ID, useValue: 'fr-FR'},
     {
       provide: MENU_CONFIG,
-      useValue: menuItems
+      useFactory: () => signal(menuItems)
     }, {
       provide: APP_CONFIG,
       useValue: environment

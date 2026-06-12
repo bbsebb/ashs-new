@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/angular';
-import { provideRouter } from '@angular/router';
-import { describe, it, expect } from 'vitest';
-import { BottomBar } from './bottom-bar';
-import { MENU_CONFIG } from '../../menu-config';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { Component } from '@angular/core';
+import {render, screen} from '@testing-library/angular';
+import {provideRouter} from '@angular/router';
+import {describe, expect, it} from 'vitest';
+import {BottomBar} from './bottom-bar';
+import {MENU_CONFIG} from '../../menu-config';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {Component, signal} from '@angular/core';
 
 @Component({
   standalone: true,
@@ -19,11 +19,11 @@ describe('BottomBar', () => {
     { icon: 'info', label: 'About', path: '/about' }
   ];
 
-  it('should render menu items from MENU_CONFIG', async () => {
+  it('should render menu items from MENU_CONFIG Signal', async () => {
     await render(TestHostComponent, {
       providers: [
         provideRouter([]),
-        { provide: MENU_CONFIG, useValue: mockMenuConfig },
+        {provide: MENU_CONFIG, useValue: signal(mockMenuConfig)},
         provideAnimationsAsync('noop')
       ]
     });
@@ -32,11 +32,11 @@ describe('BottomBar', () => {
     expect(screen.getByText('About')).toBeTruthy();
   });
 
-  it('should have correct links for menu items', async () => {
+  it('should have correct links for menu items from MENU_CONFIG Signal', async () => {
     await render(TestHostComponent, {
       providers: [
         provideRouter([]),
-        { provide: MENU_CONFIG, useValue: mockMenuConfig },
+        {provide: MENU_CONFIG, useValue: signal(mockMenuConfig)},
         provideAnimationsAsync('noop')
       ]
     });

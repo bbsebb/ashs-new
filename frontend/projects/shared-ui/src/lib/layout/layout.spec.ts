@@ -30,7 +30,7 @@ describe('Layout', () => {
       providers: [
         { provide: BreakpointService, useValue: mockBreakpointService },
         provideRouter([]),
-        { provide: MENU_CONFIG, useValue: [] },
+        {provide: MENU_CONFIG, useValue: signal([])},
         provideAnimationsAsync('noop')
       ]
     });
@@ -45,7 +45,7 @@ describe('Layout', () => {
       providers: [
         { provide: BreakpointService, useValue: mockBreakpointService },
         provideRouter([]),
-        { provide: MENU_CONFIG, useValue: [] },
+        {provide: MENU_CONFIG, useValue: signal([])},
         provideAnimationsAsync('noop')
       ]
     });
@@ -59,7 +59,7 @@ describe('Layout', () => {
       providers: [
         { provide: BreakpointService, useValue: mockBreakpointService },
         provideRouter([]),
-        { provide: MENU_CONFIG, useValue: [] },
+        {provide: MENU_CONFIG, useValue: signal([])},
         provideAnimationsAsync('noop')
       ]
     });

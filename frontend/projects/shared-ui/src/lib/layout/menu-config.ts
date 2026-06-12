@@ -1,4 +1,4 @@
-import {InjectionToken} from '@angular/core';
+import {InjectionToken, Signal} from '@angular/core';
 
 
 export interface MenuItem {
@@ -7,4 +7,4 @@ export interface MenuItem {
   path: string;
 }
 
-export const MENU_CONFIG = new InjectionToken<MenuItem[]>('menu-config');
+export const MENU_CONFIG = new InjectionToken<Signal<MenuItem[]>>('menu-config');

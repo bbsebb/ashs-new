@@ -1,8 +1,9 @@
-import { TestBed } from '@angular/core/testing';
-import { App } from './app';
-import { provideRouter } from '@angular/router';
-import { MENU_CONFIG } from '@shared-ui';
-import { APP_CONFIG } from '@shared-api';
+import {TestBed} from '@angular/core/testing';
+import {App} from './app';
+import {provideRouter} from '@angular/router';
+import {MENU_CONFIG} from '@shared-ui';
+import {APP_CONFIG} from '@shared-api';
+import {signal} from '@angular/core';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -10,7 +11,7 @@ describe('App', () => {
       imports: [App],
       providers: [
         provideRouter([]),
-        { provide: MENU_CONFIG, useValue: [] },
+        {provide: MENU_CONFIG, useValue: signal([])},
         { provide: APP_CONFIG, useValue: {} }
       ]
     }).compileComponents();

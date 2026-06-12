@@ -21,6 +21,6 @@ import {MatIcon} from '@angular/material/icon';
   standalone: true
 })
 export class BottomBar {
-  /** Menu configuration items. */
-  menuItems = inject(MENU_CONFIG);
+  /** Menu configuration items injected from the root provider as a Signal. */
+  readonly menuItems = inject(MENU_CONFIG);
 }

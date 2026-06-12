@@ -21,6 +21,6 @@ import {MENU_CONFIG} from '../../menu-config';
   standalone: true
 })
 export class NavRail {
-  /** Menu configuration items injected from the root provider. */
-  menuItems = inject(MENU_CONFIG);
+  /** Menu configuration items injected from the root provider as a Signal. */
+  readonly menuItems = inject(MENU_CONFIG);
 }

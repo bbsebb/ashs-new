@@ -30,6 +30,15 @@ describe('App', () => {
     expect(compiled.querySelector('app-layout')).toBeTruthy();
   });
 
+  it('should render a contact button pointing to /contact', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const contactBtn = compiled.querySelector('a[routerLink="/contact"]');
+    expect(contactBtn).toBeTruthy();
+  });
+
   describe('Dynamic Menu Configuration', () => {
     let activeCampaignSignalMock: any;
     let mockCampaignStore: any;

@@ -2,13 +2,14 @@ import {Component, signal} from '@angular/core';
 import {Layout} from '@shared-ui';
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
+import {RouterLink} from '@angular/router';
 
 /**
  * Root component of the application.
  */
 @Component({
   selector: 'app-root',
-  imports: [Layout, MatIconButton, MatIcon],
+  imports: [Layout, MatIconButton, MatIcon, RouterLink],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

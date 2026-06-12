@@ -2,7 +2,7 @@ import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from '
 import {setupServer} from 'msw/node';
 import {http, HttpResponse} from 'msw';
 import {TestBed} from '@angular/core/testing';
-import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClient, withXhr} from '@angular/common/http';
 import {APP_CONFIG, CampaignStore} from '@shared-api';
 import {firstValueFrom} from 'rxjs';
 
@@ -33,7 +33,7 @@ describe('CampaignStore', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         CampaignStore,
         {provide: APP_CONFIG, useValue: {apiUrl: 'http://api.test'}}
       ]

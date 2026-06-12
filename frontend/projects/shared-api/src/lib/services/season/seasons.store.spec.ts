@@ -2,7 +2,7 @@ import {beforeAll, afterAll, afterEach, describe, expect, it, beforeEach} from '
 import {setupServer} from 'msw/node';
 import {http, HttpResponse} from 'msw';
 import {TestBed} from '@angular/core/testing';
-import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClient, withXhr} from '@angular/common/http';
 import {SeasonsStore} from './seasons.store';
 import {APP_CONFIG} from '../../configs/app-config';
 import {firstValueFrom} from 'rxjs';
@@ -32,7 +32,7 @@ describe('SeasonsStore', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         SeasonsStore,
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://api.test' } }
       ]

@@ -1,4 +1,4 @@
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {HallsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, HallCard, LoadingData, NotificationService} from '@shared-ui';
@@ -23,6 +23,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   ],
   templateUrl: './hall-view.html',
   styleUrl: './hall-view.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class HallView {

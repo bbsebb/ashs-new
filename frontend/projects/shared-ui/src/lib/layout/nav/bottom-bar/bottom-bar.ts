@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MENU_CONFIG} from '../../menu-config';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {MatRipple} from '@angular/material/core';
@@ -18,6 +18,7 @@ import {MatIcon} from '@angular/material/icon';
   ],
   templateUrl: './bottom-bar.html',
   styleUrl: './bottom-bar.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class BottomBar {

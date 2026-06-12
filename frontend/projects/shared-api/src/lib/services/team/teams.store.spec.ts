@@ -2,7 +2,7 @@ import {beforeAll, afterAll, afterEach, describe, expect, it, beforeEach} from '
 import {setupServer} from 'msw/node';
 import {http, HttpResponse} from 'msw';
 import {TestBed} from '@angular/core/testing';
-import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClient, withXhr} from '@angular/common/http';
 import {TeamsStore} from './teams.store';
 import {APP_CONFIG} from '../../configs/app-config';
 
@@ -34,7 +34,7 @@ describe('TeamsStore', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         TeamsStore,
         { provide: APP_CONFIG, useValue: { apiUrl: 'http://api.test' } }
       ]

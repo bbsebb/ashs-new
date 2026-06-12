@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {PageTitle} from '../page-title/page-title';
 
 /**
@@ -9,6 +9,7 @@ import {PageTitle} from '../page-title/page-title';
   selector: 'app-public-page-container',
   imports: [PageTitle],
   templateUrl: './public-page-container.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './public-page-container.scss',
 })
 export class PublicPageContainer {

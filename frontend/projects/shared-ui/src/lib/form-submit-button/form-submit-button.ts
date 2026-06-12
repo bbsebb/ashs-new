@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatButton} from '@angular/material/button';
 
@@ -13,6 +13,7 @@ import {MatButton} from '@angular/material/button';
     MatButton
   ],
   templateUrl: './form-submit-button.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './form-submit-button.css',
 })
 export class FormSubmitButton {

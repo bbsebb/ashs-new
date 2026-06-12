@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { render, screen } from '@testing-library/angular';
 import { describe, it, expect } from 'vitest';
 import { FormFieldErrorDirective } from './form-field-error';
@@ -6,6 +6,7 @@ import { FormFieldErrorDirective } from './form-field-error';
 @Component({
   standalone: true,
   imports: [FormFieldErrorDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <div *appError="field; fallback: 'Fallback Error'; let errorMsg">
       {{ errorMsg }}

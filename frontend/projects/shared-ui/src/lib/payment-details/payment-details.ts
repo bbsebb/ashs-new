@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {PaymentDetailsViewModel} from '@shared-api';
 import {MembershipMini} from '../membership-mini/membership-mini';
 import {MatCardModule} from '@angular/material/card';
@@ -21,6 +21,7 @@ import {StatusPipe} from '../pipes';
     StatusPipe
   ],
   templateUrl: './payment-details.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './payment-details.scss',
 })
 export class PaymentDetails {

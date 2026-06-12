@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import {MatCard,  MatCardContent} from '@angular/material/card';
@@ -17,6 +17,7 @@ import {Carousel} from '../carousel/carousel';
     Carousel
   ],
   templateUrl: './feed-dialog.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './feed-dialog.scss'
 })
 export class FeedDialog {

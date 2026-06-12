@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, viewChild} from '@angular/core';
+import {Component, ElementRef, inject, viewChild, ChangeDetectionStrategy} from '@angular/core';
 
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter} from 'rxjs';
@@ -25,6 +25,7 @@ import {BreakpointService} from '../services/breakpoint.service';
     RouterOutlet
   ],
   templateUrl: './layout.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './layout.scss',
 })
 export class Layout {

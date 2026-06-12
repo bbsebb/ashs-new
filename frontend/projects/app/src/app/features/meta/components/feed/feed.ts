@@ -1,7 +1,7 @@
 /**
  * Component displaying an Instagram post (feed).
  */
-import {Component, computed, input} from '@angular/core';
+import {Component, computed, input, ChangeDetectionStrategy} from '@angular/core';
 import {MatCard, MatCardActions, MatCardContent} from '@angular/material/card';
 import {FeedDTO} from '../../models/meta.dtos';
 import {Carousel} from '../carousel/carousel';
@@ -22,6 +22,7 @@ import {MediaPlaceholder} from '../media-placeholder/media-placeholder';
     MediaPlaceholder
   ],
   templateUrl: './feed.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './feed.scss'
 })
 export class Feed {

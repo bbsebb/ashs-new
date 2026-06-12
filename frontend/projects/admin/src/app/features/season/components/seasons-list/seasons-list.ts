@@ -1,7 +1,7 @@
 /**
  * Component for listing all sport seasons with sorting and pagination.
  */
-import {Component, computed, effect, inject, viewChild} from '@angular/core';
+import {Component, computed, effect, inject, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -35,6 +35,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   selector: 'app-seasons-list',
   imports: [MatFormFieldModule, MatSortHeader, MatInputModule, MatDatepickerModule, LoadingData, ErrorData, AdminPageContainer, MatFabButton, RouterLink, MatIcon, MatTable, MatSort, MatColumnDef, MatHeaderCell, MatCell, MatHeaderCellDef, MatCellDef, MatIconButton, MatHeaderRow, MatRow, MatHeaderRowDef, MatRowDef, MatNoDataRow, MatPaginator, DatePipe, FormDeleteButton],
   templateUrl: './seasons-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './seasons-list.scss',
 })
 export class SeasonsList {

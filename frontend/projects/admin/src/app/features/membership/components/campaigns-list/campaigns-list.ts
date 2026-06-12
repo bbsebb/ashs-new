@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, viewChild} from '@angular/core';
+import {Component, computed, effect, inject, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {CampaignStore, SeasonsStore} from '@shared-api';
 import {AdminPageContainer, DialogService, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {MatFabButton, MatIconButton} from '@angular/material/button';
@@ -51,6 +51,7 @@ import {take} from 'rxjs';
     FormDeleteButton
   ],
   templateUrl: './campaigns-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './campaigns-list.scss',
 })
 export class CampaignsList {

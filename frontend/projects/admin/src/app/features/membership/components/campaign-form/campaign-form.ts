@@ -1,4 +1,4 @@
-import {Component, inject, input, effect} from '@angular/core';
+import {Component, inject, input, effect, ChangeDetectionStrategy} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -31,6 +31,7 @@ import {CampaignCategoryFields} from './campaign-category-fields/campaign-catego
     CampaignCategoryFields
   ],
   templateUrl: './campaign-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './campaign-form.scss'
 })
 export class CampaignForm {

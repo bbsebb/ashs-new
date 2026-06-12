@@ -4,12 +4,13 @@ import {describe, expect, it} from 'vitest';
 import {BottomBar} from './bottom-bar';
 import {MENU_CONFIG} from '../../menu-config';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
-import {Component, signal, NgZone} from '@angular/core';
+import {Component, signal, NgZone, ChangeDetectionStrategy} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 
 @Component({
   standalone: true,
   imports: [BottomBar],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<nav app-bottom-bar></nav>`
 })
 class TestHostComponent {}

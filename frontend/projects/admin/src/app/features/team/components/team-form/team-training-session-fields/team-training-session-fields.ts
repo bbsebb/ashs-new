@@ -1,4 +1,4 @@
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {FieldTree, FormField} from '@angular/forms/signals';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatSelectModule} from '@angular/material/select';
@@ -28,6 +28,7 @@ import {TeamFormModel} from '../../../services/team.dtos';
     FormDeleteButton
   ],
   templateUrl: './team-training-session-fields.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './team-training-session-fields.scss'
 })
 export class TeamTrainingSessionFields {

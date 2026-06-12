@@ -1,7 +1,7 @@
 /**
  * Component for viewing a single sport season detail.
  */
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {ErrorData, LoadingData, NotificationService, SeasonCard} from '@shared-ui';
 import {SeasonsStore, ViewModelMapperService} from '@shared-api';
 import {Router, RouterLink} from '@angular/router';
@@ -21,6 +21,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
     FormDeleteButton
   ],
   templateUrl: './season-view.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './season-view.scss',
 })
 export class SeasonView {

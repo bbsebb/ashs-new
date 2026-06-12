@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { provideRouter, Router } from '@angular/router';
 import { render, screen, fireEvent } from '@testing-library/angular';
 import { describe, it, expect, vi } from 'vitest';
@@ -7,6 +7,7 @@ import { ButtonBackHomeDirective } from './button-back-home-directive';
 @Component({
   standalone: true,
   imports: [ButtonBackHomeDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<button back-home [route]="route" [label]="label"></button>`
 })
 class TestHostComponent {

@@ -1,4 +1,4 @@
-import {Component, input, output} from '@angular/core';
+import {Component, input, output, ChangeDetectionStrategy} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 
@@ -28,6 +28,7 @@ import {ButtonBackHomeDirective} from '../button-back-home/button-back-home-dire
     ButtonBackHomeDirective,
   ],
   templateUrl: './error-data.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './error-data.scss',
 })
 export class ErrorData {

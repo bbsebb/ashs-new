@@ -1,7 +1,7 @@
 /**
  * Component for creating or editing a sport season via a form.
  */
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {FormFieldErrorDirective, FormSubmitButton, PageTitle, SeasonCard} from "@shared-ui";
 import {MatButton} from "@angular/material/button";
 import {MatError, MatFormField, MatInputModule, MatLabel} from "@angular/material/input";
@@ -42,6 +42,7 @@ import {Router} from '@angular/router';
     FormRoot
   ],
   templateUrl: './season-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './season-form.scss',
 })
 export class SeasonForm {

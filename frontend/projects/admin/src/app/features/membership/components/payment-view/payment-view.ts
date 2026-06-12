@@ -1,4 +1,4 @@
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {APP_CONFIG, PaymentDetailsViewModel} from '@shared-api';
 import {AdminPageContainer, ErrorData, LoadingData, PaymentDetails} from '@shared-ui';
 import {httpResource} from '@angular/common/http';
@@ -12,6 +12,7 @@ import {httpResource} from '@angular/common/http';
     PaymentDetails
   ],
   templateUrl: './payment-view.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './payment-view.scss'
 })
 export class PaymentView {

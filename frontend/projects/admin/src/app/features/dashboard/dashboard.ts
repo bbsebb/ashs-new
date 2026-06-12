@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {AuthService} from '../../core/services/auth-service';
 import {MatCardModule} from '@angular/material/card';
 import {MatButtonModule} from '@angular/material/button';
@@ -16,6 +16,7 @@ import {LayoutService} from '@shared-api';
   standalone: true,
   imports: [MatCardModule, MatButtonModule, MatIconModule, RouterLink],
   templateUrl: './dashboard.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard.scss'
 })
 export class Dashboard {

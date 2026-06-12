@@ -1,7 +1,7 @@
 /**
  * Component for listing and filtering teams by season.
  */
-import {Component, computed, effect, inject, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, inject, signal, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {LayoutService, SeasonsStore, TeamsStore} from '@shared-api';
 import {AdminPageContainer, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {
@@ -57,6 +57,7 @@ import {MatSelectModule} from '@angular/material/select';
     MatSelectModule
   ],
   templateUrl: './teams-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './teams-list.scss',
 })
 export class TeamsList {

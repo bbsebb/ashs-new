@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {CampaignStore, MembershipStore, SeasonsStore} from '@shared-api';
 import {AdminPageContainer, DialogService, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {Router, RouterLink} from '@angular/router';
@@ -28,6 +28,7 @@ import {PaymentTransactionsList} from '../payment-transactions-list/payment-tran
     PaymentTransactionsList
   ],
   templateUrl: './campaign-view.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './campaign-view.scss',
 })
 export class CampaignView {

@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {Component, signal, ChangeDetectionStrategy} from '@angular/core';
 import {Layout} from '@shared-ui';
 import {AuthMenu} from './core/layout/header/auth-menu/auth-menu';
 
@@ -6,6 +6,7 @@ import {AuthMenu} from './core/layout/header/auth-menu/auth-menu';
   selector: 'app-root',
   imports: [Layout, AuthMenu],
   templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.scss'
 })
 export class App {

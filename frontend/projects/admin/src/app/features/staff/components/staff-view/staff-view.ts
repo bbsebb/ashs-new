@@ -1,7 +1,7 @@
 /**
  * Component for viewing a staff member detail profile.
  */
-import {Component, effect, inject, input, signal} from '@angular/core';
+import {Component, effect, inject, input, signal, ChangeDetectionStrategy} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {StaffsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, LoadingData, NotificationService, StaffCard} from '@shared-ui';
@@ -22,6 +22,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   ],
   templateUrl: './staff-view.html',
   styleUrl: './staff-view.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class StaffView {

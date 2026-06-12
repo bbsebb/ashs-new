@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {CommonModule} from '@angular/common';
 
 import {MatCardModule} from '@angular/material/card';
@@ -11,6 +11,7 @@ import {ButtonBackHomeDirective} from '../button-back-home/button-back-home-dire
   standalone: true,
   imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, ButtonBackHomeDirective],
   templateUrl: './error-404.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './error-404.scss',
 })
 export class Error404 {

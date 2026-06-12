@@ -1,7 +1,7 @@
 /**
  * Optimized media handler for images and videos with priority loading support.
  */
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 
 import {NgOptimizedImage} from '@angular/common';
 import {MediaDTO} from '../../models/meta.dtos';
@@ -13,6 +13,7 @@ import {MediaDTO} from '../../models/meta.dtos';
     NgOptimizedImage
   ],
   templateUrl: './media.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './media.scss'
 })
 export class Media {

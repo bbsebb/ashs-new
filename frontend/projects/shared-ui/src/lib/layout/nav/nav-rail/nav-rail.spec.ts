@@ -4,11 +4,12 @@ import {describe, expect, it} from 'vitest';
 import {NavRail} from './nav-rail';
 import {MENU_CONFIG} from '../../menu-config';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
-import {Component, signal} from '@angular/core';
+import {Component, signal, ChangeDetectionStrategy} from '@angular/core';
 
 @Component({
   standalone: true,
   imports: [NavRail],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<nav app-nav-rail></nav>`
 })
 class TestHostComponent {}

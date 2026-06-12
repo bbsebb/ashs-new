@@ -9,7 +9,7 @@
     aria-label="Menu utilisateur"
   >
     @if (user?.profilePicture) {
-      <img [src]="user?.profilePicture" class="user-avatar-small" alt="Avatar">
+      <img [src]="$safeNavigationMigration(user?.profilePicture)" class="user-avatar-small" alt="Avatar">
     } @else {
       <mat-icon>account_circle</mat-icon>
     }
@@ -26,7 +26,7 @@
     <div class="user-details">
       <div class="user-header">
         @if (user?.profilePicture) {
-          <img [src]="user?.profilePicture" class="user-avatar-large" alt="Avatar">
+          <img [src]="$safeNavigationMigration(user?.profilePicture)" class="user-avatar-large" alt="Avatar">
         } @else {
           <mat-icon class="large-icon">account_circle</mat-icon>
         }

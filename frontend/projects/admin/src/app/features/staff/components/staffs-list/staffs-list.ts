@@ -1,7 +1,7 @@
 /**
  * Component for listing all staff members.
  */
-import {Component, computed, effect, inject, viewChild} from '@angular/core';
+import {Component, computed, effect, inject, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {LayoutService, StaffsStore} from '@shared-api';
 import {AdminPageContainer, ErrorData, LoadingData, NotificationService} from '@shared-ui';
 import {
@@ -53,6 +53,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
     FormDeleteButton
   ],
   templateUrl: './staffs-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './staffs-list.scss',
 })
 export class StaffsList {

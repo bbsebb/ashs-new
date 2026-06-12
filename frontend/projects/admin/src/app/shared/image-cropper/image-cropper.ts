@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, output, resource, signal} from '@angular/core';
+import {Component, computed, effect, input, output, resource, signal, ChangeDetectionStrategy} from '@angular/core';
 import {toObservable} from '@angular/core/rxjs-interop';
 import {ImageCropperView} from './image-cropper-view/image-cropper-view';
 import {MatIcon} from '@angular/material/icon';
@@ -22,6 +22,7 @@ const DEFAULT_CROP_MASK_HEIGHT = 400;
     ImageCropperPreview
   ],
   templateUrl: './image-cropper.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './image-cropper.scss',
 })
 export class ImageCropper {

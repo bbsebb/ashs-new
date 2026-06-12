@@ -1,7 +1,7 @@
 /**
  * Complex form component for creating or editing a team and its assignments.
  */
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -53,6 +53,7 @@ import {TeamTrainingSessionFields} from './team-training-session-fields/team-tra
     ImagePreview
   ],
   templateUrl: './team-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './team-form.scss',
 })
 export class TeamForm {

@@ -18,7 +18,7 @@ import {APP_CONFIG, GlobalErrorHandler} from '@shared-api';
 import {MAT_DATE_LOCALE, provideNativeDateAdapter} from '@angular/material/core';
 import {registerLocaleData} from '@angular/common';
 import {AuthService} from './core/services/auth-service';
-import {provideHttpClient, withInterceptors} from '@angular/common/http';
+import {provideHttpClient, withInterceptors, withXhr} from '@angular/common/http';
 import {authInterceptor} from './core/interceptors/auth-interceptor';
 import {provideAnimations} from '@angular/platform-browser/animations';
 
@@ -38,7 +38,7 @@ export const appConfig: ApplicationConfig = {
     provideSharedIcons(),
     provideNativeDateAdapter(),
     provideAnimations(),
-    provideHttpClient(
+    provideHttpClient(withXhr(), 
       withInterceptors([authInterceptor]) // <-- C'est ici que la magie opère
     ),
     provideAppInitializer(() => {

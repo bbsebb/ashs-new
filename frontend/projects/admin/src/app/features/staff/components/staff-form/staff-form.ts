@@ -1,7 +1,7 @@
 /**
  * Component for creating or editing a staff member profile.
  */
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -43,6 +43,7 @@ import {StaffFormService} from '../../services/staff-form.service';
     ImagePreview
   ],
   templateUrl: './staff-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './staff-form.scss',
 })
 export class StaffForm {

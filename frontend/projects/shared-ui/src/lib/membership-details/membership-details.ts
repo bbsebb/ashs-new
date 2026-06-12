@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {MembershipDetailsViewModel} from '@shared-api';
 import {MatCardModule} from '@angular/material/card';
 import {MatChipsModule} from '@angular/material/chips';
@@ -11,6 +11,7 @@ import {StatusPipe} from '../pipes';
   selector: 'app-membership-details',
   imports: [MatCardModule, MatChipsModule, MatIconModule, MatDividerModule, CurrencyPipe, StatusPipe],
   templateUrl: './membership-details.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './membership-details.scss',
 })
 export class MembershipDetails {

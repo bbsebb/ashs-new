@@ -1,6 +1,6 @@
 // noinspection Annotator
 
-import {Component, computed, effect, input} from '@angular/core';
+import {Component, computed, effect, input, ChangeDetectionStrategy} from '@angular/core';
 import {MatIcon} from '@angular/material/icon';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 
@@ -16,6 +16,7 @@ import {MatProgressSpinner} from '@angular/material/progress-spinner';
   ],
   templateUrl: './image-cropper-preview.html',
   styleUrl: './image-cropper-preview.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[style.--target-width.px]': 'previewWidthInputSignal()',
     '[style.--target-height.px]': 'previewHeightInputSignal()',

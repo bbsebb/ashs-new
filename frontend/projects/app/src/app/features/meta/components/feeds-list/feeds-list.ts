@@ -1,7 +1,7 @@
 /**
  * List component for social media feeds with deferred loading for performance.
  */
-import {Component, inject, Signal} from '@angular/core';
+import {Component, inject, Signal, ChangeDetectionStrategy} from '@angular/core';
 import {FeedDTO} from '../../models/meta.dtos';
 import {Feed} from '../feed/feed';
 import {MetaStore} from '../../meta-store';
@@ -17,6 +17,7 @@ import {LoadingData, ErrorData} from '@shared-ui';
     LoadingData
   ],
   templateUrl: './feeds-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './feeds-list.scss',
 })
 export class FeedsList {

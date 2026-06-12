@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 import {MatToolbar} from "@angular/material/toolbar";
 import {RouterLink} from '@angular/router';
 import {NgOptimizedImage} from '@angular/common';
@@ -16,6 +16,7 @@ import {NgOptimizedImage} from '@angular/common';
   ],
   templateUrl: './header.html',
   styleUrl: './header.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class Header {

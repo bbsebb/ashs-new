@@ -1,7 +1,7 @@
 /**
  * Component for displaying a staff member detail page in the public app.
  */
-import {Component, effect, inject, input, signal} from '@angular/core';
+import {Component, effect, inject, input, signal, ChangeDetectionStrategy} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {StaffsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, LoadingData, StaffCard} from '@shared-ui';
@@ -20,6 +20,7 @@ import {MatButton} from '@angular/material/button';
   ],
   templateUrl: './staff-view.html',
   styleUrl: './staff-view.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class StaffView {

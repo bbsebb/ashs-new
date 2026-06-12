@@ -1,6 +1,6 @@
 // noinspection Annotator
 
-import {Component, computed, effect, ElementRef, input, output, Signal, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, ElementRef, input, output, Signal, signal, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {CdkDrag} from '@angular/cdk/drag-drop';
 import {computeCropGeometry, CropGeometry} from '../utils/image-cropper-utils';
 import {MatIcon} from '@angular/material/icon';
@@ -21,6 +21,7 @@ import {PercentPipe} from '@angular/common';
   ],
   templateUrl: './image-cropper-view.html',
   styleUrl: './image-cropper-view.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     '[style.--container-scale]': 'containerScaleSignal()',
     '[style.--target-width.px]': 'cropMaskWidthInputSignal()',

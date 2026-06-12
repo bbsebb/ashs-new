@@ -1,4 +1,4 @@
-import {Component, inject, input, output} from '@angular/core';
+import {Component, inject, input, output, ChangeDetectionStrategy} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {DialogService} from '@shared-ui';
@@ -16,6 +16,7 @@ import {take} from 'rxjs';
     MatIconModule
   ],
   templateUrl: './form-delete-button.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './form-delete-button.scss'
 })
 export class FormDeleteButton {

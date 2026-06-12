@@ -1,7 +1,7 @@
 /**
  * Interactive carousel for viewing post photo albums.
  */
-import {Component, computed, input, signal} from '@angular/core';
+import {Component, computed, input, signal, ChangeDetectionStrategy} from '@angular/core';
 
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
@@ -17,6 +17,7 @@ import {SubAttachmentDTO} from '../../models/meta.dtos';
     Media
   ],
   templateUrl: './carousel.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './carousel.scss'
 })
 export class Carousel {

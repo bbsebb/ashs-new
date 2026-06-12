@@ -1,4 +1,4 @@
-import {Component, effect, inject, signal, viewChild} from '@angular/core';
+import {Component, effect, inject, signal, viewChild, ChangeDetectionStrategy} from '@angular/core';
 import {AgeGroupStore} from '@shared-api';
 import {ErrorData, LoadingData, NotificationService, PageTitle} from '@shared-ui';
 import {MatIcon} from '@angular/material/icon';
@@ -49,6 +49,7 @@ import {AgeGroup} from '@shared-domain';
     MatPaginator
   ],
   templateUrl: './age-group-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './age-group-list.scss',
 })
 export class AgeGroupList {

@@ -1,7 +1,7 @@
 /**
  * Component for displaying a team detail page in the public app.
  */
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {TeamsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, LoadingData, TeamCard} from '@shared-ui';
@@ -20,6 +20,7 @@ import {MatButton} from '@angular/material/button';
   ],
   templateUrl: './team-view.html',
   styleUrl: './team-view.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class TeamView {

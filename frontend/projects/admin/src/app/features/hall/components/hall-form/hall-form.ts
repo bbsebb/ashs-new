@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input} from '@angular/core';
+import {Component, computed, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {FormField, FormRoot} from '@angular/forms/signals';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -29,6 +29,7 @@ import {HallFormService} from '../../services/hall-form.service';
     FormRoot
   ],
   templateUrl: './hall-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './hall-form.scss',
 })
 export class HallForm {

@@ -1,7 +1,7 @@
 /**
  * Component for viewing a single team detailed profile.
  */
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {TeamsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, LoadingData, NotificationService, TeamCard} from '@shared-ui';
@@ -25,6 +25,7 @@ import {FormDeleteButton} from '../../../../shared/form-delete-button/form-delet
   ],
   templateUrl: './team-view.html',
   styleUrl: './team-view.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class TeamView {

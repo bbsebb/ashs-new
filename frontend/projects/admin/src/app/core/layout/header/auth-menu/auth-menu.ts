@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {AuthService} from '../../../services/auth-service';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -22,6 +22,7 @@ import {LayoutService} from '@shared-api';
     MatTooltipModule
   ],
   templateUrl: './auth-menu.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './auth-menu.scss',
 })
 export class AuthMenu {

@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 import {PageTitle} from '../page-title/page-title';
 
 /**
@@ -10,6 +10,7 @@ import {PageTitle} from '../page-title/page-title';
   selector: 'app-admin-page-container',
   imports: [PageTitle],
   templateUrl: './admin-page-container.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-page-container.scss',
 })
 export class AdminPageContainer {

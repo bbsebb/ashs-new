@@ -1,4 +1,4 @@
-import {Component, computed, input, output, signal} from '@angular/core';
+import {Component, computed, input, output, signal, ChangeDetectionStrategy} from '@angular/core';
 import {CampaignPaymentsViewModel, PaymentDetailsViewModel} from '@shared-api';
 import {UUID} from '@shared-domain';
 import {MatTableModule} from '@angular/material/table';
@@ -40,6 +40,7 @@ export interface MembershipRowViewModel {
     StatusPipe
   ],
   templateUrl: './payment-transactions-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './payment-transactions-list.scss'
 })
 export class PaymentTransactionsList {

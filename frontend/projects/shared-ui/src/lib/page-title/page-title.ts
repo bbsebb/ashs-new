@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, ChangeDetectionStrategy} from '@angular/core';
 
 /**
  * Reusable component for displaying standardized page titles.
@@ -8,6 +8,7 @@ import {Component, input} from '@angular/core';
   selector: 'app-page-title',
   imports: [],
   templateUrl: './page-title.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './page-title.scss',
 })
 export class PageTitle {

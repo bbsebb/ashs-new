@@ -1,4 +1,4 @@
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {FieldTree, FormField} from '@angular/forms/signals';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -22,6 +22,7 @@ import {FormDeleteButton} from '../../../../../shared/form-delete-button/form-de
     FormDeleteButton
   ],
   templateUrl: './campaign-category-fields.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './campaign-category-fields.scss'
 })
 export class CampaignCategoryFields {

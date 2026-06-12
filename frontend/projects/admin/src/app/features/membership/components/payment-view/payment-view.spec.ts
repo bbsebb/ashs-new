@@ -1,6 +1,6 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {PaymentView} from './payment-view';
-import {provideHttpClient} from '@angular/common/http';
+import {provideHttpClient, withXhr} from '@angular/common/http';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {provideRouter} from '@angular/router';
 import {APP_CONFIG} from '@shared-api';
@@ -15,7 +15,7 @@ describe('PaymentView', () => {
     await TestBed.configureTestingModule({
       imports: [PaymentView, NoopAnimationsModule],
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         provideRouter([]),
         {provide: APP_CONFIG, useValue: {apiUrl: 'http://test.api'}}

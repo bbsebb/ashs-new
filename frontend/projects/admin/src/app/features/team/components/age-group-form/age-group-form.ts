@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {FormFieldErrorDirective, FormSubmitButton, PageTitle} from '@shared-ui';
 import {Router} from '@angular/router';
 import {FormField, FormRoot} from '@angular/forms/signals';
@@ -28,6 +28,7 @@ import {AgeGroupFormService} from '../../services/age-group-form.service';
     FormRoot
   ],
   templateUrl: './age-group-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './age-group-form.scss',
 })
 export class AgeGroupForm {

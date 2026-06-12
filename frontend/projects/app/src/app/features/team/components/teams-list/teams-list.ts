@@ -1,7 +1,7 @@
 /**
  * Component for listing all teams in the public app.
  */
-import {Component, computed, inject, linkedSignal, signal} from '@angular/core';
+import {Component, computed, inject, linkedSignal, signal, ChangeDetectionStrategy} from '@angular/core';
 import {SeasonsStore, TeamsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, GenderPipe, LoadingData, PublicPageContainer, TeamCard, TeamMiniCard} from '@shared-ui';
 import {MatIconModule} from '@angular/material/icon';
@@ -28,6 +28,7 @@ import {GENDER, Gender} from '@shared-domain';
     GenderPipe
   ],
   templateUrl: './teams-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './teams-list.scss'
 })
 export class TeamsList {

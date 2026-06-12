@@ -1,7 +1,7 @@
 /**
  * Component for listing all halls in the public app.
  */
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {HallsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, HallCard, LoadingData, PublicPageContainer} from '@shared-ui';
 import {MatIconModule} from "@angular/material/icon";
@@ -16,6 +16,7 @@ import {MatIconModule} from "@angular/material/icon";
     MatIconModule
   ],
   templateUrl: './halls-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './halls-list.scss',
 })
 export class HallsList {

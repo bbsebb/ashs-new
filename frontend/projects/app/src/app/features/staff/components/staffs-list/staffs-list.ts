@@ -1,7 +1,7 @@
 /**
  * Component for listing all staff members in the public app.
  */
-import {Component, computed, effect, inject, signal} from '@angular/core';
+import {Component, computed, effect, inject, signal, ChangeDetectionStrategy} from '@angular/core';
 import {SeasonsStore, StaffsStore, TeamsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, LoadingData, PublicPageContainer, StaffCard, StaffMiniCard} from '@shared-ui';
 import {MatIconModule} from '@angular/material/icon';
@@ -32,6 +32,7 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
     MatButtonToggleModule
   ],
   templateUrl: './staffs-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './staffs-list.scss'
 })
 export class StaffsList {

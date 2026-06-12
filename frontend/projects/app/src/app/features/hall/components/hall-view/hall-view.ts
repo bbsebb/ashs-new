@@ -1,7 +1,7 @@
 /**
  * Component for displaying a hall detail page in the public app.
  */
-import {Component, effect, inject, input} from '@angular/core';
+import {Component, effect, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {Router, RouterLink} from '@angular/router';
 import {HallsStore, ViewModelMapperService} from '@shared-api';
 import {ErrorData, HallCard, LoadingData} from '@shared-ui';
@@ -19,6 +19,7 @@ import {MatButton} from '@angular/material/button';
     RouterLink,
   ],
   templateUrl: './hall-view.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true
 })
 export class HallView {

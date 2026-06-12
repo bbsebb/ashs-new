@@ -58,7 +58,7 @@ jobs:
       - name: Install & Build frontend
         working-directory: frontend
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npm run build:all
 
       - name: Create Dockerfiles & Nginx configs for Angular apps

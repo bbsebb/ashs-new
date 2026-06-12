@@ -48,7 +48,9 @@ $blur: 15px;
   }
 
   &.active {
-    color: $active-color;
+    mat-icon {
+      color: $active-color;
+    }
 
     /* Animated background capsule for the active item */
     &::before {

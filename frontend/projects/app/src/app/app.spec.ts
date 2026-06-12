@@ -88,4 +88,11 @@ describe('App', () => {
       expect(hasMembership).toBe(true);
     });
   });
+
+  it('should have Accueil path configured to /feeds', async () => {
+    const {menuItems} = await import('./core/layout/menu-items');
+    const homeItem = menuItems.find(item => item.label === 'Accueil');
+    expect(homeItem).toBeTruthy();
+    expect(homeItem?.path).toBe('/feeds');
+  });
 });

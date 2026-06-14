@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class EmailEventListener {
-
+    /**
+     * Service used to send emails.
+     */
     private final ContactService contactService;
 
     /**
@@ -23,6 +25,7 @@ public class EmailEventListener {
      */
     @ApplicationModuleListener
     public void onEmailNotification(EmailNotificationEvent event) {
+        log.debug("Processing EmailNotificationEvent: {}", event);
         log.info("Received EmailNotificationEvent for recipient: {}", event.recipient());
         this.contactService.sendEmail(event.recipient(), event.subject(), event.body());
     }

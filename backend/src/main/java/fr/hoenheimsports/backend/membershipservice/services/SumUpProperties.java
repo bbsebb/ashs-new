@@ -34,5 +34,8 @@ public class SumUpProperties {
      */
     private String returnUrl;
 
+    /**
+     * Redirect URL to send the user back to the application after SumUp payment.
+     */
     private String redirectUrl;
 }

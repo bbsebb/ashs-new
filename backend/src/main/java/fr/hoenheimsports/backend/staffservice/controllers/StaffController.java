@@ -6,6 +6,7 @@ import fr.hoenheimsports.backend.staffservice.dtos.StaffUpdateRequest;
 import fr.hoenheimsports.backend.staffservice.services.StaffService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/staffs")
 @RequiredArgsConstructor
+@Slf4j
 public class StaffController {
     private final StaffService staffService;
 
@@ -30,7 +32,10 @@ public class StaffController {
      */
     @GetMapping
     public ResponseEntity<List<StaffResponseDto>> getAllStaff() {
-        return ResponseEntity.ok(this.staffService.getAllStaff());
+        log.debug("Request received to retrieve all staff members");
+        List<StaffResponseDto> staffList = this.staffService.getAllStaff();
+        log.info("Successfully retrieved {} staff members", staffList.size());
+        return ResponseEntity.ok(staffList);
     }
 
     /**
@@ -44,7 +49,11 @@ public class StaffController {
     public ResponseEntity<StaffResponseDto> createStaff(
             @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart("staff") @Valid StaffCreateRequest staffCreateRequest) {
-        return ResponseEntity.ok(this.staffService.createStaff(file, staffCreateRequest));
+        log.debug("Request received to create a staff member with request details: {}, avatar file present: {}",
+                staffCreateRequest, file != null && !file.isEmpty());
+        StaffResponseDto createdStaff = this.staffService.createStaff(file, staffCreateRequest);
+        log.info("Successfully created staff member with ID: {}", createdStaff.id());
+        return ResponseEntity.ok(createdStaff);
     }
 
     /**
@@ -60,7 +69,11 @@ public class StaffController {
             @PathVariable UUID id,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart("staff") @Valid StaffUpdateRequest staffUpdateRequest) {
-        return ResponseEntity.ok(this.staffService.updateStaff(id, file, staffUpdateRequest));
+        log.debug("Request received to update staff member with ID: {}, update details: {}, avatar file present: {}",
+                id, staffUpdateRequest, file != null && !file.isEmpty());
+        StaffResponseDto updatedStaff = this.staffService.updateStaff(id, file, staffUpdateRequest);
+        log.info("Successfully updated staff member with ID: {}", updatedStaff.id());
+        return ResponseEntity.ok(updatedStaff);
     }
 
     /**
@@ -71,7 +84,9 @@ public class StaffController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStaff(@PathVariable UUID id) {
+        log.debug("Request received to delete staff member with ID: {}", id);
         this.staffService.deleteStaff(id);
+        log.info("Successfully deleted staff member with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 }

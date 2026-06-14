@@ -21,5 +21,11 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
     List<Membership> findByPaymentTransactionSumupCheckoutId(String id);
 
 
+    /**
+     * Finds all memberships associated with a specific campaign.
+     *
+     * @param campaignId the unique identifier of the campaign
+     * @return a list of memberships associated with the campaign
+     */
     List<Membership> findAllByCampaignId(UUID campaignId);
 }

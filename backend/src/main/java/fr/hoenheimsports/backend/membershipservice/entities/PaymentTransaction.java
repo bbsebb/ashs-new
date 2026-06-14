@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entity representing a payment transaction associated with one or more memberships.
+ * Tracks checkout metadata and overall transaction status.
+ */
 @Entity
 @Table(name = "payment_transaction", schema = "membership_schema")
 @Getter
@@ -54,6 +58,11 @@ public class PaymentTransaction {
     @Column(name = "status", nullable = false)
     private MembershipStatus status;
 
+    /**
+     * Associates a membership with this payment transaction.
+     *
+     * @param membership the membership to associate
+     */
     public void addMembership(Membership membership) {
         memberships.add(membership);
         membership.setPaymentTransaction(this);

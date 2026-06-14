@@ -21,6 +21,9 @@ import java.time.ZoneOffset;
 @Slf4j
 public class SumUpService {
 
+    /**
+     * Expiration duration in hours for checkout links.
+     */
     public static final int CHECKOUT_EXPIRATION_IN_HOURS = 2;
 
     private final SumUpProperties sumUpProperties;

@@ -5,6 +5,15 @@ import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 
+/**
+ * Data Transfer Object representing the request payload for updating an existing hall.
+ *
+ * @param name              the name of the hall/gymnasium
+ * @param addressStreet     the street component of the address
+ * @param addressCity       the city component of the address
+ * @param addressPostalCode the postal code component of the address
+ * @param addressCountry    the country component of the address
+ */
 public record HallUpdateRequest(
         @Size(message = "La nom de la salle ne doit pas dépasser 50 caractères", max = 50)
         @NotBlank(message = "La nom de la salle est obligatoire")

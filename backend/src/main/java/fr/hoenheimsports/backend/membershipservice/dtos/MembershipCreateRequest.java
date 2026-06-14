@@ -7,6 +7,12 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * DTO for creating a membership.
+ *
+ * @param firstName     the member's first name
+ * @param lastName      the member's last name
+ * @param email         the member's email address
+ * @param licenseNumber the member's license number
+ * @param category      the requested category details
  */
 public record MembershipCreateRequest(
         @NotBlank(message = "Le prénom est requis")

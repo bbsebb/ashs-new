@@ -9,6 +9,15 @@ import java.util.UUID;
 
 /**
  * DTO representing detailed information about a payment transaction.
+ *
+ * @param id           the transaction ID
+ * @param campaignId   the campaign ID
+ * @param amount       the total transaction amount
+ * @param payerInfo    the payer info
+ * @param status       the current membership payment status
+ * @param checkoutDate the checkout date
+ * @param isDiscounted flag indicating if a discount was applied
+ * @param memberships  the list of memberships paid in this transaction
  */
 public record PaymentResponse(
         UUID id,

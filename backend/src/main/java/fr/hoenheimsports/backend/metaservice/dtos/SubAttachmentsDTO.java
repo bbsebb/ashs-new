@@ -3,9 +3,9 @@ package fr.hoenheimsports.backend.metaservice.dtos;
 import java.util.List;
 
 /**
- * Conteneur pour la liste des sous-pièces jointes (dans un album).
+ * Container for the list of sub-attachments (in an album).
  *
- * @param data La liste des objets de sous-pièce jointe.
+ * @param data The list of sub-attachment objects.
  */
 public record SubAttachmentsDTO(
         List<SubAttachmentDTO> data

@@ -3,11 +3,12 @@ package fr.hoenheimsports.backend.metaservice.dtos;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 /**
- * Représente une pièce jointe principale.
+ * Represents a main attachment for a feed post.
  *
- * @param mediaType      Le type de média (ex: "album", "photo", "video").
- * @param media          L'objet média principal.
- * @param subAttachments Les sous-pièces jointes (utile pour les albums). Peut-être nul.
+ * @param mediaType      The type of media (e.g., "album", "photo", "video").
+ * @param type           The sub-type of the attachment.
+ * @param media          The main media object.
+ * @param subAttachments The sub-attachments (useful for albums). Can be null.
  */
 public record AttachmentDTO(
         @JsonAlias("media_type") String mediaType,

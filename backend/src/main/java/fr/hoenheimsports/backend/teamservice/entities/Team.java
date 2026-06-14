@@ -2,7 +2,10 @@ package fr.hoenheimsports.backend.teamservice.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 import org.jspecify.annotations.Nullable;
 
@@ -18,7 +21,6 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 public class Team implements Comparable<Team> {
     /**
      * Unique identifier for the team.
@@ -49,7 +51,6 @@ public class Team implements Comparable<Team> {
     @NotNull
     private TeamName name;
 
-
     /**
      * Filename of the team's official photo.
      */
@@ -57,15 +58,27 @@ public class Team implements Comparable<Team> {
     @Nullable
     private String photoFileName;
 
+    /**
+     * List of staff members assigned to the team.
+     */
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @Setter(AccessLevel.PRIVATE)
     private List<TeamStaff> staffs = new ArrayList<>();
 
+    /**
+     * List of training sessions scheduled for the team.
+     */
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @Setter(AccessLevel.PRIVATE)
     private List<TrainingSession> trainingSessions = new ArrayList<>();
+
+    /**
+     * Constructs a new default Team.
+     */
+    public Team() {
+    }
 
     /**
      * Returns an unmodifiable list of training sessions.
@@ -123,7 +136,12 @@ public class Team implements Comparable<Team> {
         trainingSessions.remove(trainingSession);
     }
 
-
+    /**
+     * Checks if this team is equal to another object based on their identifiers.
+     *
+     * @param o the object to compare with
+     * @return true if equal, false otherwise
+     */
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
@@ -134,11 +152,22 @@ public class Team implements Comparable<Team> {
         return Objects.equals(getId(), team.getId());
     }
 
+    /**
+     * Returns the hash code of the team.
+     *
+     * @return the hash code value
+     */
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 
+    /**
+     * Compares this team with another to determine ordering based on name and gender.
+     *
+     * @param o the team to compare with
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object
+     */
     @Override
     public int compareTo(Team o) {
         return Comparator

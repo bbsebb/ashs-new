@@ -1,12 +1,12 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
 /**
- * Représente une sous-pièce jointe (par exemple, une photo ou une vidéo dans un album).
+ * Represents a sub-attachment (for example, a photo or video inside an album).
  *
- * @param media  L'objet média de la sous-pièce jointe.
- * @param target La cible de la sous-pièce jointe (contient l'ID et l'URL).
- * @param type   Le type de média (ex: "photo", "video").
- * @param url    L'URL directe vers la publication de ce média sur Facebook.
+ * @param media  The media object of the sub-attachment.
+ * @param target The target of the sub-attachment (contains ID and URL).
+ * @param type   The type of media (e.g., "photo", "video").
+ * @param url    The direct URL to the post of this media on Facebook.
  */
 public record SubAttachmentDTO(
         MediaDTO media,

@@ -11,7 +11,6 @@ import fr.hoenheimsports.backend.teamservice.mappers.TeamMapper;
 import fr.hoenheimsports.backend.teamservice.repository.AgeGroupRepository;
 import fr.hoenheimsports.backend.teamservice.repository.TeamRepository;
 import fr.hoenheimsports.backend.teamservice.repository.TeamStaffRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.modulith.events.ApplicationModuleListener;
@@ -28,15 +27,54 @@ import java.util.stream.Collectors;
  * Also listens for staff deletion events to maintain data integrity.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class TeamService {
+
+    /**
+     * Repository for team database operations.
+     */
     private final TeamRepository teamRepository;
+
+    /**
+     * Repository for team staff database operations.
+     */
     private final TeamStaffRepository teamStaffRepository;
+
+    /**
+     * Repository for age group database operations.
+     */
     private final AgeGroupRepository ageGroupRepository;
+
+    /**
+     * Mapper to convert between Team entities and DTOs.
+     */
     private final TeamMapper teamMapper;
+
+    /**
+     * Service to handle team photo storage operations.
+     */
     private final ImageStorageService imageStorageService;
 
+    /**
+     * Constructs a new TeamService with all required repositories, mappers, and services.
+     *
+     * @param teamRepository      the team repository
+     * @param teamStaffRepository the team staff repository
+     * @param ageGroupRepository  the age group repository
+     * @param teamMapper          the team mapper
+     * @param imageStorageService the image storage service
+     */
+    public TeamService(TeamRepository teamRepository,
+                       TeamStaffRepository teamStaffRepository,
+                       AgeGroupRepository ageGroupRepository,
+                       TeamMapper teamMapper,
+                       ImageStorageService imageStorageService) {
+        this.teamRepository = teamRepository;
+        this.teamStaffRepository = teamStaffRepository;
+        this.ageGroupRepository = ageGroupRepository;
+        this.teamMapper = teamMapper;
+        this.imageStorageService = imageStorageService;
+    }
 
     /**
      * Retrieves all teams currently stored in the system.
@@ -44,11 +82,14 @@ public class TeamService {
      * @return a list of team response DTOs
      */
     public List<TeamReponseDTO> getAllTeams() {
-        return this.teamRepository.findAll()
+        log.debug("Entering getAllTeams");
+        List<TeamReponseDTO> result = this.teamRepository.findAll()
                 .stream()
                 .sorted()
                 .map(teamMapper::toDto)
                 .collect(Collectors.toList());
+        log.info("Found {} teams", result.size());
+        return result;
     }
 
     /**
@@ -59,7 +100,7 @@ public class TeamService {
      * @return the created team's DTO
      */
     public TeamReponseDTO createTeam(@Nullable MultipartFile file, TeamCreateRequest teamRequestDTO) {
-
+        log.debug("Entering createTeam with payload: {}, hasFile: {}", teamRequestDTO, file != null);
         log.debug("Mapping {}", this.teamMapper.toEntity(teamRequestDTO));
         var team = this.teamMapper.toEntity(teamRequestDTO);
         var teamName = new TeamName(teamRequestDTO.teamNumber(), findById(teamRequestDTO.ageGroupId()));
@@ -68,8 +109,9 @@ public class TeamService {
             team.setPhotoFileName(imageStorageService.saveImage(file));
         }
 
-
-        return this.teamMapper.toDto(this.teamRepository.save(team));
+        TeamReponseDTO result = this.teamMapper.toDto(this.teamRepository.save(team));
+        log.info("Successfully created team with ID: {}", result.id());
+        return result;
     }
 
     /**
@@ -83,8 +125,12 @@ public class TeamService {
      */
     @Transactional
     public TeamReponseDTO updateTeam(UUID teamId, @Nullable MultipartFile file, TeamUpdateRequest teamRequestDTO) {
+        log.debug("Entering updateTeam with ID: {}, request: {}, hasFile: {}", teamId, teamRequestDTO, file != null);
         Team team = this.teamRepository.findById(teamId)
-                .orElseThrow(() -> new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId));
+                .orElseThrow(() -> {
+                    log.error("Team with ID {} not found for update", teamId);
+                    return new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId);
+                });
 
         team.setGender(teamRequestDTO.gender());
 
@@ -95,14 +141,26 @@ public class TeamService {
         syncStaffs(team, teamRequestDTO.staffs());
         syncTrainingSessions(team, teamRequestDTO.trainingSessions());
 
-        return this.teamMapper.toDto(this.teamRepository.save(team));
+        TeamReponseDTO result = this.teamMapper.toDto(this.teamRepository.save(team));
+        log.info("Successfully updated team with ID: {}", teamId);
+        return result;
     }
 
+    /**
+     * Updates the photo file name for a team.
+     * Deletes the old file if a new file is uploaded or filename changes.
+     *
+     * @param team                     the team entity
+     * @param requestedAvatarFileName  the name of the requested avatar file
+     * @param file                     the new multipart file to upload
+     */
     private void updatePhotoFileName(
             Team team,
             @Nullable String requestedAvatarFileName,
             @Nullable MultipartFile file
     ) {
+        log.debug("Updating photo file name for team. Old: {}, Requested: {}, hasFile: {}",
+                team.getPhotoFileName(), requestedAvatarFileName, file != null);
         if (team.getPhotoFileName() != null && !team.getPhotoFileName().equals(requestedAvatarFileName)) {
             imageStorageService.deleteImage(team.getPhotoFileName());
             team.setPhotoFileName(requestedAvatarFileName);
@@ -113,7 +171,6 @@ public class TeamService {
         }
     }
 
-
     /**
      * Deletes a team by its ID.
      *
@@ -121,12 +178,24 @@ public class TeamService {
      * @throws EntityNotFoundException if the team does not exist
      */
     public void deleteTeam(UUID teamId) {
+        log.debug("Entering deleteTeam with ID: {}", teamId);
         Team team = this.teamRepository.findById(teamId)
-                .orElseThrow(() -> new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId));
+                .orElseThrow(() -> {
+                    log.error("Team with ID {} not found for deletion", teamId);
+                    return new EntityNotFoundException("L'équipe n'a pas été trouvée avec l'id: " + teamId);
+                });
         this.teamRepository.delete(team);
+        log.info("Successfully deleted team with ID: {}", teamId);
     }
 
+    /**
+     * Synchronizes the staff list of a team with the provided updates.
+     *
+     * @param team    the team entity to update
+     * @param dtoList the list of staff update requests
+     */
     private void syncStaffs(Team team, List<TeamUpdateRequest.TeamStaffUpdateRequest> dtoList) {
+        log.debug("Synchronizing staffs for team {}. Update list size: {}", team.getId(), dtoList.size());
         if (dtoList.isEmpty()) {
             new ArrayList<>(team.getStaffs()).forEach(team::removeStaff);
             return;
@@ -167,7 +236,14 @@ public class TeamService {
                 });
     }
 
+    /**
+     * Synchronizes the training sessions of a team with the provided updates.
+     *
+     * @param team    the team entity to update
+     * @param dtoList the list of training session update requests
+     */
     private void syncTrainingSessions(Team team, List<TeamUpdateRequest.TrainingSessionUpdateRequest> dtoList) {
+        log.debug("Synchronizing training sessions for team {}. Update list size: {}", team.getId(), dtoList.size());
         if (dtoList.isEmpty()) {
             new ArrayList<>(team.getTrainingSessions()).forEach(team::removeTrainingSession);
             return;
@@ -213,14 +289,22 @@ public class TeamService {
                 });
     }
 
+    /**
+     * Finds an age group by its identifier.
+     *
+     * @param id the unique identifier of the age group
+     * @return the age group entity
+     * @throws EntityNotFoundException if the age group is not found
+     */
     private AgeGroup findById(UUID id) {
+        log.debug("Finding age group by ID: {}", id);
         var ageGroup = this.ageGroupRepository.findById(id);
         if (ageGroup.isEmpty()) {
+            log.error("Age group with ID {} not found", id);
             throw new EntityNotFoundException("La catégorie n'a pas été trouvée avec l'id: " + id);
         }
         return ageGroup.get();
     }
-
 
     /**
      * Listener for staff deletion events.
@@ -230,6 +314,7 @@ public class TeamService {
      */
     @ApplicationModuleListener
     public void onStaffDeleted(StaffDeletedEvent event) {
+        log.debug("Entering onStaffDeleted with event: {}", event);
         var teams = this.teamRepository.findDistinctByStaffs_StaffId(event.id());
 
         for (var team : teams) {
@@ -239,6 +324,7 @@ public class TeamService {
         }
 
         this.teamRepository.saveAll(teams);
+        log.info("Processed staff deletion event for staff ID: {}, updated {} teams", event.id(), teams.size());
     }
 
 }

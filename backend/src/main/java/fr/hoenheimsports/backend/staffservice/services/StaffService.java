@@ -12,6 +12,7 @@ import fr.hoenheimsports.backend.staffservice.mappers.StaffMapper;
 import fr.hoenheimsports.backend.staffservice.repositories.StaffRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StaffService {
 
     private final StaffRepository staffRepository;
@@ -40,7 +42,10 @@ public class StaffService {
      * @return a list of staff response DTOs
      */
     public List<StaffResponseDto> getAllStaff() {
-        return this.staffRepository.findAll().stream().map(staffMapper::toDto).collect(Collectors.toList());
+        log.debug("Entering getAllStaff to fetch all staff members");
+        List<StaffResponseDto> staffList = this.staffRepository.findAll().stream().map(staffMapper::toDto).collect(Collectors.toList());
+        log.info("Successfully fetched {} staff members", staffList.size());
+        return staffList;
     }
 
     /**
@@ -51,12 +56,16 @@ public class StaffService {
      * @return the created staff member's DTO
      */
     public StaffResponseDto createStaff(@Nullable MultipartFile file, StaffCreateRequest staffCreateRequest) {
-
+        log.debug("Entering createStaff with request: {}, file present: {}", staffCreateRequest, file != null && !file.isEmpty());
         var staff = this.staffMapper.toEntity(staffCreateRequest);
         if (file != null) {
-            staff.setAvatarFileName(imageStorageService.saveImage(file));
+            String savedFilename = imageStorageService.saveImage(file);
+            log.debug("Saved avatar file with name: {}", savedFilename);
+            staff.setAvatarFileName(savedFilename);
         }
-        return this.staffMapper.toDto(this.staffRepository.save(staff));
+        StaffResponseDto createdDto = this.staffMapper.toDto(this.staffRepository.save(staff));
+        log.info("Successfully created staff member with ID: {}", createdDto.id());
+        return createdDto;
     }
 
     /**
@@ -69,7 +78,11 @@ public class StaffService {
      * @throws EntityNotFoundException if the staff member does not exist
      */
     public StaffResponseDto updateStaff(UUID id, @Nullable MultipartFile file, StaffUpdateRequest staffUpdateRequest) {
-        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));
+        log.debug("Entering updateStaff for ID: {}, update request: {}, file present: {}", id, staffUpdateRequest, file != null && !file.isEmpty());
+        var staff = this.staffRepository.findById(id).orElseThrow(() -> {
+            log.error("Staff member with ID {} not found during update operation", id);
+            return new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus.");
+        });
         staff.setEmail(new Email(staffUpdateRequest.email()));
         staff.setPhone(new Phone(staffUpdateRequest.phone()));
         staff.setFirstName(staffUpdateRequest.firstName());
@@ -77,21 +90,36 @@ public class StaffService {
         
         updateAvatarFileName(staff, staffUpdateRequest.avatarFileName(), file);
 
-        return this.staffMapper.toDto(this.staffRepository.save(staff));
+        StaffResponseDto updatedDto = this.staffMapper.toDto(this.staffRepository.save(staff));
+        log.info("Successfully updated staff member with ID: {}", updatedDto.id());
+        return updatedDto;
     }
 
+    /**
+     * Updates the avatar file name for the given staff member.
+     * Deletes the old avatar file if it has changed, and saves the new file if provided.
+     *
+     * @param staff                   the staff member entity to update
+     * @param requestedAvatarFileName the new avatar filename requested
+     * @param file                    the optional new avatar image file
+     */
     private void updateAvatarFileName(
             fr.hoenheimsports.backend.staffservice.entities.Staff staff,
             @Nullable String requestedAvatarFileName,
             @Nullable MultipartFile file
     ) {
+        log.debug("Updating avatar for staff ID: {}, old avatar: {}, requested avatar: {}, file present: {}",
+                staff.getId(), staff.getAvatarFileName(), requestedAvatarFileName, file != null && !file.isEmpty());
         if (staff.getAvatarFileName() != null && !staff.getAvatarFileName().equals(requestedAvatarFileName)) {
+            log.debug("Deleting old avatar: {}", staff.getAvatarFileName());
             imageStorageService.deleteImage(staff.getAvatarFileName());
             staff.setAvatarFileName(requestedAvatarFileName);
         }
 
         if (file != null) {
-            staff.setAvatarFileName(imageStorageService.saveImage(file));
+            String newFilename = imageStorageService.saveImage(file);
+            log.debug("Saved new avatar: {}", newFilename);
+            staff.setAvatarFileName(newFilename);
         }
     }
 
@@ -103,11 +131,17 @@ public class StaffService {
      */
     @Transactional
     public void deleteStaff(UUID id) {
-        var staff = this.staffRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus."));
+        log.debug("Entering deleteStaff for ID: {}", id);
+        var staff = this.staffRepository.findById(id).orElseThrow(() -> {
+            log.error("Staff member with ID {} not found during delete operation", id);
+            return new EntityNotFoundException("L'encadrant n'a pas été trouvé ou n'existe plus.");
+        });
         if (staff.getAvatarFileName() != null) {
+            log.debug("Deleting avatar: {} for staff ID: {}", staff.getAvatarFileName(), id);
             imageStorageService.deleteImage(staff.getAvatarFileName());
         }
         this.staffRepository.delete(staff);
+        log.info("Successfully deleted staff member from repository, publishing StaffDeletedEvent for ID: {}", id);
         applicationEventPublisher.publishEvent(new StaffDeletedEvent(staff.getId()));
     }
 }

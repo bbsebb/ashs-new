@@ -3,9 +3,9 @@ package fr.hoenheimsports.backend.metaservice.dtos;
 import java.util.List;
 
 /**
- * Conteneur pour la liste des pièces jointes.
+ * Container for the list of attachments.
  *
- * @param data La liste des objets de pièce jointe.
+ * @param data The list of attachment objects.
  */
 public record AttachmentsDTO(
         List<AttachmentDTO> data

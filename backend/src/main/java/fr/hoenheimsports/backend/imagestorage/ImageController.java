@@ -18,6 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RequiredArgsConstructor
 public class ImageController {
+    /**
+     * Service used to manage image persistence.
+     */
     private final ImageStorageService imageService;
 
     /**
@@ -28,6 +31,9 @@ public class ImageController {
      */
     @PostMapping(value = "/test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createWithMedia(@RequestPart("image") MultipartFile image) {
-        return ResponseEntity.ok(imageService.saveImage(image));
+        log.debug("Entering createWithMedia with image: filename={}, size={}", image.getOriginalFilename(), image.getSize());
+        String filename = imageService.saveImage(image);
+        log.info("Successfully uploaded image: {}", filename);
+        return ResponseEntity.ok(filename);
     }
 }

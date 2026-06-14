@@ -14,9 +14,23 @@ import java.net.URI;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Global exception handler that intercepts exceptions thrown by controllers
+ * and formats them into standardized RFC 7807 ProblemDetail responses.
+ */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    /**
+     * Handles method argument validation errors (e.g., failed {@code @Valid} checks).
+     * Compiles field and global validation errors into a ProblemDetail structure.
+     *
+     * @param ex      the exception containing binding and validation results
+     * @param headers the headers for the response
+     * @param status  the HTTP status code
+     * @param request the current web request
+     * @return a {@link ResponseEntity} containing the validation {@link ProblemDetail}
+     */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
@@ -55,7 +69,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-
+    /**
+     * Handles unhandled runtime exceptions.
+     * Logs the error and returns a 500 Internal Server Error problem response.
+     *
+     * @param ex      the runtime exception
+     * @param request the current web request
+     * @return a {@link ResponseEntity} containing a 500 {@link ProblemDetail}
+     */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ProblemDetail> handleRuntimeException(RuntimeException ex, WebRequest request) {
         log.error("Erreur technique lors du traitement de la demande", ex);
@@ -67,6 +88,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
+    /**
+     * Handles any generic Exception that was not caught by other handlers.
+     * Logs the error and returns a 500 Internal Server Error problem response.
+     *
+     * @param ex      the exception
+     * @param request the current web request
+     * @return a {@link ResponseEntity} containing a 500 {@link ProblemDetail}
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleAllExceptions(Exception ex, WebRequest request) {
         log.error("Erreur inattendue", ex);

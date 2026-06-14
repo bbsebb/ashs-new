@@ -1,11 +1,11 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
 /**
- * Représente les détails d'une image.
+ * Represents the details of an image.
  *
- * @param height La hauteur de l'image en pixels.
- * @param src    L'URL source de l'image.
- * @param width  La largeur de l'image en pixels.
+ * @param height The height of the image in pixels.
+ * @param src    The source URL of the image.
+ * @param width  The width of the image in pixels.
  */
 public record ImageDTO(
         int height,

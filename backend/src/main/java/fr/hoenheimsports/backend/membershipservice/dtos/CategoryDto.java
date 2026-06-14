@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 
 /**
  * DTO for creating or representing a category within a campaign.
+ *
+ * @param name   the category name (e.g. "U13", "Seniors")
+ * @param amount the price amount of the category
  */
 @NullMarked
 public record CategoryDto(

@@ -18,6 +18,11 @@ public class SumUpWebhookController {
 
     private final MembershipService membershipService;
 
+    /**
+     * Constructs a new SumUpWebhookController with the required MembershipService.
+     *
+     * @param membershipService the service managing memberships
+     */
     public SumUpWebhookController(MembershipService membershipService) {
         this.membershipService = membershipService;
     }

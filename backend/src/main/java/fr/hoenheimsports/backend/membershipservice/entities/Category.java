@@ -24,10 +24,16 @@ import java.util.Objects;
 @NullMarked
 public class Category {
 
+    /**
+     * The unique name of the membership category (e.g. "Seniors", "U15").
+     */
     @NotBlank
     @Column(name = "category_name", nullable = false)
     private String name;
 
+    /**
+     * The price associated with the category.
+     */
     @Embedded
     @AttributeOverride(name = "amount", column = @Column(name = "amount", nullable = false, precision = 19, scale = 2))
     private Price price;

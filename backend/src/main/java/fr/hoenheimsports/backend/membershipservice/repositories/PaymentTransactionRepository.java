@@ -21,7 +21,19 @@ public interface PaymentTransactionRepository extends JpaRepository<PaymentTrans
      */
     Optional<PaymentTransaction> findBySumupCheckoutId(String id);
 
+    /**
+     * Finds all payment transactions associated with a specific campaign.
+     *
+     * @param campaignId the unique identifier of the campaign
+     * @return a list of payment transactions associated with the campaign
+     */
     java.util.List<PaymentTransaction> findByCampaignId(UUID campaignId);
 
+    /**
+     * Finds all payment transactions matching a specific status.
+     *
+     * @param status the membership payment status
+     * @return a list of payment transactions with the specified status
+     */
     java.util.List<PaymentTransaction> findByStatus(MembershipStatus status);
 }

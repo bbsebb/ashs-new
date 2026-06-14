@@ -8,6 +8,11 @@ import java.util.UUID;
 
 /**
  * Response DTO representing a membership campaign.
+ *
+ * @param id         the unique identifier of the campaign
+ * @param seasonId   the UUID of the associated season
+ * @param status     the current status of the campaign
+ * @param categories the categories configured for the campaign
  */
 @NullMarked
 public record CampaignResponse(

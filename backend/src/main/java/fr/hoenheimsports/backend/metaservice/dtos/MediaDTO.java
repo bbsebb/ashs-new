@@ -1,10 +1,10 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
 /**
- * Représente le contenu multimédia.
+ * Represents the multimedia content.
  *
- * @param image  L'objet image.
- * @param source L'URL source (généralement pour les vidéos). Peut être nul.
+ * @param image  The image object.
+ * @param source The source URL (typically for videos). Can be null.
  */
 public record MediaDTO(
         ImageDTO image,

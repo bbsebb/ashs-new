@@ -45,6 +45,12 @@ public class Hall {
     @Valid
     private Address address;
 
+    /**
+     * Determines whether this hall is equal to another object based on its unique identifier.
+     *
+     * @param o the object to compare with
+     * @return true if the objects are equivalent, false otherwise
+     */
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
@@ -55,6 +61,11 @@ public class Hall {
         return Objects.equals(getId(), hall.getId());
     }
 
+    /**
+     * Computes the hash code for this hall.
+     *
+     * @return the hash code value
+     */
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();

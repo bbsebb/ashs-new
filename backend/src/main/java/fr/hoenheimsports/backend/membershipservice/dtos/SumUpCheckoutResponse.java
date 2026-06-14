@@ -9,6 +9,25 @@ import java.util.Objects;
 
 /**
  * DTO for the SumUp checkout response containing all official properties.
+ *
+ * @param id                the checkout identifier
+ * @param amount            the checkout amount
+ * @param currency          the currency
+ * @param payToEmail        the recipient merchant email
+ * @param description       the transaction description
+ * @param status            the checkout status
+ * @param date              the checkout date
+ * @param transactionCode   the transaction code
+ * @param checkoutReference the merchant checkout reference
+ * @param merchantCode      the merchant code
+ * @param validUntil        the validity limit
+ * @param redirectUrl       the redirect URL
+ * @param returnUrl         the return URL
+ * @param customerId        the customer ID
+ * @param purpose           the checkout purpose
+ * @param hostedCheckout    the hosted checkout details
+ * @param hostedCheckoutUrl the hosted checkout URL
+ * @param transactions      the list of transactions
  */
 public record SumUpCheckoutResponse(
     String id,
@@ -42,6 +61,11 @@ public record SumUpCheckoutResponse(
 
     /**
      * Convenience constructor for tests and partial objects.
+     *
+     * @param id                the checkout identifier
+     * @param status            the status
+     * @param hostedCheckout    the hosted checkout response
+     * @param hostedCheckoutUrl the hosted checkout URL
      */
     public SumUpCheckoutResponse(String id, String status, @Nullable HostedCheckoutResponse hostedCheckout, @Nullable String hostedCheckoutUrl) {
         this(id, BigDecimal.ZERO, "EUR", null, null, status, null, null, null, null, null, null, null, null, null, hostedCheckout, hostedCheckoutUrl, null);
@@ -49,6 +73,8 @@ public record SumUpCheckoutResponse(
 
     /**
      * Hosted checkout configuration block response.
+     *
+     * @param enabled flag indicating if hosted checkout is enabled
      */
     public record HostedCheckoutResponse(
             Boolean enabled
@@ -60,6 +86,15 @@ public record SumUpCheckoutResponse(
 
     /**
      * Detailed transaction information inside a checkout response.
+     *
+     * @param id              the transaction ID
+     * @param amount          the transaction amount
+     * @param currency        the transaction currency
+     * @param status          the transaction status
+     * @param paymentType     the payment type
+     * @param timestamp       the transaction timestamp
+     * @param transactionCode the transaction code
+     * @param merchantCode    the merchant code
      */
     public record SumUpTransaction(
             String id,

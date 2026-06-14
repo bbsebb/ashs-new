@@ -15,10 +15,20 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ContactService {
+    /**
+     * Mail sender interface used for sending emails.
+     */
     private final JavaMailSender javaMailSender;
+
+    /**
+     * The administrator email address configured in application properties.
+     */
     @Value("${contact.administrator.email.address}")
     private String ADMINISTRATOR_EMAIL_ADDRESS;
 
+    /**
+     * HTML template for personalized emails.
+     */
     private static final String EMAIL_TEMPLATE = """
             <!DOCTYPE html>
             <html lang="fr">
@@ -76,6 +86,7 @@ public class ContactService {
      * @throws MailServiceException if the email fails to be sent
      */
     public void sendContactEmail(String senderEmailAddress, String contactMessageSubject, String contactMessageContent) {
+        log.debug("Entering sendContactEmail with senderEmailAddress: {}, subject: {}", senderEmailAddress, contactMessageSubject);
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             simpleMailMessage.setFrom(senderEmailAddress);
@@ -90,7 +101,7 @@ public class ContactService {
             this.javaMailSender.send(simpleMailMessage);
             log.info("Email envoyé avec succès !");
         } catch (Exception exception) {
-            log.error("Error while sending email: {}", exception.getMessage());
+            log.error("Error while sending email from {}: {}", senderEmailAddress, exception.getMessage());
             throw new MailServiceException("Erreur lors de l'envoi de l'email");
         }
     }
@@ -104,6 +115,7 @@ public class ContactService {
      * @throws MailServiceException if the email fails to be sent
      */
     public void sendEmail(String recipient, String subject, String body) {
+        log.debug("Entering sendEmail with recipient: {}, subject: {}", recipient, subject);
         try {
             MimeMessage mimeMessage = this.javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");

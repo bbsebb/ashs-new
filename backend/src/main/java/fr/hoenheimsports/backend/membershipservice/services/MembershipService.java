@@ -310,6 +310,12 @@ public class MembershipService {
         return membership;
     }
 
+    /**
+     * Retrieves all payment transactions for a given campaign.
+     *
+     * @param campaignId the unique identifier of the campaign
+     * @return a list of PaymentResponse DTOs
+     */
     @Transactional(readOnly = true)
     public List<PaymentResponse> getPaymentTransactionsByCampaign(UUID campaignId) {
         return this.paymentTransactionRepository.findByCampaignId(campaignId).stream()

@@ -14,8 +14,25 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = DateRangeValidator.class)
 @Documented
 public @interface DateRange {
+    /**
+     * Default validation error message.
+     *
+     * @return the error message template
+     */
     String message() default "La date de début doit être avant la date de fin";
+
+    /**
+     * Validation groups.
+     *
+     * @return the validation groups
+     */
     Class<?>[] groups() default {};
+
+    /**
+     * Payload associated with the constraint.
+     *
+     * @return the payload class array
+     */
     Class<? extends Payload>[] payload() default {};
 
     /**
@@ -32,10 +49,18 @@ public @interface DateRange {
      */
     String endDate();
 
+    /**
+     * Defines several {@link DateRange} annotations on the same element.
+     */
     @Target({ ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @interface List {
+        /**
+         * The value representing the array of {@link DateRange} annotations.
+         *
+         * @return the DateRange annotations
+         */
         DateRange[] value();
     }
 }

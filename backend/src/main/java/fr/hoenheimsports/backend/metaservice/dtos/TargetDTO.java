@@ -1,10 +1,10 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
 /**
- * Représente la cible d'un lien ou d'un média.
+ * Represents the target of a link or media.
  *
- * @param id  L'identifiant unique de la cible.
- * @param url L'URL de la cible.
+ * @param id  The unique identifier of the target.
+ * @param url The URL of the target.
  */
 public record TargetDTO(
         String id,

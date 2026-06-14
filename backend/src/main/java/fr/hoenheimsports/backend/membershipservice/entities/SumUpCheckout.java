@@ -6,6 +6,12 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Value object representing detailed SumUp checkout information.
+ *
+ * @param id          the SumUp checkout reference
+ * @param description description of the checkout
+ * @param returnUrl   callback URL
+ * @param date        date of checkout creation
+ * @param checkoutUrl payment page URL
  */
 @Embeddable
 public record SumUpCheckout(

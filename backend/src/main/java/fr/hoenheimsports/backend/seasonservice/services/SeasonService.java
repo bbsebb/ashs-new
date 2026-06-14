@@ -29,9 +29,24 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class SeasonService {
+    /**
+     * Repository interface for Season database operations.
+     */
     private final SeasonRepository seasonRepository;
+
+    /**
+     * Mapper for converting between Season entities and DTOs.
+     */
     private final SeasonMapper seasonMapper;
+
+    /**
+     * Client interface for team operations.
+     */
     private final TeamAPI teamAPI;
+
+    /**
+     * Client interface for campaign operations.
+     */
     private final CampaignAPI campaignAPI;
 
     /**
@@ -57,16 +72,26 @@ public class SeasonService {
      */
     public void deleteById(UUID uuid) {
         log.debug("Tentative de suppression de la saison avec l'ID : {}", uuid);
-        var season = seasonRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La saison n'a pas été trouvée ou n'existe plus."));
+        var season = seasonRepository.findById(uuid).orElseThrow(() -> {
+            log.error("Season with ID {} not found for deletion", uuid);
+            return new EntityNotFoundException("La saison n'a pas été trouvée ou n'existe plus.");
+        });
         assertSeasonHasNoAssociations(season);
         seasonRepository.delete(season);
         log.info("Saison supprimée : {}", uuid);
     }
 
+    /**
+     * Ensures that the season is not referenced by any teams or campaigns before deletion.
+     *
+     * @param season the season entity to check
+     * @throws SeasonInUseException if associations exist
+     */
     private void assertSeasonHasNoAssociations(Season season) {
         int numberOfTeamBySeason = this.teamAPI.findTeamUUIDBySeasonUUID(season.getId()).size();
         int numberOfCampaignBySeason = this.campaignAPI.findCampaignUUIDBySeasonUUID(season.getId()).size();
         if (numberOfTeamBySeason + numberOfCampaignBySeason > 0) {
+            log.error("Season with ID {} is still associated with {} teams and {} campaigns", season.getId(), numberOfTeamBySeason, numberOfCampaignBySeason);
             throw new SeasonInUseException("La saison est utilisée par des équipes ou campagnes et ne peut pas être supprimée");
         }
     }
@@ -109,7 +134,10 @@ public class SeasonService {
         );
         assertValidDateRange(seasonUpdateRequest.startDate(), seasonUpdateRequest.endDate());
         var errorMessage = "La saison du %s au %s n'existe pas ou n'a pas été trouvée".formatted(seasonUpdateRequest.startDate(), seasonUpdateRequest.endDate());
-        var season = seasonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(errorMessage));
+        var season = seasonRepository.findById(id).orElseThrow(() -> {
+            log.error("Season with ID {} not found for update", id);
+            return new EntityNotFoundException(errorMessage);
+        });
         season.setStartDate(seasonUpdateRequest.startDate());
         season.setEndDate(seasonUpdateRequest.endDate());
         season.setName(createSeasonName(season.getStartDate(), season.getEndDate()));
@@ -117,12 +145,27 @@ public class SeasonService {
         return seasonMapper.toDto(seasonRepository.save(season));
     }
 
+    /**
+     * Verifies that the starting date is chronologically before the ending date.
+     *
+     * @param startDate the start date of the season
+     * @param endDate   the end date of the season
+     * @throws RangeDateException if the start date is on or after the end date
+     */
     private void assertValidDateRange(LocalDate startDate, LocalDate endDate) {
         if (!startDate.isBefore(endDate)) {
+            log.error("Invalid date range: startDate {} must be before endDate {}", startDate, endDate);
             throw new RangeDateException("La date de début doit être antérieure à la date de fin");
         }
     }
 
+    /**
+     * Generates a standardized display name for a season based on its start and end years.
+     *
+     * @param startDate the start date of the season
+     * @param endDate   the end date of the season
+     * @return the formatted season name
+     */
     private String createSeasonName(LocalDate startDate, LocalDate endDate) {
         return "Saison %d - %d".formatted(startDate.getYear(), endDate.getYear());
     }

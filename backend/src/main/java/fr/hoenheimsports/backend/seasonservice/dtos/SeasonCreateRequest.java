@@ -7,7 +7,10 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
- * DTO for {@link fr.hoenheimsports.backend.seasonservice.entities.Season}
+ * Data Transfer Object representing the request payload for creating a new season.
+ *
+ * @param startDate the starting date of the season
+ * @param endDate   the ending date of the season
  */
 @DateRange(startDate = "startDate", endDate = "endDate")
 public record SeasonCreateRequest(@NotNull(message = "La date de début est obligatoire") LocalDate startDate,

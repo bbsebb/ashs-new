@@ -10,11 +10,20 @@ import org.springframework.resilience.annotation.EnableResilientMethods;
 
 import java.time.Duration;
 
+/**
+ * Configuration class for application caching using Caffeine.
+ * Enables caching and configures specific cache settings such as TTL and size.
+ */
 @Configuration
 @EnableCaching
 @EnableResilientMethods
 public class CacheConfig {
 
+    /**
+     * Customizes the Caffeine cache manager to register specific caches.
+     *
+     * @return a {@link CacheManagerCustomizer} for {@link CaffeineCacheManager}
+     */
     @Bean
     public CacheManagerCustomizer<CaffeineCacheManager> cacheManagerCustomizer() {
         return cacheManager -> cacheManager.registerCustomCache("metaFeeds",

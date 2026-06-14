@@ -24,6 +24,19 @@ import java.util.Objects;
  * - purpose (String, optional): Purpose of the checkout (e.g. "CHECKOUT", "SETUP_RECURRING_PAYMENT").
  * - valid_until (OffsetDateTime, optional): Expiration date/time (ISO 8601) of the checkout.
  * - hosted_checkout (HostedCheckout, optional): Configuration block for the SumUp hosted payment page.
+ *
+ * @param checkout_reference unique ID for the payment checkout, specified by the merchant
+ * @param amount             total charge amount
+ * @param currency           3-letter ISO4217 code (e.g. "EUR")
+ * @param pay_to_email       email address of the merchant receiving the payment
+ * @param description        description shown in SumUp reporting
+ * @param returnUrl          callback URL called when the checkout status changes
+ * @param redirectUrl        URL to redirect the payer after payment completion
+ * @param merchantCode       the merchant account ID
+ * @param customerId         ID of the customer profile if saved
+ * @param purpose            purpose of the checkout
+ * @param validUntil         expiration date/time of the checkout
+ * @param hostedCheckout     configuration block for the SumUp hosted payment page
  */
 public record SumUpCheckoutRequest(
     String checkout_reference,
@@ -50,6 +63,11 @@ public record SumUpCheckoutRequest(
         Objects.requireNonNull(currency, "currency must not be null");
     }
 
+    /**
+     * Configuration block for SumUp hosted payment page.
+     *
+     * @param enabled flag indicating if hosted checkout is enabled
+     */
     public record HostedCheckout(boolean enabled) {
     }
 }

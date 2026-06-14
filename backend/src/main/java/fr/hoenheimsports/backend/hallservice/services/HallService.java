@@ -22,7 +22,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class HallService {
+    /**
+     * Repository for performing database operations on halls.
+     */
     private final HallRepository hallRepository;
+
+    /**
+     * Mapper for converting between Hall entities and DTOs.
+     */
     private final HallMapper hallMapper;
 
     /**
@@ -60,7 +67,10 @@ public class HallService {
      */
     public HallResponse updateHall(UUID id, HallUpdateRequest hallUpdateRequest) {
         log.debug("Tentative de mise à jour de la salle avec le nom: {}", hallUpdateRequest.name());
-        Hall hall = hallRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("La salle avec le nom -" + hallUpdateRequest.name() + "- n'a pas été trouvé ou n'existe plus."));
+        Hall hall = hallRepository.findById(id).orElseThrow(() -> {
+            log.error("Hall with ID {} not found for update", id);
+            return new EntityNotFoundException("La salle avec le nom -" + hallUpdateRequest.name() + "- n'a pas été trouvé ou n'existe plus.");
+        });
         hall.setName(hallUpdateRequest.name());
         hall.getAddress().setStreet(hallUpdateRequest.addressStreet());
         hall.getAddress().setCity(hallUpdateRequest.addressCity());
@@ -78,7 +88,10 @@ public class HallService {
      */
     public void deleteHallById(UUID uuid) {
         log.debug("Tentative de suppression de la salle avec l'ID : {}", uuid);
-        var hall = hallRepository.findById(uuid).orElseThrow(() -> new EntityNotFoundException("La salle n'a pas été trouvé ou n'existe plus."));
+        var hall = hallRepository.findById(uuid).orElseThrow(() -> {
+            log.error("Hall with ID {} not found for deletion", uuid);
+            return new EntityNotFoundException("La salle n'a pas été trouvé ou n'existe plus.");
+        });
         hallRepository.delete(hall);
         log.info("Salle supprimée : {}", uuid);
 

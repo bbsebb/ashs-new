@@ -10,6 +10,9 @@ import java.util.UUID;
 
 /**
  * Request DTO for creating a new membership campaign.
+ *
+ * @param seasonId   the UUID of the season this campaign belongs to
+ * @param categories the set of membership categories available in this campaign
  */
 @NullMarked
 public record CampaignCreateRequest(

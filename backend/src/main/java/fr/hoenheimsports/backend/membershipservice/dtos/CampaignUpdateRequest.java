@@ -8,6 +8,8 @@ import java.util.Set;
 
 /**
  * Request DTO for updating an existing membership campaign.
+ *
+ * @param categories the updated set of categories
  */
 @NullMarked
 public record CampaignUpdateRequest(

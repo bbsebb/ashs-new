@@ -5,6 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * DTO representing a request to create a new staff member.
+ *
+ * @param firstName the first name of the staff member, must not be blank
+ * @param lastName  the last name of the staff member, must not be blank
+ * @param email     the email address of the staff member, must be a valid email format or null
+ * @param phone     the phone number of the staff member, must match the phone number format or null
+ */
 public record StaffCreateRequest(
         @NotBlank(message = "Le prénom est obligatoire")
         String firstName,

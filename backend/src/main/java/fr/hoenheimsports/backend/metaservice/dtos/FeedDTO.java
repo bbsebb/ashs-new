@@ -4,12 +4,12 @@ package fr.hoenheimsports.backend.metaservice.dtos;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 /**
- * Représente une publication individuelle dans le flux.
+ * Represents an individual post in the feed.
  *
- * @param id          L'identifiant unique de la publication.
- * @param createdTime La date et l'heure de création de la publication.
- * @param message     Le message texte de la publication (peut être nul).
- * @param attachments Les pièces jointes associées à la publication.
+ * @param id          The unique identifier of the post.
+ * @param createdTime The date and time when the post was created.
+ * @param message     The text message of the post (can be null).
+ * @param attachments The attachments associated with the post.
  */
 public record FeedDTO(
         String id,

@@ -9,10 +9,20 @@ import org.springframework.web.client.support.RestClientHttpServiceGroupConfigur
 
 import org.springframework.web.service.registry.ImportHttpServices;
 
+/**
+ * Configuration class for the Meta HTTP client.
+ * Registers the declarative {@link MetaClient} and sets up its base URL, headers, and error handling.
+ */
 @Configuration
 @Slf4j
 @ImportHttpServices(group = "meta", types = MetaClient.class)
 public class MetaClientConfig {
+    /**
+     * Configures the RestClient service group named "meta" to point to the Facebook Graph API URL.
+     * Sets up default accept headers and logging status handlers for error status codes.
+     *
+     * @return a {@link RestClientHttpServiceGroupConfigurer} for the meta service group
+     */
     @Bean
     RestClientHttpServiceGroupConfigurer groupConfigurer() {
         return groups -> groups.filterByName("meta")

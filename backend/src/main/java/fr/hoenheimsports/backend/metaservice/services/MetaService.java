@@ -42,7 +42,15 @@ public class MetaService {
             delay = 100
     )
     public GraphApiResponse getFeeds() {
-        return metaClient.getFeeds(pageId,accessToken, DEFAULT_FEED_FIELDS, 100);
+        log.debug("Cache miss or retry: fetching feeds from Meta API for pageId: {}", pageId);
+        try {
+            GraphApiResponse response = metaClient.getFeeds(pageId, accessToken, DEFAULT_FEED_FIELDS, 100);
+            log.info("Successfully fetched feeds from Meta API for pageId: {}", pageId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to fetch feeds from Meta API for pageId: {}", pageId, e);
+            throw e;
+        }
     }
 
 }

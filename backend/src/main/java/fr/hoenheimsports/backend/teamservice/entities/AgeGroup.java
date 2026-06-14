@@ -17,7 +17,7 @@ import java.util.UUID;
 @ToString
 @RequiredArgsConstructor
 @Getter
-public class AgeGroup {
+public class AgeGroup implements Comparable<AgeGroup> {
     /**
      * Unique identifier for the age group.
      */
@@ -53,5 +53,13 @@ public class AgeGroup {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
+
+    @Override
+    public int compareTo(AgeGroup o) {
+        if (this.upperLimit != o.upperLimit) {
+            return this.upperLimit ? -1 : 1;
+        }
+        return Integer.compare(this.ageLimit, o.ageLimit);
     }
 }

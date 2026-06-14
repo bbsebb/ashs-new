@@ -44,7 +44,11 @@ public class TeamService {
      * @return a list of team response DTOs
      */
     public List<TeamReponseDTO> getAllTeams() {
-        return this.teamRepository.findAll().stream().map(teamMapper::toDto).collect(Collectors.toList());
+        return this.teamRepository.findAll()
+                .stream()
+                .sorted()
+                .map(teamMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     /**

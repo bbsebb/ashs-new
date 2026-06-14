@@ -10,6 +10,7 @@ import fr.hoenheimsports.backend.teamservice.mappers.TeamMapper;
 import fr.hoenheimsports.backend.teamservice.repository.AgeGroupRepository;
 import fr.hoenheimsports.backend.teamservice.repository.TeamRepository;
 import fr.hoenheimsports.backend.teamservice.repository.TeamStaffRepository;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -164,5 +165,106 @@ class TeamServiceTest {
         assertThat(team.getStaffs()).hasSize(1);
         assertThat(team.getStaffs().iterator().next().getStaffId()).isEqualTo(otherStaffId);
         verify(teamRepository).saveAll(anyList());
+    }
+
+    @Nested
+    class GetAllTeams {
+
+        private AgeGroup createAgeGroup(int ageLimit, boolean upperLimit) {
+            AgeGroup ageGroup = new AgeGroup();
+            ageGroup.setAgeLimit(ageLimit);
+            ageGroup.setUpperLimit(upperLimit);
+            org.springframework.test.util.ReflectionTestUtils.setField(ageGroup, "id", UUID.randomUUID());
+            return ageGroup;
+        }
+
+        private Team createTeam(TeamName name, Gender gender) {
+            Team team = new Team();
+            team.setName(name);
+            team.setGender(gender);
+            org.springframework.test.util.ReflectionTestUtils.setField(team, "id", UUID.randomUUID());
+            return team;
+        }
+
+        @Test
+        void shouldReturnEmptyList_WhenNoTeamsExist() {
+            // Arrange
+            when(teamRepository.findAll()).thenReturn(Collections.emptyList());
+
+            // Act
+            List<TeamReponseDTO> result = teamService.getAllTeams();
+
+            // Assert
+            assertThat(result).isEmpty();
+            verify(teamRepository).findAll();
+        }
+
+        @Test
+        void shouldReturnSingleTeam_WhenOneTeamExists() {
+            // Arrange
+            AgeGroup u18Group = createAgeGroup(18, true);
+            Team team = createTeam(new TeamName(1, u18Group), Gender.Male);
+            TeamReponseDTO dto = new TeamReponseDTO(UUID.randomUUID(), UUID.randomUUID(), Gender.Male, null, null, Collections.emptyList(), Collections.emptyList());
+
+            when(teamRepository.findAll()).thenReturn(List.of(team));
+            when(teamMapper.toDto(team)).thenReturn(dto);
+
+            // Act
+            List<TeamReponseDTO> result = teamService.getAllTeams();
+
+            // Assert
+            assertThat(result).containsExactly(dto);
+            verify(teamRepository).findAll();
+            verify(teamMapper).toDto(team);
+        }
+
+        @Test
+        void shouldReturnSortedTeams_WhenMultipleTeamsExist() {
+            // Arrange
+            AgeGroup u13Group = createAgeGroup(13, true);
+            AgeGroup u18Group = createAgeGroup(18, true);
+            AgeGroup seniorsGroup = createAgeGroup(18, false);
+
+            // Our expected order:
+            // 1. team1 (U13 1, Male)
+            // 2. team3a (U18 1, Male)
+            // 3. team3b (U18 1, Female)
+            // 4. team2 (U18 2, Male)
+            // 5. team4 (Seniors 1, Male)
+            Team team1 = createTeam(new TeamName(1, u13Group), Gender.Male);
+            Team team2 = createTeam(new TeamName(2, u18Group), Gender.Male);
+            Team team3a = createTeam(new TeamName(1, u18Group), Gender.Male);
+            Team team3b = createTeam(new TeamName(1, u18Group), Gender.Female);
+            Team team4 = createTeam(new TeamName(1, seniorsGroup), Gender.Male);
+
+            // Unsorted list returned by repository
+            List<Team> unsortedTeams = List.of(team4, team2, team3b, team3a, team1);
+
+            UUID seasonId = UUID.randomUUID();
+            TeamReponseDTO dto1 = new TeamReponseDTO(UUID.randomUUID(), seasonId, Gender.Male, null, null, Collections.emptyList(), Collections.emptyList());
+            TeamReponseDTO dto2 = new TeamReponseDTO(UUID.randomUUID(), seasonId, Gender.Male, null, null, Collections.emptyList(), Collections.emptyList());
+            TeamReponseDTO dto3a = new TeamReponseDTO(UUID.randomUUID(), seasonId, Gender.Male, null, null, Collections.emptyList(), Collections.emptyList());
+            TeamReponseDTO dto3b = new TeamReponseDTO(UUID.randomUUID(), seasonId, Gender.Female, null, null, Collections.emptyList(), Collections.emptyList());
+            TeamReponseDTO dto4 = new TeamReponseDTO(UUID.randomUUID(), seasonId, Gender.Male, null, null, Collections.emptyList(), Collections.emptyList());
+
+            when(teamRepository.findAll()).thenReturn(unsortedTeams);
+            when(teamMapper.toDto(team1)).thenReturn(dto1);
+            when(teamMapper.toDto(team2)).thenReturn(dto2);
+            when(teamMapper.toDto(team3a)).thenReturn(dto3a);
+            when(teamMapper.toDto(team3b)).thenReturn(dto3b);
+            when(teamMapper.toDto(team4)).thenReturn(dto4);
+
+            // Act
+            List<TeamReponseDTO> result = teamService.getAllTeams();
+
+            // Assert
+            assertThat(result).containsExactly(dto1, dto3a, dto3b, dto2, dto4);
+            verify(teamRepository).findAll();
+            verify(teamMapper).toDto(team1);
+            verify(teamMapper).toDto(team2);
+            verify(teamMapper).toDto(team3a);
+            verify(teamMapper).toDto(team3b);
+            verify(teamMapper).toDto(team4);
+        }
     }
 }

@@ -1,8 +1,8 @@
 package fr.hoenheimsports.backend.teamservice.services;
 
 import fr.hoenheimsports.backend.shared.exceptions.EntityNotFoundException;
-import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
 import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupCreateRequest;
+import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupResponseDTO;
 import fr.hoenheimsports.backend.teamservice.dtos.AgeGroupUpdateRequest;
 import fr.hoenheimsports.backend.teamservice.mappers.AgeGroupMapper;
 import fr.hoenheimsports.backend.teamservice.repository.AgeGroupRepository;
@@ -21,6 +21,7 @@ public class AgeGroupService {
 
     public List<AgeGroupResponseDTO> getAllAgeGroups() {
         return ageGroupRepository.findAll().stream()
+                .sorted()
                 .map(ageGroupMapper::toDto)
                 .toList();
     }

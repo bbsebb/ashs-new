@@ -19,7 +19,7 @@ import java.util.*;
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Team {
+public class Team implements Comparable<Team> {
     /**
      * Unique identifier for the team.
      */
@@ -137,5 +137,13 @@ public class Team {
     @Override
     public final int hashCode() {
         return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    }
+
+    @Override
+    public int compareTo(Team o) {
+        return Comparator
+                .comparing(Team::getName)
+                .thenComparing(Team::getGender)
+                .compare(this, o);
     }
 }

@@ -22,9 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, properties = "management.health.mail.enabled=false")
 @ActiveProfiles("test")
@@ -73,6 +71,7 @@ class ContactUseCasesTest {
 
         SimpleMailMessage capturedMessage = messageCaptor.getValue();
         assertThat(capturedMessage.getFrom()).isEqualTo("test@user.com");
+        assertThat(capturedMessage.getReplyTo()).isEqualTo("test@user.com");
         assertThat(capturedMessage.getTo()).containsExactly("test@test.com");
         assertThat(capturedMessage.getSubject()).isEqualTo("Email reçu depuis contact : Demande d'information");
         assertThat(capturedMessage.getText()).contains("test@user.com");

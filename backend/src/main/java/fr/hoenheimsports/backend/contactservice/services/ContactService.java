@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.contactservice.services;
 
 import fr.hoenheimsports.backend.contactservice.exceptions.MailServiceException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ContactService {
     /**
      * Mail sender interface used for sending emails.
@@ -68,14 +70,7 @@ public class ContactService {
             """;
 
 
-    /**
-     * Constructs a new ContactService with the required JavaMailSender.
-     *
-     * @param javaMailSender the Spring mail sender used to dispatch emails
-     */
-    public ContactService(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
+
 
     /**
      * Formats and sends a contact email to the administrator.
@@ -90,6 +85,7 @@ public class ContactService {
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             simpleMailMessage.setFrom(senderEmailAddress);
+            simpleMailMessage.setReplyTo(senderEmailAddress);
             simpleMailMessage.setTo(ADMINISTRATOR_EMAIL_ADDRESS);
             simpleMailMessage.setSubject("Email reçu depuis contact : " + contactMessageSubject);
 

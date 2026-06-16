@@ -27,7 +27,7 @@ describe('CampaignView Component (Admin)', () => {
       },
       membershipStore: {
         campaignPaymentsViewModelSignal: signal({
-          payments: [],
+          payments: [] as any[],
           isLoading: false,
           error: null
         }),

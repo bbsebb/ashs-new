@@ -66,25 +66,70 @@ graph TD
 
 ## 3. Architecture Détaillée du Frontend (Angular Monorepo)
 
-Le frontend utilise une structure de **Monorepo** (Nx-like) pour favoriser la réutilisation du code.
+Le frontend utilise une structure de **Monorepo** (Nx-like) pour structurer le code, favoriser la réutilisation et assurer une cohérence stricte des modèles de données et de l'interface utilisateur.
 
-### Structure du Monorepo
+### Structure du Monorepo et Dépendances
 ```mermaid
 graph TD
     subgraph Applications
-        App[Public App]
-        Admin[Admin Portal]
+        App[Public App: projects/app]
+        Admin[Admin Portal: projects/admin]
     end
 
     subgraph Libraries
-        SAPI[shared-api: Gateways HTTP]
-        SDOM[shared-domain: Models, DTOs, Enums]
-        SUI[shared-ui: UI Components, Scss Tokens]
+        SAPI[shared-api: projects/shared-api]
+        SDOM[shared-domain: projects/shared-domain]
+        SUI[shared-ui: projects/shared-ui]
     end
 
     App --> SAPI & SDOM & SUI
     Admin --> SAPI & SDOM & SUI
+    SAPI --> SDOM
+    SUI --> SDOM
 ```
+
+### 3.1. Applications distinctes
+Le monorepo comporte deux applications Angular 21 autonomes :
+*   **Public App (`projects/app`)** : L'application vitrine destinée au grand public. Elle permet la consultation anonyme des équipes, du personnel encadrant, des salles, des saisons, l'envoi de messages de contact, et la souscription/paiement des adhésions via l'intégration SumUp.
+*   **Admin Portal (`projects/admin`)** : Le portail d'administration sécurisé. Protégé par l'authentification Keycloak (via des guards et un Resource Server), il offre les fonctionnalités CRUD pour administrer l'ensemble des modules (saisons, équipes, membres, cotisations, configurations des salles).
+
+### 3.2. Librairies Internes
+Le code partagé est découpé en trois librairies métiers et techniques :
+1.  **`shared-domain`** : Contient uniquement les interfaces, classes, enums et types purs du domaine (ex: `Hall`, `Staff`, `Team`, `ProblemDetail`). Cette librairie n'a aucune dépendance Angular et sert de source de vérité unique pour les structures de données.
+2.  **`shared-api`** : Regroupe l'infrastructure de communication et la gestion d'état :
+    *   **Gateways** : Services gérant les requêtes HTTP pures (lectures via `httpResource`, écritures via `Observable`).
+    *   **Stores** : Services de gestion d'état centralisés utilisant les **Signals Angular** pour exposer de manière réactive l'état de l'application (ex: `HallsStore`).
+    *   **Services transverses** : Gestion globale des erreurs d'API (`FormErrorHandleService`).
+3.  **`shared-ui`** : Regroupe l'ensemble des composants Dumb / de présentation réutilisables (ex: `lib-hall-card`, `lib-staff-card`), les directives utilitaires (ex: `*appError`), les services d'interaction visuelle (ex: `NotificationService`, `DialogService`), ainsi que les variables globales et les mixins de style Material 3 SCSS.
+
+### 3.3. Architecture Spécifique des Formulaires (Portail Admin)
+Les formulaires de modification et de création dans le portail d'administration suivent une architecture hautement découplée et réactive utilisant l'API **Signal-based Forms** (`@angular/forms/signals`) d'Angular.
+
+#### Diagramme d'Architecture de Formulaire (MVVM)
+```mermaid
+graph TD
+    Comp[Form Component: HallForm] -->|Injects / Scoped Provider| FormService[Form Service: HallFormService]
+    FormService -->|Reads / Selectors| Store[Global Store: HallsStore]
+    FormService -->|Validations & Actions| SignalForm[Signal FieldTree]
+    FormService -->|Submit Errors mapping| ErrorService[FormErrorHandleService]
+    
+    Template[HTML Template] -->|formRoot| SignalForm
+    Template -->|*appError directive| SignalForm
+```
+
+#### Principes Clés d'Implémentation
+*   **MVVM avec Form Service Dédié** : La logique et l'état du formulaire sont isolés dans un service de formulaire spécifique à la fonctionnalité (ex: `HallFormService`). Ce service est déclaré dans le tableau `providers` du composant de formulaire, limitant ainsi sa durée de vie à celle du composant.
+*   **Synchronisation via `linkedSignal`** : Pour lier proprement les données asynchrones du store au formulaire :
+    1.  Le composant reçoit un ID d'entité en entrée via un `InputSignal` (`idInputSignal = input<string>()`).
+    2.  Le `FormService` récupère l'entité correspondante depuis le store global via un signal computed.
+    3.  Un `linkedSignal` local (`hallModelSignal`) suit l'entité. Dès que l'entité change (par exemple lors du chargement initial ou d'un rafraîchissement), le `linkedSignal` réinitialise automatiquement l'état interne du modèle de formulaire.
+*   **Déclaration du Formulaire** : Le formulaire est généré à l'aide de la factory `form(this.hallModelSignal, validationSchema, options)`. Il expose un arbre réactif `FieldTree` où chaque champ est accessible sous forme de propriétés réactives et de signaux.
+*   **Validation Déclarative** : Les règles de validation sont appliquées sur un arbre de chemins de schéma (`SchemaPathTree`) à l'aide de fonctions de validation explicites (ex: `required(...)`, `maxLength(...)`).
+*   **Soumission et Mapping d'Erreurs d'API** :
+    1.  L'action de soumission appelle de manière asynchrone le Store global.
+    2.  En cas d'erreur de validation renvoyée par le backend (ex: `ProblemDetail` avec un statut 400), le service passe l'erreur à `FormErrorHandleService` (`@shared-api`).
+    3.  Ce service analyse l'erreur d'API et met à jour dynamiquement l'état d'erreur de chaque champ du `FieldTree`.
+*   **Intégration Template** : Le template HTML utilise la directive `[formRoot]` sur la balise `<form>` et `[formField]` sur les entrées Material (`<input>`). La directive structurelle personnalisée `*appError` (fournie par `@shared-ui`) écoute les signaux d'erreur du champ pour restituer immédiatement les messages de validation dans les éléments `<mat-error>`.
 
 ---
 

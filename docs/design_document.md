@@ -35,6 +35,7 @@ graph TD
         Season[Season Module]
         Contact[Contact Module]
         Meta[Meta Module]
+        Membership[Membership Module]
     end
 
     subgraph Services Transverses
@@ -49,8 +50,10 @@ graph TD
     Season -->|API Check| Team
     Meta -->|HTTP| MetaAPI[Facebook API]
     Contact -->|SMTP| MailServer[Server SMTP]
+    Membership -.->|Publishes Event| Contact
+    Membership -->|HTTP| SumUpAPI[SumUp API]
     
-    Team & Staff & Hall & Season --> Shared
+    Team & Staff & Hall & Season & Membership --> Shared
 ```
 
 *   **Encapsulation :** L'isolation est garantie par Spring Modulith. Seuls les DTOs et Services exposés dans les packages racines de chaque module sont accessibles.

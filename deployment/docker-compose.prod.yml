@@ -39,9 +39,15 @@ services:
       - MAIL_USERNAME=${MAIL_USERNAME}
       - RESOURCE_SERVER_ISSUER_URI=${RESOURCE_SERVER_ISSUER_URI}
       - SPRING_FLYWAY_ENABLED=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=ashs-backend
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
     volumes:
       - ./uploads:/app/uploads
     networks:
+      - observability-network
       - ashs-network
     depends_on:
       db:
@@ -78,6 +84,8 @@ services:
 
 # Définition de l'infrastructure Docker
 networks:
+  observability-network:
+    external: true
   ashs-network:
     driver: bridge
 

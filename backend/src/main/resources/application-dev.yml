@@ -19,11 +19,15 @@ contact:
     email:
       address: sebastien.burckhardt@hoenheimsports.fr
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
 
 logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.orm.results: TRACE
-    fr.hoenheimsports: DEBUG
+    fr.hoenheimsports: TRACE

@@ -27,9 +27,5 @@ contact:
 logging:
   level:
     # On réduit drastiquement les logs pour ne pas saturer l'espace disque du VPS
-    root: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: WARN
-    org.hibernate.orm.results: WARN
+    root: WARN
     fr.hoenheimsports: INFO
-    fr.hoenheimsports.backend.metaservice: DEBUG

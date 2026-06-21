@@ -17,6 +17,9 @@ spring:
     clean-disabled: true # CRITIQUE : Empêche la suppression des données en prod
     validate-on-migrate: true
 
+  jpa:
+    open-in-view: false
+
 contact:
   administrator:
     email:
@@ -45,3 +48,11 @@ logging:
     # On réduit drastiquement les logs pour ne pas saturer l'espace disque du VPS
     root: WARN
     fr.hoenheimsports: INFO
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+  scalar:
+    enabled: false

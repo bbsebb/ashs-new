@@ -1,0 +1,18 @@
+<div class="dialog-container">
+  <button mat-icon-button class="close-button" (click)="close()" aria-label="Fermer la vidéo">
+    <mat-icon>close</mat-icon>
+  </button>
+  @if (safeEmbedHtml) {
+    <div class="video-wrapper" [style.aspect-ratio]="aspectRatio" [innerHTML]="safeEmbedHtml"></div>
+  } @else if (rawSourceUrl) {
+    <div class="video-wrapper" [style.aspect-ratio]="aspectRatio">
+      <video controls autoplay class="video-player">
+        <source [src]="rawSourceUrl" type="video/mp4"/>
+        Votre navigateur ne supporte pas les vidéos HTML5.
+      </video>
+    </div>
+  } @else {
+    <div class="error-message">Aucune source vidéo disponible.</div>
+  }
+</div>
+

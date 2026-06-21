@@ -9,6 +9,9 @@ export interface ImageDTO {
 export interface MediaDTO {
   image: ImageDTO;
   source?: string;
+  embedHtml?: string;
+  videoWidth?: number;
+  videoHeight?: number;
 }
 
 export interface TargetDTO {

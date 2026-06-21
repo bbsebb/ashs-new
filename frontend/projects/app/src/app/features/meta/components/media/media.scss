@@ -1,8 +1,73 @@
-
 img, video {
   border-top-right-radius:  var(--mat-sys-corner-medium);
   border-top-left-radius: var(--mat-sys-corner-medium);
   width: 100%;
   height: auto;
+  display: block;
 }
 
+.video-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  overflow: hidden;
+  border-top-right-radius: var(--mat-sys-corner-medium);
+  border-top-left-radius: var(--mat-sys-corner-medium);
+  display: block;
+
+  img {
+    border-radius: 0; // Géré par le parent
+  }
+
+  &:hover {
+    .video-overlay {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .play-button {
+      transform: scale(1.05);
+      background: #ffffff;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.play-button {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: inherit;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    display: block;
+    color: var(--mat-sys-primary, #1877f2); // Icône bleue pour rappeler Facebook/Instagram de manière premium
+  }
+
+  span {
+    line-height: 1;
+  }
+}

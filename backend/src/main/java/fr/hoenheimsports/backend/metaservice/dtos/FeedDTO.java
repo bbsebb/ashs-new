@@ -2,6 +2,7 @@ package fr.hoenheimsports.backend.metaservice.dtos;
 
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an individual post in the feed.
@@ -14,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 public record FeedDTO(
         String id,
         @JsonAlias(value = "created_time") String createdTime,
-        String message,
-        AttachmentsDTO attachments
+        @Nullable String message,
+        @Nullable AttachmentsDTO attachments
 ) {
 }

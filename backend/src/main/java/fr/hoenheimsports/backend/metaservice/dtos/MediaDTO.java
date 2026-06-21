@@ -1,5 +1,7 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents the multimedia content.
  *
@@ -8,6 +10,7 @@ package fr.hoenheimsports.backend.metaservice.dtos;
  */
 public record MediaDTO(
         ImageDTO image,
-        String source
+        @Nullable String source
 ) {
 }
+

@@ -32,7 +32,9 @@ export interface AttachmentDTO {
   type: string;
   media?: MediaDTO;
   subAttachments?: SubAttachmentsDTO;
+  target?: TargetDTO;
 }
+
 
 export interface AttachmentsDTO {
   data: AttachmentDTO[];

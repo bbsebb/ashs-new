@@ -21,6 +21,20 @@
       </app-media>
     }
   }
+  <!-- Tiers gauche et tiers droit pour clic facile -->
+  <button
+    class="click-zone prev-zone"
+    (click)="prevSlide()"
+    [disabled]="!canNavigateSignal()"
+    aria-label="Précédent (tiers gauche)">
+  </button>
+  <button
+    class="click-zone next-zone"
+    (click)="nextSlide()"
+    [disabled]="!canNavigateSignal()"
+    aria-label="Suivant (tiers droit)">
+  </button>
+
   <button
     mat-icon-button
     class="carousel-control prev"
@@ -38,3 +52,4 @@
     <mat-icon>arrow_forward</mat-icon>
   </button>
 </div>
+

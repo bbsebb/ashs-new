@@ -1,5 +1,7 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a sub-attachment (for example, a photo or video inside an album).
  *
@@ -9,9 +11,10 @@ package fr.hoenheimsports.backend.metaservice.dtos;
  * @param url    The direct URL to the post of this media on Facebook.
  */
 public record SubAttachmentDTO(
-        MediaDTO media,
-        TargetDTO target,
+        @Nullable MediaDTO media,
+        @Nullable TargetDTO target,
         String type,
         String url
 ) {
 }
+

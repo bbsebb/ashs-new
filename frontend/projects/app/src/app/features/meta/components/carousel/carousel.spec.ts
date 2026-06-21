@@ -22,7 +22,7 @@ describe('Carousel Component (Public)', () => {
 
     const prevButton = screen.getByRole('button', { name: /Média précédent/i }) as HTMLButtonElement;
     const nextButton = screen.getByRole('button', { name: /Média suivant/i }) as HTMLButtonElement;
-    
+
     expect(prevButton.disabled).toBeTruthy();
     expect(nextButton.disabled).toBeTruthy();
   });
@@ -39,10 +39,10 @@ describe('Carousel Component (Public)', () => {
     const prevButton = screen.getByRole('button', { name: /Média précédent/i }) as HTMLButtonElement;
     const nextButton = screen.getByRole('button', { name: /Média suivant/i }) as HTMLButtonElement;
 
-    // A l'initialisation, le premier média est affiché. 
-    // Testing Library ne peut pas vérifier facilement l'opacité (classe CSS 'active'), 
+    // A l'initialisation, le premier média est affiché.
+    // Testing Library ne peut pas vérifier facilement l'opacité (classe CSS 'active'),
     // mais on peut tester les propriétés des composants DOM rendus.
-    
+
     // Le bouton doit être actif
     expect(nextButton.disabled).toBeFalsy();
 
@@ -55,8 +55,30 @@ describe('Carousel Component (Public)', () => {
 
     // Clic pour aller à l'élément précédent (doit aller à l'index 2 à reculons)
     await user.click(prevButton);
-    
+
     // Si tout va bien, les événements ne produisent aucune erreur (la logique est isolée dans les signaux)
     expect(true).toBe(true); // Basic assert if nothing crashes
   });
+
+  it('should have clickable left and right third zones for slide navigation', async () => {
+    const user = userEvent.setup();
+    await render(Carousel, {
+      componentInputs: {
+        subAttachments: mockSubAttachments
+      },
+      imports: [NgOptimizedImage]
+    });
+
+    const leftThirdZone = screen.getByRole('button', {name: /Précédent \(tiers gauche\)/i}) as HTMLButtonElement;
+    const rightThirdZone = screen.getByRole('button', {name: /Suivant \(tiers droit\)/i}) as HTMLButtonElement;
+
+    expect(leftThirdZone).toBeDefined();
+    expect(rightThirdZone).toBeDefined();
+
+    // Tester qu'en cliquant sur le tiers droit on navigue
+    // (Le test ne vérifie que le fait de cliquer ne crash pas et s'exécute correctement)
+    await user.click(rightThirdZone);
+    await user.click(leftThirdZone);
+  });
 });
+

@@ -30,10 +30,15 @@ management:
     metrics:
       export:
         url: ${MANAGEMENT_OTLP_METRICS_EXPORT_URL:http://localhost:4318/v1/metrics}
+  opentelemetry:
     tracing:
-      endpoint: ${MANAGEMENT_OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
+      export:
+        otlp:
+          endpoint: ${MANAGEMENT_OTLP_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
     logging:
-      endpoint: ${MANAGEMENT_OTLP_LOGGING_ENDPOINT:http://localhost:4318/v1/logs}
+      export:
+        otlp:
+          endpoint: ${MANAGEMENT_OTLP_LOGGING_ENDPOINT:http://localhost:4318/v1/logs}
 
 logging:
   level:

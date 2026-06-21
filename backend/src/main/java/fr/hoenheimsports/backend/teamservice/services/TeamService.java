@@ -81,6 +81,7 @@ public class TeamService {
      *
      * @return a list of team response DTOs
      */
+    @Transactional(readOnly = true)
     public List<TeamReponseDTO> getAllTeams() {
         log.debug("Entering getAllTeams");
         List<TeamReponseDTO> result = this.teamRepository.findAll()
@@ -99,6 +100,7 @@ public class TeamService {
      * @param teamRequestDTO the details for creating the team
      * @return the created team's DTO
      */
+    @Transactional
     public TeamReponseDTO createTeam(@Nullable MultipartFile file, TeamCreateRequest teamRequestDTO) {
         log.debug("Entering createTeam with payload: {}, hasFile: {}", teamRequestDTO, file != null);
         log.debug("Mapping {}", this.teamMapper.toEntity(teamRequestDTO));

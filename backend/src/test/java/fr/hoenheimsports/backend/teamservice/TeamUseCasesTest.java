@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.jpa.open-in-view=false")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(TestcontainersConfiguration.class)
@@ -157,10 +157,28 @@ class TeamUseCasesTest {
 
         @Test
         @DisplayName("Devrait lister les équipes publiquement")
-        void shouldListTeamsPublicly() {
+        void shouldListTeamsPublicly() throws Exception {
+            TeamCreateRequest.TeamStaffCreateRequest staff = new TeamCreateRequest.TeamStaffCreateRequest(Role.COACH, staffId);
+            TeamCreateRequest.TrainingSessionCreateRequest session = new TeamCreateRequest.TrainingSessionCreateRequest(
+                    hallId, DayOfWeek.MONDAY, new TimeSlotDTO(LocalTime.of(18, 0), LocalTime.of(19, 30))
+            );
+            TeamCreateRequest request = new TeamCreateRequest(
+                    seasonId, Gender.Male, 1, ageGroupId, List.of(staff), List.of(session)
+            );
+            MockMultipartFile dataPart = new MockMultipartFile("data", "",
+                    MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
+            
+            mockMvc.perform(multipart("/api/v1/teams")
+                            .file(dataPart)
+                            .header("Authorization", "Bearer token"))
+                    .andExpect(status().isOk());
+
             restTestClient.get().uri("/api/v1/teams")
                     .exchange()
-                    .expectStatus().isOk();
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$").isArray()
+                    .jsonPath("$[0]").exists();
         }
     }
 }

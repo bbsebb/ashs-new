@@ -12,4 +12,9 @@ public record ImageDTO(
         String src,
         int width
 ) {
+    public ImageDTO {
+        if (src == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("Image src cannot be null");
+        }
+    }
 }

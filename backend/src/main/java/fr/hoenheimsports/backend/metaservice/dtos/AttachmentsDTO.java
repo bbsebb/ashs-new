@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -8,6 +9,6 @@ import java.util.List;
  * @param data The list of attachment objects.
  */
 public record AttachmentsDTO(
-        List<AttachmentDTO> data
+        @Nullable List<AttachmentDTO> data
 ) {
 }

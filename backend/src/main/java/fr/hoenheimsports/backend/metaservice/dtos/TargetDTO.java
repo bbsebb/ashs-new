@@ -1,5 +1,7 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents the target of a link or media.
  *
@@ -7,7 +9,7 @@ package fr.hoenheimsports.backend.metaservice.dtos;
  * @param url The URL of the target.
  */
 public record TargetDTO(
-        String id,
-        String url
+        @Nullable String id,
+        @Nullable String url
 ) {
 }

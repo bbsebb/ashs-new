@@ -16,6 +16,14 @@ public record VideoResponseDTO(
         String source,
         @Nullable List<VideoFormatDTO> format
 ) {
+    public VideoResponseDTO {
+        if (id == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("Video id cannot be null");
+        }
+        if (source == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("Video source cannot be null");
+        }
+    }
 }
 
 

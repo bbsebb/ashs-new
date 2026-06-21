@@ -19,5 +19,13 @@ public record AttachmentDTO(
         @JsonAlias(value = "subattachments") @Nullable SubAttachmentsDTO subAttachments,
         @Nullable TargetDTO target
 ) {
+    public AttachmentDTO {
+        if (mediaType == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("Attachment mediaType cannot be null");
+        }
+        if (type == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("Attachment type cannot be null");
+        }
+    }
 }
 

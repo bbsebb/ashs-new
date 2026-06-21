@@ -18,4 +18,12 @@ public record FeedDTO(
         @Nullable String message,
         @Nullable AttachmentsDTO attachments
 ) {
+    public FeedDTO {
+        if (id == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("Feed id cannot be null");
+        }
+        if (createdTime == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("Feed createdTime cannot be null");
+        }
+    }
 }

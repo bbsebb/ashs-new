@@ -1,5 +1,6 @@
 package fr.hoenheimsports.backend.metaservice.dtos;
 
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -7,5 +8,6 @@ import java.util.List;
  *
  * @param data the list of feed entries
  */
-public record GraphApiResponse(List<FeedDTO> data) {
+public record GraphApiResponse(@Nullable List<FeedDTO> data) {
 }
+

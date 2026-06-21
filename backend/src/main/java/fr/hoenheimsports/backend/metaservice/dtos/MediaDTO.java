@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
  * @param videoHeight The height of the video. Can be null.
  */
 public record MediaDTO(
-        ImageDTO image,
+        @Nullable ImageDTO image,
         @Nullable String source,
         @Nullable String embedHtml,
         @Nullable Integer videoWidth,

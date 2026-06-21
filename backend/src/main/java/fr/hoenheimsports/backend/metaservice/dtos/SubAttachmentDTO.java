@@ -14,7 +14,12 @@ public record SubAttachmentDTO(
         @Nullable MediaDTO media,
         @Nullable TargetDTO target,
         String type,
-        String url
+        @Nullable String url
 ) {
+    public SubAttachmentDTO {
+        if (type == null) {
+            throw new fr.hoenheimsports.backend.metaservice.exceptions.InvalidMetaDtoException("SubAttachment type cannot be null");
+        }
+    }
 }
 

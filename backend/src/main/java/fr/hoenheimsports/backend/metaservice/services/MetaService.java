@@ -201,7 +201,7 @@ public class MetaService {
     }
 
     private boolean isVideoType(String type) {
-        return type != null && (type.equals("video") || type.equals("video_inline"));
+        return type.equals("video") || type.equals("video_inline");
     }
 
     private @Nullable VideoFormatDTO selectBestFormat(@Nullable List<VideoFormatDTO> formats) {

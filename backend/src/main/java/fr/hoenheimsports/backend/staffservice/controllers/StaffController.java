@@ -48,7 +48,7 @@ public class StaffController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<StaffResponseDto> createStaff(
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestPart("staff") @Valid StaffCreateRequest staffCreateRequest) {
+            @RequestPart("data") @Valid StaffCreateRequest staffCreateRequest) {
         log.debug("Request received to create a staff member with request details: {}, avatar file present: {}",
                 staffCreateRequest, file != null && !file.isEmpty());
         StaffResponseDto createdStaff = this.staffService.createStaff(file, staffCreateRequest);
@@ -68,7 +68,7 @@ public class StaffController {
     public ResponseEntity<StaffResponseDto> updateStaff(
             @PathVariable UUID id,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestPart("staff") @Valid StaffUpdateRequest staffUpdateRequest) {
+            @RequestPart("data") @Valid StaffUpdateRequest staffUpdateRequest) {
         log.debug("Request received to update staff member with ID: {}, update details: {}, avatar file present: {}",
                 id, staffUpdateRequest, file != null && !file.isEmpty());
         StaffResponseDto updatedStaff = this.staffService.updateStaff(id, file, staffUpdateRequest);

@@ -19,9 +19,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.RestTestClient;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.time.Instant;
 import java.util.List;
@@ -92,7 +92,7 @@ class StaffUseCasesTest {
                     "John", "Doe", "john.doe@test.com", "0123456789"
             );
 
-            MockMultipartFile staffPart = new MockMultipartFile("staff", "",
+            MockMultipartFile staffPart = new MockMultipartFile("data", "",
                     MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
             MockMultipartFile filePart = new MockMultipartFile("file", "avatar.jpg",
                     MediaType.IMAGE_JPEG_VALUE, "image content".getBytes());
@@ -115,7 +115,7 @@ class StaffUseCasesTest {
         @DisplayName("Devrait lister le staff publiquement")
         void shouldListStaffPublicly() throws Exception {
             StaffCreateRequest request = new StaffCreateRequest("Jane", "Smith", "jane@test.com", "0600000000");
-            MockMultipartFile staffPart = new MockMultipartFile("staff", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
+            MockMultipartFile staffPart = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
             mockMvc.perform(multipart("/api/v1/staffs").file(staffPart).header("Authorization", "Bearer token"));
 
             restTestClient.get().uri("/api/v1/staffs")
@@ -134,7 +134,7 @@ class StaffUseCasesTest {
         @DisplayName("Devrait supprimer un staff et publier un événement")
         void shouldDeleteStaffAndPublishEvent(PublishedEvents events) throws Exception {
             StaffCreateRequest request = new StaffCreateRequest("Delete", "Me", "delete@test.com", "0123456789");
-            MockMultipartFile staffPart = new MockMultipartFile("staff", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
+            MockMultipartFile staffPart = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
             
             String response = mockMvc.perform(multipart("/api/v1/staffs").file(staffPart).header("Authorization", "Bearer token"))
                     .andReturn().getResponse().getContentAsString();

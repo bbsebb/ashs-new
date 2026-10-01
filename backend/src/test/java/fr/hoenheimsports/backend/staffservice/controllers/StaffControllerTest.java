@@ -156,7 +156,7 @@ class StaffControllerTest {
 
             when(staffService.createStaff(any(), any(StaffCreateRequest.class))).thenReturn(response);
 
-            MockMultipartFile staffPart = new MockMultipartFile("staff", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
+            MockMultipartFile staffPart = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
 
             mockMvc.perform(multipart("/api/v1/staffs")
                             .file(staffPart)
@@ -179,7 +179,7 @@ class StaffControllerTest {
         @ParameterizedTest
         @MethodSource("fr.hoenheimsports.backend.staffservice.controllers.StaffControllerTest#invalidStaffCreateRequests")
         void shouldReturn400AndSpecificFieldErrors_WhenInvalidRequest(StaffCreateRequest request, Map<String, String> expectedErrors) throws Exception {
-            MockMultipartFile staffPart = new MockMultipartFile("staff", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
+            MockMultipartFile staffPart = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
 
             var result = mockMvc.perform(multipart("/api/v1/staffs")
                             .file(staffPart)
@@ -205,7 +205,7 @@ class StaffControllerTest {
 
             when(staffService.updateStaff(eq(staffId), any(), any(StaffUpdateRequest.class))).thenReturn(response);
 
-            MockMultipartFile staffPart = new MockMultipartFile("staff", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
+            MockMultipartFile staffPart = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsBytes(request));
 
             mockMvc.perform(multipart("/api/v1/staffs/{id}", staffId)
                             .file(staffPart)
@@ -239,7 +239,7 @@ class StaffControllerTest {
             when(staffService.updateStaff(eq(staffId), any(), any(StaffUpdateRequest.class)))
                     .thenThrow(new EntityNotFoundException(errorMessage));
 
-            MockMultipartFile staffPart = new MockMultipartFile("staff", "", MediaType.APPLICATION_JSON_VALUE, "{}".getBytes());
+            MockMultipartFile staffPart = new MockMultipartFile("data", "", MediaType.APPLICATION_JSON_VALUE, "{}".getBytes());
 
             mockMvc.perform(multipart("/api/v1/staffs/{id}", staffId)
                             .file(staffPart)
